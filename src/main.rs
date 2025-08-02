@@ -55,11 +55,28 @@ impl eframe::App for MyApp {
     }
 }
 
+fn custom_light_visuals() -> egui::Visuals {
+    let mut visuals = egui::Visuals::light();
+    let win10_gray = egui::Color32::from_rgb(240, 240, 240);
+
+    visuals.extreme_bg_color = win10_gray;
+    visuals.window_fill = win10_gray;
+    visuals.panel_fill = win10_gray;
+    visuals.widgets.inactive.bg_fill = win10_gray;
+    visuals.override_text_color = Some(egui::Color32::BLACK);
+
+    visuals
+}
+
 fn main() -> Result<(), eframe::Error> {
-    let options = eframe::NativeOptions::default();
+    let native_options = eframe::NativeOptions::default();
     eframe::run_native(
         "GUI Draw Example",
-        options,
-        Box::new(|_cc| Ok::<Box<dyn eframe::App>, _>(Box::new(MyApp::new()))),
+        native_options,
+        Box::new(|cc| {
+            cc.egui_ctx.set_visuals(custom_light_visuals());
+            let app: Box<dyn eframe::App> = Box::new(MyApp::new());
+            Ok(app)
+        }),
     )
 }
