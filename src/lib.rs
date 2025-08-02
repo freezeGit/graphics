@@ -1,5 +1,18 @@
-use eframe::egui;
 
+pub use eframe::egui::{self, vec2}; // Add more as needed
+/// Set to custom light style, with Windows 10 light gray background
+pub fn custom_light_visuals() -> egui::Visuals {
+    let mut visuals = egui::Visuals::light();
+    let win10_gray = egui::Color32::from_rgb(240, 240, 240);
+
+    visuals.extreme_bg_color = win10_gray;
+    visuals.window_fill = win10_gray;
+    visuals.panel_fill = win10_gray;
+    visuals.widgets.inactive.bg_fill = win10_gray;
+    visuals.override_text_color = Some(egui::Color32::BLACK);
+
+    visuals
+}
 pub trait Draw {
     fn draw(&self, ui: &mut egui::Ui);
 }
@@ -53,17 +66,4 @@ impl eframe::App for MyApp {
             self.screen.run(ui);
         });
     }
-}
-
-pub fn custom_light_visuals() -> egui::Visuals {
-    let mut visuals = egui::Visuals::light();
-    let win10_gray = egui::Color32::from_rgb(240, 240, 240);
-
-    visuals.extreme_bg_color = win10_gray;
-    visuals.window_fill = win10_gray;
-    visuals.panel_fill = win10_gray;
-    visuals.widgets.inactive.bg_fill = win10_gray;
-    visuals.override_text_color = Some(egui::Color32::BLACK);
-
-    visuals
 }
