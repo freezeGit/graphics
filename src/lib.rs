@@ -17,21 +17,39 @@
 
 mod gui_lib {
     pub use eframe::egui::{Ui, Button as EguiButton, vec2, Visuals, Color32};
-
-    /// Set to custom light style, with Windows 10 light gray background
+    // pub use eframe::egui::{Ui, Button as EguiButton, vec2, Visuals, Color32};
+    //
+    // /// Set to custom light style, with Windows 10 light gray background
+    // pub fn custom_light_visuals() -> Visuals {
+    //     let mut visuals = Visuals::light();
+    //     let win10_gray = Color32::from_rgb(240, 240, 240);
+    //
+    //     visuals.extreme_bg_color = win10_gray;
+    //     visuals.window_fill = win10_gray;
+    //     visuals.panel_fill = win10_gray;
+    //     visuals.widgets.inactive.bg_fill = win10_gray;
+    //     visuals.override_text_color = Some(Color32::BLACK);
+    //
+    //     visuals
+    // }
+    /// Creates a light theme similar to Windows 10 appearance.
     pub fn custom_light_visuals() -> Visuals {
-        let mut visuals = Visuals::light();
-        let win10_gray = Color32::from_rgb(240, 240, 240);
+        let mut visuals = Visuals::light(); // Start from egui's built-in light theme
+        let win10_gray = Color32::from_rgb(240, 240, 240); // Main Windows 10 background color
 
-        visuals.extreme_bg_color = win10_gray;
-        visuals.window_fill = win10_gray;
-        visuals.panel_fill = win10_gray;
+        // Set overall background and panel colors
+        visuals.extreme_bg_color = win10_gray; // rarely used but set for completeness
+        visuals.window_fill = win10_gray;      // background of windows, popups, etc.
+        visuals.panel_fill = win10_gray;       // CentralPanel and other panels
+
+        // Set button (and other inactive widget) background to match
         visuals.widgets.inactive.bg_fill = win10_gray;
+
+        // Set default text color to black
         visuals.override_text_color = Some(Color32::BLACK);
 
         visuals
     }
-
     /// Trait for components that can be drawn in the UI.
     ///
     /// Implement this trait for any component that needs to be rendered
