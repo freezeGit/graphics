@@ -1,6 +1,7 @@
 
-//use eframe::egui;
 use graphics::*;
+
+///fn main() is a driver intended to demonstrate module gu_lib code using app_lib
 fn main() -> Result<(), eframe::Error> {
     //let native_options = eframe::NativeOptions::default();  // If defults are good enough
     let mut native_options = eframe::NativeOptions::default();

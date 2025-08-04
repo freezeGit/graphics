@@ -1,9 +1,20 @@
 
 // lib.rs
+//! This crate provides GUI components and application framework.
+//!
+//! It is intended to help me learn by writing a Rust version of
+//! Stroustrup's graphics/gui code from
+//! Programming Principles and Practice using C++
 
 // ------------------------------
 // Reusable module
 // ------------------------------
+/// Module containing reusable GUI components and utilities.
+///
+/// This module provides basic building blocks for creating GUI applications,
+/// including buttons, screens, and visual styling utilities. It implements
+/// a custom drawing system through the `Draw` trait.
+
 mod gui_lib {
     pub use eframe::egui::{Ui, Button as EguiButton, vec2, Visuals, Color32};
 
@@ -20,27 +31,54 @@ mod gui_lib {
 
         visuals
     }
+
+    /// Trait for components that can be drawn in the UI.
+    ///
+    /// Implement this trait for any component that needs to be rendered
+    /// in the application's user interface.
     pub trait Draw {
+        /// Draws the component in the provided UI context.
+        ///
+        /// # Arguments
+        /// * `ui` - Mutable reference to the UI context
+
         fn draw(&self, ui: &mut Ui);
     }
+
+    /// A customizable button component.
+    ///
+    /// # Fields
+    /// * `width` - The width of the button in pixels
+    /// * `height` - The height of the button in pixels
+    /// * `label` - The text displayed on the button
+    #[derive(Debug, Default)]
     pub struct Button {
         pub width: f32,
         pub height: f32,
         pub label: String,
     }
 
+    // Implement Draw trait for Button
     impl Draw for Button {
         fn draw(&self, ui: &mut Ui) {
             let size = vec2(self.width, self.height);
             ui.add_sized(size, EguiButton::new(&self.label));
         }
     }
+
+    /// A container for drawable components.
+    ///
+    /// Screen acts as a container that can hold and manage multiple
+    /// UI components that implement the `Draw` trait.
     pub struct Screen {
         pub components: Vec<Box<dyn Draw>>,
     }
 
     impl Screen {
-        // pub fn run(&self, ui: &mut egui::Ui) {
+        /// Renders all components contained in the screen.
+        ///
+        /// # Arguments
+        /// * `ui` - Mutable reference to the UI context
         pub fn run(&self, ui: &mut Ui) {
             for component in &self.components {
                 component.draw(ui);
@@ -52,17 +90,29 @@ mod gui_lib {
 // ------------------------------
 // App-specific module
 // ------------------------------
+/// Module containing the main application implementation.
+///
+/// This module defines the main application structure and its behavior,
+/// utilizing the components defined in the `gui_lib` module.
 mod app {
-    // use super::gui_lib::{Draw, custom_light_visuals, Screen, Button};
     use super::gui_lib::{Screen, Button};
-    // use eframe::egui::{Context, CentralPanel, Ui};
     use eframe::egui::{Context, CentralPanel};
-    
+
+    /// Main application structure.
+    ///
+    /// Represents the root of the application and contains
+    /// the main screen with all UI components.
+
     pub struct MyApp {
         screen: Screen,
     }
 
     impl MyApp {
+        /// Creates a new instance of the application.
+        ///
+        /// # Returns
+        /// A new `MyApp` instance initialized with a default screen
+        /// containing a sample button.
         pub fn new() -> Self {
             Self {
                 screen: Screen {
@@ -86,6 +136,6 @@ mod app {
 }
 
 // Optionally expose parts of the modules publicly
-pub use gui_lib::{Draw, custom_light_visuals};
+pub use gui_lib::{Draw, Button, Screen, custom_light_visuals};
 pub use app::MyApp;
-pub use eframe::egui::vec2;  // Add this line
+pub use eframe::egui::vec2;
