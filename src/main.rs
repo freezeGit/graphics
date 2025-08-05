@@ -5,12 +5,14 @@ use graphics::*;
 fn main() -> Result<(), eframe::Error> {
     //let native_options = eframe::NativeOptions::default();  // If defults are good enough
     let mut native_options = eframe::NativeOptions::default();
-        native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
+    native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
     eframe::run_native(
         "GUI Draw Example",
         native_options,
         Box::new(|cc| {
-            cc.egui_ctx.set_visuals(custom_light_visuals());
+            cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
+            //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+            //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
             let app: Box<dyn eframe::App> = Box::new(MyApp::new());
             Ok(app)
         }),
