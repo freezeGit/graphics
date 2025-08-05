@@ -1,4 +1,3 @@
-
 use graphics::*;
 
 ///fn main() is a driver intended to demonstrate module gu_lib code using app_lib

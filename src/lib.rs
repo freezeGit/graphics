@@ -1,4 +1,3 @@
-
 // lib.rs
 //! This crate provides GUI components and application framework.
 //!
@@ -16,7 +15,7 @@
 /// a custom drawing system through the `Draw` trait.
 
 mod gui_lib {
-    pub use eframe::egui::{Ui, Button as EguiButton, vec2, Visuals, Color32};
+    pub use eframe::egui::{Button as EguiButton, Color32, Ui, Visuals, vec2};
 
     /// Creates a light theme similar to Windows 10 appearance.
     pub fn custom_light_visuals() -> Visuals {
@@ -26,8 +25,8 @@ mod gui_lib {
 
         // Set overall background and panel colors
         visuals.extreme_bg_color = bkgd; // rarely used but set for completeness
-        visuals.window_fill = bkgd;      // background of windows, popups, etc.
-        visuals.panel_fill = bkgd;       // CentralPanel and other panels
+        visuals.window_fill = bkgd; // background of windows, popups, etc.
+        visuals.panel_fill = bkgd; // CentralPanel and other panels
         visuals.override_text_color = Some(Color32::BLACK); //set default text color
 
         visuals
@@ -117,8 +116,8 @@ mod gui_lib {
 /// This module defines the main application structure and its behavior,
 /// utilizing the components defined in the `gui_lib` module.
 mod app {
-    use super::gui_lib::{Screen, Button};
-    use eframe::egui::{Context, CentralPanel};
+    use super::gui_lib::{Button, Screen};
+    use eframe::egui::{CentralPanel, Context};
 
     /// Main application structure.
     ///
@@ -159,15 +158,16 @@ mod app {
                 screen: Screen {
                     components: vec![
                         Box::new(Button {
-                        width: 120.0,
-                        height: 40.0,
-                        label: "Click Me!".to_string(),
-                    }),
-                         Box::new(Button {
-                             width: 120.0,
-                             height: 40.0,
-                             label: "Click Me!".to_string(),
-                         }),]
+                            width: 120.0,
+                            height: 40.0,
+                            label: "Click Me!".to_string(),
+                        }),
+                        Box::new(Button {
+                            width: 120.0,
+                            height: 40.0,
+                            label: "Click Me!".to_string(),
+                        }),
+                    ],
                 },
             }
         }
@@ -183,8 +183,6 @@ mod app {
 }
 
 // Optionally expose parts of the modules publicly
-pub use gui_lib::{Draw, Button, Screen, custom_light_visuals};
 pub use app::MyApp;
 pub use eframe::egui::vec2;
-
-
+pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
