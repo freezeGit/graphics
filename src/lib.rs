@@ -72,7 +72,7 @@ mod gui_lib {
     /// # Fields
     /// * `position` - position of the circle center (: eframe::egui::Pos2)
     /// * `height` - The height of the button in pixels
-        #[derive(Debug, Default)]
+    #[derive(Debug, Default)]
     pub struct Circle {
         pub position: eframe::egui::Pos2,
         pub radius: f32,
@@ -85,7 +85,7 @@ mod gui_lib {
                 self.position,
                 self.radius,
                 eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-                eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK) // White border
+                eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK), // White border
             );
         }
     }
@@ -165,7 +165,7 @@ mod app {
                             height: 40.0,
                             label: "Click Me!".to_string(),
                         }),
-                        Box::new( Circle {
+                        Box::new(Circle {
                             //position: 120.0,
                             position: eframe::egui::Pos2::new(200.0, 200.0),
                             radius: 50.0,
