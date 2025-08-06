@@ -19,7 +19,8 @@ mod gui_lib {
 
     /// Creates a light theme similar to Windows 10 appearance.
     pub fn custom_light_visuals() -> Visuals {
-        let mut visuals = Visuals::light(); // Start from egui's built-in light theme
+        //let mut visuals = Visuals::light(); // Start from egui's built-in light theme
+        let mut visuals = Visuals::dark(); // Start from egui's built-in dark theme
         //let bkgd = Color32::from_rgb(240, 240, 240); // Main Windows 10 background color
         let bkgd = Color32::from_rgb(200, 200, 210); // My background color
 
@@ -69,21 +70,23 @@ mod gui_lib {
     /// A customizable Circle component.
     ///
     /// # Fields
-    /// * `width` - The width of the button in pixels
+    /// * `position` - position of the circle center (: eframe::egui::Pos2)
     /// * `height` - The height of the button in pixels
-    /// * `label` - The text displayed on the button
-    #[derive(Debug, Default)]
+        #[derive(Debug, Default)]
     pub struct Circle {
-        pub width: f32,
-        pub height: f32,
-        pub label: String,
+        pub position: eframe::egui::Pos2,
+        pub radius: f32,
     }
 
     // Implement Draw trait for Button
     impl Draw for Circle {
         fn draw(&self, ui: &mut Ui) {
-            let size = vec2(self.width, self.height);
-            ui.add_sized(size, EguiButton::new(&self.label));
+            ui.painter().circle(
+                self.position,
+                self.radius,
+                eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+                eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK) // White border
+            );
         }
     }
 
@@ -116,7 +119,7 @@ mod gui_lib {
 /// This module defines the main application structure and its behavior,
 /// utilizing the components defined in the `gui_lib` module.
 mod app {
-    use super::gui_lib::{Button, Screen};
+    use super::gui_lib::{Button, Circle, Screen};
     use eframe::egui::{CentralPanel, Context};
 
     /// Main application structure.
@@ -162,10 +165,11 @@ mod app {
                             height: 40.0,
                             label: "Click Me!".to_string(),
                         }),
-                        Box::new(Button {
-                            width: 120.0,
-                            height: 40.0,
-                            label: "Click Me!".to_string(),
+                        Box::new( Circle {
+                            //position: 120.0,
+                            position: eframe::egui::Pos2::new(200.0, 200.0),
+                            radius: 50.0,
+                            //label: "Click Me!".to_string(),
                         }),
                     ],
                 },
