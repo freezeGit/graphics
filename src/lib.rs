@@ -1,17 +1,17 @@
 // lib.rs
-//! This crate provides GUI components and application framework.
+//! This crate provides Shape objects, GUI components and application framework.
 //!
 //! It is intended to help me learn by writing a Rust version of
-//! Stroustrup's graphics/gui code from
+//! Stroustrup's graphics/gui API from
 //! Programming Principles and Practice using C++
 
 // ------------------------------
-// Reusable module
+// This module will become its own library crate
 // ------------------------------
-/// Module containing reusable GUI components and utilities.
+/// Module containing GUI components and utilities.
 ///
 /// This module provides basic building blocks for creating GUI applications,
-/// including buttons, screens, and visual styling utilities. It implements
+/// including buttons, screens and visual styling utilities. It implements
 /// a custom drawing system through the `Draw` trait.
 
 mod gui_lib {
@@ -37,7 +37,11 @@ mod gui_lib {
     ///
     /// Implement this trait for any component that needs to be rendered
     /// in the application's user interface.
-    pub trait Draw {
+    ///
+    /// # Trait Implementer’s Note
+    /// This trait requires `Debug` to be implemented for all types.
+    /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
+    pub trait Draw: std::fmt::Debug {
         /// Draws the component in the provided UI context.
         ///
         /// # Arguments
@@ -94,6 +98,7 @@ mod gui_lib {
     ///
     /// Screen acts as a container that can hold and manage multiple
     /// UI components that implement the `Draw` trait.
+    #[derive(Debug)]
     pub struct Screen {
         pub components: Vec<Box<dyn Draw>>,
     }
@@ -112,13 +117,13 @@ mod gui_lib {
 }
 
 // ------------------------------
-// App-specific module
+// Demonstration module. App-specific code
 // ------------------------------
-/// Module containing the main application implementation.
+/// Module containing the demo application implementation.
 ///
-/// This module defines the main application structure and its behavior,
+/// This module defines the demo application structure and its behavior,
 /// utilizing the components defined in the `gui_lib` module.
-mod app {
+mod demo {
     use super::gui_lib::{Button, Circle, Screen};
     use eframe::egui::{CentralPanel, Context};
 
@@ -126,16 +131,17 @@ mod app {
     ///
     /// Represents the root of the application and contains
     /// the main screen with all UI components.
-
-    pub struct MyApp {
+    //Your app's gateway to native windows
+    #[derive(Debug)]
+    pub struct DemoApp {
         screen: Screen,
     }
 
-    impl MyApp {
+    impl DemoApp {
         /// Creates a new instance of the application.
         ///
         /// # Returns
-        /// A new `MyApp` instance initialized with a default screen
+        /// A new `DemoApp` instance initialized with a default screen
         /// containing a sample button.
         pub fn new() -> Self {
             Self {
@@ -157,10 +163,11 @@ mod app {
             }
         }
     }
+
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
-    impl eframe::App for MyApp {
+    impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             CentralPanel::default().show(ctx, |ui| {
                 self.screen.run(ui);
@@ -169,9 +176,26 @@ mod app {
     }
 }
 
+/// Run the demo app
+pub fn run_demo() -> Result<(), eframe::Error> {
+    let mut native_options = eframe::NativeOptions::default();
+    native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
+    eframe::run_native(
+        "GUI Draw Example",
+        native_options,
+        Box::new(|cc| {
+            cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
+            //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+            //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
+            let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
+            Ok(app)
+        }),
+    )
+}
+
 // Optionally expose parts of the modules publicly
-pub use app::MyApp;
+pub use demo::DemoApp;
 pub use eframe::egui::vec2;
 pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
 
-//Aug 6b
+
