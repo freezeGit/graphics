@@ -46,8 +46,28 @@ mod gui_lib {
         ///
         /// # Arguments
         /// * `ui` - Mutable reference to the UI context
-
         fn draw(&self, ui: &mut Ui);
+    }
+
+    /// A container for drawable components.
+    ///
+    /// Screen acts as a container that can hold and manage multiple
+    /// UI components that implement the `Draw` trait.
+    #[derive(Debug)]
+    pub struct Screen {
+        pub components: Vec<Box<dyn Draw>>,
+    }
+
+    impl Screen {
+        /// Renders all components contained in the screen.
+        ///
+        /// # Arguments
+        /// * `ui` - Mutable reference to the UI context
+        pub fn run(&self, ui: &mut Ui) {
+            for component in &self.components {
+                component.draw(ui);
+            }
+        }
     }
 
     /// A customizable button component.
@@ -94,26 +114,6 @@ mod gui_lib {
         }
     }
 
-    /// A container for drawable components.
-    ///
-    /// Screen acts as a container that can hold and manage multiple
-    /// UI components that implement the `Draw` trait.
-    #[derive(Debug)]
-    pub struct Screen {
-        pub components: Vec<Box<dyn Draw>>,
-    }
-
-    impl Screen {
-        /// Renders all components contained in the screen.
-        ///
-        /// # Arguments
-        /// * `ui` - Mutable reference to the UI context
-        pub fn run(&self, ui: &mut Ui) {
-            for component in &self.components {
-                component.draw(ui);
-            }
-        }
-    }
 }
 
 // ------------------------------
