@@ -131,25 +131,6 @@ mod app {
         screen: Screen,
     }
 
-    // impl MyApp {
-    //     /// Creates a new instance of the application.
-    //     ///
-    //     /// # Returns
-    //     /// A new `MyApp` instance initialized with a default screen
-    //     /// containing a sample button.
-    //     pub fn new() -> Self {
-    //         Self {
-    //             screen: Screen {
-    //                 components: vec![Box::new(Button {
-    //                     width: 120.0,
-    //                     height: 40.0,
-    //                     label: "Click Me!".to_string(),
-    //                 })],
-    //             },
-    //         }
-    //     }
-    // }
-
     impl MyApp {
         /// Creates a new instance of the application.
         ///
@@ -176,7 +157,9 @@ mod app {
             }
         }
     }
-
+    // The eframe::App trait is the bridge between your custom application logic
+    // and the eframe framework that handles all the platform-specific details
+    // of creating a window and running an event loop.
     impl eframe::App for MyApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             CentralPanel::default().show(ctx, |ui| {

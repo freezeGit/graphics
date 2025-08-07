@@ -2,7 +2,6 @@ use graphics::*;
 
 ///fn main() is a driver intended to demonstrate module gu_lib code using app_lib
 fn main() -> Result<(), eframe::Error> {
-    //let native_options = eframe::NativeOptions::default();  // If defults are good enough
     let mut native_options = eframe::NativeOptions::default();
     native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
     eframe::run_native(
