@@ -113,7 +113,6 @@ mod gui_lib {
             );
         }
     }
-
 }
 
 // ------------------------------
@@ -197,5 +196,3 @@ pub fn run_demo() -> Result<(), eframe::Error> {
 pub use demo::DemoApp;
 pub use eframe::egui::vec2;
 pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
-
-
