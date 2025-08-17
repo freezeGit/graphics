@@ -109,7 +109,25 @@ mod gui_lib {
                 self.position,
                 self.radius,
                 eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-                eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK), // White border
+                eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+            );
+        }
+    }
+
+    #[derive(Debug, Default)]
+    pub struct Square {
+        pub position: eframe::egui::Pos2,
+        pub radius: f32,
+    }
+
+    // Implement Draw trait for Button
+    impl Draw for Square {
+        fn draw(&self, ui: &mut Ui) {
+            ui.painter().circle(
+                self.position,
+                self.radius,
+                eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+                eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
             );
         }
     }
@@ -123,7 +141,7 @@ mod gui_lib {
 /// This module defines the demo application structure and its behavior,
 /// utilizing the components defined in the `gui_lib` module.
 mod demo {
-    use super::gui_lib::{Button, Circle, Screen};
+    use super::gui_lib::{Button, Circle, Square, Screen};
     use eframe::egui::{CentralPanel, Context};
 
     /// Main application structure.
@@ -154,6 +172,12 @@ mod demo {
                         Box::new(Circle {
                             //position: 120.0,
                             position: eframe::egui::Pos2::new(200.0, 200.0),
+                            radius: 50.0,
+                            //label: "Click Me!".to_string(),
+                        }),
+                        Box::new(Square {
+                            //position: 120.0,
+                            position: eframe::egui::Pos2::new(400.0, 200.0),
                             radius: 50.0,
                             //label: "Click Me!".to_string(),
                         }),
