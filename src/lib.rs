@@ -15,7 +15,8 @@
 /// a custom drawing system through the `Draw` trait.
 
 mod gui_lib {
-    pub use eframe::egui::{Button as EguiButton, Color32, Ui, Visuals, CornerRadius, Stroke,
+    pub use eframe::egui::{Button as EguiButton, Color32, Ui, Visuals,
+                           CornerRadius, Stroke, StrokeKind,
                            Rect, pos2, vec2, Pos2, Vec2};
 
     /// Creates a light theme similar to Windows 10 appearance.
@@ -128,9 +129,10 @@ mod gui_lib {
             ui.painter().rect(
                 rect,
                 CornerRadius::ZERO,                         // or CornerRadius::same(r)
-                Color32::from_rgb(100, 150, 250),   // fill
+                //Color32::from_rgb(100, 150, 250),   // fill
+                Color32::WHITE,   // fill
                 Stroke::new(1.0, Color32::BLACK),     // border
-                eframe::egui::StrokeKind::Middle,           // Outside / Inside / Middle
+                StrokeKind::Middle,           // Outside / Inside / Middle
             );
         }
     }
