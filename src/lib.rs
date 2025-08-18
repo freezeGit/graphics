@@ -15,7 +15,7 @@
 /// a custom drawing system through the `Draw` trait.
 
 mod gui_lib {
-    pub use eframe::egui::{Button as EguiButton, Color32, Ui, Visuals, CornerRadius,
+    pub use eframe::egui::{Button as EguiButton, Color32, Ui, Visuals, CornerRadius, Stroke,
                            Rect, pos2, vec2, Pos2, Vec2};
 
     /// Creates a light theme similar to Windows 10 appearance.
@@ -124,28 +124,18 @@ mod gui_lib {
     // Implement Draw trait for Button
     impl Draw for Rectangle {
         fn draw(&self, ui: &mut Ui) {
-            // ui.painter().rect(
-            //     //self.position,
-            //     //,
-            //     Rect::from_center_size(self.position, self.size),
-            //     0.0,
-            //     eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-            //     eframe::egui::Stroke::new(1.0, eframe::egui::Color32::BLACK), // Black border
-            // );
+            let rect = Rect::from_center_size(self.position, self.size);
             ui.painter().rect(
-                Rect::from_center_size(self.position, self.size),
-                //0.0_f32.into(), // Rounding
-                CornerRadius::ZERO,
-                eframe::egui::Color32::from_rgb(100, 150, 250), // fill
-                eframe::egui::Stroke::new(1.0, eframe::egui::Color32::BLACK), // border
-                eframe::egui::StrokeKind::Outside, // or .Inside or .Middle
+                rect,
+                CornerRadius::ZERO,                         // or CornerRadius::same(r)
+                Color32::from_rgb(100, 150, 250),   // fill
+                Stroke::new(1.0, Color32::BLACK),     // border
+                eframe::egui::StrokeKind::Middle,           // Outside / Inside / Middle
             );
         }
-
-
     }
 
-}
+}   //gui_lib
 
 // ------------------------------
 // Demonstration module. App-specific code
