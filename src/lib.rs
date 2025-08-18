@@ -15,7 +15,8 @@
 /// a custom drawing system through the `Draw` trait.
 
 mod gui_lib {
-    pub use eframe::egui::{Button as EguiButton, Color32, Ui, Visuals, vec2};
+    pub use eframe::egui::{Button as EguiButton, Color32, Ui, Visuals, CornerRadius,
+                           Rect, pos2, vec2, Pos2, Vec2};
 
     /// Creates a light theme similar to Windows 10 appearance.
     pub fn custom_light_visuals() -> Visuals {
@@ -98,7 +99,7 @@ mod gui_lib {
     /// * `height` - The height of the button in pixels
     #[derive(Debug, Default)]
     pub struct Circle {
-        pub position: eframe::egui::Pos2,
+        pub position: Pos2,
         pub radius: f32,
     }
 
@@ -115,22 +116,35 @@ mod gui_lib {
     }
 
     #[derive(Debug, Default)]
-    pub struct Square {
+    pub struct Rectangle {
         pub position: eframe::egui::Pos2,
-        pub radius: f32,
-    }
+        pub size: Vec2,
+     }
 
     // Implement Draw trait for Button
-    impl Draw for Square {
+    impl Draw for Rectangle {
         fn draw(&self, ui: &mut Ui) {
-            ui.painter().circle(
-                self.position,
-                self.radius,
-                eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-                eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+            // ui.painter().rect(
+            //     //self.position,
+            //     //,
+            //     Rect::from_center_size(self.position, self.size),
+            //     0.0,
+            //     eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+            //     eframe::egui::Stroke::new(1.0, eframe::egui::Color32::BLACK), // Black border
+            // );
+            ui.painter().rect(
+                Rect::from_center_size(self.position, self.size),
+                //0.0_f32.into(), // Rounding
+                CornerRadius::ZERO,
+                eframe::egui::Color32::from_rgb(100, 150, 250), // fill
+                eframe::egui::Stroke::new(1.0, eframe::egui::Color32::BLACK), // border
+                eframe::egui::StrokeKind::Outside, // or .Inside or .Middle
             );
         }
+
+
     }
+
 }
 
 // ------------------------------
@@ -141,7 +155,7 @@ mod gui_lib {
 /// This module defines the demo application structure and its behavior,
 /// utilizing the components defined in the `gui_lib` module.
 mod demo {
-    use super::gui_lib::{Button, Circle, Square, Screen};
+    use super::gui_lib::{Button, Circle, Rectangle, Screen, Vec2};
     use eframe::egui::{CentralPanel, Context};
 
     /// Main application structure.
@@ -175,10 +189,10 @@ mod demo {
                             radius: 50.0,
                             //label: "Click Me!".to_string(),
                         }),
-                        Box::new(Square {
+                        Box::new(Rectangle {
                             //position: 120.0,
                             position: eframe::egui::Pos2::new(400.0, 200.0),
-                            radius: 50.0,
+                            size: Vec2::new(100.0, 75.0),
                             //label: "Click Me!".to_string(),
                         }),
                     ],
@@ -224,4 +238,25 @@ pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
 
 //Aug7
 
-//xxx
+// impl Draw for Rectangle {
+//     fn draw(&self, ui: &mut Ui) {
+//         ui.painter().rect(
+//             //self.position,
+//             //,
+//             Rect::from_center_size(self.position, self.size),
+//             0.0,
+//             eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+//             eframe::egui::Stroke::new(1.0, eframe::egui::Color32::BLACK), // Black border
+//             Default::default(), // TextureOptions (5th parameter),
+//         );
+//         // fn draw(&self, ui: &mut Ui) {
+//         //     ui.painter().rectangle(
+//         //         Rect::from_center_size(Pos2::new(50.0, 50.0), vec2::new(40.0, 30.0)),
+//         //         self.position,
+//         //         self.radius,
+//         //         eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+//         //         eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+//         //     );
+//     }
+// }
+// }
