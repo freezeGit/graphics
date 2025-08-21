@@ -19,7 +19,6 @@ pub mod gui_lib {
         Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2,
         Visuals, pos2, vec2,
     };
-    use crate::DemoApp;
 
     /// Creates a light theme similar to Windows 10 appearance.
     pub fn custom_light_visuals() -> Visuals {
