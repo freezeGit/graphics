@@ -14,10 +14,12 @@
 /// including buttons, screens and visual styling utilities. It implements
 /// a custom drawing system through the `Draw` trait.
 
-mod gui_lib {
-    pub use eframe::egui::{Button as EguiButton, Color32, Ui, Visuals,
-                           CornerRadius, Stroke, StrokeKind,
-                           Rect, pos2, vec2, Pos2, Vec2};
+pub mod gui_lib {
+    pub use eframe::egui::{
+        Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2,
+        Visuals, pos2, vec2,
+    };
+    use crate::DemoApp;
 
     /// Creates a light theme similar to Windows 10 appearance.
     pub fn custom_light_visuals() -> Visuals {
@@ -34,8 +36,25 @@ mod gui_lib {
 
         visuals
     }
+    
+    // /// Run the demo app
+    // pub fn run_demo() -> Result<(), eframe::Error> {
+    //     let mut native_options = eframe::NativeOptions::default();
+    //     native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
+    //     eframe::run_native(
+    //         "GUI Draw Example",
+    //         native_options,
+    //         Box::new(|cc| {
+    //             cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
+    //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+    //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
+    //             let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
+    //             Ok(app)
+    //         }),
+    //     )
+    // }
 
-    /// Trait for components that can be drawn in the UI.
+    /// Trait for  something that can be drawn in the UI.
     ///
     /// Implement this trait for any component that needs to be rendered
     /// in the application's user interface.
@@ -48,6 +67,20 @@ mod gui_lib {
         ///
         /// # Arguments
         /// * `ui` - Mutable reference to the UI context
+        fn draw(&self, ui: &mut Ui);
+    }
+
+    /// Trait for  anything that can be drawn in the UI.
+    ///
+    /// Implement this trait for any component that needs to be rendered
+    /// in the application's user interface.
+    ///
+    /// Is used as a supertrait for shapes and widgets.
+    ///
+    /// # Trait Implementer’s Note
+    /// This trait requires `Debug` to be implemented for all types.
+    /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
+    pub trait Drawable: std::fmt::Debug {
         fn draw(&self, ui: &mut Ui);
     }
 
@@ -120,7 +153,7 @@ mod gui_lib {
     pub struct Rectangle {
         pub position: eframe::egui::Pos2,
         pub size: Vec2,
-     }
+    }
 
     // Implement Draw trait for Button
     impl Draw for Rectangle {
@@ -128,16 +161,15 @@ mod gui_lib {
             let rect = Rect::from_center_size(self.position, self.size);
             ui.painter().rect(
                 rect,
-                CornerRadius::ZERO,                         // or CornerRadius::same(r)
+                CornerRadius::ZERO, // or CornerRadius::same(r)
                 //Color32::from_rgb(100, 150, 250),   // fill
-                Color32::WHITE,   // fill
-                Stroke::new(1.0, Color32::BLACK),     // border
-                StrokeKind::Middle,           // Outside / Inside / Middle
+                Color32::WHITE,                   // fill
+                Stroke::new(1.0, Color32::BLACK), // border
+                StrokeKind::Middle,               // Outside / Inside / Middle
             );
         }
     }
-
-}   //gui_lib
+} //gui_lib
 
 // ------------------------------
 // Demonstration module. App-specific code
@@ -146,9 +178,10 @@ mod gui_lib {
 ///
 /// This module defines the demo application structure and its behavior,
 /// utilizing the components defined in the `gui_lib` module.
-mod demo {
+pub mod demo {
     use super::gui_lib::{Button, Circle, Rectangle, Screen, Vec2};
     use eframe::egui::{CentralPanel, Context};
+    use crate::{custom_light_visuals, vec2};
 
     /// Main application structure.
     ///
@@ -193,6 +226,22 @@ mod demo {
         }
     }
 
+    pub fn run_demo() -> Result<(), eframe::Error> {
+        let mut native_options = eframe::NativeOptions::default();
+        native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
+        eframe::run_native(
+            "GUI Draw Example",
+            native_options,
+            Box::new(|cc| {
+                cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
+                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
+                let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
+                Ok(app)
+            }),
+        )
+    }
+
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
@@ -203,52 +252,10 @@ mod demo {
             });
         }
     }
-}
+}   // module demo
 
-/// Run the demo app
-pub fn run_demo() -> Result<(), eframe::Error> {
-    let mut native_options = eframe::NativeOptions::default();
-    native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
-    eframe::run_native(
-        "GUI Draw Example",
-        native_options,
-        Box::new(|cc| {
-            cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
-            //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
-            //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
-            let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
-            Ok(app)
-        }),
-    )
-}
-
-// Optionally expose parts of the modules publicly
-pub use demo::DemoApp;
+/// Exposed publically
 pub use eframe::egui::vec2;
+pub use demo::DemoApp;
 pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
 
-
-//Aug7
-
-// impl Draw for Rectangle {
-//     fn draw(&self, ui: &mut Ui) {
-//         ui.painter().rect(
-//             //self.position,
-//             //,
-//             Rect::from_center_size(self.position, self.size),
-//             0.0,
-//             eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-//             eframe::egui::Stroke::new(1.0, eframe::egui::Color32::BLACK), // Black border
-//             Default::default(), // TextureOptions (5th parameter),
-//         );
-//         // fn draw(&self, ui: &mut Ui) {
-//         //     ui.painter().rectangle(
-//         //         Rect::from_center_size(Pos2::new(50.0, 50.0), vec2::new(40.0, 30.0)),
-//         //         self.position,
-//         //         self.radius,
-//         //         eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-//         //         eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
-//         //     );
-//     }
-// }
-// }
