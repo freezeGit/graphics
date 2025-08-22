@@ -94,9 +94,15 @@ pub mod gui_lib {
     ///
     /// Screen acts as a container that can hold and manage multiple
     /// UI components that implement the `Draw` trait.
+    // #[derive(Debug)]
+    // pub struct Screen {
+    //     pub components: Vec<Box<dyn Draw>>,
+    // }
+
     #[derive(Debug)]
     pub struct Screen {
         pub components: Vec<Box<dyn Draw>>,
+        pub widgets: Vec<Box<dyn Widget>>,
     }
 
     impl Screen {
@@ -108,8 +114,24 @@ pub mod gui_lib {
             for component in &self.components {
                 component.draw(ui);
             }
+            for widget in &self.widgets {
+                widget.draw(ui);
+                //widget.widget_print(ui);
+            }
         }
     }
+
+    // impl Screen {
+    //     /// Renders all components contained in the screen.
+    //     ///
+    //     /// # Arguments
+    //     /// * `ui` - Mutable reference to the UI context
+    //     pub fn run(&self, ui: &mut Ui) {
+    //         for component in &self.components {
+    //             component.draw(ui);
+    //         }
+    //     }
+    // }
 
     /// A customizable button component.
     ///
@@ -138,6 +160,13 @@ pub mod gui_lib {
             ui.add_sized(size, EguiButton::new(&self.label));
         }
     }
+
+    impl Widget for Button {
+        fn widget_print(&self, _ui: &mut Ui) {
+            println!("Button: {:?}", self);
+        }
+    }
+
 
     /// A customizable Circle component.
     ///
@@ -231,6 +260,13 @@ pub mod demo {
                             position: eframe::egui::Pos2::new(400.0, 200.0),
                             size: Vec2::new(100.0, 75.0),
                             //label: "Click Me!".to_string(),
+                        }),
+                    ],
+                    widgets: vec![
+                        Box::new(Button {
+                            width: 120.0,
+                            height: 40.0,
+                            label: "Click Me!".to_string(),
                         }),
                     ],
                 },
