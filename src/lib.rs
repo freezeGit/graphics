@@ -87,8 +87,7 @@ pub mod gui_lib {
         //     ctx.set_highlight(true);
         //     self.draw(ctx);
         //     ctx.set_highlight(false);
-        // }
-    }
+       }
 
     /// A container for drawable components.
     ///
@@ -101,7 +100,7 @@ pub mod gui_lib {
 
     #[derive(Debug)]
     pub struct Screen {
-        pub components: Vec<Box<dyn Draw>>,
+        pub shapes: Vec<Box<dyn Shape>>,
         pub widgets: Vec<Box<dyn Widget>>,
     }
 
@@ -111,8 +110,8 @@ pub mod gui_lib {
         /// # Arguments
         /// * `ui` - Mutable reference to the UI context
         pub fn run(&self, ui: &mut Ui) {
-            for component in &self.components {
-                component.draw(ui);
+            for shape in &self.shapes {
+                shape.draw(ui);
             }
             for widget in &self.widgets {
                 widget.draw(ui);
@@ -120,18 +119,6 @@ pub mod gui_lib {
             }
         }
     }
-
-    // impl Screen {
-    //     /// Renders all components contained in the screen.
-    //     ///
-    //     /// # Arguments
-    //     /// * `ui` - Mutable reference to the UI context
-    //     pub fn run(&self, ui: &mut Ui) {
-    //         for component in &self.components {
-    //             component.draw(ui);
-    //         }
-    //     }
-    // }
 
     /// A customizable button component.
     ///
@@ -144,14 +131,6 @@ pub mod gui_lib {
         pub width: f32,
         pub height: f32,
         pub label: String,
-    }
-
-    // Implement Draw trait for Button
-    impl Draw for Button {
-        fn draw(&self, ui: &mut Ui) {
-            let size = vec2(self.width, self.height);
-            ui.add_sized(size, EguiButton::new(&self.label));
-        }
     }
 
     impl Drawable for Button {
@@ -167,6 +146,19 @@ pub mod gui_lib {
         }
     }
 
+    /// Trait for any shape.
+    ///
+    /// Rendered on screen with supertrait Drawable
+    ///
+    /// # Trait Implementer’s Note
+    /// This trait requires `Debug` to be implemented for all types.
+    /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
+    pub trait Shape: Drawable + std::fmt::Debug {
+        // `draw()` is provided by Drawable.
+
+        // Specific methods for widgets:
+        fn shape_print(&self, ui: &mut Ui);
+    }
 
     /// A customizable Circle component.
     ///
@@ -179,8 +171,8 @@ pub mod gui_lib {
         pub radius: f32,
     }
 
-    // Implement Draw trait for Button
-    impl Draw for Circle {
+    // Implement Draw trait for Circle
+    impl Drawable for Circle {
         fn draw(&self, ui: &mut Ui) {
             ui.painter().circle(
                 self.position,
@@ -191,13 +183,19 @@ pub mod gui_lib {
         }
     }
 
+    impl Shape for Circle {
+        fn widget_print(&self, _ui: &mut Ui) {
+            println!("Button: {:?}", self);
+        }
+    }
+
     #[derive(Debug, Default)]
     pub struct Rectangle {
         pub position: eframe::egui::Pos2,
         pub size: Vec2,
     }
 
-    impl Draw for Rectangle {
+    impl Drawable for Rectangle {
         fn draw(&self, ui: &mut Ui) {
             let rect = Rect::from_center_size(self.position, self.size);
             ui.painter().rect(
@@ -243,12 +241,7 @@ pub mod demo {
         pub fn new() -> Self {
             Self {
                 screen: Screen {
-                    components: vec![
-                        Box::new(Button {
-                            width: 120.0,
-                            height: 40.0,
-                            label: "Click Me!".to_string(),
-                        }),
+                    shapes: vec![
                         Box::new(Circle {
                             //position: 120.0,
                             position: eframe::egui::Pos2::new(200.0, 200.0),
