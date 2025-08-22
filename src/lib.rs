@@ -20,7 +20,7 @@ pub mod gui_lib {
         Visuals, pos2, vec2,
     };
 
-    /// Creates a light theme similar to Windows 10 appearance.
+    /// Creates a custom light theme.
     pub fn custom_light_visuals() -> Visuals {
         //let mut visuals = Visuals::light(); // Start from egui's built-in light theme
         let mut visuals = Visuals::dark(); // Start from egui's built-in dark theme
@@ -35,23 +35,6 @@ pub mod gui_lib {
 
         visuals
     }
-    
-    // /// Run the demo app
-    // pub fn run_demo() -> Result<(), eframe::Error> {
-    //     let mut native_options = eframe::NativeOptions::default();
-    //     native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
-    //     eframe::run_native(
-    //         "GUI Draw Example",
-    //         native_options,
-    //         Box::new(|cc| {
-    //             cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
-    //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
-    //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
-    //             let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
-    //             Ok(app)
-    //         }),
-    //     )
-    // }
 
     /// Trait for  something that can be drawn in the UI.
     ///
@@ -81,6 +64,30 @@ pub mod gui_lib {
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
     pub trait Drawable: std::fmt::Debug {
         fn draw(&self, ui: &mut Ui);
+    }
+
+    /// Trait for any widget.
+    ///
+    /// Rendered with supertrait Drawable
+     ///
+    /// # Trait Implementer’s Note
+    /// This trait requires `Debug` to be implemented for all types.
+    /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
+    pub trait Widget: Drawable + std::fmt::Debug {
+        // `draw` is provided by Drawable.
+
+        // Specific methods for widgets:
+        fn widget_print(&self, ui: &mut Ui);
+        // fn layout(&mut self, ctx: &mut LayoutCtx);
+        // fn event(&mut self, ctx: &mut EventCtx, event: &Event);
+        // fn set_focused(&mut self, focused: bool);
+
+        // Example of a different draw function
+        // fn draw_with_highlight(&self, ctx: &mut PaintCtx) {
+        //     ctx.set_highlight(true);
+        //     self.draw(ctx);
+        //     ctx.set_highlight(false);
+        // }
     }
 
     /// A container for drawable components.
@@ -125,6 +132,13 @@ pub mod gui_lib {
         }
     }
 
+    impl Drawable for Button {
+        fn draw(&self, ui: &mut Ui) {
+            let size = vec2(self.width, self.height);
+            ui.add_sized(size, EguiButton::new(&self.label));
+        }
+    }
+
     /// A customizable Circle component.
     ///
     /// # Fields
@@ -154,7 +168,6 @@ pub mod gui_lib {
         pub size: Vec2,
     }
 
-    // Implement Draw trait for Button
     impl Draw for Rectangle {
         fn draw(&self, ui: &mut Ui) {
             let rect = Rect::from_center_size(self.position, self.size);
@@ -179,8 +192,8 @@ pub mod gui_lib {
 /// utilizing the components defined in the `gui_lib` module.
 pub mod demo {
     use super::gui_lib::{Button, Circle, Rectangle, Screen, Vec2};
-    use eframe::egui::{CentralPanel, Context};
     use crate::{custom_light_visuals, vec2};
+    use eframe::egui::{CentralPanel, Context};
 
     /// Main application structure.
     ///
@@ -212,7 +225,7 @@ pub mod demo {
                             position: eframe::egui::Pos2::new(200.0, 200.0),
                             radius: 50.0,
                             //label: "Click Me!".to_string(),
-                        }),
+                            }),
                         Box::new(Rectangle {
                             //position: 120.0,
                             position: eframe::egui::Pos2::new(400.0, 200.0),
@@ -251,10 +264,9 @@ pub mod demo {
             });
         }
     }
-}   // module demo
+} // module demo
 
+pub use demo::DemoApp;
 /// Exposed publically
 pub use eframe::egui::vec2;
-pub use demo::DemoApp;
 pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
-
