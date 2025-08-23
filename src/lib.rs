@@ -184,8 +184,8 @@ pub mod gui_lib {
     }
 
     impl Shape for Circle {
-        fn widget_print(&self, _ui: &mut Ui) {
-            println!("Button: {:?}", self);
+        fn shape_print(&self, _ui: &mut Ui) {
+            println!("Circle: {:?}", self);
         }
     }
 
@@ -206,6 +206,12 @@ pub mod gui_lib {
                 Stroke::new(1.0, Color32::BLACK), // border
                 StrokeKind::Middle,               // Outside / Inside / Middle
             );
+        }
+    }
+
+    impl Shape for Rectangle {
+        fn shape_print(&self, _ui: &mut Ui) {
+            println!("Rectangle: {:?}", self);
         }
     }
 } //gui_lib
