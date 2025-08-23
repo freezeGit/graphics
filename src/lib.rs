@@ -93,11 +93,6 @@ pub mod gui_lib {
     ///
     /// Screen acts as a container that can hold and manage multiple
     /// UI components that implement the `Draw` trait.
-    // #[derive(Debug)]
-    // pub struct Screen {
-    //     pub components: Vec<Box<dyn Draw>>,
-    // }
-
     #[derive(Debug)]
     pub struct Screen {
         pub shapes: Vec<Box<dyn Shape>>,
@@ -112,6 +107,7 @@ pub mod gui_lib {
         pub fn run(&self, ui: &mut Ui) {
             for shape in &self.shapes {
                 shape.draw(ui);
+                //shape.shape_print(ui);
             }
             for widget in &self.widgets {
                 widget.draw(ui);
@@ -142,7 +138,7 @@ pub mod gui_lib {
 
     impl Widget for Button {
         fn widget_print(&self, _ui: &mut Ui) {
-            println!("Button: {:?}", self);
+            println!("Button: {:#?}", self);
         }
     }
 
@@ -211,7 +207,7 @@ pub mod gui_lib {
 
     impl Shape for Rectangle {
         fn shape_print(&self, _ui: &mut Ui) {
-            println!("Rectangle: {:?}", self);
+            println!("Rectangle: {:#?}", self);
         }
     }
 } //gui_lib
@@ -222,7 +218,7 @@ pub mod gui_lib {
 /// Module containing the demo application implementation.
 ///
 /// This module defines the demo application structure and its behavior,
-/// utilizing the components defined in the `gui_lib` module.
+/// using the components defined in the `gui_lib` module.
 pub mod demo {
     use super::gui_lib::{Button, Circle, Rectangle, Screen, Vec2};
     use crate::{custom_light_visuals, vec2};
@@ -249,13 +245,11 @@ pub mod demo {
                 screen: Screen {
                     shapes: vec![
                         Box::new(Circle {
-                            //position: 120.0,
                             position: eframe::egui::Pos2::new(200.0, 200.0),
                             radius: 50.0,
                             //label: "Click Me!".to_string(),
                             }),
                         Box::new(Rectangle {
-                            //position: 120.0,
                             position: eframe::egui::Pos2::new(400.0, 200.0),
                             size: Vec2::new(100.0, 75.0),
                             //label: "Click Me!".to_string(),
@@ -292,6 +286,7 @@ pub mod demo {
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
+    //TDJ: could this be in the gui_lib as a default?
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             CentralPanel::default().show(ctx, |ui| {
@@ -301,7 +296,7 @@ pub mod demo {
     }
 } // module demo
 
+/// Exposed publicly
 pub use demo::DemoApp;
-/// Exposed publically
 pub use eframe::egui::vec2;
 pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
