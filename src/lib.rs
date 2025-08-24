@@ -156,6 +156,35 @@ pub mod gui_lib {
         fn shape_print(&self, ui: &mut Ui);
     }
 
+    /// Base struct for all shapes.
+    #[derive(Debug)]
+    struct ShapeBase {
+        points: Vec<Pos2>,
+        position: Pos2,
+        bounds: Rect,
+        fill_color: Color32,
+        stroke: Stroke,
+    }
+
+    impl Default for ShapeBase {
+        fn default() -> Self {
+            Self {
+                points: Vec::new(),
+                position: Pos2::default(),
+                bounds: Rect::NOTHING, // Because Rect has no default value
+                fill_color: Color32::default(),
+                stroke: Stroke::default(),
+            }
+        }
+    }
+
+    impl ShapeBase {
+        /// Create a new, empty ShapeBase with default values.
+        pub fn new() -> Self {
+            Self::default()
+        }
+    }
+
     /// A customizable Circle component.
     ///
     /// # Fields
@@ -173,8 +202,9 @@ pub mod gui_lib {
             ui.painter().circle(
                 self.position,
                 self.radius,
-                eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-                eframe::egui::Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+                //eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+                Color32::TRANSPARENT, // Blue circle
+                Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
             );
         }
     }
@@ -198,7 +228,8 @@ pub mod gui_lib {
                 rect,
                 CornerRadius::ZERO, // or CornerRadius::same(r)
                 //Color32::from_rgb(100, 150, 250),   // fill
-                Color32::WHITE,                   // fill
+                //Color32::WHITE,                   // fill
+                Color32::TRANSPARENT,                   // fill
                 Stroke::new(1.0, Color32::BLACK), // border
                 StrokeKind::Middle,               // Outside / Inside / Middle
             );
