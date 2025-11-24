@@ -57,7 +57,7 @@ pub mod gui_lib {
     /// Implement this trait for any component that needs to be rendered
     /// in the application's user interface.
     ///
-    /// Is used as a supertrait for shapes and widgets.
+    /// Is used as a super trait for shapes and widgets.
     ///
     /// # Trait Implementer’s Note
     /// This trait requires `Debug` to be implemented for all types.
@@ -107,7 +107,7 @@ pub mod gui_lib {
         pub fn run(&self, ui: &mut Ui) {
             for shape in &self.shapes {
                 shape.draw(ui);
-                //shape.shape_print(ui);
+                shape.shape_print(ui);
             }
             for widget in &self.widgets {
                 widget.draw(ui);
@@ -211,7 +211,8 @@ pub mod gui_lib {
 
     impl Shape for Circle {
         fn shape_print(&self, _ui: &mut Ui) {
-            println!("Circle: {:?}", self);
+            //println!("Circle: {:?}", self);
+            println!("Why so many circles?");
         }
     }
 
