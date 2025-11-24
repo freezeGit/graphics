@@ -36,21 +36,21 @@ pub mod gui_lib {
         visuals
     }
 
-    /// Trait for  something that can be drawn in the UI.
-    ///
-    /// Implement this trait for any component that needs to be rendered
-    /// in the application's user interface.
-    ///
-    /// # Trait Implementer’s Note
-    /// This trait requires `Debug` to be implemented for all types.
-    /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
-    pub trait Draw: std::fmt::Debug {
-        /// Draws the component in the provided UI context.
-        ///
-        /// # Arguments
-        /// * `ui` - Mutable reference to the UI context
-        fn draw(&self, ui: &mut Ui);
-    }
+    // /// Trait for  something that can be drawn in the UI.
+    // ///
+    // /// Implement this trait for any component that needs to be rendered
+    // /// in the application's user interface.
+    // ///
+    // /// # Trait Implementer’s Note
+    // /// This trait requires `Debug` to be implemented for all types.
+    // /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
+    // pub trait Draw: std::fmt::Debug {
+    //     /// Draws the component in the provided UI context.
+    //     ///
+    //     /// # Arguments
+    //     /// * `ui` - Mutable reference to the UI context
+    //     fn draw(&self, ui: &mut Ui);
+    // }
 
     /// Trait for  anything that can be drawn in the UI.
     ///
@@ -328,6 +328,7 @@ pub mod demo {
 } // module demo
 
 /// Exposed publicly
-pub use demo::DemoApp;
+//pub use demo::DemoApp;
 pub use eframe::egui::vec2;
-pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
+//pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
+pub use gui_lib::{Button, Screen, custom_light_visuals};
