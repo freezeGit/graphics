@@ -36,22 +36,6 @@ pub mod gui_lib {
         visuals
     }
 
-    // /// Trait for  something that can be drawn in the UI.
-    // ///
-    // /// Implement this trait for any component that needs to be rendered
-    // /// in the application's user interface.
-    // ///
-    // /// # Trait Implementer’s Note
-    // /// This trait requires `Debug` to be implemented for all types.
-    // /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
-    // pub trait Draw: std::fmt::Debug {
-    //     /// Draws the component in the provided UI context.
-    //     ///
-    //     /// # Arguments
-    //     /// * `ui` - Mutable reference to the UI context
-    //     fn draw(&self, ui: &mut Ui);
-    // }
-
     /// Trait for  anything that can be drawn in the UI.
     ///
     /// Implement this trait for any component that needs to be rendered
@@ -107,7 +91,7 @@ pub mod gui_lib {
         pub fn run(&self, ui: &mut Ui) {
             for shape in &self.shapes {
                 shape.draw(ui);
-                shape.shape_print(ui);
+                //shape.shape_print(ui);
             }
             for widget in &self.widgets {
                 widget.draw(ui);
@@ -178,18 +162,18 @@ pub mod gui_lib {
         }
     }
 
-    impl ShapeBase {
-        /// Create a new, empty ShapeBase with default values.
-        pub fn new() -> Self {
-            Self::default()
-        }
-    }
+    // impl ShapeBase {
+    //     /// Create a new, empty ShapeBase with default values.
+    //     pub fn new() -> Self {
+    //         Self::default()
+    //     }
+    // }
 
     /// A customizable Circle component.
     ///
     /// # Fields
     /// * `position` - position of the circle center (: eframe::egui::Pos2)
-    /// * `height` - The height of the button in pixels
+    /// * `radius` - The radius of the button
     #[derive(Debug, Default)]
     pub struct Circle {
         pub position: Pos2,
@@ -198,12 +182,14 @@ pub mod gui_lib {
 
     // Implement Draw trait for Circle
     impl Drawable for Circle {
+    //impl Shape for Circle {
         fn draw(&self, ui: &mut Ui) {
             ui.painter().circle(
                 self.position,
                 self.radius,
-                //eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-                Color32::TRANSPARENT, // Blue circle
+                eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+                //Color32::TRANSPARENT,
+                //Color32::RED, // Red circle
                 Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
             );
         }
