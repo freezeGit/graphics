@@ -91,7 +91,7 @@ pub mod gui_lib {
         pub fn run(&self, ui: &mut Ui) {
             for shape in &self.shapes {
                 shape.draw(ui);
-                //shape.shape_print(ui);
+                shape.shape_print(ui);
             }
             for widget in &self.widgets {
                 widget.draw(ui);
@@ -141,26 +141,26 @@ pub mod gui_lib {
     }
 
     /// Base struct for all shapes.
-    #[derive(Debug)]
-    struct ShapeBase {
+    #[derive(Debug, Default)]
+    pub struct ShapeBase {
+        location: Pos2,
         points: Vec<Pos2>,
-        position: Pos2,
-        bounds: Rect,
+        //bounds: Rect,
         fill_color: Color32,
         stroke: Stroke,
     }
 
-    impl Default for ShapeBase {
-        fn default() -> Self {
-            Self {
-                points: Vec::new(),
-                position: Pos2::default(),
-                bounds: Rect::NOTHING, // Because Rect has no default value
-                fill_color: Color32::default(),
-                stroke: Stroke::default(),
-            }
-        }
-    }
+    // impl Default for ShapeBase {
+    //     fn default() -> Self {
+    //         Self {
+    //             location: Pos2::default(),
+    //             points: Vec::new(),
+    //             //bounds: Rect::NOTHING, // Because Rect has no default value
+    //             fill_color: Color32::default(),
+    //             stroke: Stroke::default(),
+    //         }
+    //     }
+    // }
 
     // impl ShapeBase {
     //     /// Create a new, empty ShapeBase with default values.
@@ -168,6 +168,41 @@ pub mod gui_lib {
     //         Self::default()
     //     }
     // }
+
+    /// A customizable Polyline component.
+    ///
+    /// # Fields
+    /// * `position` - position of the circle center (: eframe::egui::Pos2)
+    /// * `radius` - The radius of the button
+    #[derive(Debug, Default)]
+    pub struct Polyline {
+        pub base: ShapeBase,
+        pub position: Pos2,
+        pub radius: f32,
+    }
+    // Implement Draw trait for Circle
+    impl Drawable for Polyline {
+        //impl Shape for Circle {
+        fn draw(&self, ui: &mut Ui) {
+            ui.painter().circle(
+                self.position,
+                self.radius,
+                eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+                //Color32::TRANSPARENT,
+                //Color32::RED, // Red circle
+                Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+            );
+        }
+    }
+
+    impl Shape for Polyline {
+        fn shape_print(&self, _ui: &mut Ui) {
+            //println!("Circle: {:?}", self);
+            //println!("Polyline: {:?}", self.base.location);
+            println!("Polyline: {:?}", self.base.points);
+            //println!("Why so many circles?");
+        }
+    }
 
     /// A customizable Circle component.
     ///
@@ -182,7 +217,7 @@ pub mod gui_lib {
 
     // Implement Draw trait for Circle
     impl Drawable for Circle {
-    //impl Shape for Circle {
+        //impl Shape for Circle {
         fn draw(&self, ui: &mut Ui) {
             ui.painter().circle(
                 self.position,
@@ -201,6 +236,7 @@ pub mod gui_lib {
             println!("Why so many circles?");
         }
     }
+
 
     #[derive(Debug, Default)]
     pub struct Rectangle {
@@ -238,7 +274,7 @@ pub mod gui_lib {
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
-    use super::gui_lib::{Button, Circle, Rectangle, Screen, Vec2};
+    use super::gui_lib::{Button, Polyline, Circle, Rectangle, Screen, Vec2};
     use crate::{custom_light_visuals, vec2};
     use eframe::egui::{CentralPanel, Context};
 
@@ -272,6 +308,18 @@ pub mod demo {
                             size: Vec2::new(100.0, 75.0),
                             //label: "Click Me!".to_string(),
                         }),
+                        Box::new(Polyline {
+                            base: Default::default(),
+                            position: eframe::egui::Pos2::new(600.0, 200.0),
+                            radius: 100.0,
+                            //label: "Click Me!".to_string(),
+                        }),
+                        //    Box::new(Polyline {
+                        //     base: Default::default(),
+                        //     position: eframe::egui::Pos2::new(600.0, 200.0),
+                        //     radius: 50.0,
+                        //     //label: "Click Me!".to_string(),
+                        // }),
                     ],
                     widgets: vec![
                         Box::new(Button {
