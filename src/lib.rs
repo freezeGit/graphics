@@ -146,7 +146,8 @@ pub mod gui_lib {
         location: Pos2,
         points: Vec<Pos2>,
         //bounds: Rect,
-        fill_color: Color32,
+        color: Color32, //Default is transparent black
+        fill_color: Color32,    //Default is transparent black
         stroke: Stroke,
     }
 
@@ -180,17 +181,20 @@ pub mod gui_lib {
         pub position: Pos2,
         pub radius: f32,
     }
-    // Implement Draw trait for Circle
+    // Implement Draw trait for Polyline
     impl Drawable for Polyline {
-        //impl Shape for Circle {
+        //impl Shape for Polyline {
         fn draw(&self, ui: &mut Ui) {
             ui.painter().circle(
-                self.position,
+                //self.position,
+                self.base.location,
                 self.radius,
-                eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+                //eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+                self.base.fill_color,
                 //Color32::TRANSPARENT,
-                //Color32::RED, // Red circle
+                //Color32::WHITE,
                 Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+                //Stroke::new(2.0, self.base.color), // Black border
             );
         }
     }
@@ -343,8 +347,9 @@ pub mod demo {
                 cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
-                let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
-                Ok(app)
+                //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
+                let app = Box::new(DemoApp::new());
+                 Ok(app)
             }),
         )
     }
