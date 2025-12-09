@@ -53,7 +53,7 @@ pub mod gui_lib {
     /// Trait for any widget.
     ///
     /// Rendered with supertrait Drawable
-     ///
+    ///
     /// # Trait Implementer’s Note
     /// This trait requires `Debug` to be implemented for all types.
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
@@ -71,7 +71,7 @@ pub mod gui_lib {
         //     ctx.set_highlight(true);
         //     self.draw(ctx);
         //     ctx.set_highlight(false);
-       }
+    }
 
     /// A container for drawable components.
     ///
@@ -91,7 +91,7 @@ pub mod gui_lib {
         pub fn run(&self, ui: &mut Ui) {
             for shape in &self.shapes {
                 shape.draw(ui);
-                shape.shape_print(ui);
+                //shape.shape_print(ui);
             }
             for widget in &self.widgets {
                 widget.draw(ui);
@@ -126,6 +126,17 @@ pub mod gui_lib {
         }
     }
 
+    /// Base struct for all shapes.
+    #[derive(Debug, Default)]
+    pub struct ShapeBase {
+        location: Pos2,
+        points: Vec<Pos2>,
+        //bounds: Rect,
+        color: Color32,      //Default is transparent black
+        fill_color: Color32, //Default is transparent black
+        stroke: Stroke,
+    }
+
     /// Trait for any shape.
     ///
     /// Rendered on screen with supertrait Drawable
@@ -136,19 +147,10 @@ pub mod gui_lib {
     pub trait Shape: Drawable + std::fmt::Debug {
         // `draw()` is provided by Drawable.
 
-        // Specific methods for widgets:
-        fn shape_print(&self, ui: &mut Ui);
-    }
-
-    /// Base struct for all shapes.
-    #[derive(Debug, Default)]
-    pub struct ShapeBase {
-        location: Pos2,
-        points: Vec<Pos2>,
-        //bounds: Rect,
-        color: Color32, //Default is transparent black
-        fill_color: Color32,    //Default is transparent black
-        stroke: Stroke,
+        // Specific methods for shapes:
+        //fn shape_print(&self, ui: &mut Ui);
+        fn color(&self) -> Color32;
+        fn set_color(&mut self, col: Color32);
     }
 
     // impl Default for ShapeBase {
@@ -194,18 +196,23 @@ pub mod gui_lib {
                 //Color32::TRANSPARENT,
                 //Color32::WHITE,
                 Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
-                //Stroke::new(2.0, self.base.color), // Black border
+                                                                //Stroke::new(2.0, self.base.color), // Black border
             );
         }
     }
 
     impl Shape for Polyline {
-        fn shape_print(&self, _ui: &mut Ui) {
-            //println!("Circle: {:?}", self);
-            //println!("Polyline: {:?}", self.base.location);
-            println!("Polyline: {:?}", self.base.points);
-            //println!("Why so many circles?");
+        // fn shape_print(&self, _ui: &mut Ui) {
+        //     //println!("Circle: {:?}", self);
+        //     //println!("Polyline: {:?}", self.base.location);
+        //     println!("Polyline: {:?}", self.base.points);
+        //     //println!("Why so many circles?");
+        // }
+
+        fn color(&self) -> Color32 {
+            Color32::WHITE
         }
+        fn set_color(&mut self, col: Color32) {}
     }
 
     /// A customizable Circle component.
@@ -235,12 +242,16 @@ pub mod gui_lib {
     }
 
     impl Shape for Circle {
-        fn shape_print(&self, _ui: &mut Ui) {
-            //println!("Circle: {:?}", self);
-            println!("Why so many circles?");
-        }
-    }
+        // fn shape_print(&self, _ui: &mut Ui) {
+        //     //println!("Circle: {:?}", self);
+        //     println!("Why so many circles?");
+        // }
 
+        fn color(&self) -> Color32 {
+            Color32::WHITE
+        }
+        fn set_color(&mut self, col: Color32) {}
+    }
 
     #[derive(Debug, Default)]
     pub struct Rectangle {
@@ -256,7 +267,7 @@ pub mod gui_lib {
                 CornerRadius::ZERO, // or CornerRadius::same(r)
                 //Color32::from_rgb(100, 150, 250),   // fill
                 //Color32::WHITE,                   // fill
-                Color32::TRANSPARENT,                   // fill
+                Color32::TRANSPARENT,             // fill
                 Stroke::new(1.0, Color32::BLACK), // border
                 StrokeKind::Middle,               // Outside / Inside / Middle
             );
@@ -264,9 +275,14 @@ pub mod gui_lib {
     }
 
     impl Shape for Rectangle {
-        fn shape_print(&self, _ui: &mut Ui) {
-            println!("Rectangle: {:#?}", self);
+        // fn shape_print(&self, _ui: &mut Ui) {
+        //     println!("Rectangle: {:#?}", self);
+        // }
+
+        fn color(&self) -> Color32 {
+            Color32::WHITE
         }
+        fn set_color(&mut self, col: Color32) {}
     }
 } //gui_lib
 
@@ -278,7 +294,7 @@ pub mod gui_lib {
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
-    use super::gui_lib::{Button, Polyline, Circle, Rectangle, Screen, Vec2};
+    use super::gui_lib::{Button, Circle, Polyline, Rectangle, Screen, Vec2};
     use crate::{custom_light_visuals, vec2};
     use eframe::egui::{CentralPanel, Context};
 
@@ -306,7 +322,7 @@ pub mod demo {
                             position: eframe::egui::Pos2::new(200.0, 200.0),
                             radius: 50.0,
                             //label: "Click Me!".to_string(),
-                            }),
+                        }),
                         Box::new(Rectangle {
                             position: eframe::egui::Pos2::new(400.0, 200.0),
                             size: Vec2::new(100.0, 75.0),
@@ -325,13 +341,11 @@ pub mod demo {
                         //     //label: "Click Me!".to_string(),
                         // }),
                     ],
-                    widgets: vec![
-                        Box::new(Button {
-                            width: 120.0,
-                            height: 40.0,
-                            label: "Click Me!".to_string(),
-                        }),
-                    ],
+                    widgets: vec![Box::new(Button {
+                        width: 120.0,
+                        height: 40.0,
+                        label: "Click Me!".to_string(),
+                    })],
                 },
             }
         }
@@ -349,7 +363,8 @@ pub mod demo {
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
                 //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
                 let app = Box::new(DemoApp::new());
-                 Ok(app)
+                //println!("{:?}", app.screen.shapes[2].base);
+                Ok(app)
             }),
         )
     }
