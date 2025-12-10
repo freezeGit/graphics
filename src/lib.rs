@@ -195,24 +195,21 @@ pub mod gui_lib {
                 self.base.fill_color,
                 //Color32::TRANSPARENT,
                 //Color32::WHITE,
-                Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+                //Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+                Stroke::new(2.0, self.base.color), // Black border
                                                                 //Stroke::new(2.0, self.base.color), // Black border
             );
         }
     }
 
     impl Shape for Polyline {
-        // fn shape_print(&self, _ui: &mut Ui) {
-        //     //println!("Circle: {:?}", self);
-        //     //println!("Polyline: {:?}", self.base.location);
-        //     println!("Polyline: {:?}", self.base.points);
-        //     //println!("Why so many circles?");
-        // }
-
         fn color(&self) -> Color32 {
-            Color32::WHITE
+            //Color32::WHITE
+            self.base.color
         }
-        fn set_color(&mut self, col: Color32) {}
+        fn set_color(&mut self, col: Color32) {
+            self.base.color = col;
+        }
     }
 
     /// A customizable Circle component.
@@ -294,7 +291,7 @@ pub mod gui_lib {
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
-    use super::gui_lib::{Button, Circle, Polyline, Rectangle, Screen, Vec2};
+    use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen, Vec2};
     use crate::{custom_light_visuals, vec2};
     use eframe::egui::{CentralPanel, Context};
 
@@ -352,6 +349,10 @@ pub mod demo {
     }
 
     pub fn run_demo() -> Result<(), eframe::Error> {
+        let mut app = Box::new(DemoApp::new());
+        println!("{:?}", app.screen.shapes[2].color());
+        app.screen.shapes[2].set_color(Color32::DARK_GREEN);
+        println!("{:?}", app.screen.shapes[2].color());
         let mut native_options = eframe::NativeOptions::default();
         native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
         eframe::run_native(
@@ -362,12 +363,33 @@ pub mod demo {
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
                 //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
-                let app = Box::new(DemoApp::new());
-                //println!("{:?}", app.screen.shapes[2].base);
+                //let mut app = Box::new(DemoApp::new());
+                //app.screen.shapes[2].set_color(Color32::GREEN);
+                //println!("{:?}", app.screen.shapes[2].color());
                 Ok(app)
             }),
         )
     }
+
+    // pub fn run_demo() -> Result<(), eframe::Error> {
+    //     //let mut app = Box::new(DemoApp::new());
+    //     let mut native_options = eframe::NativeOptions::default();
+    //     native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
+    //     eframe::run_native(
+    //         "GUI Draw Example",
+    //         native_options,
+    //         Box::new(|cc| {
+    //             cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
+    //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+    //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
+    //             //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
+    //             let mut app = Box::new(DemoApp::new());
+    //             //app.screen.shapes[2].set_color(Color32::GREEN);
+    //             println!("{:?}", app.screen.shapes[2].color());
+    //             Ok(app)
+    //         }),
+    //     )
+    // }
 
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
