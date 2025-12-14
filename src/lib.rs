@@ -311,7 +311,6 @@ pub mod demo {
     use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen, Vec2};
     use crate::{custom_light_visuals, vec2};
     use eframe::egui::{CentralPanel, Context};
-    use std::{thread, time};
 
     /// Main application structure.
     ///
@@ -324,9 +323,6 @@ pub mod demo {
         last_toggle: f64,
         is_red: bool,
     }
-    // pub struct DemoApp {
-    //     screen: Screen,
-    // }
 
     impl DemoApp {
         /// Creates a new instance of the application.
@@ -367,34 +363,11 @@ pub mod demo {
                         label: "Click Me!".to_string(),
                     })],
                 },
-                last_toggle: 0.0,
+                last_toggle: 0.0,   //For time-gating
                 is_red: true,
             }
         }
     }
-
-    // pub fn run_demo() -> Result<(), eframe::Error> {
-    //     let mut app = Box::new(DemoApp::new());
-    //     println!("{:?}", app.screen.shapes[2].color());
-    //     app.screen.shapes[2].set_color(Color32::DARK_GREEN);
-    //     println!("{:?}", app.screen.shapes[2].color());
-    //     let mut native_options = eframe::NativeOptions::default();
-    //     native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
-    //     eframe::run_native(
-    //         "GUI Draw Example",
-    //         native_options,
-    //         Box::new(|cc| {
-    //             cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
-    //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
-    //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
-    //             //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
-    //             //let mut app = Box::new(DemoApp::new());
-    //             //app.screen.shapes[2].set_color(Color32::GREEN);
-    //             //println!("{:?}", app.screen.shapes[2].color());
-    //             Ok(app)
-    //         }),
-    //     )
-    // }
 
     pub fn run_demo() -> Result<(), eframe::Error> {
         //let mut app = Box::new(DemoApp::new());
@@ -419,31 +392,10 @@ pub mod demo {
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
-    //TDJ: could this be in the gui_lib as a default?
-    // impl eframe::App for DemoApp {
-    //     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-    //         // Programmatic changes go here.
-    //         //TDJ: this should be encapsulated in a step function
-    //         if self.screen.shapes[2].color() == Color32::RED {
-    //             self.screen.shapes[2].set_color(Color32::BLUE);
-    //             self.screen.shapes[2].set_fill_color(Color32::BLUE);
-    //         } else {
-    //             self.screen.shapes[2].set_color(Color32::RED);
-    //             self.screen.shapes[2].set_fill_color(Color32::RED);
-    //         };
-    //
-    //         CentralPanel::default().show(ctx, |ui| {
-    //             self.screen.run(ui);
-    //         });
-    //         //ctx.request_repaint_after(std::time::Duration::from_millis(500));
-    //         thread::sleep(time::Duration::from_millis(500));
-    //         ctx.request_repaint();
-    //     }
-    // }
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             let now = ctx.input(|i| i.time);
-
+            //Time-gated 0.5 seconds
             if now - self.last_toggle >= 0.5 {
                 self.last_toggle = now;
                 self.is_red = !self.is_red;
@@ -463,17 +415,6 @@ pub mod demo {
             // or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
         }
     }
-    // impl eframe::App for DemoApp {
-    //     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-    //         // To change color programmatically in the event loop, do it here.
-    //         // Note: We use 'self' instead of 'app' inside the implementation block.
-    //         self.screen.shapes[2].set_color(Color32::RED);
-    //
-    //         CentralPanel::default().show(ctx, |ui| {
-    //             self.screen.run(ui);
-    //         });
-    //     }
-    // }
 } // module demo
 
 /// Exposed publicly
@@ -482,4 +423,3 @@ pub use eframe::egui::vec2;
 //pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
 pub use gui_lib::{Button, Screen, custom_light_visuals};
 
-//Computer A
