@@ -151,6 +151,8 @@ pub mod gui_lib {
         //fn shape_print(&self, ui: &mut Ui);
         fn color(&self) -> Color32;
         fn set_color(&mut self, col: Color32);
+        fn fill_color(&self) -> Color32;
+        fn set_fill_color(&mut self, col: Color32);
     }
 
     // impl Default for ShapeBase {
@@ -210,6 +212,13 @@ pub mod gui_lib {
         fn set_color(&mut self, col: Color32) {
             self.base.color = col;
         }
+
+        fn fill_color(&self) -> Color32 {
+            self.base.fill_color
+        }
+        fn set_fill_color(&mut self, col: Color32) {
+            self.base.fill_color = col;
+        }
     }
 
     /// A customizable Circle component.
@@ -248,6 +257,10 @@ pub mod gui_lib {
             Color32::WHITE
         }
         fn set_color(&mut self, col: Color32) {}
+        fn fill_color(&self) -> Color32 {
+            Color32::WHITE
+        }
+        fn set_fill_color(&mut self, col: Color32) {}
     }
 
     #[derive(Debug, Default)]
@@ -280,6 +293,10 @@ pub mod gui_lib {
             Color32::WHITE
         }
         fn set_color(&mut self, col: Color32) {}
+        fn fill_color(&self) -> Color32 {
+            Color32::WHITE
+        }
+        fn set_fill_color(&mut self, col: Color32) {}
     }
 } //gui_lib
 
@@ -294,6 +311,7 @@ pub mod demo {
     use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen, Vec2};
     use crate::{custom_light_visuals, vec2};
     use eframe::egui::{CentralPanel, Context};
+    use std::{thread, time};
 
     /// Main application structure.
     ///
@@ -348,31 +366,11 @@ pub mod demo {
         }
     }
 
-    pub fn run_demo() -> Result<(), eframe::Error> {
-        let mut app = Box::new(DemoApp::new());
-        println!("{:?}", app.screen.shapes[2].color());
-        app.screen.shapes[2].set_color(Color32::DARK_GREEN);
-        println!("{:?}", app.screen.shapes[2].color());
-        let mut native_options = eframe::NativeOptions::default();
-        native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
-        eframe::run_native(
-            "GUI Draw Example",
-            native_options,
-            Box::new(|cc| {
-                cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
-                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
-                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
-                //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
-                //let mut app = Box::new(DemoApp::new());
-                //app.screen.shapes[2].set_color(Color32::GREEN);
-                //println!("{:?}", app.screen.shapes[2].color());
-                Ok(app)
-            }),
-        )
-    }
-
     // pub fn run_demo() -> Result<(), eframe::Error> {
-    //     //let mut app = Box::new(DemoApp::new());
+    //     let mut app = Box::new(DemoApp::new());
+    //     println!("{:?}", app.screen.shapes[2].color());
+    //     app.screen.shapes[2].set_color(Color32::DARK_GREEN);
+    //     println!("{:?}", app.screen.shapes[2].color());
     //     let mut native_options = eframe::NativeOptions::default();
     //     native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
     //     eframe::run_native(
@@ -383,13 +381,33 @@ pub mod demo {
     //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
     //             //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
     //             //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
-    //             let mut app = Box::new(DemoApp::new());
+    //             //let mut app = Box::new(DemoApp::new());
     //             //app.screen.shapes[2].set_color(Color32::GREEN);
-    //             println!("{:?}", app.screen.shapes[2].color());
+    //             //println!("{:?}", app.screen.shapes[2].color());
     //             Ok(app)
     //         }),
     //     )
     // }
+
+    pub fn run_demo() -> Result<(), eframe::Error> {
+        //let mut app = Box::new(DemoApp::new());
+        let mut native_options = eframe::NativeOptions::default();
+        native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
+        eframe::run_native(
+            "GUI Draw Example",
+            native_options,
+            Box::new(|cc| {
+                cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
+                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
+                //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
+                let mut app = Box::new(DemoApp::new());
+                //app.screen.shapes[2].set_color(Color32::GREEN);
+                println!("{:?}", app.screen.shapes[2].color());
+                Ok(app)
+            }),
+        )
+    }
 
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
@@ -397,11 +415,36 @@ pub mod demo {
     //TDJ: could this be in the gui_lib as a default?
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+            // Programmatic changes go here.
+            //TDJ: this should be encapsulated in a step function
+            if self.screen.shapes[2].color() == Color32::RED {
+                self.screen.shapes[2].set_color(Color32::BLUE);
+                self.screen.shapes[2].set_fill_color(Color32::BLUE);
+            } else {
+                self.screen.shapes[2].set_color(Color32::RED);
+                self.screen.shapes[2].set_fill_color(Color32::RED);
+            };
+
             CentralPanel::default().show(ctx, |ui| {
                 self.screen.run(ui);
             });
+            //ctx.request_repaint_after(std::time::Duration::from_millis(500));
+            thread::sleep(time::Duration::from_millis(500));
+            ctx.request_repaint();
         }
     }
+
+    // impl eframe::App for DemoApp {
+    //     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+    //         // To change color programmatically in the event loop, do it here.
+    //         // Note: We use 'self' instead of 'app' inside the implementation block.
+    //         self.screen.shapes[2].set_color(Color32::RED);
+    //
+    //         CentralPanel::default().show(ctx, |ui| {
+    //             self.screen.run(ui);
+    //         });
+    //     }
+    // }
 } // module demo
 
 /// Exposed publicly
