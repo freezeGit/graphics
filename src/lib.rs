@@ -319,9 +319,14 @@ pub mod demo {
     /// the main screen with all UI components.
     //Your app's gateway to native windows
     #[derive(Debug)]
-    pub struct DemoApp {
+    struct DemoApp {
         screen: Screen,
+        last_toggle: f64,
+        is_red: bool,
     }
+    // pub struct DemoApp {
+    //     screen: Screen,
+    // }
 
     impl DemoApp {
         /// Creates a new instance of the application.
@@ -362,6 +367,8 @@ pub mod demo {
                         label: "Click Me!".to_string(),
                     })],
                 },
+                last_toggle: 0.0,
+                is_red: true,
             }
         }
     }
@@ -413,27 +420,49 @@ pub mod demo {
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
     //TDJ: could this be in the gui_lib as a default?
+    // impl eframe::App for DemoApp {
+    //     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+    //         // Programmatic changes go here.
+    //         //TDJ: this should be encapsulated in a step function
+    //         if self.screen.shapes[2].color() == Color32::RED {
+    //             self.screen.shapes[2].set_color(Color32::BLUE);
+    //             self.screen.shapes[2].set_fill_color(Color32::BLUE);
+    //         } else {
+    //             self.screen.shapes[2].set_color(Color32::RED);
+    //             self.screen.shapes[2].set_fill_color(Color32::RED);
+    //         };
+    //
+    //         CentralPanel::default().show(ctx, |ui| {
+    //             self.screen.run(ui);
+    //         });
+    //         //ctx.request_repaint_after(std::time::Duration::from_millis(500));
+    //         thread::sleep(time::Duration::from_millis(500));
+    //         ctx.request_repaint();
+    //     }
+    // }
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-            // Programmatic changes go here.
-            //TDJ: this should be encapsulated in a step function
-            if self.screen.shapes[2].color() == Color32::RED {
-                self.screen.shapes[2].set_color(Color32::BLUE);
-                self.screen.shapes[2].set_fill_color(Color32::BLUE);
-            } else {
-                self.screen.shapes[2].set_color(Color32::RED);
-                self.screen.shapes[2].set_fill_color(Color32::RED);
-            };
+            let now = ctx.input(|i| i.time);
+
+            if now - self.last_toggle >= 0.5 {
+                self.last_toggle = now;
+                self.is_red = !self.is_red;
+
+                if let Some(s) = self.screen.shapes.get_mut(2) {
+                    let c = if self.is_red { Color32::RED } else { Color32::BLUE };
+                    s.set_color(c);
+                    s.set_fill_color(c);
+                }
+            }
 
             CentralPanel::default().show(ctx, |ui| {
                 self.screen.run(ui);
             });
-            //ctx.request_repaint_after(std::time::Duration::from_millis(500));
-            thread::sleep(time::Duration::from_millis(500));
-            ctx.request_repaint();
+
+            ctx.request_repaint_after(std::time::Duration::from_millis(16));
+            // or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
         }
     }
-
     // impl eframe::App for DemoApp {
     //     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
     //         // To change color programmatically in the event loop, do it here.
