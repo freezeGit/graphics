@@ -160,10 +160,12 @@ pub mod gui_lib {
             Self {
                 location: Pos2::default(),
                 points: Vec::new(),
-                //bounds: Rect::NOTHING, // Because Rect has no default value
                 color: Color32::default(),
                 //fill_color: Color32::default(),
-                fill_color: Color32::WHITE,
+                //fill_color: Color32::WHITE,
+                fill_color: Color32::TRANSPARENT,
+                //line_width: f32,
+                //line_style: f32,
                 //stroke: Stroke::default(),
             }
         }
@@ -261,25 +263,11 @@ pub mod gui_lib {
     // Implement Draw trait for Circle
     impl Drawable for Circle {
         //impl Shape for Circle {
-        // fn draw(&self, ui: &mut Ui) {
-        //     ui.painter().circle(
-        //         self.position,
-        //         self.radius,
-        //         eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-        //         //Color32::TRANSPARENT,
-        //         //Color32::RED, // Red circle
-        //         Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
-        //     );
-        // }
         fn draw(&self, ui: &mut Ui) {
             ui.painter().circle(
                 self.base.location,
                 self.radius,
                 self.base.fill_color,
-                //eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-                //Color32::TRANSPARENT,
-                //Color32::RED, // Red circle
-                //Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
                 Stroke::new(2.0, self.base.color), // Black border
             );
         }
@@ -331,7 +319,6 @@ pub mod gui_lib {
         }
         fn set_fill_color(&mut self, col: Color32) {}
     }
-
 } //gui_lib
 
 // ------------------------------
@@ -345,6 +332,7 @@ pub mod demo {
     use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen, Vec2};
     use crate::{custom_light_visuals, vec2};
     use eframe::egui::{CentralPanel, Context};
+    use super::gui_lib::Shape;
 
     /// Main application structure.
     ///
@@ -363,23 +351,26 @@ pub mod demo {
         ///
         /// # Returns
         /// A new `DemoApp` instance initialized with a default screen
-        /// containing a sample button.
+        /// containing several shapes
+        /// and containing a sample button.
         pub fn new() -> Self {
+            let mut s1 = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0);
+            s1.set_fill_color(Color32::DARK_GREEN);
+
             Self {
                 screen: Screen {
                     shapes: vec![
-                        Box::new(Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0)),
+                        Box::new(s1),
+                        //Box::new(Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0)),
 
                         Box::new(Rectangle {
                             position: eframe::egui::Pos2::new(400.0, 200.0),
                             size: Vec2::new(100.0, 75.0),
-                            //label: "Click Me!".to_string(),
-                        }),
+                                                    }),
                         Box::new(Polyline {
                             base: Default::default(),
                             position: eframe::egui::Pos2::new(600.0, 200.0),
                             radius: 100.0,
-                            //label: "Click Me!".to_string(),
                         }),
                         //    Box::new(Polyline {
                         //     base: Default::default(),
@@ -388,6 +379,7 @@ pub mod demo {
                         //     //label: "Click Me!".to_string(),
                         // }),
                     ],
+
                     widgets: vec![Box::new(Button {
                         width: 120.0,
                         height: 40.0,
@@ -398,6 +390,40 @@ pub mod demo {
                 is_red: true,
             }
         }
+        // pub fn new() -> Self {
+        //     Self {
+        //         screen: Screen {
+        //             shapes: vec![
+        //                 Box::new(Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0)),
+        //
+        //                 Box::new(Rectangle {
+        //                     position: eframe::egui::Pos2::new(400.0, 200.0),
+        //                     size: Vec2::new(100.0, 75.0),
+        //                     //label: "Click Me!".to_string(),
+        //                 }),
+        //                 Box::new(Polyline {
+        //                     base: Default::default(),
+        //                     position: eframe::egui::Pos2::new(600.0, 200.0),
+        //                     radius: 100.0,
+        //                     //label: "Click Me!".to_string(),
+        //                 }),
+        //                 //    Box::new(Polyline {
+        //                 //     base: Default::default(),
+        //                 //     position: eframe::egui::Pos2::new(600.0, 200.0),
+        //                 //     radius: 50.0,
+        //                 //     //label: "Click Me!".to_string(),
+        //                 // }),
+        //             ],
+        //             widgets: vec![Box::new(Button {
+        //                 width: 120.0,
+        //                 height: 40.0,
+        //                 label: "Click Me!".to_string(),
+        //             })],
+        //         },
+        //         last_toggle: 0.0, //For time-gating
+        //         is_red: true,
+        //     }
+        // }
     }
 
     pub fn run_demo() -> Result<(), eframe::Error> {
