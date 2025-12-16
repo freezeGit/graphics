@@ -127,14 +127,14 @@ pub mod gui_lib {
     }
 
     /// Base struct for all shapes.
-    #[derive(Debug, Default)]
+    //#[derive(Debug, Default)]
+    #[derive(Debug)]
     pub struct ShapeBase {
         location: Pos2,
         points: Vec<Pos2>,
-        //bounds: Rect,
-        color: Color32,      //Default is transparent black
-        fill_color: Color32, //Default is transparent black
-        stroke: Stroke,
+        color: Color32,
+        fill_color: Color32,
+        //stroke: Stroke,
     }
 
     /// Trait for any shape.
@@ -155,17 +155,19 @@ pub mod gui_lib {
         fn set_fill_color(&mut self, col: Color32);
     }
 
-    // impl Default for ShapeBase {
-    //     fn default() -> Self {
-    //         Self {
-    //             location: Pos2::default(),
-    //             points: Vec::new(),
-    //             //bounds: Rect::NOTHING, // Because Rect has no default value
-    //             fill_color: Color32::default(),
-    //             stroke: Stroke::default(),
-    //         }
-    //     }
-    // }
+    impl Default for ShapeBase {
+        fn default() -> Self {
+            Self {
+                location: Pos2::default(),
+                points: Vec::new(),
+                //bounds: Rect::NOTHING, // Because Rect has no default value
+                color: Color32::default(),
+                //fill_color: Color32::default(),
+                fill_color: Color32::WHITE,
+                //stroke: Stroke::default(),
+            }
+        }
+    }
 
     // impl ShapeBase {
     //     /// Create a new, empty ShapeBase with default values.
@@ -199,7 +201,7 @@ pub mod gui_lib {
                 //Color32::WHITE,
                 //Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
                 Stroke::new(2.0, self.base.color), // Black border
-                                                                //Stroke::new(2.0, self.base.color), // Black border
+                                                   //Stroke::new(2.0, self.base.color), // Black border
             );
         }
     }
@@ -220,6 +222,10 @@ pub mod gui_lib {
             self.base.fill_color = col;
         }
     }
+    //     fn set_fill_color(&mut self, col: Color32) {
+    //         self.base.fill_color = col;
+    //     }
+    // }
 
     /// A customizable Circle component.
     ///
@@ -228,39 +234,70 @@ pub mod gui_lib {
     /// * `radius` - The radius of the button
     #[derive(Debug, Default)]
     pub struct Circle {
-        pub position: Pos2,
+        pub base: ShapeBase,
+        //pub position: Pos2,
         pub radius: f32,
+    }
+    //let center = egui::Pos2::new(100.0, 100.0);
+    impl Circle {
+        // An associated function named 'new' that acts as a constructor
+        // fn new(x: f64, y: f64) -> Self { // 'Self' refers to the type 'Point'
+        //     Point { x, y }
+        //fn new(center: f64, radius: f64) -> Self { // 'Self' refers to the type 'Point'
+        pub fn new(center: Pos2, radius: f32) -> Self {
+            // 'Self' refers to the type 'Circle'
+            Circle {
+                base: {
+                    ShapeBase {
+                        location: center,
+                        ..Default::default()
+                    }
+                },
+                radius: radius,
+            }
+        }
     }
 
     // Implement Draw trait for Circle
     impl Drawable for Circle {
         //impl Shape for Circle {
+        // fn draw(&self, ui: &mut Ui) {
+        //     ui.painter().circle(
+        //         self.position,
+        //         self.radius,
+        //         eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+        //         //Color32::TRANSPARENT,
+        //         //Color32::RED, // Red circle
+        //         Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+        //     );
+        // }
         fn draw(&self, ui: &mut Ui) {
             ui.painter().circle(
-                self.position,
+                self.base.location,
                 self.radius,
-                eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
+                self.base.fill_color,
+                //eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
                 //Color32::TRANSPARENT,
                 //Color32::RED, // Red circle
-                Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+                //Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
+                Stroke::new(2.0, self.base.color), // Black border
             );
         }
     }
 
     impl Shape for Circle {
-        // fn shape_print(&self, _ui: &mut Ui) {
-        //     //println!("Circle: {:?}", self);
-        //     println!("Why so many circles?");
-        // }
-
         fn color(&self) -> Color32 {
-            Color32::WHITE
+            self.base.color
         }
-        fn set_color(&mut self, col: Color32) {}
+        fn set_color(&mut self, col: Color32) {
+            self.base.color = col;
+        }
         fn fill_color(&self) -> Color32 {
-            Color32::WHITE
+            self.base.fill_color
         }
-        fn set_fill_color(&mut self, col: Color32) {}
+        fn set_fill_color(&mut self, col: Color32) {
+            self.base.fill_color = col;
+        }
     }
 
     #[derive(Debug, Default)]
@@ -285,10 +322,6 @@ pub mod gui_lib {
     }
 
     impl Shape for Rectangle {
-        // fn shape_print(&self, _ui: &mut Ui) {
-        //     println!("Rectangle: {:#?}", self);
-        // }
-
         fn color(&self) -> Color32 {
             Color32::WHITE
         }
@@ -298,6 +331,7 @@ pub mod gui_lib {
         }
         fn set_fill_color(&mut self, col: Color32) {}
     }
+
 } //gui_lib
 
 // ------------------------------
@@ -334,11 +368,8 @@ pub mod demo {
             Self {
                 screen: Screen {
                     shapes: vec![
-                        Box::new(Circle {
-                            position: eframe::egui::Pos2::new(200.0, 200.0),
-                            radius: 50.0,
-                            //label: "Click Me!".to_string(),
-                        }),
+                        Box::new(Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0)),
+
                         Box::new(Rectangle {
                             position: eframe::egui::Pos2::new(400.0, 200.0),
                             size: Vec2::new(100.0, 75.0),
@@ -363,7 +394,7 @@ pub mod demo {
                         label: "Click Me!".to_string(),
                     })],
                 },
-                last_toggle: 0.0,   //For time-gating
+                last_toggle: 0.0, //For time-gating
                 is_red: true,
             }
         }
@@ -381,9 +412,9 @@ pub mod demo {
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
                 //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
-                let mut app = Box::new(DemoApp::new());
-                //app.screen.shapes[2].set_color(Color32::GREEN);
-                println!("{:?}", app.screen.shapes[2].color());
+                //let mut app = Box::new(DemoApp::new());
+                let app = Box::new(DemoApp::new());
+                //app.screen.shapes[0].set_fill_color(Color32::GREEN);
                 Ok(app)
             }),
         )
@@ -394,6 +425,11 @@ pub mod demo {
     // of creating a window and running an event loop.
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+            if let Some(s) = self.screen.shapes.get_mut(0) {
+                s.set_color(Color32::RED);
+                //s.set_fill_color(Color32::DARK_GREEN);
+            }
+
             let now = ctx.input(|i| i.time);
             //Time-gated 0.5 seconds
             if now - self.last_toggle >= 0.5 {
@@ -401,7 +437,11 @@ pub mod demo {
                 self.is_red = !self.is_red;
 
                 if let Some(s) = self.screen.shapes.get_mut(2) {
-                    let c = if self.is_red { Color32::RED } else { Color32::BLUE };
+                    let c = if self.is_red {
+                        Color32::RED
+                    } else {
+                        Color32::BLUE
+                    };
                     s.set_color(c);
                     s.set_fill_color(c);
                 }
@@ -422,4 +462,3 @@ pub mod demo {
 pub use eframe::egui::vec2;
 //pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
 pub use gui_lib::{Button, Screen, custom_light_visuals};
-

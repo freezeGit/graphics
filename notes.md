@@ -750,3 +750,77 @@ ui.painter().add(Shape::convex_polygon(
 For most cases, `painter.rect()`, `painter.circle()`, etc., are simpler. Under the hood, they create `Shape` objects for you!
 
 Let me know if you’d like a deep dive into `Mesh` or text rendering! 🎨
+
+Patch:
+
+// ------------------------------
+// Demonstration module. App-specific code
+// ------------------------------
+/// Module containing the demo application implementation.
+///
+/// This module defines the demo application structure and its behavior,
+/// using the components defined in the `gui_lib` module.
+pub mod demo {
+use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen, Vec2};
+use crate::gui_lib::Shape;
+use crate::{custom_light_visuals, vec2};
+use eframe::egui::{CentralPanel, Context};
+
+    /// Main application structure.
+    ///
+    /// Represents the root of the application and contains
+    /// the main screen with all UI components.
+    //Your app's gateway to native windows
+    #[derive(Debug)]
+    struct DemoApp {
+        screen: Screen,
+        last_toggle: f64,
+        is_red: bool,
+    }
+
+    impl DemoApp {
+        /// Creates a new instance of the application.
+        ///
+        /// # Returns
+        /// A new `DemoApp` instance initialized with a default screen
+        /// containing a sample button.
+        pub fn new() -> Self {
+            let mut circle = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0);
+            circle.set_fill_color(Color32::DARK_GREEN);
+
+            Self {
+                screen: Screen {
+                    shapes: vec![
+                        Box::new(circle),
+                        Box::new(Rectangle {
+                            position: eframe::egui::Pos2::new(400.0, 200.0),
+                            size: Vec2::new(100.0, 75.0),
+                            //label: "Click Me!".to_string(),
+                        }),
+                        Box::new(Polyline {
+                            base: Default::default(),
+                            position: eframe::egui::Pos2::new(600.0, 200.0),
+                            radius: 100.0,
+                            //label: "Click Me!".to_string(),
+                        }),
+                        //    Box::new(Polyline {
+                        //     base: Default::default(),
+                        //     position: eframe::egui::Pos2::new(600.0, 200.0),
+                        //     radius: 50.0,
+                        //     //label: "Click Me!".to_string(),
+                        // }),
+                    ],
+                    widgets: vec![Box::new(Button {
+                        width: 120.0,
+                        height: 40.0,
+                        label: "Click Me!".to_string(),
+                    })],
+                },
+                last_toggle: 0.0, //For time-gating
+                is_red: true,
+            }
+        }
+    }
+
+    // ... existing code ...
+}
