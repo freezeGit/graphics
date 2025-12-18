@@ -133,7 +133,7 @@ pub mod gui_lib {
         color: Color32,
         fill_color: Color32,
         line_width: f32,
-        //stroke: Stroke,
+        //line_style: f32,
     }
 
     /// Trait for any shape.
@@ -162,8 +162,7 @@ pub mod gui_lib {
                 location: Pos2::default(),
                 points: Vec::new(),
                 color: Color32::BLACK,
-                fill_color: Color32::WHITE,
-                //fill_color: Color32::TRANSPARENT,
+                fill_color: Color32::TRANSPARENT,
                 line_width: 1.0,
                 //line_style: f32,
             }
@@ -193,8 +192,8 @@ pub mod gui_lib {
         //impl Shape for Polyline {
         fn draw(&self, ui: &mut Ui) {
             ui.painter().circle(
-                //self.position,
-                self.base.location,
+                self.position,
+                //self.base.location,
                 self.radius,
                 //eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
                 self.base.fill_color,
@@ -207,22 +206,6 @@ pub mod gui_lib {
         }
     }
 
-    // impl Shape for Polyline {
-    //     fn color(&self) -> Color32 {
-    //         self.base.color
-    //     }
-    //     fn set_color(&mut self, col: Color32) {
-    //         self.base.color = col;
-    //     }
-    //     fn fill_color(&self) -> Color32 {
-    //         self.base.fill_color
-    //     }
-    //     fn set_fill_color(&mut self, col: Color32) {
-    //         self.base.fill_color = col;
-    //     }
-    //     fn line_width(&self) -> f32;
-    //     fn set_line_width(&mut self, lw: f32);
-    // }
     impl Shape for Polyline {
         fn color(&self) -> Color32 {
             self.base.color
@@ -406,42 +389,41 @@ pub mod demo {
             // Vec to hold Shape trait objects
             let mut vs: Vec<Box<dyn Shape>> = Vec::new();
 
-            let mut s1 = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0);
-            s1.set_fill_color(Color32::DARK_GREEN);
-            vs.push(Box::new(s1));
+            let mut sc1 = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0);
+            sc1.set_line_width(3.0);
+            sc1.set_fill_color(Color32::DARK_RED);
+            vs.push(Box::new(sc1));
 
-            let mut s2 = Rectangle::new(
+            let mut sc2 = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 10.0);
+            vs.push(Box::new(sc2));
+
+            let mut sr = Rectangle::new(
                 eframe::egui::Pos2::new(400.0, 200.0),
-                eframe::egui::Vec2::new(100.0, 75.0),
+                eframe::egui::Vec2::new(150.0, 100.0),
             );
             //s2.set_color(Color32::RED);
-            s2.set_fill_color(Color32::ORANGE);
-            s2.set_line_width(5.0);
-            vs.push(Box::new(s2));
+            sr.set_fill_color(Color32::GOLD);
+            //sr.set_line_width(5.0);
+            vs.push(Box::new(sr));
+
+            let mut spln = Polyline {
+                        base: Default::default(),
+                        position: eframe::egui::Pos2::new(600.0, 200.0),
+                        radius: 100.0 };
+            vs.push(Box::new(spln));
 
             Self {
                 screen: Screen {
                     shapes: vs,
                     // shapes: vec![
-                    //     //Box::new(s1),
+                    //     Box::new(s1),
                     //     Box::new(Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0)),
-                    //
                     //     Box::new(Rectangle {
                     //         position: eframe::egui::Pos2::new(400.0, 200.0),
                     //         size: Vec2::new(100.0, 75.0),
-                    //                                 }),
-                    //     Box::new(Polyline {
-                    //         base: Default::default(),
-                    //         position: eframe::egui::Pos2::new(600.0, 200.0),
-                    //         radius: 100.0,
                     //     }),
-                    //     //    Box::new(Polyline {
-                    //     //     base: Default::default(),
-                    //     //     position: eframe::egui::Pos2::new(600.0, 200.0),
-                    //     //     radius: 50.0,
-                    //     //     //label: "Click Me!".to_string(),
-                    //     // }),
                     // ],
+
                     widgets: vec![Box::new(Button {
                         width: 120.0,
                         height: 40.0,
@@ -452,40 +434,6 @@ pub mod demo {
                 is_red: true,
             }
         }
-        // pub fn new() -> Self {
-        //     Self {
-        //         screen: Screen {
-        //             shapes: vec![
-        //                 Box::new(Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0)),
-        //
-        //                 Box::new(Rectangle {
-        //                     position: eframe::egui::Pos2::new(400.0, 200.0),
-        //                     size: Vec2::new(100.0, 75.0),
-        //                     //label: "Click Me!".to_string(),
-        //                 }),
-        //                 Box::new(Polyline {
-        //                     base: Default::default(),
-        //                     position: eframe::egui::Pos2::new(600.0, 200.0),
-        //                     radius: 100.0,
-        //                     //label: "Click Me!".to_string(),
-        //                 }),
-        //                 //    Box::new(Polyline {
-        //                 //     base: Default::default(),
-        //                 //     position: eframe::egui::Pos2::new(600.0, 200.0),
-        //                 //     radius: 50.0,
-        //                 //     //label: "Click Me!".to_string(),
-        //                 // }),
-        //             ],
-        //             widgets: vec![Box::new(Button {
-        //                 width: 120.0,
-        //                 height: 40.0,
-        //                 label: "Click Me!".to_string(),
-        //             })],
-        //         },
-        //         last_toggle: 0.0, //For time-gating
-        //         is_red: true,
-        //     }
-        // }
     }
 
     pub fn run_demo() -> Result<(), eframe::Error> {
