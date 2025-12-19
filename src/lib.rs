@@ -163,18 +163,22 @@ pub mod gui_lib {
                 points: Vec::new(),
                 color: Color32::BLACK,
                 fill_color: Color32::TRANSPARENT,
-                line_width: 1.0,
+                line_width: 2.0,
                 //line_style: f32,
             }
         }
     }
 
-    // impl ShapeBase {
-    //     /// Create a new, empty ShapeBase with default values.
-    //     pub fn new() -> Self {
-    //         Self::default()
-    //     }
-    // }
+    impl ShapeBase {
+        /// Create a new, empty ShapeBase with default values.
+        // pub fn new() -> Self {
+        //     Self::default()
+        // }
+
+        fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
+            self.points.iter().map(|p| *p + offset).collect()
+        }
+    }
 
     /// A customizable Polyline component.
     ///
@@ -184,26 +188,25 @@ pub mod gui_lib {
     #[derive(Debug, Default)]
     pub struct Polyline {
         pub base: ShapeBase,
-        pub location: Pos2,
     }
 
     impl Polyline {
         pub fn new(location: Pos2, points: impl IntoIterator<Item = Pos2>) -> Self {
             Self {
                 base: ShapeBase {
+                    location,
                     points: points.into_iter().collect(),
                     ..Default::default()
                 },
-                location,
             }
         }
     }
 
     impl Drawable for Polyline {
         fn draw(&self, ui: &mut Ui) {
-            ui.painter().add(eframe::epaint::PathShape::line(
-                self.base.points.clone(),
-                Stroke::new(self.base.line_width, self.base.color),
+              ui.painter().add(eframe::epaint::PathShape::line(
+                self.base.points_translated(self.base.location.to_vec2()),
+                  Stroke::new(self.base.line_width, self.base.color),
             ));
         }
     }
@@ -393,7 +396,7 @@ pub mod demo {
             let mut vs: Vec<Box<dyn Shape>> = Vec::new();
 
             let mut sc1 = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0);
-            sc1.set_line_width(3.0);
+            sc1.set_line_width(4.0);
             sc1.set_fill_color(Color32::DARK_RED);
             vs.push(Box::new(sc1));
 
@@ -423,6 +426,7 @@ pub mod demo {
             Self {
                 screen: Screen {
                     shapes: vs,
+                    // Other ways to create shapes:
                     // shapes: vec![
                     //     Box::new(s1),
                     //     Box::new(Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0)),
