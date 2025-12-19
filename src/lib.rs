@@ -184,25 +184,39 @@ pub mod gui_lib {
     #[derive(Debug, Default)]
     pub struct Polyline {
         pub base: ShapeBase,
-        pub position: Pos2,
-        pub radius: f32,
+        pub location: Pos2,
     }
-    // Implement Draw trait for Polyline
+
+    impl Polyline {
+        pub fn new(location: Pos2, points: impl IntoIterator<Item = Pos2>) -> Self {
+            Self {
+                base: ShapeBase {
+                    points: points.into_iter().collect(),
+                    ..Default::default()
+                },
+                location: location,
+            }
+        }
+    }
+
+
+
+    // impl Polyline {
+    //     pub fn new(points: impl IntoIterator<Item = Pos2>) -> Self {
+    //         Self {
+    //             points: points.into_iter().collect(),
+    //         }
+    //     }
+    // }
+
+
     impl Drawable for Polyline {
-        //impl Shape for Polyline {
-        fn draw(&self, ui: &mut Ui) {
-            ui.painter().circle(
-                self.position,
-                //self.base.location,
-                self.radius,
-                //eframe::egui::Color32::from_rgb(100, 150, 250), // Blue circle
-                self.base.fill_color,
-                //Color32::TRANSPARENT,
-                //Color32::WHITE,
-                //Stroke::new(2.0, eframe::egui::Color32::BLACK), // Black border
-                Stroke::new(2.0, self.base.color), // Black border
-                                                   //Stroke::new(2.0, self.base.color), // Black border
-            );
+    fn draw(&self, ui: &mut Ui) {
+            ui.painter().add(eframe::epaint::PathShape::line(
+                self.base.points.clone(),
+                //Stroke::new(2.0, eframe::egui::Color32::BLACK)
+                Stroke::new(self.base.line_width, self.base.color)
+            ));
         }
     }
 
@@ -238,11 +252,27 @@ pub mod gui_lib {
         pub radius: f32,
     }
     //let center = egui::Pos2::new(100.0, 100.0);
+    // impl Circle {
+    //     // Constructor method
+    //     pub fn new(center: Pos2, radius: f32) -> Self {
+    //         // 'Self' refers to the type 'Circle'
+    //         Circle {
+    //             base: {
+    //                 ShapeBase {
+    //                     location: center,
+    //                     ..Default::default()
+    //                 }
+    //             },
+    //             radius: radius,
+    //         }
+    //     }
+    // }
+
     impl Circle {
         // Constructor method
         pub fn new(center: Pos2, radius: f32) -> Self {
             // 'Self' refers to the type 'Circle'
-            Circle {
+            Self {
                 base: {
                     ShapeBase {
                         location: center,
@@ -362,7 +392,8 @@ pub mod gui_lib {
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
     use super::gui_lib::Shape;
-    use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen, Vec2};
+    //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen, Vec2};
+    use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen};
     use crate::{custom_light_visuals, vec2};
     use eframe::egui::{CentralPanel, Context};
 
@@ -406,11 +437,21 @@ pub mod demo {
             //sr.set_line_width(5.0);
             vs.push(Box::new(sr));
 
-            let mut spln = Polyline {
-                        base: Default::default(),
-                        position: eframe::egui::Pos2::new(600.0, 200.0),
-                        radius: 100.0 };
-            vs.push(Box::new(spln));
+            let mut sp = Polyline::new(
+                eframe::egui::Pos2::new(600.0, 200.0),
+                [eframe::egui::Pos2::new(0.0, 0.0),
+                    eframe::egui::Pos2::new(100.0, 200.0),
+                    eframe::egui::Pos2::new(300.0, 400.0)]
+            );
+            sp.set_color(Color32::RED);
+            vs.push(Box::new(sp));
+
+            // let mut spln = Polyline {
+            //     base: Default::default(),
+            //     location: eframe::egui::Pos2::new(600.0, 200.0),
+            //     //radius: 100.0 };
+            // };
+            // vs.push(Box::new(spln));
 
             Self {
                 screen: Screen {
