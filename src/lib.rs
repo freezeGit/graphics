@@ -204,9 +204,9 @@ pub mod gui_lib {
 
     impl Drawable for Polyline {
         fn draw(&self, ui: &mut Ui) {
-              ui.painter().add(eframe::epaint::PathShape::line(
+            ui.painter().add(eframe::epaint::PathShape::line(
                 self.base.points_translated(self.base.location.to_vec2()),
-                  Stroke::new(self.base.line_width, self.base.color),
+                Stroke::new(self.base.line_width, self.base.color),
             ));
         }
     }
@@ -413,11 +413,15 @@ pub mod demo {
             vs.push(Box::new(sr));
 
             let mut sp = Polyline::new(
-                eframe::egui::Pos2::new(600.0, 200.0),
+                eframe::egui::Pos2::new(550.0, 200.0),
                 [
                     eframe::egui::Pos2::new(0.0, 0.0),
-                    eframe::egui::Pos2::new(100.0, 200.0),
-                    eframe::egui::Pos2::new(300.0, 400.0),
+                    eframe::egui::Pos2::new(25.0, 50.0),
+                    eframe::egui::Pos2::new(75.0, -50.0),
+                    eframe::egui::Pos2::new(125.0, 50.0),
+                    eframe::egui::Pos2::new(175.0, -50.0),
+                    eframe::egui::Pos2::new(225.0, 50.0),
+                    eframe::egui::Pos2::new(250.0, 0.0),
                 ],
             );
             sp.set_color(Color32::RED);
