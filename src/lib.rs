@@ -194,28 +194,16 @@ pub mod gui_lib {
                     points: points.into_iter().collect(),
                     ..Default::default()
                 },
-                location: location,
+                location,
             }
         }
     }
 
-
-
-    // impl Polyline {
-    //     pub fn new(points: impl IntoIterator<Item = Pos2>) -> Self {
-    //         Self {
-    //             points: points.into_iter().collect(),
-    //         }
-    //     }
-    // }
-
-
     impl Drawable for Polyline {
-    fn draw(&self, ui: &mut Ui) {
+        fn draw(&self, ui: &mut Ui) {
             ui.painter().add(eframe::epaint::PathShape::line(
                 self.base.points.clone(),
-                //Stroke::new(2.0, eframe::egui::Color32::BLACK)
-                Stroke::new(self.base.line_width, self.base.color)
+                Stroke::new(self.base.line_width, self.base.color),
             ));
         }
     }
@@ -251,22 +239,6 @@ pub mod gui_lib {
         pub base: ShapeBase,
         pub radius: f32,
     }
-    //let center = egui::Pos2::new(100.0, 100.0);
-    // impl Circle {
-    //     // Constructor method
-    //     pub fn new(center: Pos2, radius: f32) -> Self {
-    //         // 'Self' refers to the type 'Circle'
-    //         Circle {
-    //             base: {
-    //                 ShapeBase {
-    //                     location: center,
-    //                     ..Default::default()
-    //                 }
-    //             },
-    //             radius: radius,
-    //         }
-    //     }
-    // }
 
     impl Circle {
         // Constructor method
@@ -439,19 +411,14 @@ pub mod demo {
 
             let mut sp = Polyline::new(
                 eframe::egui::Pos2::new(600.0, 200.0),
-                [eframe::egui::Pos2::new(0.0, 0.0),
+                [
+                    eframe::egui::Pos2::new(0.0, 0.0),
                     eframe::egui::Pos2::new(100.0, 200.0),
-                    eframe::egui::Pos2::new(300.0, 400.0)]
+                    eframe::egui::Pos2::new(300.0, 400.0),
+                ],
             );
             sp.set_color(Color32::RED);
             vs.push(Box::new(sp));
-
-            // let mut spln = Polyline {
-            //     base: Default::default(),
-            //     location: eframe::egui::Pos2::new(600.0, 200.0),
-            //     //radius: 100.0 };
-            // };
-            // vs.push(Box::new(spln));
 
             Self {
                 screen: Screen {
@@ -464,7 +431,6 @@ pub mod demo {
                     //         size: Vec2::new(100.0, 75.0),
                     //     }),
                     // ],
-
                     widgets: vec![Box::new(Button {
                         width: 120.0,
                         height: 40.0,
