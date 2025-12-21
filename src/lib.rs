@@ -124,6 +124,15 @@ pub mod gui_lib {
         }
     }
 
+    #[derive(Debug, Clone, Copy, PartialEq)]
+    pub enum LineStyle {
+        Solid,
+        Dashed,
+        Dotted,
+        //Dashed { dash: f32, gap: f32 },
+        //Dotted { spacing: f32, radius: f32 },
+    }
+
     /// Base struct for all shapes.
     //#[derive(Debug, Default)]
     #[derive(Debug)]
@@ -133,7 +142,7 @@ pub mod gui_lib {
         color: Color32,
         fill_color: Color32,
         line_width: f32,
-        //line_style: f32,
+        line_style: LineStyle,
     }
 
     /// Trait for any shape.
@@ -164,7 +173,11 @@ pub mod gui_lib {
                 color: Color32::BLACK,
                 fill_color: Color32::TRANSPARENT,
                 line_width: 2.0,
-                //line_style: f32,
+                //line_style: LineStyle::Solid,
+                //line_style: LineStyle::Dashed { dash: 8.0, gap: 4.0 },
+                //line_style: LineStyle::Dashed,
+                //line_style: LineStyle::Dotted { spacing: 8.0, radius: 2.0 },
+                line_style: LineStyle::Dotted,
             }
         }
     }
@@ -177,6 +190,19 @@ pub mod gui_lib {
 
         fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
             self.points.iter().map(|p| *p + offset).collect()
+        }
+
+        fn dash_length(&self) -> f32 {
+            4.0*self.line_width
+        }
+        fn dash_gap(&self) -> f32 {
+            1.0+(2.0*self.line_width)
+        }
+        fn dot_radius(&self) -> f32 {
+            self.line_width/2.0
+        }
+        fn dot_spacing(&self) -> f32 {
+            1.0+(2.0*self.line_width)
         }
     }
 
@@ -204,12 +230,37 @@ pub mod gui_lib {
 
     impl Drawable for Polyline {
         fn draw(&self, ui: &mut Ui) {
-            ui.painter().add(eframe::epaint::PathShape::line(
-                self.base.points_translated(self.base.location.to_vec2()),
-                Stroke::new(self.base.line_width, self.base.color),
-            ));
+            let painter = ui.painter();
+
+            let points = self.base.points_translated(self.base.location.to_vec2());
+            let stroke = Stroke::new(self.base.line_width, self.base.color);
+
+            match self.base.line_style {
+                LineStyle::Solid => {
+                    painter.add(eframe::epaint::PathShape::line(points, stroke)); // :contentReference[oaicite:4]{index=4}
+                }
+                LineStyle::Dashed => {
+                    let shapes = eframe::egui::Shape::dashed_line(&points, stroke, self.base.dash_length(), self.base.dash_gap()); // :contentReference[oaicite:5]{index=5}
+                    painter.extend(shapes); // :contentReference[oaicite:6]{index=6}
+                }
+
+                LineStyle::Dotted => {
+                    let shapes = eframe::egui::Shape::dotted_line(&points, self.base.color, self.base.dot_spacing(), self.base.dot_radius()); // :contentReference[oaicite:7]{index=7}
+                    painter.extend(shapes); // :contentReference[oaicite:8]{index=8}
+                }
+            }
         }
     }
+
+
+    // impl Drawable for Polyline {
+    //     fn draw(&self, ui: &mut Ui) {
+    //         ui.painter().add(eframe::epaint::PathShape::line(
+    //             self.base.points_translated(self.base.location.to_vec2()),
+    //             Stroke::new(self.base.line_width, self.base.color),
+    //         ));
+    //     }
+    // }
 
     impl Shape for Polyline {
         fn color(&self) -> Color32 {
@@ -424,6 +475,7 @@ pub mod demo {
                     eframe::egui::Pos2::new(250.0, 0.0),
                 ],
             );
+            sp.set_line_width(2.0);
             sp.set_color(Color32::RED);
             vs.push(Box::new(sp));
 
