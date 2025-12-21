@@ -152,18 +152,32 @@ pub mod gui_lib {
     /// # Trait Implementer’s Note
     /// This trait requires `Debug` to be implemented for all types.
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
-    pub trait Shape: Drawable + std::fmt::Debug {
-        // `draw()` is provided by Drawable.
 
-        // Specific methods for shapes:
-        //fn shape_print(&self, ui: &mut Ui);
-        fn color(&self) -> Color32;
-        fn set_color(&mut self, col: Color32);
-        fn fill_color(&self) -> Color32;
-        fn set_fill_color(&mut self, col: Color32);
-        fn line_width(&self) -> f32;
-        fn set_line_width(&mut self, lw: f32);
+    pub trait Shape: Drawable + std::fmt::Debug {
+        fn base(&self) -> &ShapeBase;
+        fn base_mut(&mut self) -> &mut ShapeBase;
+
+        fn color(&self) -> Color32 { self.base().color() }
+        fn set_color(&mut self, col: Color32) { self.base_mut().set_color(col) }
+
+        fn fill_color(&self) -> Color32 { self.base().fill_color() }
+        fn set_fill_color(&mut self, col: Color32) { self.base_mut().set_fill_color(col) }
+
+        fn line_width(&self) -> f32 { self.base().line_width() }
+        fn set_line_width(&mut self, lw: f32) { self.base_mut().set_line_width(lw) }
     }
+    // pub trait Shape: Drawable + std::fmt::Debug {
+    //     // `draw()` is provided by Drawable.
+    //
+    //     // Specific methods for shapes:
+    //
+    //     fn color(&self) -> Color32;
+    //     fn set_color(&mut self, col: Color32);
+    //     fn fill_color(&self) -> Color32;
+    //     fn set_fill_color(&mut self, col: Color32);
+    //     fn line_width(&self) -> f32;
+    //     fn set_line_width(&mut self, lw: f32);
+    // }
 
     impl Default for ShapeBase {
         fn default() -> Self {
@@ -187,6 +201,15 @@ pub mod gui_lib {
         // pub fn new() -> Self {
         //     Self::default()
         // }
+
+        pub fn color(&self) -> Color32 { self.color }
+        pub fn set_color(&mut self, col: Color32) { self.color = col; }
+
+        pub fn fill_color(&self) -> Color32 { self.fill_color }
+        pub fn set_fill_color(&mut self, col: Color32) { self.fill_color = col; }
+
+        pub fn line_width(&self) -> f32 { self.line_width }
+        pub fn set_line_width(&mut self, lw: f32) { self.line_width = lw; }
 
         fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
             self.points.iter().map(|p| *p + offset).collect()
@@ -263,24 +286,8 @@ pub mod gui_lib {
     // }
 
     impl Shape for Polyline {
-        fn color(&self) -> Color32 {
-            self.base.color
-        }
-        fn set_color(&mut self, col: Color32) {
-            self.base.color = col;
-        }
-        fn fill_color(&self) -> Color32 {
-            self.base.fill_color
-        }
-        fn set_fill_color(&mut self, col: Color32) {
-            self.base.fill_color = col;
-        }
-        fn line_width(&self) -> f32 {
-            self.base.line_width
-        }
-        fn set_line_width(&mut self, lw: f32) {
-            self.base.line_width = lw;
-        }
+        fn base(&self) -> &ShapeBase { &self.base }
+        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
     }
 
     /// A customizable Circle component.
@@ -325,23 +332,10 @@ pub mod gui_lib {
     }
 
     impl Shape for Circle {
+        fn base(&self) -> &ShapeBase { &self.base }
+        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
         fn color(&self) -> Color32 {
             self.base.color
-        }
-        fn set_color(&mut self, col: Color32) {
-            self.base.color = col;
-        }
-        fn fill_color(&self) -> Color32 {
-            self.base.fill_color
-        }
-        fn set_fill_color(&mut self, col: Color32) {
-            self.base.fill_color = col;
-        }
-        fn line_width(&self) -> f32 {
-            self.base.line_width
-        }
-        fn set_line_width(&mut self, lw: f32) {
-            self.base.line_width = lw;
         }
     }
 
@@ -388,24 +382,8 @@ pub mod gui_lib {
     }
 
     impl Shape for Rectangle {
-        fn color(&self) -> Color32 {
-            self.base.color
-        }
-        fn set_color(&mut self, col: Color32) {
-            self.base.color = col;
-        }
-        fn fill_color(&self) -> Color32 {
-            self.base.fill_color
-        }
-        fn set_fill_color(&mut self, col: Color32) {
-            self.base.fill_color = col;
-        }
-        fn line_width(&self) -> f32 {
-            self.base.line_width
-        }
-        fn set_line_width(&mut self, lw: f32) {
-            self.base.line_width = lw;
-        }
+        fn base(&self) -> &ShapeBase { &self.base }
+        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
     }
 } //gui_lib
 
