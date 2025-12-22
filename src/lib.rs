@@ -157,6 +157,10 @@ pub mod gui_lib {
         fn base(&self) -> &ShapeBase;
         fn base_mut(&mut self) -> &mut ShapeBase;
 
+        fn move_to(&mut self, location: Pos2) {
+            self.base_mut().move_to(location)
+        }
+
         fn color(&self) -> Color32 { self.base().color() }
         fn set_color(&mut self, col: Color32) { self.base_mut().set_color(col) }
 
@@ -166,18 +170,6 @@ pub mod gui_lib {
         fn line_width(&self) -> f32 { self.base().line_width() }
         fn set_line_width(&mut self, lw: f32) { self.base_mut().set_line_width(lw) }
     }
-    // pub trait Shape: Drawable + std::fmt::Debug {
-    //     // `draw()` is provided by Drawable.
-    //
-    //     // Specific methods for shapes:
-    //
-    //     fn color(&self) -> Color32;
-    //     fn set_color(&mut self, col: Color32);
-    //     fn fill_color(&self) -> Color32;
-    //     fn set_fill_color(&mut self, col: Color32);
-    //     fn line_width(&self) -> f32;
-    //     fn set_line_width(&mut self, lw: f32);
-    // }
 
     impl Default for ShapeBase {
         fn default() -> Self {
@@ -202,6 +194,7 @@ pub mod gui_lib {
         //     Self::default()
         // }
 
+        pub fn move_to(&mut self, location: Pos2) { self.location = location; }
         pub fn color(&self) -> Color32 { self.color }
         pub fn set_color(&mut self, col: Color32) { self.color = col; }
 
@@ -211,20 +204,20 @@ pub mod gui_lib {
         pub fn line_width(&self) -> f32 { self.line_width }
         pub fn set_line_width(&mut self, lw: f32) { self.line_width = lw; }
 
-        fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
+        pub(crate) fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
             self.points.iter().map(|p| *p + offset).collect()
         }
 
-        fn dash_length(&self) -> f32 {
+        pub(crate) fn dash_length(&self) -> f32 {
             4.0*self.line_width
         }
-        fn dash_gap(&self) -> f32 {
+        pub(crate) fn dash_gap(&self) -> f32 {
             1.0+(2.0*self.line_width)
         }
-        fn dot_radius(&self) -> f32 {
+        pub(crate) fn dot_radius(&self) -> f32 {
             self.line_width/2.0
         }
-        fn dot_spacing(&self) -> f32 {
+        pub(crate) fn dot_spacing(&self) -> f32 {
             1.0+(2.0*self.line_width)
         }
     }
@@ -236,7 +229,7 @@ pub mod gui_lib {
     /// * `radius` - The radius of the button
     #[derive(Debug, Default)]
     pub struct Polyline {
-        pub base: ShapeBase,
+        base: ShapeBase,
     }
 
     impl Polyline {
@@ -275,16 +268,6 @@ pub mod gui_lib {
         }
     }
 
-
-    // impl Drawable for Polyline {
-    //     fn draw(&self, ui: &mut Ui) {
-    //         ui.painter().add(eframe::epaint::PathShape::line(
-    //             self.base.points_translated(self.base.location.to_vec2()),
-    //             Stroke::new(self.base.line_width, self.base.color),
-    //         ));
-    //     }
-    // }
-
     impl Shape for Polyline {
         fn base(&self) -> &ShapeBase { &self.base }
         fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
@@ -297,7 +280,7 @@ pub mod gui_lib {
     /// * `radius` - The radius of the button
     #[derive(Debug, Default)]
     pub struct Circle {
-        pub base: ShapeBase,
+        base: ShapeBase,
         pub radius: f32,
     }
 
@@ -325,7 +308,6 @@ pub mod gui_lib {
                 self.base.location,
                 self.radius,
                 self.base.fill_color,
-                //Stroke::new(2.0, self.base.color), // Black border
                 Stroke::new(self.base.line_width, self.base.color), // Black border
             );
         }
@@ -334,21 +316,11 @@ pub mod gui_lib {
     impl Shape for Circle {
         fn base(&self) -> &ShapeBase { &self.base }
         fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
-        fn color(&self) -> Color32 {
-            self.base.color
-        }
     }
 
-    // #[derive(Debug, Default)]
-    // pub struct Rectangle {
-    //     pub base: ShapeBase,
-    //     pub position: eframe::egui::Pos2,
-    //     pub size: Vec2,
-    // }
     #[derive(Debug, Default)]
     pub struct Rectangle {
-        pub base: ShapeBase,
-        //pub location: eframe::egui::Pos2,
+        base: ShapeBase,
         pub size: Vec2,
     }
     impl Rectangle {
@@ -374,7 +346,6 @@ pub mod gui_lib {
                 rect,
                 CornerRadius::ZERO,   // or CornerRadius::same(r)
                 self.base.fill_color, // fill
-                //Stroke::new(1.0, self.base.color), // border
                 Stroke::new(self.base.line_width, self.base.color), // border
                 StrokeKind::Outside,                                // Outside / Inside / Middle
             );
@@ -506,10 +477,10 @@ pub mod demo {
     // of creating a window and running an event loop.
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-            // if let Some(s) = self.screen.shapes.get_mut(0) {
-            //     s.set_color(Color32::RED);
-            //     //s.set_fill_color(Color32::YELLOW);
-            // }
+            // Test that trait Shape functions can be called here in update()
+            if let Some(s) = self.screen.shapes.get_mut(2) {
+                s.move_to(eframe::egui::Pos2::new(400.0, 400.0));
+            }
 
             let now = ctx.input(|i| i.time);
             //Time-gated 0.5 seconds
