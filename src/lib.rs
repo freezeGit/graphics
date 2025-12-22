@@ -11,7 +11,7 @@
 /// Module containing GUI components and utilities.
 ///
 /// This module provides basic building blocks for creating GUI applications,
-/// including buttons, screens and visual styling utilities. It implements
+/// including buttons, canvass and visual styling utilities. It implements
 /// a custom drawing system through the `Draw` trait.
 
 pub mod gui_lib {
@@ -46,9 +46,9 @@ pub mod gui_lib {
     /// # Trait Implementer’s Note
     /// This trait requires `Debug` to be implemented for all types.
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
-    pub trait Drawable: std::fmt::Debug {
-        fn draw(&self, ui: &mut Ui);
-    }
+    //pub trait Drawable: std::fmt::Debug {
+        //fn draw(&self, ui: &mut Ui);
+    //}
 
     /// Trait for any widget.
     ///
@@ -57,7 +57,7 @@ pub mod gui_lib {
     /// # Trait Implementer’s Note
     /// This trait requires `Debug` to be implemented for all types.
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
-    pub trait Widget: Drawable + std::fmt::Debug {
+    pub trait Widget: std::fmt::Debug {
         // `draw` is provided by Drawable.
 
         // Specific methods for widgets:
@@ -75,16 +75,16 @@ pub mod gui_lib {
 
     /// A container for drawable components.
     ///
-    /// Screen acts as a container that can hold and manage multiple
+    /// Canvas acts as a container that can hold and manage multiple
     /// UI components that implement the `Draw` trait.
     #[derive(Debug)]
-    pub struct Screen {
+    pub struct Canvas {
         pub shapes: Vec<Box<dyn Shape>>,
-        pub widgets: Vec<Box<dyn Widget>>,
+        //pub widgets: Vec<Box<dyn Widget>>,
     }
 
-    impl Screen {
-        /// Renders all components contained in the screen.
+    impl Canvas {
+        /// Renders all components contained in the canvas.
         ///
         /// # Arguments
         /// * `ui` - Mutable reference to the UI context
@@ -92,9 +92,9 @@ pub mod gui_lib {
             for shape in &self.shapes {
                 shape.draw(ui);
             }
-            for widget in &self.widgets {
-                widget.draw(ui);
-            }
+            // for widget in &self.widgets {
+            //     widget.draw(ui);
+            // }
         }
     }
 
@@ -111,18 +111,18 @@ pub mod gui_lib {
         pub label: String,
     }
 
-    impl Drawable for Button {
-        fn draw(&self, ui: &mut Ui) {
-            let size = vec2(self.width, self.height);
-            ui.add_sized(size, EguiButton::new(&self.label));
-        }
-    }
+    // impl Drawable for Button {
+    //     fn draw(&self, ui: &mut Ui) {
+    //         let size = vec2(self.width, self.height);
+    //         ui.add_sized(size, EguiButton::new(&self.label));
+    //     }
+    // }
 
-    impl Widget for Button {
-        fn widget_print(&self, _ui: &mut Ui) {
-            println!("Button: {:#?}", self);
-        }
-    }
+    // impl Widget for Button {
+    //     fn widget_print(&self, _ui: &mut Ui) {
+    //         println!("Button: {:#?}", self);
+    //     }
+    // }
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     pub enum LineStyle {
@@ -147,15 +147,17 @@ pub mod gui_lib {
 
     /// Trait for any shape.
     ///
-    /// Rendered on screen with supertrait Drawable
+    /// Rendered on canvas with supertrait Drawable
     ///
     /// # Trait Implementer’s Note
     /// This trait requires `Debug` to be implemented for all types.
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
 
-    pub trait Shape: Drawable + std::fmt::Debug {
+    pub trait Shape: std::fmt::Debug {
         fn base(&self) -> &ShapeBase;
         fn base_mut(&mut self) -> &mut ShapeBase;
+
+        fn draw(&self, ui: &mut Ui);
 
         fn move_to(&mut self, location: Pos2) {
             self.base_mut().move_to(location)
@@ -244,7 +246,12 @@ pub mod gui_lib {
         }
     }
 
-    impl Drawable for Polyline {
+
+
+    impl Shape for Polyline {
+        fn base(&self) -> &ShapeBase { &self.base }
+        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
+
         fn draw(&self, ui: &mut Ui) {
             let painter = ui.painter();
 
@@ -266,11 +273,6 @@ pub mod gui_lib {
                 }
             }
         }
-    }
-
-    impl Shape for Polyline {
-        fn base(&self) -> &ShapeBase { &self.base }
-        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
     }
 
     /// A customizable Circle component.
@@ -301,8 +303,22 @@ pub mod gui_lib {
     }
 
     // Implement Draw trait for Circle
-    impl Drawable for Circle {
+    //impl Drawable for Circle {
         //impl Shape for Circle {
+        // fn draw(&self, ui: &mut Ui) {
+        //     ui.painter().circle(
+        //         self.base.location,
+        //         self.radius,
+        //         self.base.fill_color,
+        //         Stroke::new(self.base.line_width, self.base.color), // Black border
+        //     );
+        // }
+    //}
+
+    impl Shape for Circle {
+        fn base(&self) -> &ShapeBase { &self.base }
+        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
+
         fn draw(&self, ui: &mut Ui) {
             ui.painter().circle(
                 self.base.location,
@@ -311,11 +327,6 @@ pub mod gui_lib {
                 Stroke::new(self.base.line_width, self.base.color), // Black border
             );
         }
-    }
-
-    impl Shape for Circle {
-        fn base(&self) -> &ShapeBase { &self.base }
-        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
     }
 
     #[derive(Debug, Default)]
@@ -339,7 +350,23 @@ pub mod gui_lib {
         }
     }
 
-    impl Drawable for Rectangle {
+    // impl Drawable for Rectangle {
+    //     fn draw(&self, ui: &mut Ui) {
+    //         let rect = Rect::from_center_size(self.base.location, self.size);
+    //         ui.painter().rect(
+    //             rect,
+    //             CornerRadius::ZERO,   // or CornerRadius::same(r)
+    //             self.base.fill_color, // fill
+    //             Stroke::new(self.base.line_width, self.base.color), // border
+    //             StrokeKind::Outside,                                // Outside / Inside / Middle
+    //         );
+    //     }
+    // }
+
+    impl Shape for Rectangle {
+        fn base(&self) -> &ShapeBase { &self.base }
+        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
+
         fn draw(&self, ui: &mut Ui) {
             let rect = Rect::from_center_size(self.base.location, self.size);
             ui.painter().rect(
@@ -350,11 +377,6 @@ pub mod gui_lib {
                 StrokeKind::Outside,                                // Outside / Inside / Middle
             );
         }
-    }
-
-    impl Shape for Rectangle {
-        fn base(&self) -> &ShapeBase { &self.base }
-        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
     }
 } //gui_lib
 
@@ -367,19 +389,19 @@ pub mod gui_lib {
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
     use super::gui_lib::Shape;
-    //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen, Vec2};
-    use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Screen};
+    //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
+    use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas};
     use crate::{custom_light_visuals, vec2};
     use eframe::egui::{CentralPanel, Context};
 
     /// Main application structure.
     ///
     /// Represents the root of the application and contains
-    /// the main screen with all UI components.
+    /// the main canvas with all UI components.
     //Your app's gateway to native windows
     #[derive(Debug)]
     struct DemoApp {
-        screen: Screen,
+        canvas: Canvas,
         last_toggle: f64,
         is_red: bool,
     }
@@ -388,7 +410,7 @@ pub mod demo {
         /// Creates a new instance of the application.
         ///
         /// # Returns
-        /// A new `DemoApp` instance initialized with a default screen
+        /// A new `DemoApp` instance initialized with a default canvas
         /// containing several shapes
         /// and containing a sample button.
         pub fn new() -> Self {
@@ -429,7 +451,7 @@ pub mod demo {
             vs.push(Box::new(sp));
 
             Self {
-                screen: Screen {
+                canvas: Canvas {
                     shapes: vs,
                     // Other ways to create shapes:
                     // shapes: vec![
@@ -440,11 +462,13 @@ pub mod demo {
                     //         size: Vec2::new(100.0, 75.0),
                     //     }),
                     // ],
-                    widgets: vec![Box::new(Button {
-                        width: 120.0,
-                        height: 40.0,
-                        label: "Click Me!".to_string(),
-                    })],
+
+                    // widgets: vec![Box::new(Button {
+                    //     width: 120.0,
+                    //     height: 40.0,
+                    //     label: "Click Me!".to_string(),
+                    // })],
+
                 },
                 last_toggle: 0.0, //For time-gating
                 is_red: true,
@@ -466,7 +490,7 @@ pub mod demo {
                 //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
                 //let mut app = Box::new(DemoApp::new());
                 let app = Box::new(DemoApp::new());
-                //app.screen.shapes[0].set_fill_color(Color32::GREEN);
+                //app.canvas.shapes[0].set_fill_color(Color32::GREEN);
                 Ok(app)
             }),
         )
@@ -478,7 +502,7 @@ pub mod demo {
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Test that trait Shape functions can be called here in update()
-            if let Some(s) = self.screen.shapes.get_mut(2) {
+            if let Some(s) = self.canvas.shapes.get_mut(2) {
                 s.move_to(eframe::egui::Pos2::new(400.0, 400.0));
             }
 
@@ -488,7 +512,7 @@ pub mod demo {
                 self.last_toggle = now;
                 self.is_red = !self.is_red;
 
-                if let Some(s) = self.screen.shapes.get_mut(1) {
+                if let Some(s) = self.canvas.shapes.get_mut(1) {
                     let c = if self.is_red {
                         Color32::RED
                     } else {
@@ -500,7 +524,7 @@ pub mod demo {
             }
 
             CentralPanel::default().show(ctx, |ui| {
-                self.screen.run(ui);
+                self.canvas.run(ui);
             });
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
@@ -512,7 +536,7 @@ pub mod demo {
 /// Exposed publicly
 //pub use demo::DemoApp;
 pub use eframe::egui::vec2;
-//pub use gui_lib::{Button, Draw, Screen, custom_light_visuals};
-pub use gui_lib::{Button, Screen, custom_light_visuals};
+//pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
+pub use gui_lib::{Button, Canvas, custom_light_visuals};
 
 //Changed
