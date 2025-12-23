@@ -19,6 +19,7 @@ pub mod gui_lib {
         Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2,
         Visuals, pos2, vec2,
     };
+    use eframe::egui::Response;
 
     /// Creates a custom light theme.
     pub fn custom_light_visuals() -> Visuals {
@@ -75,10 +76,9 @@ pub mod gui_lib {
     /// This trait requires `Debug` to be implemented for all types.
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
     pub trait Widget: std::fmt::Debug {
-        // `draw` is provided by Drawable.
 
-        // Specific methods for widgets:
-        fn widget_print(&self, ui: &mut Ui);
+        fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
+
         // fn layout(&mut self, ctx: &mut LayoutCtx);
         // fn event(&mut self, ctx: &mut EventCtx, event: &Event);
         // fn set_focused(&mut self, focused: bool);
@@ -105,12 +105,12 @@ pub mod gui_lib {
         ///
         /// # Arguments
         /// * `ui` - Mutable reference to the UI context
-        pub fn run(&self, ui: &mut Ui) {
+        pub fn run(&mut self, ui: &mut Ui) {
             for shape in &self.shapes {
                 shape.draw(ui);
             }
-            for widget in &self.widgets {
-                widget.widget_print(ui);
+            for widget in &mut self.widgets {
+                widget.invoke(ui);
             }
         }
     }
@@ -129,8 +129,9 @@ pub mod gui_lib {
     }
 
     impl Widget for Button {
-        fn widget_print(&self, _ui: &mut Ui) {
-            println!("Button: {:#?}", self);
+        fn invoke(&mut self, ui: &mut Ui) -> Response {
+            let size = vec2(self.width, self.height);
+            ui.add_sized(size, EguiButton::new(&self.label))
         }
     }
 
