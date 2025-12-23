@@ -128,6 +128,17 @@ pub mod gui_lib {
         pub label: String,
     }
 
+    impl Button {
+        // Constructor method
+        pub fn new(width: f32, height: f32, label: String) -> Self {
+            Self {
+                width,
+                height,
+                label
+            }
+        }
+    }
+
     impl Widget for Button {
         fn invoke(&mut self, ui: &mut Ui) -> Response {
             let size = vec2(self.width, self.height);
@@ -454,6 +465,8 @@ pub mod gui_lib {
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
     use super::gui_lib::Shape;
+    use super::gui_lib::Widget;
+    //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
     use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas};
     //use crate::{custom_light_visuals, native_options, vec2};
@@ -516,6 +529,11 @@ pub mod demo {
             sp.set_color(Color32::RED);
             vs.push(Box::new(sp));
 
+            let mut vw: Vec<Box<dyn Widget>> = Vec::new();
+
+            let mut wc = Button::new(120.0, 40.0, "Push me".to_string());
+            vw.push(Box::new(wc));
+
             Self {
                 canvas: Canvas {
                     shapes: vs,
@@ -529,11 +547,13 @@ pub mod demo {
                     //     }),
                     // ],
 
-                    widgets: vec![Box::new(Button {
-                        width: 120.0,
-                        height: 40.0,
-                        label: "Click Me!".to_string(),
-                    })],
+                    widgets: vw,
+
+                    // widgets: vec![Box::new(Button {
+                    //     width: 120.0,
+                    //     height: 40.0,
+                    //     label: "Click Me!".to_string(),
+                    // })],
 
                 },
                 last_toggle: 0.0, //For time-gating
