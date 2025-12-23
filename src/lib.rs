@@ -111,13 +111,6 @@ pub mod gui_lib {
         pub label: String,
     }
 
-    // impl Drawable for Button {
-    //     fn draw(&self, ui: &mut Ui) {
-    //         let size = vec2(self.width, self.height);
-    //         ui.add_sized(size, EguiButton::new(&self.label));
-    //     }
-    // }
-
     // impl Widget for Button {
     //     fn widget_print(&self, _ui: &mut Ui) {
     //         println!("Button: {:#?}", self);
@@ -302,19 +295,6 @@ pub mod gui_lib {
         }
     }
 
-    // Implement Draw trait for Circle
-    //impl Drawable for Circle {
-        //impl Shape for Circle {
-        // fn draw(&self, ui: &mut Ui) {
-        //     ui.painter().circle(
-        //         self.base.location,
-        //         self.radius,
-        //         self.base.fill_color,
-        //         Stroke::new(self.base.line_width, self.base.color), // Black border
-        //     );
-        // }
-    //}
-
     impl Shape for Circle {
         fn base(&self) -> &ShapeBase { &self.base }
         fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
@@ -349,19 +329,6 @@ pub mod gui_lib {
             }
         }
     }
-
-    // impl Drawable for Rectangle {
-    //     fn draw(&self, ui: &mut Ui) {
-    //         let rect = Rect::from_center_size(self.base.location, self.size);
-    //         ui.painter().rect(
-    //             rect,
-    //             CornerRadius::ZERO,   // or CornerRadius::same(r)
-    //             self.base.fill_color, // fill
-    //             Stroke::new(self.base.line_width, self.base.color), // border
-    //             StrokeKind::Outside,                                // Outside / Inside / Middle
-    //         );
-    //     }
-    // }
 
     impl Shape for Rectangle {
         fn base(&self) -> &ShapeBase { &self.base }
