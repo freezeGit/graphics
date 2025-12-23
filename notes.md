@@ -1,3 +1,27 @@
+    pub fn run_demo() -> Result<(), eframe::Error> {
+        //let mut app = Box::new(DemoApp::new());
+        // let mut native_options = eframe::NativeOptions::default();
+        // native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
+        eframe::run_native(
+            "GUI Draw Example",
+            //native_options,
+            super::gui_lib::native_options(),
+            Box::new(|cc| {
+                cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
+                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
+                //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
+                //let mut app = Box::new(DemoApp::new());
+                let app = Box::new(DemoApp::new());
+                //app.canvas.shapes[0].set_fill_color(Color32::GREEN);
+                Ok(app)
+            }),
+        )
+    }
+---------------------------------------------------------
+
+
+
 Let me check the available shape drawing methods in egui's Painter.Based on the documentation [[1]](https://doc.qu1x.dev/bevy_trackball/egui/struct.Painter.html), the Painter struct provides several methods for drawing shapes:
 
 1. Circle methods:

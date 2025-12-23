@@ -36,6 +36,23 @@ pub mod gui_lib {
         visuals
     }
 
+    /// Constructs and returns a customized instance of `eframe::NativeOptions`.
+    ///
+    /// This function initializes a default `eframe::NativeOptions` object and modifies its viewport to have
+    /// an inner size of 1200x800 pixels. The customized `NativeOptions` object is returned for further use.
+    ///
+    /// # Returns
+    /// * `eframe::NativeOptions` - An instance of `eframe::NativeOptions` with the specified viewport size.
+    ///
+    /// # Example
+
+    /// Use instead of `eframe::NativeOptions::default()` to set a custom viewport size.
+    pub fn native_options() -> eframe::NativeOptions {
+        let mut native_options = eframe::NativeOptions::default();
+        native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
+        native_options
+    }
+
     /// Trait for  anything that can be drawn in the UI.
     ///
     /// Implement this trait for any component that needs to be rendered
@@ -80,7 +97,7 @@ pub mod gui_lib {
     #[derive(Debug)]
     pub struct Canvas {
         pub shapes: Vec<Box<dyn Shape>>,
-        //pub widgets: Vec<Box<dyn Widget>>,
+        pub widgets: Vec<Box<dyn Widget>>,
     }
 
     impl Canvas {
@@ -92,9 +109,9 @@ pub mod gui_lib {
             for shape in &self.shapes {
                 shape.draw(ui);
             }
-            // for widget in &self.widgets {
-            //     widget.draw(ui);
-            // }
+            for widget in &self.widgets {
+                widget.widget_print(ui);
+            }
         }
     }
 
@@ -111,11 +128,11 @@ pub mod gui_lib {
         pub label: String,
     }
 
-    // impl Widget for Button {
-    //     fn widget_print(&self, _ui: &mut Ui) {
-    //         println!("Button: {:#?}", self);
-    //     }
-    // }
+    impl Widget for Button {
+        fn widget_print(&self, _ui: &mut Ui) {
+            println!("Button: {:#?}", self);
+        }
+    }
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     pub enum LineStyle {
@@ -347,7 +364,87 @@ pub mod gui_lib {
     }
 } //gui_lib
 
-// ------------------------------
+
+///
+/// Demonstration module for an application with a custom UI.
+///
+/// This module showcases the implementation of a demo application using the `eframe`
+/// framework and a custom `gui_lib` library to render various graphical components.
+///
+/// - The application initializes and displays a set of graphical shapes on a canvas.
+/// - It features basic animation and user interaction behaviors.
+/// - Components such as circles, rectangles, and polylines are created, styled, and animated.
+/// - Demonstrates the use of time-based updates (`ctx.input(|i| i.time)`) for animations.
+///
+/// # Main Features
+/// - Central panel UI using `eframe::egui`.
+/// - Customizable shapes rendered on a canvas.
+/// - The ability to toggle visual properties (e.g., color) over time.
+/// - Integration with `eframe::App` for interacting with the `egui` context.
+///
+/// # Modules
+/// - The `demo` module defines an application structure (`DemoApp`) and its behavior.
+/// - Uses utilities and components from the `gui_lib` module.
+///
+/// # Components
+///
+/// ## DemoApp
+/// The main structure and entry point of the application.
+/// - Contains a `Canvas` for holding a collection of shapes.
+/// - Provides methods for creating and updating the UI.
+///
+/// ## Canvas
+/// A container for rendering and managing graphical shapes.
+///
+/// ## Shapes
+/// Custom shapes implemented via the `gui_lib::Shape` trait:
+/// - `Circle`: A circular shape with customizable size, fill color, and outline.
+/// - `Rectangle`: A rectangular shape with customizable size, position, and fill color.
+/// - `Polyline`: A series of connected line segments with customizable line width and color.
+///
+/// # Animation
+/// - Demonstrates basic animations and state toggles using time-based checks.
+/// - Shapes on the canvas have their properties dynamically updated, e.g., blinking colors.
+///
+/// # Usage
+///
+/// ## Running the Application
+/// Call the `run_demo()` function to start the application.
+/// It initializes an `eframe` native window and sets up the demo layout and visuals.
+/// ```rust
+/// demo::run_demo()
+/// ```
+///
+/// ## Modifying Shapes
+/// The application supports dynamic modification of shape properties, such as:
+/// - Color, size, and position.
+/// These can be altered within the `update` method using the shape trait's API.
+///
+/// ## Extending Functionality
+/// - Additional shapes and widgets can be added to the `Canvas`.
+/// - Use the `Shape` trait to define custom graphical components.
+///
+/// # Example
+/// use super::demo::run_demo;
+///
+/// fn main() -> Result<(), eframe::Error> {
+///     run_demo()
+/// }
+///
+/// # Notes
+/// - The `custom_light_visuals` function is used to define a custom theme for the UI.
+/// - `ctx.request_repaint_after()` ensures smooth animations by updating the frame at a fixed interval.
+///
+/// # Modules Used:
+/// - Uses core functionality from:
+///   - `eframe::egui`
+///   - `crate::gui_lib`
+/// - Demonstrates integration with external modules like `gui_lib` for rendering and shapes.
+///
+/// # Errors
+/// This application returns an `eframe::Error` if initialization or event handling fails.
+///
+
 // Demonstration module. App-specific code
 // ------------------------------
 /// Module containing the demo application implementation.
@@ -358,8 +455,9 @@ pub mod demo {
     use super::gui_lib::Shape;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
     use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas};
-    use crate::{custom_light_visuals, vec2};
-    use eframe::egui::{CentralPanel, Context};
+    //use crate::{custom_light_visuals, native_options, vec2};
+    use crate::{custom_light_visuals};
+    use eframe::egui::{vec2, CentralPanel, Context};
 
     /// Main application structure.
     ///
@@ -430,11 +528,11 @@ pub mod demo {
                     //     }),
                     // ],
 
-                    // widgets: vec![Box::new(Button {
-                    //     width: 120.0,
-                    //     height: 40.0,
-                    //     label: "Click Me!".to_string(),
-                    // })],
+                    widgets: vec![Box::new(Button {
+                        width: 120.0,
+                        height: 40.0,
+                        label: "Click Me!".to_string(),
+                    })],
 
                 },
                 last_toggle: 0.0, //For time-gating
@@ -444,20 +542,15 @@ pub mod demo {
     }
 
     pub fn run_demo() -> Result<(), eframe::Error> {
-        //let mut app = Box::new(DemoApp::new());
-        let mut native_options = eframe::NativeOptions::default();
-        native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
         eframe::run_native(
             "GUI Draw Example",
-            native_options,
+            super::gui_lib::native_options(),
             Box::new(|cc| {
                 cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
-                //let app: Box<dyn eframe::App> = Box::new(DemoApp::new());
-                //let mut app = Box::new(DemoApp::new());
                 let app = Box::new(DemoApp::new());
-                //app.canvas.shapes[0].set_fill_color(Color32::GREEN);
+                //app.canvas.shapes[0].set_fill_color(Color32::GREEN); // Shape can be changed here
                 Ok(app)
             }),
         )
@@ -466,6 +559,11 @@ pub mod demo {
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
+
+/// The eframe::App trait is the bridge between your custom application logic
+/// and the eframe framework that handles all the platform-specific details
+/// of creating a window and running an event loop.
+
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Test that trait Shape functions can be called here in update()
@@ -473,6 +571,7 @@ pub mod demo {
                 s.move_to(eframe::egui::Pos2::new(400.0, 400.0));
             }
 
+            // Test of basic simulation/animation
             let now = ctx.input(|i| i.time);
             //Time-gated 0.5 seconds
             if now - self.last_toggle >= 0.5 {
