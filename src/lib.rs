@@ -98,14 +98,14 @@ pub mod gui_lib {
     /// Canvas acts as a container that can hold and manage multiple
     /// UI components that implement the `Draw` trait.
     #[derive(Debug)]
-    pub struct Canvas {
+    pub struct BasicCanvas {
         //pub shapes: Vec<Box<dyn Shape>>,
         //shapes: Vec<ShapeHandle> = vec![],
         pub shapes: Vec<ShapeHandle>,
         pub widgets: Vec<Box<dyn Widget>>,
     }
 
-    impl Canvas {
+    impl BasicCanvas {
         /// Renders all components contained in the canvas.
         /// pub fn run(&mut self, ui: &mut Ui) {
 
@@ -540,7 +540,7 @@ pub mod demo {
     //use super::gui_lib::Widget;
     //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
-    use super::gui_lib::{Button, Canvas, Circle, Color32, Polyline, Rectangle};
+    use super::gui_lib::{Button, BasicCanvas, Circle, Color32, Polyline, Rectangle, ShapeBase};
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     use crate::custom_light_visuals;
@@ -552,17 +552,35 @@ pub mod demo {
     //use crate::{custom_light_visuals, gui_lib::Shape, gui_lib::Widget, gui_lib::ShapeHandle};
     //use eframe::egui::{vec2, CentralPanel, Context};
 
+    #[derive(Debug)]
+    pub struct DemoCanvas {
+        pub canvas: BasicCanvas,
+
+        // pub shapes: Vec<ShapeHandle>,
+        // pub widgets: Vec<Box<dyn Widget>>,
+    }
+
     /// Main application structure.
     ///
     /// Represents the root of the application and contains
     /// the main canvas with all UI components.
     //Your app's gateway to native windows
+    // #[derive(Debug)]
+    // struct DemoApp {
+    //     canvas: Canvas,
+    //     last_toggle: f64,
+    //     is_red: bool,
+    // }
+
     #[derive(Debug)]
     struct DemoApp {
-        canvas: Canvas,
+        canvas: DemoCanvas,
         last_toggle: f64,
         is_red: bool,
     }
+
+    // fn base(&self) -> &ShapeBase;
+    // fn base_mut(&mut self) -> &mut ShapeBase;
 
     impl DemoApp {
         /// Creates a new instance of the application.
@@ -623,10 +641,20 @@ pub mod demo {
             sr.borrow_mut().set_fill_color(Color32::LIGHT_BLUE);
 
             Self {
-                canvas: Canvas {
-                    shapes: vs,
-                     widgets: vw,
-                 },
+                // d_canvas: DemoCanvas {
+                //     canvas: Canvas {
+                //         shapes: vs.clone(),
+                //         widgets: vec![], // Widgets often aren't Clone, so we provide an empty vec or move logic
+                //     },
+                // },
+                canvas: DemoCanvas {
+                    canvas: BasicCanvas {
+                        shapes: vs,
+                        widgets: vw,
+                    }
+                },
+
+
                 last_toggle: 0.0, //For time-gating
                 is_red: true,
             }
@@ -659,10 +687,10 @@ pub mod demo {
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Use the helper method to access shapes safely and avoid private field errors
-            if let Some(s) = self.canvas.get_shape_mut(3) {
-                s.borrow_mut()
-                    .move_to(eframe::egui::Pos2::new(550.0, 400.0));
-            }
+            // if let Some(s) = self.canvas.get_shape_mut(3) {
+            //     s.borrow_mut()
+            //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
+            // } // TDJ
 
             // Test of basic simulation/animation
             let now = ctx.input(|i| i.time);
@@ -671,15 +699,15 @@ pub mod demo {
                 self.last_toggle = now;
                 self.is_red = !self.is_red;
 
-                if let Some(s) = self.canvas.get_shape_mut(1) {
-                    let c = if self.is_red {
-                        Color32::RED
-                    } else {
-                        Color32::BLUE
-                    };
-                    s.borrow_mut().set_fill_color(c);
-                    //s.borrow_mut().set_color(Color32::WHITE);
-                }
+                // if let Some(s) = self.canvas.get_shape_mut(1) {
+                //     let c = if self.is_red {
+                //         Color32::RED
+                //     } else {
+                //         Color32::BLUE
+                //     };
+                //     s.borrow_mut().set_fill_color(c);
+                //     //s.borrow_mut().set_color(Color32::WHITE);
+                //}  //TDJ
 
                 // if let Some(s) = self.canvas.get_shape_mut(1) {
                 //     let c = if self.is_red {
@@ -692,7 +720,8 @@ pub mod demo {
             }
 
             CentralPanel::default().show(ctx, |ui| {
-                self.canvas.run(ui);
+                //self.canvas.run(ui);
+                self.canvas.canvas.run(ui);
             });
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
@@ -705,6 +734,6 @@ pub mod demo {
 //pub use demo::DemoApp;
 pub use eframe::egui::vec2;
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
-pub use gui_lib::{Button, Canvas, custom_light_visuals};
+pub use gui_lib::{Button, BasicCanvas, custom_light_visuals};
 
 //Changed
