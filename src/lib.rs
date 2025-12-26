@@ -108,10 +108,7 @@ pub mod gui_lib {
 
     impl Canvas {
         /// Renders all components contained in the canvas.
-        ///
-        /// # Arguments
-        /// * `ui` - Mutable reference to the UI context
-        ///         pub fn run(&mut self, ui: &mut Ui) {
+        /// pub fn run(&mut self, ui: &mut Ui) {
 
         pub fn run(&mut self, ui: &mut Ui) {
             for shape in &self.shapes {
@@ -120,6 +117,11 @@ pub mod gui_lib {
             for widget in &mut self.widgets {
                 widget.invoke(ui);
             }
+        }
+
+        /// Returns a mutable reference to a shape handle at the given index.
+        pub fn get_shape_mut(&mut self, index: usize) -> Option<&mut ShapeHandle> {
+            self.shapes.get_mut(index)
         }
     }
 
@@ -669,29 +671,27 @@ pub mod demo {
 
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-            // Test that trait Shape functions can be called here in update()
-            // if let Some(s) = self.canvas.shapes.get_mut(2) {
-            //     s.move_to(eframe::egui::Pos2::new(400.0, 400.0));
-            //}
+            // Use the helper method to access shapes safely and avoid private field errors
+            if let Some(s) = self.canvas.get_shape_mut(2) {
+                s.borrow_mut().move_to(eframe::egui::Pos2::new(400.0, 400.0));
+            }
 
             // Test of basic simulation/animation
             let now = ctx.input(|i| i.time);
-            //Time-gated 0.5 seconds
-            //TDJ
-            // if now - self.last_toggle >= 0.5 {
-            //     self.last_toggle = now;
-            //     self.is_red = !self.is_red;
-            //
-            //     if let Some(s) = self.canvas.shapes.get_mut(1) {
-            //         let c = if self.is_red {
-            //             Color32::RED
-            //         } else {
-            //             Color32::BLUE
-            //         };
-            //         //s.set_color(c);
-            //         s.set_fill_color(c);
-            //     }
-            // }
+            
+            if now - self.last_toggle >= 0.5 {
+                self.last_toggle = now;
+                self.is_red = !self.is_red;
+
+                if let Some(s) = self.canvas.get_shape_mut(1) {
+                    let c = if self.is_red {
+                        Color32::RED
+                    } else {
+                        Color32::BLUE
+                    };
+                    s.borrow_mut().set_fill_color(c);
+                }
+            }
 
             CentralPanel::default().show(ctx, |ui| {
                 self.canvas.run(ui);
