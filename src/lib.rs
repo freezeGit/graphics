@@ -15,13 +15,13 @@
 /// a custom drawing system through the `Draw` trait.
 
 pub mod gui_lib {
+    use eframe::egui::Response;
     pub use eframe::egui::{
         Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2,
         Visuals, pos2, vec2,
     };
-    use eframe::egui::Response;
-    use std::rc::Rc;
     use std::cell::RefCell;
+    use std::rc::Rc;
 
     pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
 
@@ -69,7 +69,7 @@ pub mod gui_lib {
     /// This trait requires `Debug` to be implemented for all types.
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
     //pub trait Drawable: std::fmt::Debug {
-        //fn draw(&self, ui: &mut Ui);
+    //fn draw(&self, ui: &mut Ui);
     //}
 
     /// Trait for any widget.
@@ -80,7 +80,6 @@ pub mod gui_lib {
     /// This trait requires `Debug` to be implemented for all types.
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
     pub trait Widget: std::fmt::Debug {
-
         fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
 
         // fn layout(&mut self, ctx: &mut LayoutCtx);
@@ -133,13 +132,13 @@ pub mod gui_lib {
     // }
 
     // pub fn run(&mut self, ui: &mut Ui) {
-        //     for shape in &self.shapes {
-        //         shape.draw(ui);
-        //     }
-        //     for widget in &mut self.widgets {
-        //         widget.invoke(ui);
-        //     }
-        // }
+    //     for shape in &self.shapes {
+    //         shape.draw(ui);
+    //     }
+    //     for widget in &mut self.widgets {
+    //         widget.invoke(ui);
+    //     }
+    // }
     //}
 
     /// A customizable button component.
@@ -161,7 +160,7 @@ pub mod gui_lib {
             Self {
                 width,
                 height,
-                label
+                label,
             }
         }
     }
@@ -212,14 +211,26 @@ pub mod gui_lib {
             self.base_mut().move_to(location)
         }
 
-        fn color(&self) -> Color32 { self.base().color() }
-        fn set_color(&mut self, col: Color32) { self.base_mut().set_color(col) }
+        fn color(&self) -> Color32 {
+            self.base().color()
+        }
+        fn set_color(&mut self, col: Color32) {
+            self.base_mut().set_color(col)
+        }
 
-        fn fill_color(&self) -> Color32 { self.base().fill_color() }
-        fn set_fill_color(&mut self, col: Color32) { self.base_mut().set_fill_color(col) }
+        fn fill_color(&self) -> Color32 {
+            self.base().fill_color()
+        }
+        fn set_fill_color(&mut self, col: Color32) {
+            self.base_mut().set_fill_color(col)
+        }
 
-        fn line_width(&self) -> f32 { self.base().line_width() }
-        fn set_line_width(&mut self, lw: f32) { self.base_mut().set_line_width(lw) }
+        fn line_width(&self) -> f32 {
+            self.base().line_width()
+        }
+        fn set_line_width(&mut self, lw: f32) {
+            self.base_mut().set_line_width(lw)
+        }
     }
 
     impl Default for ShapeBase {
@@ -245,31 +256,45 @@ pub mod gui_lib {
         //     Self::default()
         // }
 
-        pub fn move_to(&mut self, location: Pos2) { self.location = location; }
-        pub fn color(&self) -> Color32 { self.color }
-        pub fn set_color(&mut self, col: Color32) { self.color = col; }
+        pub fn move_to(&mut self, location: Pos2) {
+            self.location = location;
+        }
+        pub fn color(&self) -> Color32 {
+            self.color
+        }
+        pub fn set_color(&mut self, col: Color32) {
+            self.color = col;
+        }
 
-        pub fn fill_color(&self) -> Color32 { self.fill_color }
-        pub fn set_fill_color(&mut self, col: Color32) { self.fill_color = col; }
+        pub fn fill_color(&self) -> Color32 {
+            self.fill_color
+        }
+        pub fn set_fill_color(&mut self, col: Color32) {
+            self.fill_color = col;
+        }
 
-        pub fn line_width(&self) -> f32 { self.line_width }
-        pub fn set_line_width(&mut self, lw: f32) { self.line_width = lw; }
+        pub fn line_width(&self) -> f32 {
+            self.line_width
+        }
+        pub fn set_line_width(&mut self, lw: f32) {
+            self.line_width = lw;
+        }
 
         pub(crate) fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
             self.points.iter().map(|p| *p + offset).collect()
         }
 
         pub(crate) fn dash_length(&self) -> f32 {
-            4.0*self.line_width
+            4.0 * self.line_width
         }
         pub(crate) fn dash_gap(&self) -> f32 {
-            1.0+(2.0*self.line_width)
+            1.0 + (2.0 * self.line_width)
         }
         pub(crate) fn dot_radius(&self) -> f32 {
-            self.line_width/2.0
+            self.line_width / 2.0
         }
         pub(crate) fn dot_spacing(&self) -> f32 {
-            1.0+(2.0*self.line_width)
+            1.0 + (2.0 * self.line_width)
         }
     }
 
@@ -295,11 +320,13 @@ pub mod gui_lib {
         }
     }
 
-
-
     impl Shape for Polyline {
-        fn base(&self) -> &ShapeBase { &self.base }
-        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
+        fn base(&self) -> &ShapeBase {
+            &self.base
+        }
+        fn base_mut(&mut self) -> &mut ShapeBase {
+            &mut self.base
+        }
 
         fn draw(&self, ui: &mut Ui) {
             let painter = ui.painter();
@@ -312,12 +339,22 @@ pub mod gui_lib {
                     painter.add(eframe::epaint::PathShape::line(points, stroke)); // :contentReference[oaicite:4]{index=4}
                 }
                 LineStyle::Dashed => {
-                    let shapes = eframe::egui::Shape::dashed_line(&points, stroke, self.base.dash_length(), self.base.dash_gap()); // :contentReference[oaicite:5]{index=5}
+                    let shapes = eframe::egui::Shape::dashed_line(
+                        &points,
+                        stroke,
+                        self.base.dash_length(),
+                        self.base.dash_gap(),
+                    ); // :contentReference[oaicite:5]{index=5}
                     painter.extend(shapes); // :contentReference[oaicite:6]{index=6}
                 }
 
                 LineStyle::Dotted => {
-                    let shapes = eframe::egui::Shape::dotted_line(&points, self.base.color, self.base.dot_spacing(), self.base.dot_radius()); // :contentReference[oaicite:7]{index=7}
+                    let shapes = eframe::egui::Shape::dotted_line(
+                        &points,
+                        self.base.color,
+                        self.base.dot_spacing(),
+                        self.base.dot_radius(),
+                    ); // :contentReference[oaicite:7]{index=7}
                     painter.extend(shapes); // :contentReference[oaicite:8]{index=8}
                 }
             }
@@ -352,8 +389,12 @@ pub mod gui_lib {
     }
 
     impl Shape for Circle {
-        fn base(&self) -> &ShapeBase { &self.base }
-        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
+        fn base(&self) -> &ShapeBase {
+            &self.base
+        }
+        fn base_mut(&mut self) -> &mut ShapeBase {
+            &mut self.base
+        }
 
         fn draw(&self, ui: &mut Ui) {
             ui.painter().circle(
@@ -387,8 +428,12 @@ pub mod gui_lib {
     }
 
     impl Shape for Rectangle {
-        fn base(&self) -> &ShapeBase { &self.base }
-        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
+        fn base(&self) -> &ShapeBase {
+            &self.base
+        }
+        fn base_mut(&mut self) -> &mut ShapeBase {
+            &mut self.base
+        }
 
         fn draw(&self, ui: &mut Ui) {
             let rect = Rect::from_center_size(self.base.location, self.size);
@@ -397,14 +442,13 @@ pub mod gui_lib {
                 CornerRadius::ZERO,   // or CornerRadius::same(r)
                 self.base.fill_color, // fill
                 Stroke::new(self.base.line_width, self.base.color), // border
-                StrokeKind::Outside,                                // Outside / Inside / Middle
+                StrokeKind::Outside,  // Outside / Inside / Middle
             );
         }
     }
 } // This closes impl Canvas (Line 109)
 
 //} // This closes mod gui_lib (Line 17/394)
-
 
 ///
 /// Demonstration module for an application with a custom UI.
@@ -496,14 +540,14 @@ pub mod demo {
     //use super::gui_lib::Widget;
     //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
-    use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas};
+    use super::gui_lib::{Button, Canvas, Circle, Color32, Polyline, Rectangle};
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
-    use crate::gui_lib::{Shape, Widget, ShapeHandle};
     use crate::custom_light_visuals;
-    use std::rc::Rc;
+    use crate::gui_lib::{Shape, ShapeHandle, Widget};
+    use eframe::egui::{CentralPanel, Context, vec2};
     use std::cell::RefCell;
-    use eframe::egui::{vec2, CentralPanel, Context};
+    use std::rc::Rc;
 
     //use crate::{custom_light_visuals, gui_lib::Shape, gui_lib::Widget, gui_lib::ShapeHandle};
     //use eframe::egui::{vec2, CentralPanel, Context};
@@ -528,118 +572,61 @@ pub mod demo {
         /// containing several shapes
         /// and containing a sample button.
         pub fn new() -> Self {
-            // Vec to hold Shape trait objects
-            //let mut vs: Vec<Box<dyn Shape>> = Vec::new();
+            // container for shapes
             let mut vs: Vec<ShapeHandle> = vec![];
-            //let mut vs: Vec<Box<dyn Shape>> = Vec::new();
 
-            // let mut sc1 = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0);
-            // sc1.set_line_width(4.0);
-            // sc1.set_fill_color(Color32::DARK_RED);
-            // vs.push(Box::new(sc1));
-
-
-            let sc1: Rc<RefCell<Circle>> =
-                Rc::new(RefCell::new(Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0)));
-            //sc1.set_line_width(4.0);
+            let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+                eframe::egui::Pos2::new(200.0, 200.0),
+                75.0,
+            )));
             sc1.borrow_mut().set_line_width(4.0);
-            //sc1.set_fill_color(Color32::DARK_RED);
-            sc1.borrow_mut().set_fill_color(Color32::WHITE);
+            sc1.borrow_mut().set_fill_color(Color32::DARK_RED);
             vs.push(sc1.clone()); // store in collection
 
-            //
-            // let mut sc2 = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 10.0);
-            // vs.push(Box::new(sc2));
-            //
-            // let mut sr = Rectangle::new(
-            //     eframe::egui::Pos2::new(400.0, 200.0),
-            //     eframe::egui::Vec2::new(150.0, 100.0),
-            // );
-            // //s2.set_color(Color32::RED);
-            // sr.set_fill_color(Color32::GOLD);
-            // //sr.set_line_width(5.0);
-            // vs.push(Box::new(sr));
-            //
-            // let mut sp = Polyline::new(
-            //     eframe::egui::Pos2::new(550.0, 200.0),
-            //     [
-            //         eframe::egui::Pos2::new(0.0, 0.0),
-            //         eframe::egui::Pos2::new(25.0, 50.0),
-            //         eframe::egui::Pos2::new(75.0, -50.0),
-            //         eframe::egui::Pos2::new(125.0, 50.0),
-            //         eframe::egui::Pos2::new(175.0, -50.0),
-            //         eframe::egui::Pos2::new(225.0, 50.0),
-            //         eframe::egui::Pos2::new(250.0, 0.0),
-            //     ],
-            //);
-            // sp.set_line_width(2.0);
-            // sp.set_color(Color32::RED);
-            // vs.push(Box::new(sp));
+            let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+                eframe::egui::Pos2::new(200.0, 200.0),
+                10.0,
+            )));
+            vs.push(sc2.clone());
 
+            let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+                eframe::egui::Pos2::new(400.0, 200.0),
+                eframe::egui::Vec2::new(150.0, 100.0),
+            )));
+            sr.borrow_mut().set_fill_color(Color32::GOLD);
+            vs.push(sr.clone()); // store in collection
 
-            // // Vec to hold Shape trait objects
-            // let mut vs: Vec<Box<dyn Shape>> = Vec::new();
-            //
-            // let mut sc1 = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0);
-            // sc1.set_line_width(4.0);
-            // sc1.set_fill_color(Color32::DARK_RED);
-            // vs.push(Box::new(sc1));
-            //
-            // let mut sc2 = Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 10.0);
-            // vs.push(Box::new(sc2));
-            //
-            // let mut sr = Rectangle::new(
-            //     eframe::egui::Pos2::new(400.0, 200.0),
-            //     eframe::egui::Vec2::new(150.0, 100.0),
-            // );
-            // //s2.set_color(Color32::RED);
-            // sr.set_fill_color(Color32::GOLD);
-            // //sr.set_line_width(5.0);
-            // vs.push(Box::new(sr));
-            //
-            // let mut sp = Polyline::new(
-            //     eframe::egui::Pos2::new(550.0, 200.0),
-            //     [
-            //         eframe::egui::Pos2::new(0.0, 0.0),
-            //         eframe::egui::Pos2::new(25.0, 50.0),
-            //         eframe::egui::Pos2::new(75.0, -50.0),
-            //         eframe::egui::Pos2::new(125.0, 50.0),
-            //         eframe::egui::Pos2::new(175.0, -50.0),
-            //         eframe::egui::Pos2::new(225.0, 50.0),
-            //         eframe::egui::Pos2::new(250.0, 0.0),
-            //     ],
-            //);
-            // sp.set_line_width(2.0);
-            // sp.set_color(Color32::RED);
-            // vs.push(Box::new(sp));
+            let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
+            //let mut sp = Polyline::new(
+                eframe::egui::Pos2::new(550.0, 200.0),
+                [
+                    eframe::egui::Pos2::new(0.0, 0.0),
+                    eframe::egui::Pos2::new(25.0, 50.0),
+                    eframe::egui::Pos2::new(75.0, -50.0),
+                    eframe::egui::Pos2::new(125.0, 50.0),
+                    eframe::egui::Pos2::new(175.0, -50.0),
+                    eframe::egui::Pos2::new(225.0, 50.0),
+                    eframe::egui::Pos2::new(250.0, 0.0),
+                ],
+            )));
+            sp.borrow_mut().set_line_width(2.0);
+            sp.borrow_mut().set_color(Color32::RED);
+            vs.push(sp.clone());
 
+            // container for widgets
             let mut vw: Vec<Box<dyn Widget>> = Vec::new();
 
-            let mut wc = Button::new(120.0, 40.0, "Push me".to_string());
-            vw.push(Box::new(wc));
+            let mut wb = Button::new(120.0, 40.0, "Push me".to_string());
+            vw.push(Box::new(wb));
+
+            // test handle
+            sr.borrow_mut().set_fill_color(Color32::LIGHT_BLUE);
 
             Self {
                 canvas: Canvas {
                     shapes: vs,
-                    // Other ways to create shapes:
-                    // shapes: vec![
-                    //     Box::new(s1),
-                    //     Box::new(Circle::new(eframe::egui::Pos2::new(200.0, 200.0), 75.0)),
-                    //     Box::new(Rectangle {
-                    //         position: eframe::egui::Pos2::new(400.0, 200.0),
-                    //         size: Vec2::new(100.0, 75.0),
-                    //     }),
-                    // ],
-
-                    widgets: vw,
-
-                    // widgets: vec![Box::new(Button {
-                    //     width: 120.0,
-                    //     height: 40.0,
-                    //     label: "Click Me!".to_string(),
-                    // })],
-
-                },
+                     widgets: vw,
+                 },
                 last_toggle: 0.0, //For time-gating
                 is_red: true,
             }
@@ -665,20 +652,21 @@ pub mod demo {
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
 
-/// The eframe::App trait is the bridge between your custom application logic
-/// and the eframe framework that handles all the platform-specific details
-/// of creating a window and running an event loop.
+    /// The eframe::App trait is the bridge between your custom application logic
+    /// and the eframe framework that handles all the platform-specific details
+    /// of creating a window and running an event loop.
 
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Use the helper method to access shapes safely and avoid private field errors
-            if let Some(s) = self.canvas.get_shape_mut(2) {
-                s.borrow_mut().move_to(eframe::egui::Pos2::new(400.0, 400.0));
+            if let Some(s) = self.canvas.get_shape_mut(3) {
+                s.borrow_mut()
+                    .move_to(eframe::egui::Pos2::new(550.0, 400.0));
             }
 
             // Test of basic simulation/animation
             let now = ctx.input(|i| i.time);
-            
+
             if now - self.last_toggle >= 0.5 {
                 self.last_toggle = now;
                 self.is_red = !self.is_red;
@@ -690,7 +678,17 @@ pub mod demo {
                         Color32::BLUE
                     };
                     s.borrow_mut().set_fill_color(c);
+                    //s.borrow_mut().set_color(Color32::WHITE);
                 }
+
+                // if let Some(s) = self.canvas.get_shape_mut(1) {
+                //     let c = if self.is_red {
+                //         Color32::RED
+                //     } else {
+                //         Color32::BLUE
+                //     };
+                //     s.borrow_mut().set_fill_color(c);
+                // }
             }
 
             CentralPanel::default().show(ctx, |ui| {
