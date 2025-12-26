@@ -464,13 +464,14 @@ pub mod gui_lib {
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
-    use super::gui_lib::Shape;
-    use super::gui_lib::Widget;
+    //use super::gui_lib::Shape;
+    //use super::gui_lib::Widget;
     //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
     use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas};
     //use crate::{custom_light_visuals, native_options, vec2};
-    use crate::{custom_light_visuals};
+    //use crate::{custom_light_visuals};
+    use crate::{custom_light_visuals, gui_lib::Shape, gui_lib::Widget};
     use eframe::egui::{vec2, CentralPanel, Context};
 
     /// Main application structure.
