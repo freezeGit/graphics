@@ -570,10 +570,11 @@ pub mod demo {
     pub struct DemoCanvas {
         pub canvas: BasicCanvas,
         pub sc1: ShapeHandle,
-        //pub rect: ShapeHandle,
+        pub sc2: ShapeHandle,
+        pub sr: ShapeHandle,
+        pub sp: ShapeHandle,
     }
-    // let circle = Rc::new(RefCell::new(Circle::new(...)));
-    // canvas.add_shape(circle.clone());
+
     impl DemoCanvas {
         pub fn new() -> Self {
             // Build the canvas and shapes together, return fully initialized Self.
@@ -587,21 +588,39 @@ pub mod demo {
             sc1.borrow_mut().set_fill_color(Color32::DARK_RED);
             canvas.add_shape(sc1.clone());
 
-            Self { canvas, sc1 }
-        }
+            let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+                eframe::egui::Pos2::new(200.0, 200.0),
+                10.0,
+            )));
+            canvas.add_shape(sc2.clone());
 
-        // pub fn new() -> Self {
-        //     // Build the canvas and shapes together, return fully initialized Self.
-        //     let mut canvas = BasicCanvas::new_empty();
-        //
-        //     let fly = /* create shape handle */;
-        //     canvas.add_shape(fly.clone());
-        //
-        //     let food = /* create shape handle */;
-        //     canvas.add_shape(food.clone());
-        //
-        //     Self { canvas, fly, food }
-        // }
+            let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+                eframe::egui::Pos2::new(400.0, 200.0),
+                eframe::egui::Vec2::new(150.0, 100.0),
+            )));
+            sr.borrow_mut().set_fill_color(Color32::GOLD);
+            canvas.add_shape(sr.clone());
+
+            let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
+            //let mut sp = Polyline::new(
+                eframe::egui::Pos2::new(550.0, 200.0),
+                [
+                    eframe::egui::Pos2::new(0.0, 0.0),
+                    eframe::egui::Pos2::new(25.0, 50.0),
+                    eframe::egui::Pos2::new(75.0, -50.0),
+                    eframe::egui::Pos2::new(125.0, 50.0),
+                    eframe::egui::Pos2::new(175.0, -50.0),
+                    eframe::egui::Pos2::new(225.0, 50.0),
+                    eframe::egui::Pos2::new(250.0, 0.0),
+                ],
+            )));
+            sp.borrow_mut().set_line_width(2.0);
+            sp.borrow_mut().set_color(Color32::RED);
+            canvas.add_shape(sp.clone());
+
+            //Self { canvas, sc1 }
+            Self { canvas, sc1, sc2, sr, sp, }
+        }
         pub fn canvas(&self) -> &BasicCanvas { &self.canvas }
         pub fn canvas_mut(&mut self) -> &mut BasicCanvas { &mut self.canvas }
     }
@@ -727,11 +746,12 @@ pub mod demo {
 
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-            // Use the helper method to access shapes safely and avoid private field errors
-            // if let Some(s) = self.canvas.get_shape_mut(3) {
+            // Demonstrate access to Shape sc1 TDJ
+            //self.canvas.sc1.borrow_mut().move_to(eframe::egui::Pos2::new(550.0, 400.0));
+            // if let Some(s) = self.canvas.canvas. get_shape_mut(0) {
             //     s.borrow_mut()
             //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
-            // } // TDJ
+            //} // TDJ
 
             // Test of basic simulation/animation
             let now = ctx.input(|i| i.time);
