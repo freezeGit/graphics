@@ -129,9 +129,7 @@ pub mod gui_lib {
         pub fn get_shape_mut(&mut self, index: usize) -> Option<&mut ShapeHandle> {
             self.shapes.get_mut(index)
         }
-    }
 
-    impl BasicCanvas {
         pub fn add_shape(&mut self, s: ShapeHandle) {
             self.shapes.push(s);
         }
@@ -571,13 +569,27 @@ pub mod demo {
     #[derive(Debug)]
     pub struct DemoCanvas {
         pub canvas: BasicCanvas,
-        //pub circ: ShapeHandle,
+        pub sc1: ShapeHandle,
         //pub rect: ShapeHandle,
     }
     // let circle = Rc::new(RefCell::new(Circle::new(...)));
     // canvas.add_shape(circle.clone());
     impl DemoCanvas {
-   //
+        pub fn new() -> Self {
+            // Build the canvas and shapes together, return fully initialized Self.
+            let mut canvas = BasicCanvas::new();
+
+            let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+                eframe::egui::Pos2::new(200.0, 200.0),
+                75.0,
+            )));
+            sc1.borrow_mut().set_line_width(4.0);
+            sc1.borrow_mut().set_fill_color(Color32::DARK_RED);
+            canvas.add_shape(sc1.clone());
+
+            Self { canvas, sc1 }
+        }
+
         // pub fn new() -> Self {
         //     // Build the canvas and shapes together, return fully initialized Self.
         //     let mut canvas = BasicCanvas::new_empty();
@@ -624,71 +636,66 @@ pub mod demo {
         /// containing several shapes
         /// and containing a sample button.
         pub fn new() -> Self {
-            // container for shapes
-            let mut vs: Vec<ShapeHandle> = vec![];
-
-            let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-                eframe::egui::Pos2::new(200.0, 200.0),
-                75.0,
-            )));
-            sc1.borrow_mut().set_line_width(4.0);
-            sc1.borrow_mut().set_fill_color(Color32::DARK_RED);
-            vs.push(sc1.clone()); // store in collection
-
-            let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-                eframe::egui::Pos2::new(200.0, 200.0),
-                10.0,
-            )));
-            vs.push(sc2.clone());
-
-            let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
-                eframe::egui::Pos2::new(400.0, 200.0),
-                eframe::egui::Vec2::new(150.0, 100.0),
-            )));
-            sr.borrow_mut().set_fill_color(Color32::GOLD);
-            vs.push(sr.clone()); // store in collection
-
-            let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-            //let mut sp = Polyline::new(
-                eframe::egui::Pos2::new(550.0, 200.0),
-                [
-                    eframe::egui::Pos2::new(0.0, 0.0),
-                    eframe::egui::Pos2::new(25.0, 50.0),
-                    eframe::egui::Pos2::new(75.0, -50.0),
-                    eframe::egui::Pos2::new(125.0, 50.0),
-                    eframe::egui::Pos2::new(175.0, -50.0),
-                    eframe::egui::Pos2::new(225.0, 50.0),
-                    eframe::egui::Pos2::new(250.0, 0.0),
-                ],
-            )));
-            sp.borrow_mut().set_line_width(2.0);
-            sp.borrow_mut().set_color(Color32::RED);
-            vs.push(sp.clone());
-
-            // container for widgets
-            let mut vw: Vec<Box<dyn Widget>> = Vec::new();
-
-            let mut wb = Button::new(120.0, 40.0, "Push me".to_string());
-            vw.push(Box::new(wb));
-
-            // test handle
-            sr.borrow_mut().set_fill_color(Color32::LIGHT_BLUE);
+            //container for shapes
+            // let mut vs: Vec<ShapeHandle> = vec![];
+            //
+            // let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+            //     eframe::egui::Pos2::new(200.0, 200.0),
+            //     75.0,
+            // )));
+            // sc1.borrow_mut().set_line_width(4.0);
+            // sc1.borrow_mut().set_fill_color(Color32::DARK_RED);
+            // vs.push(sc1.clone()); // store in collection
+            //
+            // let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+            //     eframe::egui::Pos2::new(200.0, 200.0),
+            //     10.0,
+            // )));
+            // vs.push(sc2.clone());
+            //
+            // let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+            //     eframe::egui::Pos2::new(400.0, 200.0),
+            //     eframe::egui::Vec2::new(150.0, 100.0),
+            // )));
+            // sr.borrow_mut().set_fill_color(Color32::GOLD);
+            // vs.push(sr.clone()); // store in collection
+            //
+            // let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
+            // //let mut sp = Polyline::new(
+            //     eframe::egui::Pos2::new(550.0, 200.0),
+            //     [
+            //         eframe::egui::Pos2::new(0.0, 0.0),
+            //         eframe::egui::Pos2::new(25.0, 50.0),
+            //         eframe::egui::Pos2::new(75.0, -50.0),
+            //         eframe::egui::Pos2::new(125.0, 50.0),
+            //         eframe::egui::Pos2::new(175.0, -50.0),
+            //         eframe::egui::Pos2::new(225.0, 50.0),
+            //         eframe::egui::Pos2::new(250.0, 0.0),
+            //     ],
+            // )));
+            // sp.borrow_mut().set_line_width(2.0);
+            // sp.borrow_mut().set_color(Color32::RED);
+            // vs.push(sp.clone());
+            //
+            // // container for widgets
+            // let mut vw: Vec<Box<dyn Widget>> = Vec::new();
+            //
+            // let mut wb = Button::new(120.0, 40.0, "Push me".to_string());
+            // vw.push(Box::new(wb));
+            //
+            // // test handle
+            // //sr.borrow_mut().set_fill_color(Color32::LIGHT_BLUE);
 
             Self {
-                // d_canvas: DemoCanvas {
-                //     canvas: Canvas {
-                //         shapes: vs.clone(),
-                //         widgets: vec![], // Widgets often aren't Clone, so we provide an empty vec or move logic
+                //  canvas: DemoCanvas {
+                //     canvas: BasicCanvas {
+                //         shapes: vs,
+                //         widgets: vw,
                 //     },
+                //     sc1: sc1.clone(),
                 // },
-                canvas: DemoCanvas {
-                    canvas: BasicCanvas {
-                        shapes: vs,
-                        widgets: vw,
-                    }
-                },
 
-
+                canvas: DemoCanvas::new(),
                 last_toggle: 0.0, //For time-gating
                 is_red: true,
             }
