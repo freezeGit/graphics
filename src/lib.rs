@@ -68,9 +68,6 @@ pub mod gui_lib {
     /// # Trait Implementer’s Note
     /// This trait requires `Debug` to be implemented for all types.
     /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
-    //pub trait Drawable: std::fmt::Debug {
-    //fn draw(&self, ui: &mut Ui);
-    //}
 
     /// Trait for any widget.
     ///
@@ -99,10 +96,8 @@ pub mod gui_lib {
     /// UI components that implement the `Draw` trait.
     #[derive(Debug)]
     pub struct BasicCanvas {
-        //pub shapes: Vec<Box<dyn Shape>>,
-        //shapes: Vec<ShapeHandle> = vec![],
-        pub shapes: Vec<ShapeHandle>,
-        pub widgets: Vec<Box<dyn Widget>>,
+        shapes: Vec<ShapeHandle>,
+        pub widgets: Vec<Box<dyn Widget>>,  // TDJ: make private
     }
 
     impl BasicCanvas {
@@ -137,23 +132,6 @@ pub mod gui_lib {
             self.widgets.push(w);
         }
     }
-
-    // Recommended by AI
-    // impl Canvas {
-    //     pub fn get_shape_mut(&mut self, index: usize) -> Option<&mut ShapeHandle> {
-    //         self.shapes.get_mut(index)
-    //     }
-    // }
-
-    // pub fn run(&mut self, ui: &mut Ui) {
-    //     for shape in &self.shapes {
-    //         shape.draw(ui);
-    //     }
-    //     for widget in &mut self.widgets {
-    //         widget.invoke(ui);
-    //     }
-    // }
-    //}
 
     /// A customizable button component.
     ///
@@ -196,7 +174,6 @@ pub mod gui_lib {
     }
 
     /// Base struct for all shapes.
-    //#[derive(Debug, Default)]
     #[derive(Debug)]
     pub struct ShapeBase {
         location: Pos2,
@@ -389,7 +366,6 @@ pub mod gui_lib {
     impl Circle {
         // Constructor method
         pub fn new(center: Pos2, radius: f32) -> Self {
-            // 'Self' refers to the type 'Circle'
             Self {
                 base: {
                     ShapeBase {
@@ -426,7 +402,6 @@ pub mod gui_lib {
         pub size: Vec2,
     }
     impl Rectangle {
-        // Constructor method
         pub fn new(center: Pos2, size: Vec2) -> Self {
             Rectangle {
                 base: {
@@ -460,9 +435,9 @@ pub mod gui_lib {
             );
         }
     }
-} // This closes impl Canvas (Line 109)
+} // closes mod gui_lib
 
-//} // This closes mod gui_lib (Line 17/394)
+
 
 ///
 /// Demonstration module for an application with a custom UI.
@@ -576,10 +551,12 @@ pub mod demo {
     }
 
     impl DemoCanvas {
+    // Build the BasicCanvas field, shapes, and widgets together, return fully initialized Self
         pub fn new() -> Self {
-            // Build the canvas and shapes together, return fully initialized Self.
+            // New empty canvas
             let mut canvas = BasicCanvas::new();
 
+            //Create and add shapes as Rc<RefCell<T>
             let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
                 eframe::egui::Pos2::new(200.0, 200.0),
                 75.0,
@@ -618,7 +595,11 @@ pub mod demo {
             sp.borrow_mut().set_color(Color32::RED);
             canvas.add_shape(sp.clone());
 
-            //Self { canvas, sc1 }
+            // Create and add widgets as Box<dyn Widget>
+            let mut wb = Button::new(120.0, 40.0, "Push me".to_string());
+            canvas.widgets.push(Box::new(wb));
+
+            //Create the DemoCanvas
             Self { canvas, sc1, sc2, sr, sp, }
         }
         pub fn canvas(&self) -> &BasicCanvas { &self.canvas }
@@ -629,14 +610,6 @@ pub mod demo {
     ///
     /// Represents the root of the application and contains
     /// the main canvas with all UI components.
-    //Your app's gateway to native windows
-    // #[derive(Debug)]
-    // struct DemoApp {
-    //     canvas: Canvas,
-    //     last_toggle: f64,
-    //     is_red: bool,
-    // }
-
     #[derive(Debug)]
     struct DemoApp {
         canvas: DemoCanvas,
@@ -655,65 +628,7 @@ pub mod demo {
         /// containing several shapes
         /// and containing a sample button.
         pub fn new() -> Self {
-            //container for shapes
-            // let mut vs: Vec<ShapeHandle> = vec![];
-            //
-            // let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-            //     eframe::egui::Pos2::new(200.0, 200.0),
-            //     75.0,
-            // )));
-            // sc1.borrow_mut().set_line_width(4.0);
-            // sc1.borrow_mut().set_fill_color(Color32::DARK_RED);
-            // vs.push(sc1.clone()); // store in collection
-            //
-            // let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-            //     eframe::egui::Pos2::new(200.0, 200.0),
-            //     10.0,
-            // )));
-            // vs.push(sc2.clone());
-            //
-            // let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
-            //     eframe::egui::Pos2::new(400.0, 200.0),
-            //     eframe::egui::Vec2::new(150.0, 100.0),
-            // )));
-            // sr.borrow_mut().set_fill_color(Color32::GOLD);
-            // vs.push(sr.clone()); // store in collection
-            //
-            // let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-            // //let mut sp = Polyline::new(
-            //     eframe::egui::Pos2::new(550.0, 200.0),
-            //     [
-            //         eframe::egui::Pos2::new(0.0, 0.0),
-            //         eframe::egui::Pos2::new(25.0, 50.0),
-            //         eframe::egui::Pos2::new(75.0, -50.0),
-            //         eframe::egui::Pos2::new(125.0, 50.0),
-            //         eframe::egui::Pos2::new(175.0, -50.0),
-            //         eframe::egui::Pos2::new(225.0, 50.0),
-            //         eframe::egui::Pos2::new(250.0, 0.0),
-            //     ],
-            // )));
-            // sp.borrow_mut().set_line_width(2.0);
-            // sp.borrow_mut().set_color(Color32::RED);
-            // vs.push(sp.clone());
-            //
-            // // container for widgets
-            // let mut vw: Vec<Box<dyn Widget>> = Vec::new();
-            //
-            // let mut wb = Button::new(120.0, 40.0, "Push me".to_string());
-            // vw.push(Box::new(wb));
-            //
-            // // test handle
-            // //sr.borrow_mut().set_fill_color(Color32::LIGHT_BLUE);
-
             Self {
-                //  canvas: DemoCanvas {
-                //     canvas: BasicCanvas {
-                //         shapes: vs,
-                //         widgets: vw,
-                //     },
-                //     sc1: sc1.clone(),
-                // },
-
                 canvas: DemoCanvas::new(),
                 last_toggle: 0.0, //For time-gating
                 is_red: true,
@@ -747,37 +662,19 @@ pub mod demo {
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Demonstrate access to Shape sc1 TDJ
-            //self.canvas.sc1.borrow_mut().move_to(eframe::egui::Pos2::new(550.0, 400.0));
-            // if let Some(s) = self.canvas.canvas. get_shape_mut(0) {
-            //     s.borrow_mut()
-            //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
-            //} // TDJ
+            self.canvas.sp.borrow_mut().move_to(eframe::egui::Pos2::new(550.0, 400.0));
 
             // Test of basic simulation/animation
             let now = ctx.input(|i| i.time);
-
             if now - self.last_toggle >= 0.5 {
                 self.last_toggle = now;
                 self.is_red = !self.is_red;
-
-                // if let Some(s) = self.canvas.get_shape_mut(1) {
-                //     let c = if self.is_red {
-                //         Color32::RED
-                //     } else {
-                //         Color32::BLUE
-                //     };
-                //     s.borrow_mut().set_fill_color(c);
-                //     //s.borrow_mut().set_color(Color32::WHITE);
-                //}  //TDJ
-
-                // if let Some(s) = self.canvas.get_shape_mut(1) {
-                //     let c = if self.is_red {
-                //         Color32::RED
-                //     } else {
-                //         Color32::BLUE
-                //     };
-                //     s.borrow_mut().set_fill_color(c);
-                // }
+                    let c = if self.is_red {
+                        Color32::RED
+                    } else {
+                        Color32::BLUE
+                    };
+                self.canvas.sc2.borrow_mut().set_fill_color(c);
             }
 
             CentralPanel::default().show(ctx, |ui| {
