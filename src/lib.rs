@@ -106,6 +106,13 @@ pub mod gui_lib {
     }
 
     impl BasicCanvas {
+        pub fn new() -> Self {
+            BasicCanvas {
+                shapes: Vec::new(),
+                widgets: Vec::new(),
+            }
+        }
+
         /// Renders all components contained in the canvas.
         /// pub fn run(&mut self, ui: &mut Ui) {
 
@@ -121,6 +128,15 @@ pub mod gui_lib {
         /// Returns a mutable reference to a shape handle at the given index.
         pub fn get_shape_mut(&mut self, index: usize) -> Option<&mut ShapeHandle> {
             self.shapes.get_mut(index)
+        }
+    }
+
+    impl BasicCanvas {
+        pub fn add_shape(&mut self, s: ShapeHandle) {
+            self.shapes.push(s);
+        }
+        pub fn add_widget(&mut self, w: Box<dyn Widget>) {
+            self.widgets.push(w);
         }
     }
 
@@ -555,9 +571,27 @@ pub mod demo {
     #[derive(Debug)]
     pub struct DemoCanvas {
         pub canvas: BasicCanvas,
-
-        // pub shapes: Vec<ShapeHandle>,
-        // pub widgets: Vec<Box<dyn Widget>>,
+        //pub circ: ShapeHandle,
+        //pub rect: ShapeHandle,
+    }
+    // let circle = Rc::new(RefCell::new(Circle::new(...)));
+    // canvas.add_shape(circle.clone());
+    impl DemoCanvas {
+   //
+        // pub fn new() -> Self {
+        //     // Build the canvas and shapes together, return fully initialized Self.
+        //     let mut canvas = BasicCanvas::new_empty();
+        //
+        //     let fly = /* create shape handle */;
+        //     canvas.add_shape(fly.clone());
+        //
+        //     let food = /* create shape handle */;
+        //     canvas.add_shape(food.clone());
+        //
+        //     Self { canvas, fly, food }
+        // }
+        pub fn canvas(&self) -> &BasicCanvas { &self.canvas }
+        pub fn canvas_mut(&mut self) -> &mut BasicCanvas { &mut self.canvas }
     }
 
     /// Main application structure.
