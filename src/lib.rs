@@ -97,7 +97,7 @@ pub mod gui_lib {
     #[derive(Debug)]
     pub struct BasicCanvas {
         shapes: Vec<ShapeHandle>,
-        pub widgets: Vec<Box<dyn Widget>>,  // TDJ: make private
+        pub widgets: Vec<Box<dyn Widget>>, // TDJ: make private
     }
 
     impl BasicCanvas {
@@ -437,8 +437,6 @@ pub mod gui_lib {
     }
 } // closes mod gui_lib
 
-
-
 ///
 /// Demonstration module for an application with a custom UI.
 ///
@@ -529,12 +527,12 @@ pub mod demo {
     //use super::gui_lib::Widget;
     //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
-    use super::gui_lib::{Button, BasicCanvas, Circle, Color32, Polyline, Rectangle, ShapeBase};
+    use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle};
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     use crate::custom_light_visuals;
     use crate::gui_lib::{Shape, ShapeHandle, Widget};
-    use eframe::egui::{CentralPanel, Context, vec2};
+    use eframe::egui::{CentralPanel, Context};
     use std::cell::RefCell;
     use std::rc::Rc;
 
@@ -551,7 +549,7 @@ pub mod demo {
     }
 
     impl DemoCanvas {
-    // Build the BasicCanvas field, shapes, and widgets together, return fully initialized Self
+        // Build the BasicCanvas field, shapes, and widgets together, return fully initialized Self
         pub fn new() -> Self {
             // New empty canvas
             let mut canvas = BasicCanvas::new();
@@ -579,7 +577,6 @@ pub mod demo {
             canvas.add_shape(sr.clone());
 
             let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-            //let mut sp = Polyline::new(
                 eframe::egui::Pos2::new(550.0, 200.0),
                 [
                     eframe::egui::Pos2::new(0.0, 0.0),
@@ -600,10 +597,20 @@ pub mod demo {
             canvas.widgets.push(Box::new(wb));
 
             //Create the DemoCanvas
-            Self { canvas, sc1, sc2, sr, sp, }
+            Self {
+                canvas,
+                sc1,
+                sc2,
+                sr,
+                sp,
+            }
         }
-        pub fn canvas(&self) -> &BasicCanvas { &self.canvas }
-        pub fn canvas_mut(&mut self) -> &mut BasicCanvas { &mut self.canvas }
+        pub fn canvas(&self) -> &BasicCanvas {
+            &self.canvas
+        }
+        pub fn canvas_mut(&mut self) -> &mut BasicCanvas {
+            &mut self.canvas
+        }
     }
 
     /// Main application structure.
@@ -661,19 +668,28 @@ pub mod demo {
 
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-            // Demonstrate access to Shape sc1 TDJ
-            self.canvas.sp.borrow_mut().move_to(eframe::egui::Pos2::new(550.0, 400.0));
+            // Demonstrate access to Shape sp
+            self.canvas
+                .sp
+                .borrow_mut()
+                .move_to(eframe::egui::Pos2::new(550.0, 400.0));
+
+            //if using index instead of handle
+            // if let Some(s) = self.canvas.canvas.get_shape_mut(3) {
+            //     s.borrow_mut()
+            //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
+            // }
 
             // Test of basic simulation/animation
             let now = ctx.input(|i| i.time);
             if now - self.last_toggle >= 0.5 {
                 self.last_toggle = now;
                 self.is_red = !self.is_red;
-                    let c = if self.is_red {
-                        Color32::RED
-                    } else {
-                        Color32::BLUE
-                    };
+                let c = if self.is_red {
+                    Color32::RED
+                } else {
+                    Color32::BLUE
+                };
                 self.canvas.sc2.borrow_mut().set_fill_color(c);
             }
 
@@ -692,6 +708,6 @@ pub mod demo {
 //pub use demo::DemoApp;
 pub use eframe::egui::vec2;
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
-pub use gui_lib::{Button, BasicCanvas, custom_light_visuals};
+pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
 
 //Changed
