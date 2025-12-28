@@ -111,12 +111,25 @@ pub mod gui_lib {
         /// Renders all components contained in the canvas.
         /// pub fn run(&mut self, ui: &mut Ui) {
 
+        // pub fn run(&mut self, ui: &mut Ui) {
+        //     for shape in &self.shapes {
+        //         shape.borrow().draw(ui);
+        //     }
+        //     for widget in &mut self.widgets {
+        //         widget.invoke(ui);
+        //     }
+        // }
+
         pub fn run(&mut self, ui: &mut Ui) {
             for shape in &self.shapes {
                 shape.borrow().draw(ui);
             }
             for widget in &mut self.widgets {
-                widget.invoke(ui);
+                let response = widget.invoke(ui);
+                if response.clicked() {
+                    println!("Button clicked!");
+                    // do something useful here
+                }
             }
         }
 
@@ -534,8 +547,9 @@ pub mod demo {
     //use super::gui_lib::Widget;
     //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
+    //use super::gui_lib::{BasicCanvas, Button, Circle, LineStyle, Color32, Polyline, Rectangle};
     use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle};
-    use crate::gui_lib::LineStyle::Dashed;
+    use crate::gui_lib::LineStyle::*;
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     use crate::custom_light_visuals;
@@ -611,13 +625,15 @@ pub mod demo {
                     eframe::egui::Pos2::new(250.0, 0.0),
                 ],
             )));
-            sp.borrow_mut().set_line_width(2.0);
-            sp.borrow_mut().set_line_width(2.0);
-            sp.borrow_mut().set_line_style(Dashed);
+            //sp.borrow_mut().set_line_width(2.0);
+            sp.borrow_mut().set_line_width(4.0);
+            //sp.borrow_mut().set_line_style(Dashed);
+            sp.borrow_mut().set_line_style(Dotted);
+            //sp.borrow_mut().set_line_style(Solid);
             canvas.add_shape(sp.clone());
 
             // Create and add widgets as Box<dyn Widget>
-            let mut wb = Button::new(120.0, 40.0, "Push me".to_string());
+            let wb = Button::new(120.0, 40.0, "Push me".to_string());
             canvas.widgets.push(Box::new(wb));
 
             //Create the DemoCanvas
