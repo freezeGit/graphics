@@ -222,6 +222,9 @@ pub mod gui_lib {
         fn set_line_width(&mut self, lw: f32) {
             self.base_mut().set_line_width(lw)
         }
+        fn set_line_style(&mut self, ls: LineStyle) {
+            self.base_mut().set_line_style(ls)
+        }
     }
 
     impl Default for ShapeBase {
@@ -232,11 +235,11 @@ pub mod gui_lib {
                 color: Color32::BLACK,
                 fill_color: Color32::TRANSPARENT,
                 line_width: 2.0,
-                //line_style: LineStyle::Solid,
+                line_style: LineStyle::Solid,
                 //line_style: LineStyle::Dashed { dash: 8.0, gap: 4.0 },
                 //line_style: LineStyle::Dashed,
                 //line_style: LineStyle::Dotted { spacing: 8.0, radius: 2.0 },
-                line_style: LineStyle::Dotted,
+                //line_style: LineStyle::Dotted,
             }
         }
     }
@@ -269,6 +272,10 @@ pub mod gui_lib {
         }
         pub fn set_line_width(&mut self, lw: f32) {
             self.line_width = lw;
+        }
+
+        pub fn set_line_style(&mut self, ls: LineStyle) {
+            self.line_style = ls;
         }
 
         pub(crate) fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
@@ -528,6 +535,7 @@ pub mod demo {
     //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
     use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle};
+    use crate::gui_lib::LineStyle::Dashed;
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     use crate::custom_light_visuals;
@@ -551,10 +559,25 @@ pub mod demo {
     impl DemoCanvas {
         // Build the BasicCanvas field, shapes, and widgets together, return fully initialized Self
         pub fn new() -> Self {
-            // New empty canvas
+            // New empty BasicCanvas
             let mut canvas = BasicCanvas::new();
 
-            //Create and add shapes as Rc<RefCell<T>
+            // Add shapes without handles to the canvas
+            let mut y = 75.0;
+            for _ in 0..30 {
+                let vee: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
+                    eframe::egui::Pos2::new(150.0, y),
+                    [
+                        eframe::egui::Pos2::new(0.0, 0.0),
+                        eframe::egui::Pos2::new(10.0, 10.0),
+                        eframe::egui::Pos2::new(20.0, 0.0),
+                    ],
+                )));
+                canvas.add_shape(vee);
+                y += 10.0;
+            }
+
+            // Add shapes with handles to the canvas
             let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
                 eframe::egui::Pos2::new(200.0, 200.0),
                 75.0,
@@ -589,7 +612,8 @@ pub mod demo {
                 ],
             )));
             sp.borrow_mut().set_line_width(2.0);
-            sp.borrow_mut().set_color(Color32::RED);
+            sp.borrow_mut().set_line_width(2.0);
+            sp.borrow_mut().set_line_style(Dashed);
             canvas.add_shape(sp.clone());
 
             // Create and add widgets as Box<dyn Widget>
