@@ -22,6 +22,7 @@ pub mod gui_lib {
     };
     use std::cell::RefCell;
     use std::rc::Rc;
+    use egui::{CentralPanel, Context};
 
     pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
 
@@ -111,6 +112,70 @@ pub mod gui_lib {
         /// Renders all components contained in the canvas.
         /// pub fn run(&mut self, ui: &mut Ui) {
 
+        pub fn render_central(&mut self, ctx: &Context) {
+            CentralPanel::default().show(ctx, |ui| {
+                for shape in &self.shapes {
+                    shape.borrow().draw(ui);
+                }
+                for widget in &mut self.widgets {
+                    widget.invoke(ui);
+                }
+            });
+        }
+
+        pub fn render_side_central(&mut self, ctx: &Context) {
+            egui::SidePanel::left("controls")
+                .resizable(true)
+                .default_width(180.0)
+                .show(ctx, |ui| {
+                    ui.heading("Controls");
+                    for widget in &mut self.widgets {
+                        widget.invoke(ui);
+                    }
+                });
+
+            CentralPanel::default().show(ctx, |ui| {
+                for shape in &self.shapes {
+                    shape.borrow().draw(ui);
+                }
+            });
+        }
+
+        pub fn render_top_central(&mut self, ctx: &Context) {
+            egui::TopBottomPanel::top("my_panel").show(ctx, |ui| {
+                ui.label("Hello World!");
+                for widget in &mut self.widgets {
+                    widget.invoke(ui);
+                };
+            });
+            // egui::SidePanel::left("controls")
+            //     .resizable(true)
+            //     .default_width(180.0)
+            //     .show(ctx, |ui| {
+            //         ui.heading("Controls");
+            //         for widget in &mut self.widgets {
+            //             widget.invoke(ui);
+            //         }
+            //     });
+
+            CentralPanel::default().show(ctx, |ui| {
+                for shape in &self.shapes {
+                    shape.borrow().draw(ui);
+                }
+            });
+        }
+
+        // pub fn run(&mut self, ctx: &Context) {
+        //     CentralPanel::default().show(ctx, |ui| {
+        //         for shape in &self.shapes {
+        //             shape.borrow().draw(ui);
+        //         }
+        //         for widget in &mut self.widgets {
+        //             widget.invoke(ui);
+        //         }
+        //     });
+        // }
+
         // pub fn run(&mut self, ui: &mut Ui) {
         //     for shape in &self.shapes {
         //         shape.borrow().draw(ui);
@@ -120,18 +185,18 @@ pub mod gui_lib {
         //     }
         // }
 
-        pub fn run(&mut self, ui: &mut Ui) {
-            for shape in &self.shapes {
-                shape.borrow().draw(ui);
-            }
-            for widget in &mut self.widgets {
-                let response = widget.invoke(ui);
-                if response.clicked() {
-                    println!("Button clicked!");
-                    // do something useful here
-                }
-            }
-        }
+        // pub fn run(&mut self, ui: &mut Ui) {
+        //     for shape in &self.shapes {
+        //         shape.borrow().draw(ui);
+        //     }
+        //     for widget in &mut self.widgets {
+        //         let response = widget.invoke(ui);
+        //         if response.clicked() {
+        //             println!("Button clicked!");
+        //             // do something useful here
+        //         }
+        //     }
+        // }
 
         /// Returns a mutable reference to a shape handle at the given index.
         pub fn get_shape_mut(&mut self, index: usize) -> Option<&mut ShapeHandle> {
@@ -733,10 +798,13 @@ pub mod demo {
                 self.canvas.sc2.borrow_mut().set_fill_color(c);
             }
 
-            CentralPanel::default().show(ctx, |ui| {
-                //self.canvas.run(ui);
-                self.canvas.canvas.run(ui);
-            });
+            self.canvas.canvas.render_side_central(ctx);
+            //self.canvas.canvas.render_top_central(ctx);
+
+            // CentralPanel::default().show(ctx, |ui| {
+            //     //self.canvas.run(ui);
+            //     self.canvas.canvas.run(ui);
+            // });
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
             // or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
