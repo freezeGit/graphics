@@ -109,7 +109,7 @@ pub mod gui_lib {
             }
         }
 
-        /// Renders all components contained in the canvas.
+        /// Renders all widgets and shapes in the CentralPanel.
         pub fn render_central(&mut self, ctx: &Context) {
             CentralPanel::default().show(ctx, |ui| {
                 let painter = ui.painter();
@@ -122,6 +122,7 @@ pub mod gui_lib {
             });
         }
 
+        /// Renders all widgets in SidePanel and shapes in the CentralPanel.
         pub fn render_side_central(&mut self, ctx: &Context) {
             egui::SidePanel::left("controls")
                 .resizable(true)
@@ -145,6 +146,7 @@ pub mod gui_lib {
             });
         }
 
+        /// Renders all widgets in TopBottomPanel and shapes in the CentralPanel.
         pub fn render_top_central(&mut self, ctx: &Context) {
             egui::TopBottomPanel::top("my_panel").show(ctx, |ui| {
                 ui.label("Hello World!");
@@ -163,52 +165,16 @@ pub mod gui_lib {
                     shape.borrow_mut().draw_offset(&painter, offset);
                 }
             });
-
-            // CentralPanel::default().show(ctx, |ui| {
-            //     let painter = ui.painter();
-            //     for shape in &self.shapes {
-            //         shape.borrow().draw(&painter);
-            //     }
-            // });
         }
-
-        // pub fn run(&mut self, ctx: &Context) {
-        //     CentralPanel::default().show(ctx, |ui| {
-        //         for shape in &self.shapes {
-        //             shape.borrow().draw(ui);
-        //         }
-        //         for widget in &mut self.widgets {
-        //             widget.invoke(ui);
-        //         }
-        //     });
-        // }
-
-        // pub fn run(&mut self, ui: &mut Ui) {
-        //     for shape in &self.shapes {
-        //         shape.borrow().draw(ui);
-        //     }
-        //     for widget in &mut self.widgets {
-        //         widget.invoke(ui);
-        //     }
-        // }
-
-        // pub fn run(&mut self, ui: &mut Ui) {
-        //     for shape in &self.shapes {
-        //         shape.borrow().draw(ui);
-        //     }
-        //     for widget in &mut self.widgets {
-        //         let response = widget.invoke(ui);
-        //         if response.clicked() {
-        //             println!("Button clicked!");
-        //             // do something useful here
-        //         }
-        //     }
-        // }
 
         /// Returns a mutable reference to a shape handle at the given index.
         pub fn get_shape_mut(&mut self, index: usize) -> Option<&mut ShapeHandle> {
             self.shapes.get_mut(index)
         }
+        /// Returns a mutable reference to the top-most shape handle (last added).
+        pub fn get_top_shape_mut(&mut self) -> Option<&mut ShapeHandle> {
+            self.shapes.last_mut()
+            }
 
         pub fn add_shape(&mut self, s: ShapeHandle) {
             self.shapes.push(s);
@@ -484,16 +450,6 @@ pub mod gui_lib {
             &mut self.base
         }
 
-        //     fn draw(&self, ui: &mut Ui) {
-        //         ui.painter().circle(
-        //             self.base.location,
-        //             self.radius,
-        //             self.base.fill_color,
-        //             Stroke::new(self.base.line_width, self.base.color), // Black border
-        //         );
-        //     }
-        // }
-
         fn draw(&self, painter: &egui::Painter) {
             painter.circle(
                 self.base.location,
@@ -657,15 +613,6 @@ pub mod demo {
         pub sp: ShapeHandle,
     }
 
-    // #[derive(Debug)]
-    // pub struct DemoCanvas {
-    //     pub canvas: BasicCanvas,
-    //     pub sc1: ShapeHandle,
-    //     pub sc2: ShapeHandle,
-    //     pub sr: ShapeHandle,
-    //     pub sp: ShapeHandle,
-    // }
-
     impl DemoCanvas {
         pub fn new() -> Self {
             // New empty BasicCanvas
@@ -689,7 +636,7 @@ pub mod demo {
             // // Add shapes with handles to the canvas
             let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
                 eframe::egui::Pos2::new(200.0, 200.0),
-                //eframe::egui::Pos2::new(0.0, 0.0),
+                //eframe::egui::Pos2::new(0.0, 0.0),  // to test origin
                 75.0,
             )));
             sc1.borrow_mut().set_line_width(4.0);
@@ -742,80 +689,6 @@ pub mod demo {
             }
         }
 
-        // Build the BasicCanvas field, shapes, and widgets together, return fully initialized Self
-        // pub fn new() -> Self {
-        //     // New empty BasicCanvas
-        //     let mut canvas = BasicCanvas::new();
-        //
-        //     // Add shapes without handles to the canvas
-        //     let mut y = 75.0;
-        //     for _ in 0..30 {
-        //         let vee: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-        //             eframe::egui::Pos2::new(150.0, y),
-        //             [
-        //                 eframe::egui::Pos2::new(0.0, 0.0),
-        //                 eframe::egui::Pos2::new(10.0, 10.0),
-        //                 eframe::egui::Pos2::new(20.0, 0.0),
-        //             ],
-        //         )));
-        //         canvas.add_shape(vee);
-        //         y += 10.0;
-        //     }
-        //
-        //     // Add shapes with handles to the canvas
-        //     let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-        //         eframe::egui::Pos2::new(200.0, 200.0),
-        //         75.0,
-        //     )));
-        //     sc1.borrow_mut().set_line_width(4.0);
-        //     sc1.borrow_mut().set_fill_color(Color32::DARK_RED);
-        //     canvas.add_shape(sc1.clone());
-        //
-        //     let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-        //         eframe::egui::Pos2::new(200.0, 200.0),
-        //         10.0,
-        //     )));
-        //     canvas.add_shape(sc2.clone());
-        //
-        //     let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
-        //         eframe::egui::Pos2::new(400.0, 200.0),
-        //         eframe::egui::Vec2::new(150.0, 100.0),
-        //     )));
-        //     sr.borrow_mut().set_fill_color(Color32::GOLD);
-        //     canvas.add_shape(sr.clone());
-        //
-        //     let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-        //         eframe::egui::Pos2::new(550.0, 200.0),
-        //         [
-        //             eframe::egui::Pos2::new(0.0, 0.0),
-        //             eframe::egui::Pos2::new(25.0, 50.0),
-        //             eframe::egui::Pos2::new(75.0, -50.0),
-        //             eframe::egui::Pos2::new(125.0, 50.0),
-        //             eframe::egui::Pos2::new(175.0, -50.0),
-        //             eframe::egui::Pos2::new(225.0, 50.0),
-        //             eframe::egui::Pos2::new(250.0, 0.0),
-        //         ],
-        //     )));
-        //     //sp.borrow_mut().set_line_width(2.0);
-        //     sp.borrow_mut().set_line_width(4.0);
-        //     //sp.borrow_mut().set_line_style(Dashed);
-        //     sp.borrow_mut().set_line_style(Dotted);
-        //     //sp.borrow_mut().set_line_style(Solid);
-        //     canvas.add_shape(sp.clone());
-        //
-        //     // Create and add widgets as Box<dyn Widget>
-        //     let wb = Button::new(120.0, 40.0, "Push me".to_string());
-        //     canvas.widgets.push(Box::new(wb));
-        //
-        //     //Create the DemoCanvas
-        //     Self {
-        //         canvas,
-        //         sc1,
-        //         sc2,
-        //         sr,
-        //         sp,
-        //     }
-        // }
         pub fn canvas(&self) -> &BasicCanvas {
             &self.canvas
         }
@@ -886,21 +759,12 @@ pub mod demo {
             //     s.borrow_mut()
             //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
             // }
-            // TDJ: if using index instead of handle
-            // if let Some(s) = self.canvas.canvas.get_shape_mut(3) {
-            //     s.borrow_mut()
-            //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
-            //     match vec.last() {
-            //         Some(last_item) => println!("The last item is: {}", last_item),
-            //         None => println!("The vector is empty"),
-            //     }
-            // }
 
-
-            // match vec.last() {
-            //     Some(last_item) => println!("The last item is: {}", last_item),
-            //     None => println!("The vector is empty"),
-            // }
+            // TDJ: If accessing last shape added
+            if let Some(s) = self.canvas.canvas.get_top_shape_mut() {
+                s.borrow_mut()
+                    .set_color(Color32::BLUE);
+            }
 
             //Test of basic simulation/animation  //TDJ
             let now = ctx.input(|i| i.time);
@@ -915,9 +779,10 @@ pub mod demo {
                 self.canvas.sc2.borrow_mut().set_fill_color(c);
             }
 
-            self.canvas.canvas.render_side_central(ctx);
-            //self.canvas.canvas.render_top_central(ctx);
-            //self.canvas.canvas.render_central(ctx);
+            // Render everything in the canvas
+            self.canvas.canvas.render_side_central(ctx);  // side panel and central panel
+            //self.canvas.canvas.render_top_central(ctx);  // top panel and central panel
+            //self.canvas.canvas.render_central(ctx);  // central panel only
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
             // TDJ or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
