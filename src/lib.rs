@@ -110,8 +110,6 @@ pub mod gui_lib {
         }
 
         /// Renders all components contained in the canvas.
-        /// pub fn run(&mut self, ui: &mut Ui) {
-
         pub fn render_central(&mut self, ctx: &Context) {
             CentralPanel::default().show(ctx, |ui| {
                 let painter = ui.painter();
@@ -136,13 +134,13 @@ pub mod gui_lib {
                 });
 
             CentralPanel::default().show(ctx, |ui| {
-                //let painter = ui.painter();
-                //let rect = ui.max_rect();
-                //let painter = ui.painter_at(rect);
                 let (response, painter) =
                     ui.allocate_painter(ui.available_size(), egui::Sense::hover());
+                // (response.rect).min is the top-left corner position
+                // of the rectangular area returned by ui.available_size()
+                let offset = (response.rect).min.to_vec2();  // to top-left corner
                 for shape in &self.shapes {
-                    shape.borrow().draw(&painter);
+                    shape.borrow_mut().draw_offset(&painter, offset);
                 }
             });
         }
@@ -156,11 +154,22 @@ pub mod gui_lib {
             });
 
             CentralPanel::default().show(ctx, |ui| {
-                let painter = ui.painter();
+                let (response, painter) =
+                    ui.allocate_painter(ui.available_size(), egui::Sense::hover());
+                // (response.rect).min is the top-left corner position
+                // of the rectangular area returned by ui.available_size()
+                let offset = (response.rect).min.to_vec2();  // to top-left corner
                 for shape in &self.shapes {
-                    shape.borrow().draw(&painter);
+                    shape.borrow_mut().draw_offset(&painter, offset);
                 }
             });
+
+            // CentralPanel::default().show(ctx, |ui| {
+            //     let painter = ui.painter();
+            //     for shape in &self.shapes {
+            //         shape.borrow().draw(&painter);
+            //     }
+            // });
         }
 
         // pub fn run(&mut self, ctx: &Context) {
@@ -274,6 +283,12 @@ pub mod gui_lib {
 
         //fn draw(&self, ui: &mut Ui);
         fn draw(&self, painter: &egui::Painter);
+        fn draw_offset(&mut self, painter: &egui::Painter, offset: Vec2) {
+            let orig_loc =self.base().location;
+            self.base_mut().location = orig_loc + offset;
+            self.draw(painter);
+            self.base_mut().location = orig_loc;
+        }
 
         fn move_to(&mut self, location: Pos2) {
             self.base_mut().move_to(location)
@@ -395,46 +410,45 @@ pub mod gui_lib {
         }
     }
 
-    // impl Shape for Polyline {
-    //     fn base(&self) -> &ShapeBase {
-    //         &self.base
-    //     }
-    //     fn base_mut(&mut self) -> &mut ShapeBase {
-    //         &mut self.base
-    //     }
-    //
-    //     fn draw(&self, ui: &mut Ui) {
-    //         let painter = ui.painter();
-    //
-    //         let points = self.base.points_translated(self.base.location.to_vec2());
-    //         let stroke = Stroke::new(self.base.line_width, self.base.color);
-    //
-    //         match self.base.line_style {
-    //             LineStyle::Solid => {
-    //                 painter.add(eframe::epaint::PathShape::line(points, stroke)); // :contentReference[oaicite:4]{index=4}
-    //             }
-    //             LineStyle::Dashed => {
-    //                 let shapes = eframe::egui::Shape::dashed_line(
-    //                     &points,
-    //                     stroke,
-    //                     self.base.dash_length(),
-    //                     self.base.dash_gap(),
-    //                 ); // :contentReference[oaicite:5]{index=5}
-    //                 painter.extend(shapes); // :contentReference[oaicite:6]{index=6}
-    //             }
-    //
-    //             LineStyle::Dotted => {
-    //                 let shapes = eframe::egui::Shape::dotted_line(
-    //                     &points,
-    //                     self.base.color,
-    //                     self.base.dot_spacing(),
-    //                     self.base.dot_radius(),
-    //                 ); // :contentReference[oaicite:7]{index=7}
-    //                 painter.extend(shapes); // :contentReference[oaicite:8]{index=8}
-    //             }
-    //         }
-    //     }
-    // }
+    impl Shape for Polyline {
+        fn base(&self) -> &ShapeBase {
+            &self.base
+        }
+        fn base_mut(&mut self) -> &mut ShapeBase {
+            &mut self.base
+        }
+
+        //fn draw(&self, ui: &mut Ui) {
+        fn draw(&self, painter: &egui::Painter) {
+            let points = self.base.points_translated(self.base.location.to_vec2());
+            let stroke = Stroke::new(self.base.line_width, self.base.color);
+
+            match self.base.line_style {
+                LineStyle::Solid => {
+                    painter.add(eframe::epaint::PathShape::line(points, stroke)); // :contentReference[oaicite:4]{index=4}
+                }
+                LineStyle::Dashed => {
+                    let shapes = eframe::egui::Shape::dashed_line(
+                        &points,
+                        stroke,
+                        self.base.dash_length(),
+                        self.base.dash_gap(),
+                    ); // :contentReference[oaicite:5]{index=5}
+                    painter.extend(shapes); // :contentReference[oaicite:6]{index=6}
+                }
+
+                LineStyle::Dotted => {
+                    let shapes = eframe::egui::Shape::dotted_line(
+                        &points,
+                        self.base.color,
+                        self.base.dot_spacing(),
+                        self.base.dot_radius(),
+                    ); // :contentReference[oaicite:7]{index=7}
+                    painter.extend(shapes); // :contentReference[oaicite:8]{index=8}
+                }
+            }
+        }
+    }
 
     /// A customizable Circle component.
     ///
@@ -510,25 +524,24 @@ pub mod gui_lib {
         }
     }
 
-    // impl Shape for Rectangle {
-    //     fn base(&self) -> &ShapeBase {
-    //         &self.base
-    //     }
-    //     fn base_mut(&mut self) -> &mut ShapeBase {
-    //         &mut self.base
-    //     }
-    //
-    //     fn draw(&self, ui: &mut Ui) {
-    //         let rect = Rect::from_center_size(self.base.location, self.size);
-    //         ui.painter().rect(
-    //             rect,
-    //             CornerRadius::ZERO,   // or CornerRadius::same(r)
-    //             self.base.fill_color, // fill
-    //             Stroke::new(self.base.line_width, self.base.color), // border
-    //             StrokeKind::Outside,  // Outside / Inside / Middle
-    //         );
-    //     }
-    // }
+    impl Shape for Rectangle {
+        fn base(&self) -> &ShapeBase {
+            &self.base
+        }
+        fn base_mut(&mut self) -> &mut ShapeBase {
+            &mut self.base
+        }
+        fn draw(&self, painter: &egui::Painter) {
+            let rect = Rect::from_center_size(self.base.location, self.size);
+            painter.rect(
+                rect,
+                CornerRadius::ZERO,   // or CornerRadius::same(r)
+                self.base.fill_color, // fill
+                Stroke::new(self.base.line_width, self.base.color), // border
+                StrokeKind::Outside,  // Outside / Inside / Middle
+            );
+        }
+    }
 } // closes mod gui_lib
 
 ///
@@ -639,9 +652,9 @@ pub mod demo {
     pub struct DemoCanvas {
         pub canvas: BasicCanvas,
         pub sc1: ShapeHandle,
-        // pub sc2: ShapeHandle,
-        // pub sr: ShapeHandle,
-        // pub sp: ShapeHandle,
+        pub sc2: ShapeHandle,
+        pub sr: ShapeHandle,
+        pub sp: ShapeHandle,
     }
 
     // #[derive(Debug)]
@@ -657,62 +670,63 @@ pub mod demo {
         pub fn new() -> Self {
             // New empty BasicCanvas
             let mut canvas = BasicCanvas::new();
-            //
-            // // Add shapes without handles to the canvas
-            // let mut y = 75.0;
-            // for _ in 0..30 {
-            //     let vee: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-            //         eframe::egui::Pos2::new(150.0, y),
-            //         [
-            //             eframe::egui::Pos2::new(0.0, 0.0),
-            //             eframe::egui::Pos2::new(10.0, 10.0),
-            //             eframe::egui::Pos2::new(20.0, 0.0),
-            //         ],
-            //     )));
-            //     canvas.add_shape(vee);
-            //     y += 10.0;
-            // }
-            //
+
+            // Add shapes without handles to the canvas
+            let mut y = 75.0;
+            for _ in 0..30 {
+                let vee: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
+                    eframe::egui::Pos2::new(150.0, y),
+                    [
+                        eframe::egui::Pos2::new(0.0, 0.0),
+                        eframe::egui::Pos2::new(10.0, 10.0),
+                        eframe::egui::Pos2::new(20.0, 0.0),
+                    ],
+                )));
+                canvas.add_shape(vee);
+                y += 10.0;
+            }
+
             // // Add shapes with handles to the canvas
             let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
                 eframe::egui::Pos2::new(200.0, 200.0),
+                //eframe::egui::Pos2::new(0.0, 0.0),
                 75.0,
             )));
             sc1.borrow_mut().set_line_width(4.0);
             sc1.borrow_mut().set_fill_color(Color32::DARK_RED);
             canvas.add_shape(sc1.clone());
-            //
-            // let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-            //     eframe::egui::Pos2::new(200.0, 200.0),
-            //     10.0,
-            // )));
-            // canvas.add_shape(sc2.clone());
-            //
-            // let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
-            //     eframe::egui::Pos2::new(400.0, 200.0),
-            //     eframe::egui::Vec2::new(150.0, 100.0),
-            // )));
-            // sr.borrow_mut().set_fill_color(Color32::GOLD);
-            // canvas.add_shape(sr.clone());
-            //
-            // let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-            //     eframe::egui::Pos2::new(550.0, 200.0),
-            //     [
-            //         eframe::egui::Pos2::new(0.0, 0.0),
-            //         eframe::egui::Pos2::new(25.0, 50.0),
-            //         eframe::egui::Pos2::new(75.0, -50.0),
-            //         eframe::egui::Pos2::new(125.0, 50.0),
-            //         eframe::egui::Pos2::new(175.0, -50.0),
-            //         eframe::egui::Pos2::new(225.0, 50.0),
-            //         eframe::egui::Pos2::new(250.0, 0.0),
-            //     ],
-            // )));
-            // //sp.borrow_mut().set_line_width(2.0);
-            // sp.borrow_mut().set_line_width(4.0);
-            // //sp.borrow_mut().set_line_style(Dashed);
-            // sp.borrow_mut().set_line_style(Dotted);
-            // //sp.borrow_mut().set_line_style(Solid);
-            // canvas.add_shape(sp.clone());
+
+            let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+                eframe::egui::Pos2::new(200.0, 200.0),
+                10.0,
+            )));
+            canvas.add_shape(sc2.clone());
+
+            let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+                eframe::egui::Pos2::new(400.0, 200.0),
+                eframe::egui::Vec2::new(150.0, 100.0),
+            )));
+            sr.borrow_mut().set_fill_color(Color32::GOLD);
+            canvas.add_shape(sr.clone());
+
+            let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
+                eframe::egui::Pos2::new(550.0, 200.0),
+                [
+                    eframe::egui::Pos2::new(0.0, 0.0),
+                    eframe::egui::Pos2::new(25.0, 50.0),
+                    eframe::egui::Pos2::new(75.0, -50.0),
+                    eframe::egui::Pos2::new(125.0, 50.0),
+                    eframe::egui::Pos2::new(175.0, -50.0),
+                    eframe::egui::Pos2::new(225.0, 50.0),
+                    eframe::egui::Pos2::new(250.0, 0.0),
+                ],
+            )));
+            sp.borrow_mut().set_line_width(2.0);
+            sp.borrow_mut().set_line_width(4.0);
+            //sp.borrow_mut().set_line_style(Dashed);
+            sp.borrow_mut().set_line_style(Dotted);
+            //sp.borrow_mut().set_line_style(Solid);
+            canvas.add_shape(sp.clone());
 
             // Create and add widgets as Box<dyn Widget>
             let wb = Button::new(120.0, 40.0, "Push me".to_string());
@@ -722,9 +736,9 @@ pub mod demo {
             Self {
                 canvas,
                 sc1,
-                // sc2,
-                // sr,
-                // sp,
+                sc2,
+                sr,
+                sp,
             }
         }
 
@@ -866,41 +880,47 @@ pub mod demo {
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Demonstrate access to Shape sp
-            //self.canvas  //TDJ
-                // .sp
-                // .borrow_mut()
-                // .move_to(eframe::egui::Pos2::new(550.0, 400.0));
 
-            //if using index instead of handle
+            // TDJ: if using index instead of handle
             // if let Some(s) = self.canvas.canvas.get_shape_mut(3) {
             //     s.borrow_mut()
             //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
             // }
-
-            // Test of basic simulation/animation  //TDJ
-            // let now = ctx.input(|i| i.time);
-            // if now - self.last_toggle >= 0.5 {
-            //     self.last_toggle = now;
-            //     self.is_red = !self.is_red;
-            //     let c = if self.is_red {
-            //         Color32::RED
-            //     } else {
-            //         Color32::BLUE
-            //     };
-            //     self.canvas.sc2.borrow_mut().set_fill_color(c);
+            // TDJ: if using index instead of handle
+            // if let Some(s) = self.canvas.canvas.get_shape_mut(3) {
+            //     s.borrow_mut()
+            //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
+            //     match vec.last() {
+            //         Some(last_item) => println!("The last item is: {}", last_item),
+            //         None => println!("The vector is empty"),
+            //     }
             // }
+
+
+            // match vec.last() {
+            //     Some(last_item) => println!("The last item is: {}", last_item),
+            //     None => println!("The vector is empty"),
+            // }
+
+            //Test of basic simulation/animation  //TDJ
+            let now = ctx.input(|i| i.time);
+            if now - self.last_toggle >= 0.5 {
+                self.last_toggle = now;
+                self.is_red = !self.is_red;
+                let c = if self.is_red {
+                    Color32::RED
+                } else {
+                    Color32::BLUE
+                };
+                self.canvas.sc2.borrow_mut().set_fill_color(c);
+            }
 
             self.canvas.canvas.render_side_central(ctx);
             //self.canvas.canvas.render_top_central(ctx);
             //self.canvas.canvas.render_central(ctx);
 
-            // CentralPanel::default().show(ctx, |ui| {
-            //     //self.canvas.run(ui);
-            //     self.canvas.canvas.run(ui);
-            // });
-
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
-            // or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
+            // TDJ or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
         }
     }
 } // module demo
