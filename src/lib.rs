@@ -95,6 +95,7 @@ pub mod gui_lib {
     pub trait World: std::fmt::Debug {
         fn advance(&mut self);
     }
+    //---------------------------------------------------------
 
     /// A container for drawable components.
     ///
@@ -188,22 +189,22 @@ pub mod gui_lib {
             self.widgets.push(w);
         }
     }
-//-------------------------------------------------------------------
+    //-------------------------------------------------------------------
 
-/// Trait for invoking any widget in the UI.
-pub trait Widget: std::fmt::Debug {
-    fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
+    /// Trait for invoking any widget in the UI.
+    pub trait Widget: std::fmt::Debug {
+        fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
 
-    // fn layout(&mut self, ctx: &mut LayoutCtx);
-    // fn event(&mut self, ctx: &mut EventCtx, event: &Event);
-    // fn set_focused(&mut self, focused: bool);
+        // fn layout(&mut self, ctx: &mut LayoutCtx);
+        // fn event(&mut self, ctx: &mut EventCtx, event: &Event);
+        // fn set_focused(&mut self, focused: bool);
 
-    // Example of a different draw function
-    // fn draw_with_highlight(&self, ctx: &mut PaintCtx) {
-    //     ctx.set_highlight(true);
-    //     self.draw(ctx);
-    //     ctx.set_highlight(false);
-}
+        // Example of a different draw function
+        // fn draw_with_highlight(&self, ctx: &mut PaintCtx) {
+        //     ctx.set_highlight(true);
+        //     self.draw(ctx);
+        //     ctx.set_highlight(false);
+    }
 
     /// A customizable button component.
     ///
@@ -235,7 +236,7 @@ pub trait Widget: std::fmt::Debug {
             ui.add_sized(size, EguiButton::new(&self.label))
         }
     }
-//---------------------------------------------------------------------------
+    //---------------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     pub enum LineStyle {
@@ -776,10 +777,7 @@ pub mod demo {
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Demonstrate access to Shape sp
-            self.canvas
-                .sp
-                .borrow_mut()
-                .set_color(Color32::BLUE);
+            self.canvas.sp.borrow_mut().set_color(Color32::BLUE);
 
             // TDJ: if using index instead of handle
             // if let Some(s) = self.canvas.canvas.get_shape_mut(3) {
