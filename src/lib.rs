@@ -20,9 +20,9 @@ pub mod gui_lib {
         Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2,
         Visuals, pos2, vec2,
     };
+    use egui::{CentralPanel, Context};
     use std::cell::RefCell;
     use std::rc::Rc;
-    use egui::{CentralPanel, Context};
 
     pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
 
@@ -58,37 +58,42 @@ pub mod gui_lib {
         native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));
         native_options
     }
+    //----------------------------------------------------------
 
-    /// Trait for  anything that can be drawn in the UI.
+    /// ```rust
+    /// A trait that represents a world with the ability to advance its state.
     ///
-    /// Implement this trait for any component that needs to be rendered
-    /// in the application's user interface.
+    /// This trait provides an abstraction for any type that can simulate or model
+    /// a world and update its state over time. Types implementing this trait must
+    /// also implement the `Debug` trait for debugging purposes.
     ///
-    /// Is used as a super trait for shapes and widgets.
+    /// # Required Methods
     ///
-    /// # Trait Implementer’s Note
-    /// This trait requires `Debug` to be implemented for all types.
-    /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
-
-    /// Trait for any widget.
+    /// - `advance(&mut self)`: Advances the state of the world. The specific behavior
+    ///   of this method depends on the implementing type.
     ///
-    /// Rendered with supertrait Drawable
+    /// # Examples
     ///
-    /// # Trait Implementer’s Note
-    /// This trait requires `Debug` to be implemented for all types.
-    /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
-    pub trait Widget: std::fmt::Debug {
-        fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
-
-        // fn layout(&mut self, ctx: &mut LayoutCtx);
-        // fn event(&mut self, ctx: &mut EventCtx, event: &Event);
-        // fn set_focused(&mut self, focused: bool);
-
-        // Example of a different draw function
-        // fn draw_with_highlight(&self, ctx: &mut PaintCtx) {
-        //     ctx.set_highlight(true);
-        //     self.draw(ctx);
-        //     ctx.set_highlight(false);
+    /// ```
+    /// // Example of implementing the World trait for a simple struct
+    /// #[derive(Debug)]
+    /// struct SimpleWorld {
+    ///     state: i32,
+    /// }
+    ///
+    /// impl World for SimpleWorld {
+    ///     fn advance(&mut self) {
+    ///         self.state += 1;
+    ///     }
+    /// }
+    ///
+    /// let mut world = SimpleWorld { state: 0 };
+    /// world.advance();
+    /// println!("{:?}", world); // Outputs: SimpleWorld { state: 1 }
+    /// ```
+    /// pub
+    pub trait World: std::fmt::Debug {
+        fn advance(&mut self);
     }
 
     /// A container for drawable components.
@@ -139,7 +144,7 @@ pub mod gui_lib {
                     ui.allocate_painter(ui.available_size(), egui::Sense::hover());
                 // (response.rect).min is the top-left corner position
                 // of the rectangular area returned by ui.available_size()
-                let offset = (response.rect).min.to_vec2();  // to top-left corner
+                let offset = (response.rect).min.to_vec2(); // to top-left corner
                 for shape in &self.shapes {
                     shape.borrow_mut().draw_offset(&painter, offset);
                 }
@@ -152,7 +157,7 @@ pub mod gui_lib {
                 ui.label("Hello World!");
                 for widget in &mut self.widgets {
                     widget.invoke(ui);
-                };
+                }
             });
 
             CentralPanel::default().show(ctx, |ui| {
@@ -160,7 +165,7 @@ pub mod gui_lib {
                     ui.allocate_painter(ui.available_size(), egui::Sense::hover());
                 // (response.rect).min is the top-left corner position
                 // of the rectangular area returned by ui.available_size()
-                let offset = (response.rect).min.to_vec2();  // to top-left corner
+                let offset = (response.rect).min.to_vec2(); // to top-left corner
                 for shape in &self.shapes {
                     shape.borrow_mut().draw_offset(&painter, offset);
                 }
@@ -174,7 +179,7 @@ pub mod gui_lib {
         /// Returns a mutable reference to the top-most shape handle (last added).
         pub fn get_top_shape_mut(&mut self) -> Option<&mut ShapeHandle> {
             self.shapes.last_mut()
-            }
+        }
 
         pub fn add_shape(&mut self, s: ShapeHandle) {
             self.shapes.push(s);
@@ -183,6 +188,22 @@ pub mod gui_lib {
             self.widgets.push(w);
         }
     }
+//-------------------------------------------------------------------
+
+/// Trait for invoking any widget in the UI.
+pub trait Widget: std::fmt::Debug {
+    fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
+
+    // fn layout(&mut self, ctx: &mut LayoutCtx);
+    // fn event(&mut self, ctx: &mut EventCtx, event: &Event);
+    // fn set_focused(&mut self, focused: bool);
+
+    // Example of a different draw function
+    // fn draw_with_highlight(&self, ctx: &mut PaintCtx) {
+    //     ctx.set_highlight(true);
+    //     self.draw(ctx);
+    //     ctx.set_highlight(false);
+}
 
     /// A customizable button component.
     ///
@@ -214,6 +235,7 @@ pub mod gui_lib {
             ui.add_sized(size, EguiButton::new(&self.label))
         }
     }
+//---------------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     pub enum LineStyle {
@@ -250,7 +272,7 @@ pub mod gui_lib {
         //fn draw(&self, ui: &mut Ui);
         fn draw(&self, painter: &egui::Painter);
         fn draw_offset(&mut self, painter: &egui::Painter, offset: Vec2) {
-            let orig_loc =self.base().location;
+            let orig_loc = self.base().location;
             self.base_mut().location = orig_loc + offset;
             self.draw(painter);
             self.base_mut().location = orig_loc;
@@ -498,6 +520,7 @@ pub mod gui_lib {
             );
         }
     }
+    //--------------------------------------------------------------
 } // closes mod gui_lib
 
 ///
@@ -753,6 +776,10 @@ pub mod demo {
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Demonstrate access to Shape sp
+            self.canvas
+                .sp
+                .borrow_mut()
+                .set_color(Color32::BLUE);
 
             // TDJ: if using index instead of handle
             // if let Some(s) = self.canvas.canvas.get_shape_mut(3) {
@@ -760,11 +787,10 @@ pub mod demo {
             //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
             // }
 
-            // TDJ: If accessing last shape added
-            if let Some(s) = self.canvas.canvas.get_top_shape_mut() {
-                s.borrow_mut()
-                    .set_color(Color32::BLUE);
-            }
+            // // TDJ: If accessing last shape added
+            // if let Some(s) = self.canvas.canvas.get_top_shape_mut() {
+            //     s.borrow_mut().set_color(Color32::BLUE);
+            // }
 
             //Test of basic simulation/animation  //TDJ
             let now = ctx.input(|i| i.time);
@@ -780,7 +806,7 @@ pub mod demo {
             }
 
             // Render everything in the canvas
-            self.canvas.canvas.render_side_central(ctx);  // side panel and central panel
+            self.canvas.canvas.render_side_central(ctx); // side panel and central panel
             //self.canvas.canvas.render_top_central(ctx);  // top panel and central panel
             //self.canvas.canvas.render_central(ctx);  // central panel only
 
