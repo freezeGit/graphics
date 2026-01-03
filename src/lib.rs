@@ -134,7 +134,7 @@ pub mod gui_lib {
                 .resizable(true)
                 .default_width(180.0)
                 .show(ctx, |ui| {
-                    ui.heading("Controls");
+                    //ui.heading("Controls");  // TDJ: only if you want side panel to be labelled
                     for widget in &mut self.widgets {
                         widget.invoke(ui);
                     }
@@ -153,13 +153,18 @@ pub mod gui_lib {
         }
 
         /// Renders all widgets in TopBottomPanel and shapes in the CentralPanel.
+
         pub fn render_top_central(&mut self, ctx: &Context) {
-            egui::TopBottomPanel::top("my_panel").show(ctx, |ui| {
-                ui.label("Hello World!");
-                for widget in &mut self.widgets {
-                    widget.invoke(ui);
-                }
-            });
+            egui::TopBottomPanel::top("toolbar")
+                .resizable(true)
+                .default_height(48.0)
+                .show(ctx, |ui| {
+                    ui.horizontal(|ui| {
+                        for widget in &mut self.widgets {
+                            widget.invoke(ui);
+                        }
+                    });
+                });
 
             CentralPanel::default().show(ctx, |ui| {
                 let (response, painter) =
@@ -236,6 +241,9 @@ pub mod gui_lib {
             ui.add_sized(size, EguiButton::new(&self.label))
         }
     }
+
+    // if ui.button("Click me!").clicked() {
+    //     self.label = "Button clicked!".to_owned();
     //---------------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq)]
@@ -700,8 +708,11 @@ pub mod demo {
             canvas.add_shape(sp.clone());
 
             // Create and add widgets as Box<dyn Widget>
-            let wb = Button::new(120.0, 40.0, "Push me".to_string());
-            canvas.widgets.push(Box::new(wb));
+            let wb1 = Button::new(120.0, 40.0, "Push me".to_string());
+            canvas.widgets.push(Box::new(wb1));
+
+            let wb2 = Button::new(120.0, 40.0, "Push me".to_string());
+            canvas.widgets.push(Box::new(wb2));
 
             //Create the DemoCanvas
             Self {
@@ -804,8 +815,8 @@ pub mod demo {
             }
 
             // Render everything in the canvas
-            self.canvas.canvas.render_side_central(ctx); // side panel and central panel
-            //self.canvas.canvas.render_top_central(ctx);  // top panel and central panel
+            //self.canvas.canvas.render_side_central(ctx); // side panel and central panel
+            self.canvas.canvas.render_top_central(ctx);  // top panel and central panel
             //self.canvas.canvas.render_central(ctx);  // central panel only
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
