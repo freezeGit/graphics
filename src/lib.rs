@@ -624,7 +624,7 @@ pub mod demo {
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
     //use super::gui_lib::{BasicCanvas, Button, Circle, LineStyle, Color32, Polyline, Rectangle};
     use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle};
-    use crate::gui_lib::LineStyle::*;
+    use crate::gui_lib::{LineStyle::*, World};
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     use crate::custom_light_visuals;
@@ -636,6 +636,45 @@ pub mod demo {
     //use crate::{custom_light_visuals, gui_lib::Shape, gui_lib::Widget, gui_lib::ShapeHandle};
     //use eframe::egui::{vec2, CentralPanel, Context};
 
+    //#[derive(Debug)]
+    #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+    enum Signal {
+        Stop,
+        Go,
+    }
+    #[derive(Debug)]
+    struct TrafficLight {
+        state: Signal,
+    }
+
+    #[derive(Debug)]
+    struct DemoWorld {
+        state: i32,
+        tl: TrafficLight,
+    }
+
+    impl World for DemoWorld {
+        fn advance(&mut self) {
+            self.state += 1;
+            self.toggle_light();
+        }
+    }
+
+    impl DemoWorld {
+        fn new() -> Self {
+            Self {
+                state: 0,
+                tl: TrafficLight { state: Signal::Stop },
+            }
+        }
+
+        fn toggle_light(&mut self) {
+            self.tl.state = match self.tl.state {
+                Signal::Stop => Signal::Go,
+                Signal::Go => Signal::Stop,
+            };
+        }
+    }
     #[derive(Debug)]
     pub struct DemoCanvas {
         pub canvas: BasicCanvas,
@@ -672,7 +711,7 @@ pub mod demo {
                 75.0,
             )));
             sc1.borrow_mut().set_line_width(4.0);
-            sc1.borrow_mut().set_fill_color(Color32::DARK_RED);
+            sc1.borrow_mut().set_fill_color(Color32::GRAY);
             canvas.add_shape(sc1.clone());
 
             let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
@@ -738,10 +777,13 @@ pub mod demo {
     /// the main canvas with all UI components.
     #[derive(Debug)]
     struct DemoApp {
+        world: Box<DemoWorld>,
         canvas: DemoCanvas,
         last_toggle: f64,
         is_red: bool,
     }
+
+    // let mut world = Box::new(World::new());
 
     // fn base(&self) -> &ShapeBase;
     // fn base_mut(&mut self) -> &mut ShapeBase;
@@ -755,6 +797,7 @@ pub mod demo {
         /// and containing a sample button.
         pub fn new() -> Self {
             Self {
+                world: Box::new(DemoWorld::new()),
                 canvas: DemoCanvas::new(),
                 last_toggle: 0.0, //For time-gating
                 is_red: true,
@@ -785,6 +828,13 @@ pub mod demo {
     /// and the eframe framework that handles all the platform-specific details
     /// of creating a window and running an event loop.
 
+    // impl eframe::App for DemoApp {
+    //     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
+    //         self.world.step();
+    //         self.screen.draw(&self.world);
+    //     }
+    // }
+
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Demonstrate access to Shape sp
@@ -803,20 +853,51 @@ pub mod demo {
 
             //Test of basic simulation/animation  //TDJ
             let now = ctx.input(|i| i.time);
+
             if now - self.last_toggle >= 0.5 {
                 self.last_toggle = now;
-                self.is_red = !self.is_red;
-                let c = if self.is_red {
-                    Color32::RED
-                } else {
-                    Color32::BLUE
-                };
-                self.canvas.sc2.borrow_mut().set_fill_color(c);
+                self.world.advance(); // one tick
+
+                    let c = if self.world.tl.state==Signal::Stop {
+                        Color32::RED
+                    } else {
+                        Color32::GREEN
+                    };
+                    self.canvas.sc2.borrow_mut().set_fill_color(c);
             }
+
+            // if now - self.last_toggle >= 0.5 {
+            //     self.last_toggle = now;
+            //     self.world.advance(); // one tick
+            // }
+
+            // if now - self.last_toggle >= 0.5 {
+            //     self.last_toggle = now;
+            //     self.is_red = !self.is_red;
+            //     let c = if self.is_red {
+            //         Color32::RED
+            //     } else {
+            //         Color32::GREEN
+            //     };
+            //     self.canvas.sc2.borrow_mut().set_fill_color(c);
+            // }
+
+            // //Test of basic simulation/animation  //TDJ
+            // let now = ctx.input(|i| i.time);
+            // if now - self.last_toggle >= 0.5 {
+            //     self.last_toggle = now;
+            //     self.is_red = !self.is_red;
+            //     let c = if self.is_red {
+            //         Color32::RED
+            //     } else {
+            //         Color32::GREEN
+            //     };
+            //     self.canvas.sc2.borrow_mut().set_fill_color(c);
+            // }
 
             // Render everything in the canvas
             //self.canvas.canvas.render_side_central(ctx); // side panel and central panel
-            self.canvas.canvas.render_top_central(ctx);  // top panel and central panel
+            self.canvas.canvas.render_top_central(ctx); // top panel and central panel
             //self.canvas.canvas.render_central(ctx);  // central panel only
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
