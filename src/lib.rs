@@ -664,7 +664,9 @@ pub mod demo {
         fn new() -> Self {
             Self {
                 state: 0,
-                tl: TrafficLight { state: Signal::Stop },
+                tl: TrafficLight {
+                    state: Signal::Stop,
+                },
             }
         }
 
@@ -783,8 +785,6 @@ pub mod demo {
         is_red: bool,
     }
 
-    // let mut world = Box::new(World::new());
-
     // fn base(&self) -> &ShapeBase;
     // fn base_mut(&mut self) -> &mut ShapeBase;
 
@@ -824,21 +824,9 @@ pub mod demo {
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
 
-    /// The eframe::App trait is the bridge between your custom application logic
-    /// and the eframe framework that handles all the platform-specific details
-    /// of creating a window and running an event loop.
-
-    // impl eframe::App for DemoApp {
-    //     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
-    //         self.world.step();
-    //         self.screen.draw(&self.world);
-    //     }
-    // }
-
     impl eframe::App for DemoApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // Demonstrate access to Shape sp
-            self.canvas.sp.borrow_mut().set_color(Color32::BLUE);
 
             // TDJ: if using index instead of handle
             // if let Some(s) = self.canvas.canvas.get_shape_mut(3) {
@@ -856,44 +844,17 @@ pub mod demo {
 
             if now - self.last_toggle >= 0.5 {
                 self.last_toggle = now;
-                self.world.advance(); // one tick
+                self.world.advance(); // advance world one tick
 
-                    let c = if self.world.tl.state==Signal::Stop {
-                        Color32::RED
-                    } else {
-                        Color32::GREEN
-                    };
-                    self.canvas.sc2.borrow_mut().set_fill_color(c);
+                // Get state of traffic light and set appropriate color
+                let c = if self.world.tl.state == Signal::Stop {
+                    Color32::RED
+                } else {
+                    Color32::GREEN
+                };
+                //Red light represents Stop signal. Green light represents Go signal
+                self.canvas.sc2.borrow_mut().set_fill_color(c);
             }
-
-            // if now - self.last_toggle >= 0.5 {
-            //     self.last_toggle = now;
-            //     self.world.advance(); // one tick
-            // }
-
-            // if now - self.last_toggle >= 0.5 {
-            //     self.last_toggle = now;
-            //     self.is_red = !self.is_red;
-            //     let c = if self.is_red {
-            //         Color32::RED
-            //     } else {
-            //         Color32::GREEN
-            //     };
-            //     self.canvas.sc2.borrow_mut().set_fill_color(c);
-            // }
-
-            // //Test of basic simulation/animation  //TDJ
-            // let now = ctx.input(|i| i.time);
-            // if now - self.last_toggle >= 0.5 {
-            //     self.last_toggle = now;
-            //     self.is_red = !self.is_red;
-            //     let c = if self.is_red {
-            //         Color32::RED
-            //     } else {
-            //         Color32::GREEN
-            //     };
-            //     self.canvas.sc2.borrow_mut().set_fill_color(c);
-            // }
 
             // Render everything in the canvas
             //self.canvas.canvas.render_side_central(ctx); // side panel and central panel
