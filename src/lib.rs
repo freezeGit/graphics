@@ -60,42 +60,11 @@ pub mod gui_lib {
     }
     //----------------------------------------------------------
 
-    /// ```rust
     /// A trait that represents a world with the ability to advance its state.
-    ///
-    /// This trait provides an abstraction for any type that can simulate or model
-    /// a world and update its state over time. Types implementing this trait must
-    /// also implement the `Debug` trait for debugging purposes.
-    ///
-    /// # Required Methods
-    ///
-    /// - `advance(&mut self)`: Advances the state of the world. The specific behavior
-    ///   of this method depends on the implementing type.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// // Example of implementing the World trait for a simple struct
-    /// #[derive(Debug)]
-    /// struct SimpleWorld {
-    ///     state: i32,
-    /// }
-    ///
-    /// impl World for SimpleWorld {
-    ///     fn advance(&mut self) {
-    ///         self.state += 1;
-    ///     }
-    /// }
-    ///
-    /// let mut world = SimpleWorld { state: 0 };
-    /// world.advance();
-    /// println!("{:?}", world); // Outputs: SimpleWorld { state: 1 }
-    /// ```
-    /// pub
     pub trait World: std::fmt::Debug {
         fn advance(&mut self);
     }
-    //---------------------------------------------------------
+//------------------------------------------------
 
     /// A container for drawable components.
     ///
@@ -785,6 +754,17 @@ pub mod demo {
         is_red: bool,
     }
 
+    fn update_canvas(canvas: &mut DemoCanvas, world: &DemoWorld) {
+        // Get state of traffic light and set appropriate color
+        let c = if world.tl.state == Signal::Stop {
+            Color32::RED
+        } else {
+            Color32::GREEN
+        };
+        //Red light represents Stop signal. Green light represents Go signal
+        canvas.sc2.borrow_mut().set_fill_color(c);
+    }
+
     // fn base(&self) -> &ShapeBase;
     // fn base_mut(&mut self) -> &mut ShapeBase;
 
@@ -845,15 +825,7 @@ pub mod demo {
             if now - self.last_toggle >= 0.5 {
                 self.last_toggle = now;
                 self.world.advance(); // advance world one tick
-
-                // Get state of traffic light and set appropriate color
-                let c = if self.world.tl.state == Signal::Stop {
-                    Color32::RED
-                } else {
-                    Color32::GREEN
-                };
-                //Red light represents Stop signal. Green light represents Go signal
-                self.canvas.sc2.borrow_mut().set_fill_color(c);
+                update_canvas(&mut self.canvas, &self.world);
             }
 
             // Render everything in the canvas
