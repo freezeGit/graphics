@@ -167,7 +167,8 @@ pub mod gui_lib {
 
     /// Trait for invoking any widget in the UI.
     pub trait Widget: std::fmt::Debug {
-        fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
+        // fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
+        fn invoke(&mut self, ui: &mut Ui);
 
         // fn layout(&mut self, ctx: &mut LayoutCtx);
         // fn event(&mut self, ctx: &mut EventCtx, event: &Event);
@@ -204,10 +205,20 @@ pub mod gui_lib {
         }
     }
 
+    // impl Widget for Button {
+    //     fn invoke(&mut self, ui: &mut Ui) -> Response {
+    //         let size = vec2(self.width, self.height);
+    //         ui.add_sized(size, EguiButton::new(&self.label))
+    //     }
+    // }
+
     impl Widget for Button {
-        fn invoke(&mut self, ui: &mut Ui) -> Response {
+        fn invoke(&mut self, ui: &mut Ui) {
             let size = vec2(self.width, self.height);
-            ui.add_sized(size, EguiButton::new(&self.label))
+            if ui.add_sized(size, EguiButton::new(&self.label))
+                .clicked() {
+                self.label = "Button clicked!".to_owned();
+            }
         }
     }
 
@@ -649,10 +660,10 @@ pub mod demo {
     #[derive(Debug)]
     pub struct DemoCanvas {
         pub canvas: BasicCanvas,
-        pub sc1: ShapeHandle,
-        pub sc2: ShapeHandle,
-        pub sr: ShapeHandle,
-        pub sp: ShapeHandle,
+        pub sc1: Rc<RefCell<Circle>>,
+        pub sc2: Rc<RefCell<Circle>>,
+        pub sr: Rc<RefCell<Rectangle>>,
+        pub sp: Rc<RefCell<Polyline>>,
     }
 
     impl DemoCanvas {
@@ -663,6 +674,7 @@ pub mod demo {
             // Add shapes without handles to the canvas
             let mut y = 75.0;
             for _ in 0..30 {
+                // note: vee will be lost. It will not be a field in Self
                 let vee: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
                     eframe::egui::Pos2::new(150.0, y),
                     [
@@ -671,7 +683,9 @@ pub mod demo {
                         eframe::egui::Pos2::new(20.0, 0.0),
                     ],
                 )));
-                canvas.add_shape(vee);
+                //vee.borrow_mut().set_line_width(4.0);
+                let vee_cln: ShapeHandle = vee.clone();
+                canvas.add_shape(vee_cln);
                 y += 10.0;
             }
 
@@ -683,20 +697,23 @@ pub mod demo {
             )));
             sc1.borrow_mut().set_line_width(4.0);
             sc1.borrow_mut().set_fill_color(Color32::GRAY);
-            canvas.add_shape(sc1.clone());
+            let sc1_cln: ShapeHandle = sc1.clone();
+            canvas.add_shape(sc1_cln);
 
             let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
                 eframe::egui::Pos2::new(200.0, 200.0),
                 10.0,
             )));
-            canvas.add_shape(sc2.clone());
+             let sc2_cln: ShapeHandle = sc2.clone();
+            canvas.add_shape(sc2_cln);
 
             let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
                 eframe::egui::Pos2::new(400.0, 200.0),
                 eframe::egui::Vec2::new(150.0, 100.0),
             )));
             sr.borrow_mut().set_fill_color(Color32::GOLD);
-            canvas.add_shape(sr.clone());
+            let sr_cln: ShapeHandle = sr.clone();
+            canvas.add_shape(sr_cln);
 
             let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
                 eframe::egui::Pos2::new(550.0, 200.0),
@@ -715,7 +732,8 @@ pub mod demo {
             //sp.borrow_mut().set_line_style(Dashed);
             sp.borrow_mut().set_line_style(Dotted);
             //sp.borrow_mut().set_line_style(Solid);
-            canvas.add_shape(sp.clone());
+             let sp_cln: ShapeHandle = sp.clone();
+            canvas.add_shape(sp_cln);
 
             // Create and add widgets as Box<dyn Widget>
             let wb1 = Button::new(120.0, 40.0, "Push me".to_string());
