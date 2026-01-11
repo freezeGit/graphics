@@ -84,8 +84,114 @@ pub mod gui_lib {
             }
         }
 
+        // --- internal helper: convert any concrete Rc<RefCell<T>> into a ShapeHandle
+        fn erase_handle<T: Shape + 'static>(rc: &Rc<RefCell<T>>) -> ShapeHandle {
+            rc.clone() // unsize coercion to Rc<RefCell<dyn Shape>>
+        }
+
+        // --- internal helper: find index by pointer identity (ShapeHandle -> ShapeHandle)
+        fn index_of_handle(&self, target: &ShapeHandle) -> Option<usize> {
+            self.shapes.iter().position(|h| Rc::ptr_eq(h, target))
+        }
+
+        /// Put shape `a` on top (i.e., draw last).
+        /// Returns false if shape is not found in `self.shapes`.
+        //pub fn put_on_top();
+        pub fn put_on_top<TA>(&mut self, a: &Rc<RefCell<TA>>) -> bool
+        where
+            TA: Shape + 'static,
+        {
+            let a_h: ShapeHandle = Self::erase_handle(a);
+            self.put_on_top_handle(&a_h)
+        }
+
+        /// Same as `put_on_top`, but takes erased handles directly.
+        pub fn put_on_top_handle(&mut self, a: &ShapeHandle) -> bool {
+             if let Some(top) = self.shapes.last().cloned() {
+                    return self.put_on_top_of_handle(a, &top);
+                }
+                false
+            }
+
+            /// Put shape `a` on top of shape `b` (i.e., draw `a` after `b`).
+        /// Returns false if either shape is not found in `self.shapes`.
+        pub fn put_on_top_of<TA, TB>(&mut self, a: &Rc<RefCell<TA>>, b: &Rc<RefCell<TB>>) -> bool
+        where
+            TA: Shape + 'static,
+            TB: Shape + 'static,
+        {
+            let a_h: ShapeHandle = Self::erase_handle(a);
+            let b_h: ShapeHandle = Self::erase_handle(b);
+            self.put_on_top_of_handle(&a_h, &b_h)
+        }
+
+        /// Same as `put_on_top_of`, but takes erased handles directly.
+        pub fn put_on_top_of_handle(&mut self, a: &ShapeHandle, b: &ShapeHandle) -> bool {
+            let ia = self.index_of_handle(a);
+            let ib = self.index_of_handle(b);
+            let (Some(mut ia), Some(mut ib)) = (ia, ib) else { return false };
+
+            if ia == ib {
+                return true;
+            }
+
+            // Remove A first
+            let entry = self.shapes.remove(ia);
+
+            // If A was before B, B shifts left by 1 after removal
+            if ia < ib {
+                ib -= 1;
+            }
+
+            // Insert A after B so it draws "over" B
+            self.shapes.insert(ib + 1, entry);
+            true
+        }
+
+        // /// Same as `put_on_top_of`, but takes erased handles directly.
+        // pub fn put_on_top_of_handle(&mut self, a: &ShapeHandle, b: &ShapeHandle) -> bool {
+        //     let ia = self.index_of_handle(a);
+        //     let ib = self.index_of_handle(b);
+        //     let (Some(mut ia), Some(mut ib)) = (ia, ib) else { return false };
+        //
+        //     if ia == ib {
+        //         return true;
+        //     }
+        //
+        //     // Remove A first
+        //     let entry = self.shapes.remove(ia);
+        //
+        //     // If A was before B, B shifts left by 1 after removal
+        //     if ia < ib {
+        //         ib -= 1;
+        //     }
+        //
+        //     // Insert A after B so it draws "over" B
+        //     self.shapes.insert(ib + 1, entry);
+        //     true
+        // }
+
+        /// Remove a shape by identity, using your concrete handle (e.g. &self.sc2).
+        /// Returns true if removed.
+        pub fn remove_shape<T: Shape + 'static>(&mut self, s: &Rc<RefCell<T>>) -> bool {
+            let s_h: ShapeHandle = Self::erase_handle(s);
+            self.remove_shape_handle(&s_h)
+        }
+
+        /// Remove a shape by identity, using an erased handle.
+        /// Returns true if removed.
+        pub fn remove_shape_handle(&mut self, s: &ShapeHandle) -> bool {
+            if let Some(i) = self.index_of_handle(s) {
+                self.shapes.remove(i);
+                true
+            } else {
+                false
+            }
+        }
+
+
         /// Renders all widgets and shapes in the CentralPanel.
-        pub fn render_central(&mut self, ctx: &Context) {
+        pub fn render(&mut self, ctx: &Context) {
             CentralPanel::default().show(ctx, |ui| {
                 let painter = ui.painter();
                 for shape in &self.shapes {
@@ -98,7 +204,7 @@ pub mod gui_lib {
         }
 
         /// Renders all widgets in SidePanel and shapes in the CentralPanel.
-        pub fn render_side_central(&mut self, ctx: &Context) {
+        pub fn render_with_side_panel(&mut self, ctx: &Context) {
             egui::SidePanel::left("controls")
                 .resizable(true)
                 .default_width(180.0)
@@ -123,7 +229,7 @@ pub mod gui_lib {
 
         /// Renders all widgets in TopBottomPanel and shapes in the CentralPanel.
 
-        pub fn render_top_central(&mut self, ctx: &Context) {
+        pub fn render_with_top_panel(&mut self, ctx: &Context) {
             egui::TopBottomPanel::top("toolbar")
                 .resizable(true)
                 .default_height(48.0)
@@ -742,6 +848,9 @@ pub mod demo {
             let wb2 = Button::new(120.0, 40.0, "Push me".to_string());
             canvas.widgets.push(Box::new(wb2));
 
+            //canvas.put_on_top_of(&sc1, &sc2);  //TDJ test
+            //canvas.put_on_top(&sc1);  //TDJ test
+
             //Create the DemoCanvas
             Self {
                 canvas,
@@ -847,9 +956,9 @@ pub mod demo {
             }
 
             // Render everything in the canvas
-            //self.canvas.canvas.render_side_central(ctx); // side panel and central panel
-            self.canvas.canvas.render_top_central(ctx); // top panel and central panel
-            //self.canvas.canvas.render_central(ctx);  // central panel only
+            //self.canvas.canvas.render_with_side_panel(ctx); // side panel and central panel
+            self.canvas.canvas.render_with_top_panel(ctx); // top panel and central panel
+            //self.canvas.canvas.render(ctx);  // central panel only
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
             // TDJ or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
