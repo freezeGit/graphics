@@ -84,6 +84,8 @@ pub mod gui_lib {
             }
         }
 
+        // Shapes --------------------------------
+
         // --- internal helper: convert any concrete Rc<RefCell<T>> into a ShapeHandle
         fn erase_handle<T: Shape + 'static>(rc: &Rc<RefCell<T>>) -> ShapeHandle {
             rc.clone() // unsize coercion to Rc<RefCell<dyn Shape>>
@@ -92,6 +94,22 @@ pub mod gui_lib {
         // --- internal helper: find index by pointer identity (ShapeHandle -> ShapeHandle)
         fn index_of_handle(&self, target: &ShapeHandle) -> Option<usize> {
             self.shapes.iter().position(|h| Rc::ptr_eq(h, target))
+        }
+
+        /// Add a shape to the canvas.
+        pub fn add_shape(&mut self, s: ShapeHandle) {
+            self.shapes.push(s);
+        }
+
+        // Returns a mutable reference to a shape handle at the given index.
+        // TDJ: is this needed?
+        pub fn get_shape_mut(&mut self, index: usize) -> Option<&mut ShapeHandle> {
+            self.shapes.get_mut(index)
+        }
+        //  Returns a mutable reference to the top-most shape handle (last added).
+        // TDJ:: is this needed?
+        pub fn get_top_shape_mut(&mut self) -> Option<&mut ShapeHandle> {
+            self.shapes.last_mut()
         }
 
         /// Put shape `a` on top (i.e., draw last).
@@ -107,13 +125,14 @@ pub mod gui_lib {
 
         /// Same as `put_on_top`, but takes erased handles directly.
         pub fn put_on_top_handle(&mut self, a: &ShapeHandle) -> bool {
-             if let Some(top) = self.shapes.last().cloned() {
-                    return self.put_on_top_of_handle(a, &top);
-                }
-                false
-            }
+            let Some(i) = self.shapes.iter().position(|h| Rc::ptr_eq(h, a)) else { return false };
+            if i + 1 == self.shapes.len() { return true; } // already top
+            let entry = self.shapes.remove(i);
+            self.shapes.push(entry);
+            true
+        }
 
-            /// Put shape `a` on top of shape `b` (i.e., draw `a` after `b`).
+        /// Put shape `a` on top of shape `b` (i.e., draw `a` after `b`).
         /// Returns false if either shape is not found in `self.shapes`.
         pub fn put_on_top_of<TA, TB>(&mut self, a: &Rc<RefCell<TA>>, b: &Rc<RefCell<TB>>) -> bool
         where
@@ -148,29 +167,6 @@ pub mod gui_lib {
             true
         }
 
-        // /// Same as `put_on_top_of`, but takes erased handles directly.
-        // pub fn put_on_top_of_handle(&mut self, a: &ShapeHandle, b: &ShapeHandle) -> bool {
-        //     let ia = self.index_of_handle(a);
-        //     let ib = self.index_of_handle(b);
-        //     let (Some(mut ia), Some(mut ib)) = (ia, ib) else { return false };
-        //
-        //     if ia == ib {
-        //         return true;
-        //     }
-        //
-        //     // Remove A first
-        //     let entry = self.shapes.remove(ia);
-        //
-        //     // If A was before B, B shifts left by 1 after removal
-        //     if ia < ib {
-        //         ib -= 1;
-        //     }
-        //
-        //     // Insert A after B so it draws "over" B
-        //     self.shapes.insert(ib + 1, entry);
-        //     true
-        // }
-
         /// Remove a shape by identity, using your concrete handle (e.g. &self.sc2).
         /// Returns true if removed.
         pub fn remove_shape<T: Shape + 'static>(&mut self, s: &Rc<RefCell<T>>) -> bool {
@@ -189,6 +185,14 @@ pub mod gui_lib {
             }
         }
 
+        // Widgets --------------------------------------------------
+
+        /// Add a widget to the canvas
+        pub fn add_widget(&mut self, w: Box<dyn Widget>) {
+            self.widgets.push(w);
+        }
+
+        // Rendering ---------------------------------------------
 
         /// Renders all widgets and shapes in the CentralPanel.
         pub fn render(&mut self, ctx: &Context) {
@@ -228,7 +232,6 @@ pub mod gui_lib {
         }
 
         /// Renders all widgets in TopBottomPanel and shapes in the CentralPanel.
-
         pub fn render_with_top_panel(&mut self, ctx: &Context) {
             egui::TopBottomPanel::top("toolbar")
                 .resizable(true)
@@ -252,23 +255,8 @@ pub mod gui_lib {
                 }
             });
         }
-
-        /// Returns a mutable reference to a shape handle at the given index.
-        pub fn get_shape_mut(&mut self, index: usize) -> Option<&mut ShapeHandle> {
-            self.shapes.get_mut(index)
-        }
-        /// Returns a mutable reference to the top-most shape handle (last added).
-        pub fn get_top_shape_mut(&mut self) -> Option<&mut ShapeHandle> {
-            self.shapes.last_mut()
-        }
-
-        pub fn add_shape(&mut self, s: ShapeHandle) {
-            self.shapes.push(s);
-        }
-        pub fn add_widget(&mut self, w: Box<dyn Widget>) {
-            self.widgets.push(w);
-        }
     }
+
     //-------------------------------------------------------------------
 
     /// Trait for invoking any widget in the UI.
