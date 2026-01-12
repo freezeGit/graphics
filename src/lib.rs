@@ -64,7 +64,7 @@ pub mod gui_lib {
     pub trait World: std::fmt::Debug {
         fn advance(&mut self);
     }
-//------------------------------------------------
+    //------------------------------------------------
 
     /// A container for drawable components.
     ///
@@ -125,8 +125,12 @@ pub mod gui_lib {
 
         /// Same as `put_on_top`, but takes erased handles directly.
         pub fn put_on_top_handle(&mut self, a: &ShapeHandle) -> bool {
-            let Some(i) = self.shapes.iter().position(|h| Rc::ptr_eq(h, a)) else { return false };
-            if i + 1 == self.shapes.len() { return true; } // already top
+            let Some(i) = self.shapes.iter().position(|h| Rc::ptr_eq(h, a)) else {
+                return false;
+            };
+            if i + 1 == self.shapes.len() {
+                return true;
+            } // already top
             let entry = self.shapes.remove(i);
             self.shapes.push(entry);
             true
@@ -148,7 +152,9 @@ pub mod gui_lib {
         pub fn put_on_top_of_handle(&mut self, a: &ShapeHandle, b: &ShapeHandle) -> bool {
             let ia = self.index_of_handle(a);
             let ib = self.index_of_handle(b);
-            let (Some(mut ia), Some(mut ib)) = (ia, ib) else { return false };
+            let (Some(mut ia), Some(mut ib)) = (ia, ib) else {
+                return false;
+            };
 
             if ia == ib {
                 return true;
@@ -309,15 +315,12 @@ pub mod gui_lib {
     impl Widget for Button {
         fn invoke(&mut self, ui: &mut Ui) {
             let size = vec2(self.width, self.height);
-            if ui.add_sized(size, EguiButton::new(&self.label))
-                .clicked() {
+            if ui.add_sized(size, EguiButton::new(&self.label)).clicked() {
                 self.label = "Button clicked!".to_owned();
             }
         }
     }
 
-    // if ui.button("Click me!").clicked() {
-    //     self.label = "Button clicked!".to_owned();
     //---------------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq)]
@@ -798,7 +801,7 @@ pub mod demo {
                 eframe::egui::Pos2::new(200.0, 200.0),
                 10.0,
             )));
-             let sc2_cln: ShapeHandle = sc2.clone();
+            let sc2_cln: ShapeHandle = sc2.clone();
             canvas.add_shape(sc2_cln);
 
             let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
@@ -826,7 +829,7 @@ pub mod demo {
             //sp.borrow_mut().set_line_style(Dashed);
             sp.borrow_mut().set_line_style(Dotted);
             //sp.borrow_mut().set_line_style(Solid);
-             let sp_cln: ShapeHandle = sp.clone();
+            let sp_cln: ShapeHandle = sp.clone();
             canvas.add_shape(sp_cln);
 
             // Create and add widgets as Box<dyn Widget>
@@ -960,4 +963,9 @@ pub use eframe::egui::vec2;
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
 pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
 
-// Jan6: Surface
+// Jan12: pre Widgets
+// -------------------------------------
+// if ui.add(egui::Slider::new(&mut my_f32_value, 0.0..=100.0).text("My value")).changed() {
+// // Code to run when the value changes
+// println!("Value changed to: {}", my_f32_value);
+// }
