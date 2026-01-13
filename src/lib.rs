@@ -305,13 +305,6 @@ pub mod gui_lib {
         }
     }
 
-    // impl Widget for Button {
-    //     fn invoke(&mut self, ui: &mut Ui) -> Response {
-    //         let size = vec2(self.width, self.height);
-    //         ui.add_sized(size, EguiButton::new(&self.label))
-    //     }
-    // }
-
     impl Widget for Button {
         fn invoke(&mut self, ui: &mut Ui) {
             let size = vec2(self.width, self.height);
@@ -320,6 +313,34 @@ pub mod gui_lib {
             }
         }
     }
+
+    #[derive(Debug, Default)]
+    pub struct Slider {
+        pub value: f32,
+        //pub height: f32,
+        pub label: String,
+    }
+
+    impl Slider {
+        // Constructor method
+         pub fn new(value: f32, label: String) -> Self {
+            Self {
+                value,
+                label,
+            }
+        }
+    }
+
+    impl Widget for Slider {
+        fn invoke(&mut self, ui: &mut Ui) {
+            if ui.add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")).changed() {
+            //if ui.add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")).clicked() {
+                // Code to run when the value changes
+                println!("Value changed to: {}", self.value);
+            }
+        }
+    }
+
 
     //---------------------------------------------------------------------------
 
@@ -700,7 +721,7 @@ pub mod demo {
     //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
     //use super::gui_lib::{BasicCanvas, Button, Circle, LineStyle, Color32, Polyline, Rectangle};
-    use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle};
+    use super::gui_lib::{BasicCanvas, Button, Slider, Circle, Color32, Polyline, Rectangle};
     use crate::gui_lib::{LineStyle::*, World};
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
@@ -839,6 +860,9 @@ pub mod demo {
             let wb2 = Button::new(120.0, 40.0, "Push me".to_string());
             canvas.widgets.push(Box::new(wb2));
 
+            let ws1 = Slider::new(120.0, "Slider".to_string());
+            canvas.widgets.push(Box::new(ws1));
+
             //canvas.put_on_top_of(&sc1, &sc2);  //TDJ test
             //canvas.put_on_top(&sc1);  //TDJ test
 
@@ -908,8 +932,8 @@ pub mod demo {
             "GUI Draw Example",
             super::gui_lib::native_options(),
             Box::new(|cc| {
-                cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
-                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+                //cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
+                cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
                 //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
                 let app = Box::new(DemoApp::new());
                 //app.canvas.shapes[0].set_fill_color(Color32::GREEN); // Shape can be changed here
