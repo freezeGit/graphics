@@ -375,21 +375,13 @@ pub mod gui_lib {
         line_style: LineStyle,
     }
 
-    /// Trait for any shape.
-    ///
-    /// Rendered on canvas with supertrait Drawable
-    ///
-    /// # Trait Implementer’s Note
-    /// This trait requires `Debug` to be implemented for all types.
-    /// Use `#[derive(Debug)]` or manually implement `std::fmt::Debug`.
-
     pub trait Shape: std::fmt::Debug {
         fn base(&self) -> &ShapeBase;
         fn base_mut(&mut self) -> &mut ShapeBase;
 
         //fn draw(&self, ui: &mut Ui);
         fn draw(&self, painter: &egui::Painter);
-        //fn draw_offset(&mut self, painter: &egui::Painter, offset: Vec2) {
+
         fn draw_offset(&mut self, painter: &egui::Painter, offset: Vec2) {
             let orig_loc = self.base().location;
             self.base_mut().location = orig_loc + offset;
