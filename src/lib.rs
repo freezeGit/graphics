@@ -72,19 +72,20 @@ pub mod gui_lib {
     /// UI components that implement the `Draw` trait.
     #[derive(Debug)]
     pub struct BasicCanvas {
+        background_color: Color32,
         shapes: Vec<ShapeHandle>,
         pub widgets: Vec<Box<dyn Widget>>, // TDJ: make private
     }
-
+    //Color32::from_rgb(200, 200, 210)
     impl BasicCanvas {
         pub fn new() -> Self {
             BasicCanvas {
+                background_color: Color32::from_rgb(200, 200, 210),
+                //background_color: Color32::from_rgb(240, 240, 240),
                 shapes: Vec::new(),
                 widgets: Vec::new(),
             }
         }
-
-        // Shapes --------------------------------
 
         // --- internal helper: convert any concrete Rc<RefCell<T>> into a ShapeHandle
         fn erase_handle<T: Shape + 'static>(rc: &Rc<RefCell<T>>) -> ShapeHandle {
@@ -94,6 +95,10 @@ pub mod gui_lib {
         // --- internal helper: find index by pointer identity (ShapeHandle -> ShapeHandle)
         fn index_of_handle(&self, target: &ShapeHandle) -> Option<usize> {
             self.shapes.iter().position(|h| Rc::ptr_eq(h, target))
+        }
+
+        pub fn set_background_color(&mut self, color: Color32) {
+            self.background_color = color;
         }
 
         /// Add a shape to the canvas.
@@ -204,6 +209,9 @@ pub mod gui_lib {
         pub fn render(&mut self, ctx: &Context) {
             CentralPanel::default().show(ctx, |ui| {
                 let painter = ui.painter();
+                let rect = ui.available_rect_before_wrap();
+                painter.rect_filled(rect, 0.0, self.background_color);
+
                 for shape in &self.shapes {
                     shape.borrow().draw(&painter);
                 }
@@ -228,6 +236,8 @@ pub mod gui_lib {
             CentralPanel::default().show(ctx, |ui| {
                 let (response, painter) =
                     ui.allocate_painter(ui.available_size(), egui::Sense::hover());
+                let rect = response.rect;
+                painter.rect_filled(rect, 0.0, self.background_color);
                 // (response.rect).min is the top-left corner position
                 // of the rectangular area returned by ui.available_size()
                 let offset = (response.rect).min.to_vec2(); // to top-left corner
@@ -253,11 +263,14 @@ pub mod gui_lib {
             CentralPanel::default().show(ctx, |ui| {
                 let (response, painter) =
                     ui.allocate_painter(ui.available_size(), egui::Sense::hover());
+                let rect = response.rect;
+                painter.rect_filled(rect, 0.0, self.background_color);
                 // (response.rect).min is the top-left corner position
                 // of the rectangular area returned by ui.available_size()
                 let offset = (response.rect).min.to_vec2(); // to top-left corner
                 for shape in &self.shapes {
                     shape.borrow_mut().draw_offset(&painter, offset);
+                    //shape.borrow().draw_offset(&painter, offset);
                 }
             });
         }
@@ -317,30 +330,28 @@ pub mod gui_lib {
     #[derive(Debug, Default)]
     pub struct Slider {
         pub value: f32,
-        //pub height: f32,
         pub label: String,
     }
 
     impl Slider {
         // Constructor method
-         pub fn new(value: f32, label: String) -> Self {
-            Self {
-                value,
-                label,
-            }
+        pub fn new(value: f32, label: String) -> Self {
+            Self { value, label }
         }
     }
 
     impl Widget for Slider {
         fn invoke(&mut self, ui: &mut Ui) {
-            if ui.add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")).changed() {
-            //if ui.add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")).clicked() {
+            if ui
+                .add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value"))
+                .changed()
+            {
+                //if ui.add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")).clicked() {
                 // Code to run when the value changes
                 println!("Value changed to: {}", self.value);
             }
         }
     }
-
 
     //---------------------------------------------------------------------------
 
@@ -378,6 +389,7 @@ pub mod gui_lib {
 
         //fn draw(&self, ui: &mut Ui);
         fn draw(&self, painter: &egui::Painter);
+        //fn draw_offset(&mut self, painter: &egui::Painter, offset: Vec2) {
         fn draw_offset(&mut self, painter: &egui::Painter, offset: Vec2) {
             let orig_loc = self.base().location;
             self.base_mut().location = orig_loc + offset;
@@ -721,7 +733,7 @@ pub mod demo {
     //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
     //use super::gui_lib::{BasicCanvas, Button, Circle, LineStyle, Color32, Polyline, Rectangle};
-    use super::gui_lib::{BasicCanvas, Button, Slider, Circle, Color32, Polyline, Rectangle};
+    use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider};
     use crate::gui_lib::{LineStyle::*, World};
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
@@ -788,6 +800,14 @@ pub mod demo {
         pub fn new() -> Self {
             // New empty BasicCanvas
             let mut canvas = BasicCanvas::new();
+
+            // let bckgrd: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+            //     eframe::egui::Pos2::new(400.0, 200.0),
+            //     eframe::egui::Vec2::new(150.0, 100.0),
+            // )));
+            // bckgrd.borrow_mut().set_fill_color(Color32::GOLD);
+            // let sr_cln: ShapeHandle = bckgrd.clone();
+            // canvas.add_shape(sr_cln);
 
             // Add shapes without handles to the canvas
             let mut y = 75.0;
@@ -860,7 +880,7 @@ pub mod demo {
             let wb2 = Button::new(120.0, 40.0, "Push me".to_string());
             canvas.widgets.push(Box::new(wb2));
 
-            let ws1 = Slider::new(120.0, "Slider".to_string());
+            let ws1 = Slider::new(0.0, "Slider".to_string());
             canvas.widgets.push(Box::new(ws1));
 
             //canvas.put_on_top_of(&sc1, &sc2);  //TDJ test
@@ -961,6 +981,8 @@ pub mod demo {
             //     s.borrow_mut().set_color(Color32::BLUE);
             // }
 
+            //self.canvas.canvas.set_background_color(Color32::BLUE);
+
             //Test of basic simulation/animation  //TDJ
             let now = ctx.input(|i| i.time);
 
@@ -972,8 +994,8 @@ pub mod demo {
 
             // Render everything in the canvas
             //self.canvas.canvas.render_with_side_panel(ctx); // side panel and central panel
-            self.canvas.canvas.render_with_top_panel(ctx); // top panel and central panel
-            //self.canvas.canvas.render(ctx);  // central panel only
+            //self.canvas.canvas.render_with_top_panel(ctx); // top panel and central panel
+            self.canvas.canvas.render(ctx); // central panel only
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
             // TDJ or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
