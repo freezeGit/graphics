@@ -242,10 +242,15 @@ pub mod gui_lib {
                 painter.rect_filled(rect, 0.0, self.background_color);
                 // (response.rect).min is the top-left corner position
                 // of the rectangular area returned by ui.available_size()
-                let offset = (response.rect).min.to_vec2(); // to top-left corner
+                let offset = response.rect.min.to_vec2(); // to top-left corner
                 for shape in &self.shapes {
-                    shape.borrow_mut().draw_offset(&painter, offset);
+                    shape.borrow().draw_at(&painter, offset);
                 }
+                // TDJ: shape2
+                // let offset = (response.rect).min.to_vec2(); // to top-left corner
+                // for shape in &self.shapes {
+                //     shape.borrow_mut().draw_offset(&painter, offset);
+                // }
             });
         }
 
@@ -269,11 +274,16 @@ pub mod gui_lib {
                 painter.rect_filled(rect, 0.0, self.background_color);
                 // (response.rect).min is the top-left corner position
                 // of the rectangular area returned by ui.available_size()
-                let offset = (response.rect).min.to_vec2(); // to top-left corner
+                let offset = response.rect.min.to_vec2(); // to top-left corner
                 for shape in &self.shapes {
-                    shape.borrow_mut().draw_offset(&painter, offset);
-                    //shape.borrow().draw_offset(&painter, offset);
+                    shape.borrow().draw_at(&painter, offset);
                 }
+                // TDJ: shape2
+                // let offset = (response.rect).min.to_vec2(); // to top-left corner
+                // for shape in &self.shapes {
+                //     shape.borrow_mut().draw_offset(&painter, offset);
+                //     //shape.borrow().draw_offset(&painter, offset);
+                // }
             });
         }
     }
@@ -381,14 +391,24 @@ pub mod gui_lib {
         fn base(&self) -> &ShapeBase;
         fn base_mut(&mut self) -> &mut ShapeBase;
 
+        // TDJ: shape2
         //fn draw(&self, ui: &mut Ui);
-        fn draw(&self, painter: &egui::Painter);
+        // fn draw(&self, painter: &egui::Painter);
+        //
+        // fn draw_offset(&mut self, painter: &egui::Painter, offset: Vec2) {
+        //     let orig_loc = self.base().location;
+        //     self.base_mut().location = orig_loc + offset;
+        //     self.draw(painter);
+        //     self.base_mut().location = orig_loc;
+        // }
 
-        fn draw_offset(&mut self, painter: &egui::Painter, offset: Vec2) {
-            let orig_loc = self.base().location;
-            self.base_mut().location = orig_loc + offset;
-            self.draw(painter);
-            self.base_mut().location = orig_loc;
+        /// Draw in *canvas-local* coordinates, translated by `canvas_offset`
+        /// where `canvas_offset` is the screen-space top-left of the canvas.
+        fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2);
+
+        /// Convenience: draw with canvas at (0,0)
+        fn draw(&self, painter: &egui::Painter) {
+            self.draw_at(painter, egui::Vec2::ZERO);
         }
 
         fn move_to(&mut self, location: Pos2) {
@@ -578,20 +598,37 @@ pub mod gui_lib {
         }
     }
 
-    impl Shape for Circle {
-        fn base(&self) -> &ShapeBase {
-            &self.base
-        }
-        fn base_mut(&mut self) -> &mut ShapeBase {
-            &mut self.base
-        }
+    // TDJ: shape2
+    // impl Shape for Circle {
+    //     fn base(&self) -> &ShapeBase {
+    //         &self.base
+    //     }
+    //     fn base_mut(&mut self) -> &mut ShapeBase {
+    //         &mut self.base
+    //     }
+    //
+    //     fn draw(&self, painter: &egui::Painter) {
+    //         painter.circle(
+    //             self.base.location,
+    //             self.radius,
+    //             self.base.fill_color,
+    //             Stroke::new(self.base.line_width, self.base.color), // Black border
+    //         );
+    //     }
+    // }
 
-        fn draw(&self, painter: &egui::Painter) {
+    impl Shape for Circle {
+        fn base(&self) -> &ShapeBase { &self.base }
+        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
+
+        fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+            let center = self.base.location + canvas_offset;
+
             painter.circle(
-                self.base.location,
+                center,
                 self.radius,
                 self.base.fill_color,
-                Stroke::new(self.base.line_width, self.base.color), // Black border
+                egui::Stroke::new(self.base.line_width, self.base.color),
             );
         }
     }
@@ -993,8 +1030,8 @@ pub mod demo {
 
             // Render everything in the canvas
             //self.canvas.canvas.render_with_side_panel(ctx); // side panel and central panel
-            //self.canvas.canvas.render_with_top_panel(ctx); // top panel and central panel
-            self.canvas.canvas.render(ctx); // central panel only
+            self.canvas.canvas.render_with_top_panel(ctx); // top panel and central panel
+            //self.canvas.canvas.render(ctx); // central panel only
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
             // TDJ or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
