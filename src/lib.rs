@@ -27,20 +27,20 @@ pub mod gui_lib {
     pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
 
     /// Creates a custom light theme.
-    pub fn custom_light_visuals() -> Visuals {
-        //let mut visuals = Visuals::light(); // Start from egui's built-in light theme
-        let mut visuals = Visuals::dark(); // Start from egui's built-in dark theme
-        //let bkgd = Color32::from_rgb(240, 240, 240); // Main Windows 10 background color
-        let bkgd = Color32::from_rgb(200, 200, 210); // My background color
-
-        // Set overall background and panel colors
-        visuals.extreme_bg_color = bkgd; // rarely used but set for completeness
-        visuals.window_fill = bkgd; // background of windows, popups, etc.
-        visuals.panel_fill = bkgd; // CentralPanel and other panels
-        visuals.override_text_color = Some(Color32::BLACK); //set default text color
-
-        visuals
-    }
+    // pub fn custom_light_visuals() -> Visuals {
+    //     //let mut visuals = Visuals::light(); // Start from egui's built-in light theme
+    //     let mut visuals = Visuals::dark(); // Start from egui's built-in dark theme
+    //     //let bkgd = Color32::from_rgb(240, 240, 240); // Main Windows 10 background color
+    //     let bkgd = Color32::from_rgb(200, 200, 210); // My background color
+    //
+    //     // Set overall background and panel colors
+    //     visuals.extreme_bg_color = bkgd; // rarely used but set for completeness
+    //     visuals.window_fill = bkgd; // background of windows, popups, etc.
+    //     visuals.panel_fill = bkgd; // CentralPanel and other panels
+    //     visuals.override_text_color = Some(Color32::BLACK); //set default text color
+    //
+    //     visuals
+    // }
 
     /// Constructs and returns a customized instance of `eframe::NativeOptions`.
     ///
@@ -81,7 +81,7 @@ pub mod gui_lib {
         pub fn new() -> Self {
             BasicCanvas {
                 background_color: Color32::from_rgb(200, 200, 210),
-                //background_color: Color32::from_rgb(240, 240, 240),
+                //background_color: Color32::from_rgb(240, 240, 240), //Windows theme
                 shapes: Vec::new(),
                 widgets: Vec::new(),
             }
@@ -159,7 +159,7 @@ pub mod gui_lib {
         pub fn put_on_top_of_handle(&mut self, a: &ShapeHandle, b: &ShapeHandle) -> bool {
             let ia = self.index_of_handle(a);
             let ib = self.index_of_handle(b);
-            let (Some(mut ia), Some(mut ib)) = (ia, ib) else {
+            let (Some(ia), Some(mut ib)) = (ia, ib) else {
                 return false;
             };
 
@@ -246,11 +246,6 @@ pub mod gui_lib {
                 for shape in &self.shapes {
                     shape.borrow().draw_at(&painter, offset);
                 }
-                // TDJ: shape2
-                // let offset = (response.rect).min.to_vec2(); // to top-left corner
-                // for shape in &self.shapes {
-                //     shape.borrow_mut().draw_offset(&painter, offset);
-                // }
             });
         }
 
@@ -278,12 +273,6 @@ pub mod gui_lib {
                 for shape in &self.shapes {
                     shape.borrow().draw_at(&painter, offset);
                 }
-                // TDJ: shape2
-                // let offset = (response.rect).min.to_vec2(); // to top-left corner
-                // for shape in &self.shapes {
-                //     shape.borrow_mut().draw_offset(&painter, offset);
-                //     //shape.borrow().draw_offset(&painter, offset);
-                // }
             });
         }
     }
@@ -390,17 +379,6 @@ pub mod gui_lib {
     pub trait Shape: std::fmt::Debug {
         fn base(&self) -> &ShapeBase;
         fn base_mut(&mut self) -> &mut ShapeBase;
-
-        // TDJ: shape2
-        //fn draw(&self, ui: &mut Ui);
-        // fn draw(&self, painter: &egui::Painter);
-        //
-        // fn draw_offset(&mut self, painter: &egui::Painter, offset: Vec2) {
-        //     let orig_loc = self.base().location;
-        //     self.base_mut().location = orig_loc + offset;
-        //     self.draw(painter);
-        //     self.base_mut().location = orig_loc;
-        // }
 
         /// Draw in *canvas-local* coordinates, translated by `canvas_offset`
         /// where `canvas_offset` is the screen-space top-left of the canvas.
@@ -509,7 +487,6 @@ pub mod gui_lib {
         }
     }
 
-    // TDJ: shape
     /// A customizable Polyline component.
     ///
     /// # Fields
@@ -531,50 +508,14 @@ pub mod gui_lib {
             }
         }
     }
-    //
-    // impl Shape for Polyline {
-    //     fn base(&self) -> &ShapeBase {
-    //         &self.base
-    //     }
-    //     fn base_mut(&mut self) -> &mut ShapeBase {
-    //         &mut self.base
-    //     }
-    //
-    //     //fn draw(&self, ui: &mut Ui) {
-    //     fn draw(&self, painter: &egui::Painter) {
-    //         let points = self.base.points_translated(self.base.location.to_vec2());
-    //         let stroke = Stroke::new(self.base.line_width, self.base.color);
-    //
-    //         match self.base.line_style {
-    //             LineStyle::Solid => {
-    //                 painter.add(eframe::epaint::PathShape::line(points, stroke)); // :contentReference[oaicite:4]{index=4}
-    //             }
-    //             LineStyle::Dashed => {
-    //                 let shapes = eframe::egui::Shape::dashed_line(
-    //                     &points,
-    //                     stroke,
-    //                     self.base.dash_length(),
-    //                     self.base.dash_gap(),
-    //                 ); // :contentReference[oaicite:5]{index=5}
-    //                 painter.extend(shapes); // :contentReference[oaicite:6]{index=6}
-    //             }
-    //
-    //             LineStyle::Dotted => {
-    //                 let shapes = eframe::egui::Shape::dotted_line(
-    //                     &points,
-    //                     self.base.color,
-    //                     self.base.dot_spacing(),
-    //                     self.base.dot_radius(),
-    //                 ); // :contentReference[oaicite:7]{index=7}
-    //                 painter.extend(shapes); // :contentReference[oaicite:8]{index=8}
-    //             }
-    //         }
-    //     }
-    // }
 
     impl Shape for Polyline {
-        fn base(&self) -> &ShapeBase { &self.base }
-        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
+        fn base(&self) -> &ShapeBase {
+            &self.base
+        }
+        fn base_mut(&mut self) -> &mut ShapeBase {
+            &mut self.base
+        }
 
         fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
             let translation = self.base.location.to_vec2() + canvas_offset;
@@ -608,7 +549,6 @@ pub mod gui_lib {
         }
     }
 
-
     /// A customizable Circle component.
     ///
     /// # Fields
@@ -635,28 +575,13 @@ pub mod gui_lib {
         }
     }
 
-    // TDJ: shape2
-    // impl Shape for Circle {
-    //     fn base(&self) -> &ShapeBase {
-    //         &self.base
-    //     }
-    //     fn base_mut(&mut self) -> &mut ShapeBase {
-    //         &mut self.base
-    //     }
-    //
-    //     fn draw(&self, painter: &egui::Painter) {
-    //         painter.circle(
-    //             self.base.location,
-    //             self.radius,
-    //             self.base.fill_color,
-    //             Stroke::new(self.base.line_width, self.base.color), // Black border
-    //         );
-    //     }
-    // }
-
     impl Shape for Circle {
-        fn base(&self) -> &ShapeBase { &self.base }
-        fn base_mut(&mut self) -> &mut ShapeBase { &mut self.base }
+        fn base(&self) -> &ShapeBase {
+            &self.base
+        }
+        fn base_mut(&mut self) -> &mut ShapeBase {
+            &mut self.base
+        }
 
         fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
             let center = self.base.location + canvas_offset;
@@ -670,7 +595,6 @@ pub mod gui_lib {
         }
     }
 
-    // TDJ: shape
     #[derive(Debug, Default)]
     pub struct Rectangle {
         base: ShapeBase,
@@ -698,28 +622,17 @@ pub mod gui_lib {
         fn base_mut(&mut self) -> &mut ShapeBase {
             &mut self.base
         }
-    //     fn draw(&self, painter: &egui::Painter) {
-    //         let rect = Rect::from_center_size(self.base.location, self.size);
-    //         painter.rect(
-    //             rect,
-    //             CornerRadius::ZERO,   // or CornerRadius::same(r)
-    //             self.base.fill_color, // fill
-    //             Stroke::new(self.base.line_width, self.base.color), // border
-    //             StrokeKind::Outside,  // Outside / Inside / Middle
-    //         );
-    //     }
-    // }
 
-    fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-         let rect = Rect::from_center_size(self.base.location + canvas_offset, self.size);
-        painter.rect(
-            rect,
-            CornerRadius::ZERO,   // or CornerRadius::same(r)
-            self.base.fill_color, // fill
-            Stroke::new(self.base.line_width, self.base.color), // border
-            StrokeKind::Outside,  // Outside / Inside / Middle
-        );
-    }
+        fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+            let rect = Rect::from_center_size(self.base.location + canvas_offset, self.size);
+            painter.rect(
+                rect,
+                CornerRadius::ZERO,   // or CornerRadius::same(r)
+                self.base.fill_color, // fill
+                Stroke::new(self.base.line_width, self.base.color), // border
+                StrokeKind::Outside,  // Outside / Inside / Middle
+            );
+        }
     }
 
     // fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
@@ -826,14 +739,13 @@ pub mod demo {
     //use crate::gui_lib::Widget;
     //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
     //use super::gui_lib::{BasicCanvas, Button, Circle, LineStyle, Color32, Polyline, Rectangle};
-    use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider};  // TDJ: shape
-    //use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider};
+    use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider};
     use crate::gui_lib::{LineStyle::*, World};
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
-    use crate::custom_light_visuals;
+    //use crate::custom_light_visuals;
     use crate::gui_lib::{Shape, ShapeHandle, Widget};
-    use eframe::egui::{CentralPanel, Context};
+    use eframe::egui::{Context};
     use std::cell::RefCell;
     use std::rc::Rc;
 
@@ -886,8 +798,8 @@ pub mod demo {
         pub canvas: BasicCanvas,
         pub sc1: Rc<RefCell<Circle>>,
         pub sc2: Rc<RefCell<Circle>>,
-        pub sr: Rc<RefCell<Rectangle>>, // TDJ: shape
-        pub sp: Rc<RefCell<Polyline>>, // TDJ: shape
+        pub sr: Rc<RefCell<Rectangle>>,
+        pub sp: Rc<RefCell<Polyline>>,
     }
 
     impl DemoCanvas {
@@ -895,15 +807,7 @@ pub mod demo {
             // New empty BasicCanvas
             let mut canvas = BasicCanvas::new();
 
-            // let bckgrd: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
-            //     eframe::egui::Pos2::new(400.0, 200.0),
-            //     eframe::egui::Vec2::new(150.0, 100.0),
-            // )));
-            // bckgrd.borrow_mut().set_fill_color(Color32::GOLD);
-            // let sr_cln: ShapeHandle = bckgrd.clone();
-            // canvas.add_shape(sr_cln);
-
-            // Add shapes without handles to the canvas // TDJ: shape
+            // Add shapes without handles to the canvas
             let mut y = 75.0;
             for _ in 0..30 {
                 //note: vee will be lost. It will not be a field in Self
@@ -939,7 +843,6 @@ pub mod demo {
             let sc2_cln: ShapeHandle = sc2.clone();
             canvas.add_shape(sc2_cln);
 
-            //TDJ: shape
             let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
                 eframe::egui::Pos2::new(400.0, 200.0),
                 eframe::egui::Vec2::new(150.0, 100.0),
@@ -948,7 +851,6 @@ pub mod demo {
             let sr_cln: ShapeHandle = sr.clone();
             canvas.add_shape(sr_cln);
 
-            // TDJ: shape
             let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
                 eframe::egui::Pos2::new(550.0, 200.0),
                 [
@@ -987,8 +889,8 @@ pub mod demo {
                 canvas,
                 sc1,
                 sc2,
-                sr,  //TDJ: shape
-                sp,  //TDJ: shape
+                sr,
+                sp,
             }
         }
 
@@ -1048,11 +950,10 @@ pub mod demo {
             "GUI Draw Example",
             super::gui_lib::native_options(),
             Box::new(|cc| {
-                //cc.egui_ctx.set_visuals(custom_light_visuals()); //custom_light_visuals() lib.rs
-                cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
-                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme (default)
+                // light theme (dark theme is default)
+                // before rendering, paint background using BasicCanvas::background_color
+                cc.egui_ctx.set_visuals(eframe::egui::Visuals::light());
                 let app = Box::new(DemoApp::new());
-                //app.canvas.shapes[0].set_fill_color(Color32::GREEN); // Shape can be changed here
                 Ok(app)
             }),
         )
@@ -1076,8 +977,6 @@ pub mod demo {
             // if let Some(s) = self.canvas.canvas.get_top_shape_mut() {
             //     s.borrow_mut().set_color(Color32::BLUE);
             // }
-
-            //self.canvas.canvas.set_background_color(Color32::BLUE);
 
             //Test of basic simulation/animation  //TDJ
             let now = ctx.input(|i| i.time);
@@ -1103,7 +1002,7 @@ pub mod demo {
 //pub use demo::DemoApp;
 pub use eframe::egui::vec2;
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
-pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
+//pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
 
 // Jan12: pre Widgets
 // -------------------------------------
