@@ -279,20 +279,29 @@ pub mod gui_lib {
 
     //-------------------------------------------------------------------
 
+    pub type WidgetId = u32;
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub struct ButtonId(pub WidgetId);
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub struct SliderId(pub WidgetId);
+    // #[derive(Debug, Clone, PartialEq, Eq)]
+    // pub enum WidgetMsg {
+    //     ButtonClicked(ButtonId),
+    // }
+    #[derive(Debug, Clone, PartialEq)]
+    pub enum WidgetMsg {
+        ButtonClicked(ButtonId),
+        SliderChanged(SliderId, f32),
+    }
+
     /// Trait for invoking any widget in the UI.
     pub trait Widget: std::fmt::Debug {
         // fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
         fn invoke(&mut self, ui: &mut Ui);
+        //fn invoke(&mut self, ui: &mut Ui) -> SignalTab;
 
-        // fn layout(&mut self, ctx: &mut LayoutCtx);
-        // fn event(&mut self, ctx: &mut EventCtx, event: &Event);
-        // fn set_focused(&mut self, focused: bool);
-
-        // Example of a different draw function
-        // fn draw_with_highlight(&self, ctx: &mut PaintCtx) {
-        //     ctx.set_highlight(true);
-        //     self.draw(ctx);
-        //     ctx.set_highlight(false);
     }
 
     /// A customizable button component.
@@ -654,17 +663,6 @@ pub mod gui_lib {
 /// This module showcases the implementation of a demo application using the `eframe`
 /// framework and a custom `gui_lib` library to render various graphical components.
 ///
-/// - The application initializes and displays a set of graphical shapes on a canvas.
-/// - It features basic animation and user interaction behaviors.
-/// - Components such as circles, rectangles, and polylines are created, styled, and animated.
-/// - Demonstrates the use of time-based updates (`ctx.input(|i| i.time)`) for animations.
-///
-/// # Main Features
-/// - Central panel UI using `eframe::egui`.
-/// - Customizable shapes rendered on a canvas.
-/// - The ability to toggle visual properties (e.g., color) over time.
-/// - Integration with `eframe::App` for interacting with the `egui` context.
-///
 /// # Modules
 /// - The `demo` module defines an application structure (`DemoApp`) and its behavior.
 /// - Uses utilities and components from the `gui_lib` module.
@@ -714,7 +712,6 @@ pub mod gui_lib {
 /// }
 ///
 /// # Notes
-/// - The `custom_light_visuals` function is used to define a custom theme for the UI.
 /// - `ctx.request_repaint_after()` ensures smooth animations by updating the frame at a fixed interval.
 ///
 /// # Modules Used:
@@ -744,13 +741,11 @@ pub mod demo {
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     //use crate::custom_light_visuals;
-    use crate::gui_lib::{Shape, ShapeHandle, Widget};
+    use crate::gui_lib::{Shape, ShapeHandle, Widget, WidgetMsg};
+    //use crate::gui_lib::WidgetMsg;
     use eframe::egui::{Context};
     use std::cell::RefCell;
     use std::rc::Rc;
-
-    //use crate::{custom_light_visuals, gui_lib::Shape, gui_lib::Widget, gui_lib::ShapeHandle};
-    //use eframe::egui::{vec2, CentralPanel, Context};
 
     //#[derive(Debug)]
     #[derive(Debug, PartialEq, Eq, Clone, Copy)]
@@ -910,6 +905,7 @@ pub mod demo {
     struct DemoApp {
         world: Box<DemoWorld>,
         canvas: DemoCanvas,
+        msgs: Vec<WidgetMsg>,
         last_toggle: f64,
         is_red: bool,
     }
@@ -939,6 +935,7 @@ pub mod demo {
             Self {
                 world: Box::new(DemoWorld::new()),
                 canvas: DemoCanvas::new(),
+                msgs: Vec::new(),  //TDJ:wid is this good
                 last_toggle: 0.0, //For time-gating
                 is_red: true,
             }
