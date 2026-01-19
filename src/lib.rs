@@ -747,7 +747,23 @@ pub mod demo {
     use std::cell::RefCell;
     use std::rc::Rc;
 
-    //#[derive(Debug)]
+    #[derive(Debug)]
+    struct Gauge {
+        pointer: f64,
+    }
+
+    impl Gauge {
+        fn new() -> Self {
+            Self {
+                pointer: 0.0,
+            }
+        }
+
+        fn set_pointer(&mut self, pointer: f64) {
+            self.pointer = pointer;
+        }
+    }
+
     #[derive(Debug, PartialEq, Eq, Clone, Copy)]
     enum Signal {
         Stop,
@@ -804,7 +820,7 @@ pub mod demo {
 
             // Add shapes without handles to the canvas
             let mut y = 75.0;
-            for _ in 0..30 {
+            for _ in 0..22 {
                 //note: vee will be lost. It will not be a field in Self
                 let vee: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
                     eframe::egui::Pos2::new(150.0, y),
@@ -865,6 +881,28 @@ pub mod demo {
             //sp.borrow_mut().set_line_style(Solid);
             let sp_cln: ShapeHandle = sp.clone();
             canvas.add_shape(sp_cln);
+
+            // TDJ: change to left upper corner when possible
+            let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+                eframe::egui::Pos2::new(500.0, 350.0),
+                eframe::egui::Vec2::new(850.0, 50.0),
+            )));
+            gauge.borrow_mut().set_fill_color(Color32::LIGHT_GRAY);
+            let gauge_cln: ShapeHandle = gauge.clone();
+            canvas.add_shape(gauge_cln);
+
+            let arrow_head: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
+                eframe::egui::Pos2::new(100.0, 369.0),
+                //eframe::egui::Pos2::new(900.0, 369.0),
+                [
+                    eframe::egui::Pos2::new(-5.0, 0.0),
+                    eframe::egui::Pos2::new(0.0, -39.0),
+                    eframe::egui::Pos2::new(5.0, 0.0),
+                ],
+            )));
+            arrow_head.borrow_mut().set_line_width(2.0);
+            let arrow_head_cln: ShapeHandle = arrow_head.clone();
+            canvas.add_shape(arrow_head_cln);
 
             // Create and add widgets as Box<dyn Widget>
             let wb1 = Button::new(120.0, 40.0, "Push me".to_string());
