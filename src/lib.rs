@@ -26,22 +26,6 @@ pub mod gui_lib {
 
     pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
 
-    /// Creates a custom light theme.
-    // pub fn custom_light_visuals() -> Visuals {
-    //     //let mut visuals = Visuals::light(); // Start from egui's built-in light theme
-    //     let mut visuals = Visuals::dark(); // Start from egui's built-in dark theme
-    //     //let bkgd = Color32::from_rgb(240, 240, 240); // Main Windows 10 background color
-    //     let bkgd = Color32::from_rgb(200, 200, 210); // My background color
-    //
-    //     // Set overall background and panel colors
-    //     visuals.extreme_bg_color = bkgd; // rarely used but set for completeness
-    //     visuals.window_fill = bkgd; // background of windows, popups, etc.
-    //     visuals.panel_fill = bkgd; // CentralPanel and other panels
-    //     visuals.override_text_color = Some(Color32::BLACK); //set default text color
-    //
-    //     visuals
-    // }
-
     /// Constructs and returns a customized instance of `eframe::NativeOptions`.
     ///
     /// This function initializes a default `eframe::NativeOptions` object and modifies its viewport to have
@@ -301,7 +285,6 @@ pub mod gui_lib {
         // fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
         fn invoke(&mut self, ui: &mut Ui);
         //fn invoke(&mut self, ui: &mut Ui) -> SignalTab;
-
     }
 
     /// A customizable button component.
@@ -743,7 +726,7 @@ pub mod demo {
     //use crate::custom_light_visuals;
     use crate::gui_lib::{Shape, ShapeHandle, Widget, WidgetMsg};
     //use crate::gui_lib::WidgetMsg;
-    use eframe::egui::{Context};
+    use eframe::egui::Context;
     use std::cell::RefCell;
     use std::rc::Rc;
 
@@ -754,9 +737,10 @@ pub mod demo {
 
     impl Gauge {
         fn new() -> Self {
-            Self {
-                pointer: 0.0,
-            }
+            Self { pointer: 0.0 }
+        }
+        fn pointer(&self) -> f64 {
+            self.pointer
         }
 
         fn set_pointer(&mut self, pointer: f64) {
@@ -806,11 +790,12 @@ pub mod demo {
     }
     #[derive(Debug)]
     pub struct DemoCanvas {
-        pub canvas: BasicCanvas,
-        pub sc1: Rc<RefCell<Circle>>,
-        pub sc2: Rc<RefCell<Circle>>,
-        pub sr: Rc<RefCell<Rectangle>>,
-        pub sp: Rc<RefCell<Polyline>>,
+        canvas: BasicCanvas,
+        sc1: Rc<RefCell<Circle>>,
+        sc2: Rc<RefCell<Circle>>,
+        sr: Rc<RefCell<Rectangle>>,
+        sp: Rc<RefCell<Polyline>>,
+        pub arrow_head: Rc<RefCell<Polyline>>,  //TDJ: is pub needed?
     }
 
     impl DemoCanvas {
@@ -895,9 +880,9 @@ pub mod demo {
                 eframe::egui::Pos2::new(100.0, 369.0),
                 //eframe::egui::Pos2::new(900.0, 369.0),
                 [
-                    eframe::egui::Pos2::new(-5.0, 0.0),
+                    eframe::egui::Pos2::new(-4.0, 0.0),
                     eframe::egui::Pos2::new(0.0, -39.0),
-                    eframe::egui::Pos2::new(5.0, 0.0),
+                    eframe::egui::Pos2::new(4.0, 0.0),
                 ],
             )));
             arrow_head.borrow_mut().set_line_width(2.0);
@@ -924,6 +909,7 @@ pub mod demo {
                 sc2,
                 sr,
                 sp,
+                arrow_head,
             }
         }
 
@@ -973,7 +959,7 @@ pub mod demo {
             Self {
                 world: Box::new(DemoWorld::new()),
                 canvas: DemoCanvas::new(),
-                msgs: Vec::new(),  //TDJ:wid is this good
+                msgs: Vec::new(), //TDJ:wid is this good
                 last_toggle: 0.0, //For time-gating
                 is_red: true,
             }
@@ -1045,3 +1031,5 @@ pub use eframe::egui::vec2;
 // // Code to run when the value changes
 // println!("Value changed to: {}", my_f32_value);
 // }
+
+// Ready to connect widgets
