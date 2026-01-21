@@ -192,56 +192,84 @@ pub mod gui_lib {
         // Rendering canvas ---------------------------------------------
 
         /// Renders all widgets and shapes in the CentralPanel.
-        pub fn render(&mut self, ctx: &Context) {
-            CentralPanel::default().show(ctx, |ui| {
-                let painter = ui.painter();
-                let rect = ui.available_rect_before_wrap();
-                painter.rect_filled(rect, 0.0, self.background_color);
-
-                for shape in &self.shapes {
-                    shape.borrow().draw(&painter);
-                }
-                for widget in &mut self.widgets {
-                    widget.invoke(ui);
-                }
-            });
-        }
-
-        /// Renders all widgets in SidePanel and shapes in the CentralPanel.
-        pub fn render_with_side_panel(&mut self, ctx: &Context) {
-            egui::SidePanel::left("controls")
-                .resizable(true)
-                .default_width(180.0)
-                .show(ctx, |ui| {
-                    //ui.heading("Controls");  // TDJ: only if you want side panel to be labelled
-                    for widget in &mut self.widgets {
-                        widget.invoke(ui);
-                    }
-                });
-
-            CentralPanel::default().show(ctx, |ui| {
-                let (response, painter) =
-                    ui.allocate_painter(ui.available_size(), egui::Sense::hover());
-                let rect = response.rect;
-                painter.rect_filled(rect, 0.0, self.background_color);
-                // (response.rect).min is the top-left corner position
-                // of the rectangular area returned by ui.available_size()
-                let offset = response.rect.min.to_vec2(); // to top-left corner
-                for shape in &self.shapes {
-                    shape.borrow().draw_at(&painter, offset);
-                }
-            });
-        }
+        // TDJ:wid
+        // pub fn render(&mut self, ctx: &Context) {
+        //     CentralPanel::default().show(ctx, |ui| {
+        //         let painter = ui.painter();
+        //         let rect = ui.available_rect_before_wrap();
+        //         painter.rect_filled(rect, 0.0, self.background_color);
+        //
+        //         for shape in &self.shapes {
+        //             shape.borrow().draw(&painter);
+        //         }
+        //         for widget in &mut self.widgets {
+        //             widget.invoke(ui);
+        //         }
+        //     });
+        // }
+        //
+        // /// Renders all widgets in SidePanel and shapes in the CentralPanel.
+        // pub fn render_with_side_panel(&mut self, ctx: &Context) {
+        //     egui::SidePanel::left("controls")
+        //         .resizable(true)
+        //         .default_width(180.0)
+        //         .show(ctx, |ui| {
+        //             //ui.heading("Controls");  // TDJ: only if you want side panel to be labelled
+        //             for widget in &mut self.widgets {
+        //                 widget.invoke(ui);
+        //             }
+        //         });
+        //
+        //     CentralPanel::default().show(ctx, |ui| {
+        //         let (response, painter) =
+        //             ui.allocate_painter(ui.available_size(), egui::Sense::hover());
+        //         let rect = response.rect;
+        //         painter.rect_filled(rect, 0.0, self.background_color);
+        //         // (response.rect).min is the top-left corner position
+        //         // of the rectangular area returned by ui.available_size()
+        //         let offset = response.rect.min.to_vec2(); // to top-left corner
+        //         for shape in &self.shapes {
+        //             shape.borrow().draw_at(&painter, offset);
+        //         }
+        //     });
+        // }
 
         /// Renders all widgets in TopBottomPanel and shapes in the CentralPanel.
-        pub fn render_with_top_panel(&mut self, ctx: &Context) {
+        // pub fn render_with_top_panel(&mut self, ctx: &Context) {
+        //     egui::TopBottomPanel::top("toolbar")
+        //         .resizable(true)
+        //         .default_height(48.0)
+        //         .show(ctx, |ui| {
+        //             ui.horizontal(|ui| {
+        //                 for widget in &mut self.widgets {
+        //                     widget.invoke(ui);
+        //                 }
+        //             });
+        //         });
+        //
+        //     CentralPanel::default().show(ctx, |ui| {
+        //         let (response, painter) =
+        //             ui.allocate_painter(ui.available_size(), egui::Sense::hover());
+        //         let rect = response.rect;
+        //         painter.rect_filled(rect, 0.0, self.background_color);
+        //         // (response.rect).min is the top-left corner position
+        //         // of the rectangular area returned by ui.available_size()
+        //         let offset = response.rect.min.to_vec2(); // to top-left corner
+        //         for shape in &self.shapes {
+        //             shape.borrow().draw_at(&painter, offset);
+        //         }
+        //     });
+        // }
+
+        //TDJ:wid
+        pub fn render_with_top_panel(&mut self, ctx: &Context, out: &mut Vec<WidgetMsg>) {
             egui::TopBottomPanel::top("toolbar")
                 .resizable(true)
                 .default_height(48.0)
                 .show(ctx, |ui| {
                     ui.horizontal(|ui| {
                         for widget in &mut self.widgets {
-                            widget.invoke(ui);
+                            widget.invoke(ui, out);
                         }
                     });
                 });
@@ -268,7 +296,7 @@ pub mod gui_lib {
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct ButtonId(pub WidgetId);
 
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct SliderId(pub WidgetId);
     // #[derive(Debug, Clone, PartialEq, Eq)]
     // pub enum WidgetMsg {
@@ -281,11 +309,16 @@ pub mod gui_lib {
     }
 
     /// Trait for invoking any widget in the UI.
+    // pub trait Widget: std::fmt::Debug {
+    //     // fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
+    //     fn invoke(&mut self, ui: &mut Ui);
+    //     //fn invoke(&mut self, ui: &mut Ui) -> SignalTab;
+    // }
+
     pub trait Widget: std::fmt::Debug {
-        // fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
-        fn invoke(&mut self, ui: &mut Ui);
-        //fn invoke(&mut self, ui: &mut Ui) -> SignalTab;
+        fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>);
     }
+
 
     /// A customizable button component.
     ///
@@ -311,41 +344,87 @@ pub mod gui_lib {
         }
     }
 
-    impl Widget for Button {
-        fn invoke(&mut self, ui: &mut Ui) {
-            let size = vec2(self.width, self.height);
-            if ui.add_sized(size, EguiButton::new(&self.label)).clicked() {
-                self.label = "Button clicked!".to_owned();
-            }
-        }
-    }
+    // TDJ:wid
+    // impl Widget for Button {
+    //     fn invoke(&mut self, ui: &mut Ui) {
+    //         let size = vec2(self.width, self.height);
+    //         if ui.add_sized(size, EguiButton::new(&self.label)).clicked() {
+    //             self.label = "Button clicked!".to_owned();
+    //         }
+    //     }
+    // }
 
     #[derive(Debug, Default)]
     pub struct Slider {
+        id: SliderId,  //TDJ:wid
         pub value: f32,
         pub label: String,
+        //range: std::ops::RangeInclusive<f32>,
     }
 
     impl Slider {
         // Constructor method
-        pub fn new(value: f32, label: String) -> Self {
-            Self { value, label }
+        pub fn new(id: SliderId, value: f32, label: String) -> Self {
+            Self { id, value, label }
+        }
+
+        pub fn value(&self) -> f32 {
+            self.value
         }
     }
 
+    // TDJ:wid
+    // impl Widget for Slider {
+    //     fn invoke(&mut self, ui: &mut Ui) {
+    //         if ui
+    //             .add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value"))
+    //             .changed()
+    //         {
+    //             //if ui.add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")).clicked() {
+    //             // Code to run when the value changes
+    //             println!("Value changed to: {}", self.value);
+    //         }
+    //     }
+    // }
+
+    // impl Widget for Slider {
+    //     fn invoke(&mut self, ui: &mut Ui, out: &mut Vec<WidgetMsg>) {
+    //         if ui
+    //             .add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value"))
+    //             .changed()
+    //         {
+    //             //out.push(WidgetMsg::ButtonClicked(self.id));
+    //             out.push(WidgetMsg::SliderChanged(self.id));
+    //
+    //             println!("Value changed to: {}", self.value);
+    //         }
+    //     }
+    // }
+
     impl Widget for Slider {
-        fn invoke(&mut self, ui: &mut Ui) {
-            if ui
-                .add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value"))
-                .changed()
-            {
-                //if ui.add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")).clicked() {
-                // Code to run when the value changes
-                println!("Value changed to: {}", self.value);
+        fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
+            let resp = ui.add(
+                egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")
+                    .text(&self.label),
+            );
+
+            if resp.changed() {
+                out.push(WidgetMsg::SliderChanged(self.id, self.value));
             }
         }
     }
-
+    // impl Widget for Button {
+    //     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
+    //         let resp = ui.add_sized(
+    //             egui::vec2(self.width, self.height),
+    //             egui::Button::new(&self.label),
+    //         );
+    //
+    //         if resp.clicked() {
+    //             out.push(WidgetMsg::ButtonClicked(self.id));
+    //         }
+    //     }
+    // }
     //---------------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq)]
@@ -724,7 +803,7 @@ pub mod demo {
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     //use crate::custom_light_visuals;
-    use crate::gui_lib::{Shape, ShapeHandle, Widget, WidgetMsg};
+    use crate::gui_lib::{Shape, ShapeHandle, Widget, WidgetMsg, SliderId};
     //use crate::gui_lib::WidgetMsg;
     use eframe::egui::Context;
     use std::cell::RefCell;
@@ -889,15 +968,17 @@ pub mod demo {
             let arrow_head_cln: ShapeHandle = arrow_head.clone();
             canvas.add_shape(arrow_head_cln);
 
-            // Create and add widgets as Box<dyn Widget>
-            let wb1 = Button::new(120.0, 40.0, "Push me".to_string());
-            canvas.widgets.push(Box::new(wb1));
+            // Create and add widgets as Box<dyn Widget> TDJ:wid
+            // let wb1 = Button::new(120.0, 40.0, "Push me".to_string());
+            // canvas.widgets.push(Box::new(wb1));
+            //
+            // let wb2 = Button::new(120.0, 40.0, "Push me".to_string());
+            // canvas.widgets.push(Box::new(wb2));
 
-            let wb2 = Button::new(120.0, 40.0, "Push me".to_string());
-            canvas.widgets.push(Box::new(wb2));
-
-            let ws1 = Slider::new(0.0, "Slider".to_string());
-            canvas.widgets.push(Box::new(ws1));
+            //let ws1 = Slider::new(0.0, "Slider".to_string());
+            //let ws1 = Slider::new(Slider::new(SliderId(1)),0.0, "Slider".to_string());
+            let ws1 = Slider::new(SliderId(1), 0.0, "Slider".to_string());
+             canvas.widgets.push(Box::new(ws1));
 
             //canvas.put_on_top_of(&sc1, &sc2);  //TDJ test
             //canvas.put_on_top(&sc1);  //TDJ test
@@ -1008,10 +1089,21 @@ pub mod demo {
                 update_canvas(&mut self.canvas, &self.world);
             }
 
-            // Render everything in the canvas
-            //self.canvas.canvas.render_with_side_panel(ctx); // side panel and central panel
-            self.canvas.canvas.render_with_top_panel(ctx); // top panel and central panel
-            //self.canvas.canvas.render(ctx); // central panel only
+            //TDJ:wid
+            // // Render everything in the canvas
+            // //self.canvas.canvas.render_with_side_panel(ctx); // side panel and central panel
+            // self.canvas.canvas.render_with_top_panel(ctx); // top panel and central panel
+            // //self.canvas.canvas.render(ctx); // central panel only
+
+            self.msgs.clear();//TDJ:wid
+            //self.canvas.run(ui, &mut self.msgs);
+            self.canvas.canvas.render_with_top_panel(ctx, &mut self.msgs);
+
+            if !self.msgs.is_empty() {
+                for msg in self.msgs.drain(..) {
+                    self.handle_msg(msg);
+                }
+            }
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
             // TDJ or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
