@@ -293,15 +293,12 @@ pub mod gui_lib {
 
     pub type WidgetId = u32;
 
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct ButtonId(pub WidgetId);
 
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct SliderId(pub WidgetId);
-    // #[derive(Debug, Clone, PartialEq, Eq)]
-    // pub enum WidgetMsg {
-    //     ButtonClicked(ButtonId),
-    // }
+
     #[derive(Debug, Clone, PartialEq)]
     pub enum WidgetMsg {
         ButtonClicked(ButtonId),
@@ -460,6 +457,10 @@ pub mod gui_lib {
             self.draw_at(painter, egui::Vec2::ZERO);
         }
 
+        fn location(&self) -> Pos2 {
+            self.base().location()
+        }
+
         fn move_to(&mut self, location: Pos2) {
             self.base_mut().move_to(location)
         }
@@ -511,7 +512,9 @@ pub mod gui_lib {
         // pub fn new() -> Self {
         //     Self::default()
         // }
-
+        pub fn location(&self) -> Pos2 {
+            self.location
+        }
         pub fn move_to(&mut self, location: Pos2) {
             self.location = location;
         }
@@ -803,11 +806,14 @@ pub mod demo {
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     //use crate::custom_light_visuals;
-    use crate::gui_lib::{Shape, ShapeHandle, Widget, WidgetMsg, SliderId};
+    use crate::gui_lib::{Shape, ShapeHandle, Widget, WidgetMsg, ButtonId, SliderId};
     //use crate::gui_lib::WidgetMsg;
     use eframe::egui::Context;
     use std::cell::RefCell;
     use std::rc::Rc;
+
+    const SLIDER_GAUGE: SliderId = SliderId(1);
+    const SLIDER_ANOTHER:  SliderId = SliderId(2);
 
     #[derive(Debug)]
     struct Gauge {
@@ -841,6 +847,7 @@ pub mod demo {
     struct DemoWorld {
         state: i32,
         tl: TrafficLight,
+        gauge: Gauge,
     }
 
     impl World for DemoWorld {
@@ -857,6 +864,9 @@ pub mod demo {
                 tl: TrafficLight {
                     state: Signal::Stop,
                 },
+                gauge: Gauge {
+                    pointer: 0.0,
+                }
             }
         }
 
@@ -957,7 +967,6 @@ pub mod demo {
 
             let arrow_head: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
                 eframe::egui::Pos2::new(100.0, 369.0),
-                //eframe::egui::Pos2::new(900.0, 369.0),
                 [
                     eframe::egui::Pos2::new(-4.0, 0.0),
                     eframe::egui::Pos2::new(0.0, -39.0),
@@ -1024,6 +1033,11 @@ pub mod demo {
         };
         //Red light represents Stop signal. Green light represents Go signal
         canvas.sc2.borrow_mut().set_fill_color(c);
+
+        let mut ah_pos = canvas.arrow_head.borrow_mut().location();
+        //ah_pos.x = world.gauge.pointer() as f32;
+        ah_pos.x = 100.0 + 8.0*(world.gauge.pointer() as f32);
+        canvas.arrow_head.borrow_mut().move_to(ah_pos);
     }
 
     // fn base(&self) -> &ShapeBase;
@@ -1043,6 +1057,61 @@ pub mod demo {
                 msgs: Vec::new(), //TDJ:wid is this good
                 last_toggle: 0.0, //For time-gating
                 is_red: true,
+            }
+        }
+    //}
+
+    // pub fn run_demo() -> Result<(), eframe::Error> {
+    //     eframe::run_native(
+    //         "GUI Draw Example",
+    //         super::gui_lib::native_options(),
+    //         Box::new(|cc| {
+    //             // light theme (dark theme is default)
+    //             // before rendering, paint background using BasicCanvas::background_color
+    //             cc.egui_ctx.set_visuals(eframe::egui::Visuals::light());
+    //             let app = Box::new(DemoApp::new());
+    //             Ok(app)
+    //         }),
+    //     )
+    // }
+
+    //impl DemoApp {
+        fn handle_msg(&mut self, msg: WidgetMsg) {
+            match msg {
+                WidgetMsg::ButtonClicked(id) => {
+                    self.handle_button(id);
+                }
+                WidgetMsg::SliderChanged(id, value) => {
+                    self.handle_slider(id, value);
+                }
+            }
+        //update_canvas(&mut self.canvas, &self.world);
+        }
+    //}
+
+    //impl DemoApp {
+        fn handle_button(&mut self, id: ButtonId) {
+            match id {
+                BTN_STEP => {
+                    //self.world.step();
+                }
+                BTN_RESET => {
+                    //self.world.reset();
+                }
+                _ => {}
+            }
+        }
+
+        fn handle_slider(&mut self, id: SliderId, value: f32) {
+            match id {
+                SLIDER_RADIUS => {
+                    //self.world.circle_radius = value;
+                    self.world.gauge.set_pointer(value.into());
+                }
+                SLIDER_SPEED => {
+                    //self.world.speed = value;
+                }
+                _ => {}
             }
         }
     }
@@ -1100,9 +1169,18 @@ pub mod demo {
             self.canvas.canvas.render_with_top_panel(ctx, &mut self.msgs);
 
             if !self.msgs.is_empty() {
-                for msg in self.msgs.drain(..) {
+                // Move msgs out of self so we can mutably borrow self inside the loop.
+                let mut msgs = std::mem::take(&mut self.msgs);
+
+                //for msg in self.msgs.drain(..) {
+                for msg in msgs.drain(..) {
                     self.handle_msg(msg);
                 }
+                // Put the buffer back (empty, but keeps its capacity).
+                self.msgs = msgs;
+
+                // Update canvas once after all state changes:
+                update_canvas(&mut self.canvas, &self.world);
             }
 
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
