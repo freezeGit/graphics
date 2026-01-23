@@ -4,4 +4,3 @@ use graphics::demo::run_demo;
 fn main() -> Result<(), eframe::Error> {
     run_demo()
 }
-

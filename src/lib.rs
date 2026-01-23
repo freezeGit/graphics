@@ -367,11 +367,6 @@ pub mod gui_lib {
         range: std::ops::RangeInclusive<f32>,
     }
     impl Slider {
-        // Constructor method
-        // pub fn new(id: SliderId, value: f32, label: String) -> Self {
-        //     Self { id, value, label }
-        // }
-
         pub fn new(
             id: SliderId,
             label: impl Into<String>,
@@ -420,10 +415,10 @@ pub mod gui_lib {
     // }
 
     impl Widget for Slider {
+
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
             let resp = ui.add(
-                egui::Slider::new(&mut self.value, 0.0..=100.0)
-                    .text("My value")
+                egui::Slider::new(&mut self.value, self.range.clone())
                     .text(&self.label),
             );
 
@@ -432,6 +427,7 @@ pub mod gui_lib {
             }
         }
     }
+
     // impl Widget for Button {
     //     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
     //         let resp = ui.add_sized(
@@ -828,8 +824,8 @@ pub mod demo {
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     //use crate::custom_light_visuals;
-    use crate::gui_lib::{ButtonId, Shape, ShapeHandle, SliderId, Widget, WidgetMsg};
     use crate::demo::WidgetMsg::SliderChanged;
+    use crate::gui_lib::{ButtonId, Shape, ShapeHandle, SliderId, Widget, WidgetMsg};
     //use crate::gui_lib::WidgetMsg;
     use eframe::egui::Context;
     use std::cell::RefCell;
@@ -1005,12 +1001,8 @@ pub mod demo {
             // let wb2 = Button::new(120.0, 40.0, "Push me".to_string());
             // canvas.widgets.push(Box::new(wb2));
 
-            //let ws1 = Slider::new(0.0, "Slider".to_string());
-            //let ws1 = Slider::new(Slider::new(SliderId(1)),0.0, "Slider".to_string());
-            //let ws1 = Slider::new(SliderId(1), 0.0, "Slider".to_string());
-            //let ws1 = Slider::new(SliderChanged(SliderId, f32), 0.0, "Slider".to_string());
-            let ws1 = Slider::new(SliderId(1), "Slider".to_string(), 0.0, 0.0..=100.0);
-            canvas.widgets.push(Box::new(ws1));
+            let ws1 = Slider::new(SLIDER_GAUGE, "Slider", 0.0, 0.0..=100.0);
+            canvas.add_widget(Box::new(ws1));
 
             //canvas.put_on_top_of(&sc1, &sc2);  //TDJ test
             //canvas.put_on_top(&sc1);  //TDJ test
