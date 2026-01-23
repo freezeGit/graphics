@@ -15,7 +15,7 @@
 /// a custom drawing system through the `Draw` trait.
 
 pub mod gui_lib {
-    use eframe::egui::Response;
+    //use eframe::egui::Response;
     pub use eframe::egui::{
         Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2,
         Visuals, pos2, vec2,
@@ -306,12 +306,6 @@ pub mod gui_lib {
     }
 
     /// Trait for invoking any widget in the UI.
-    // pub trait Widget: std::fmt::Debug {
-    //     // fn invoke(&mut self, ui: &mut Ui) -> eframe::egui::Response;
-    //     fn invoke(&mut self, ui: &mut Ui);
-    //     //fn invoke(&mut self, ui: &mut Ui) -> SignalTab;
-    // }
-
     pub trait Widget: std::fmt::Debug {
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>);
     }
@@ -324,39 +318,36 @@ pub mod gui_lib {
     /// * `label` - The text displayed on the button
     #[derive(Debug, Default)]
     pub struct Button {
+        pub id: ButtonId,
+        pub label: String,
         pub width: f32,
         pub height: f32,
-        pub label: String,
     }
 
     impl Button {
         // Constructor method
-        pub fn new(width: f32, height: f32, label: String) -> Self {
+        pub fn new(id: ButtonId, label: impl Into<String>, width: f32, height: f32) -> Self {
             Self {
+                id,
+                label: label.into(),
                 width,
                 height,
-                label,
-            }
+             }
         }
     }
 
-    // TDJ:wid
-    // impl Widget for Button {
-    //     fn invoke(&mut self, ui: &mut Ui) {
-    //         let size = vec2(self.width, self.height);
-    //         if ui.add_sized(size, EguiButton::new(&self.label)).clicked() {
-    //             self.label = "Button clicked!".to_owned();
-    //         }
-    //     }
-    // }
+    impl Widget for Button {
+        fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
+            let resp = ui.add_sized(
+                egui::vec2(self.width, self.height),
+                egui::Button::new(&self.label),
+            );
 
-    // #[derive(Debug, Default)]
-    // pub struct Slider {
-    //     id: SliderId,  //TDJ:wid
-    //     pub value: f32,
-    //     pub label: String,
-    //     //range: std::ops::RangeInclusive<f32>,
-    // }
+            if resp.clicked() {
+                out.push(WidgetMsg::ButtonClicked(self.id));
+            }
+        }
+    }
 
     //#[derive(Debug, Default)]
     #[derive(Debug)]
@@ -386,34 +377,6 @@ pub mod gui_lib {
         }
     }
 
-    // TDJ:wid
-    // impl Widget for Slider {
-    //     fn invoke(&mut self, ui: &mut Ui) {
-    //         if ui
-    //             .add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value"))
-    //             .changed()
-    //         {
-    //             //if ui.add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")).clicked() {
-    //             // Code to run when the value changes
-    //             println!("Value changed to: {}", self.value);
-    //         }
-    //     }
-    // }
-
-    // impl Widget for Slider {
-    //     fn invoke(&mut self, ui: &mut Ui, out: &mut Vec<WidgetMsg>) {
-    //         if ui
-    //             .add(egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value"))
-    //             .changed()
-    //         {
-    //             //out.push(WidgetMsg::ButtonClicked(self.id));
-    //             out.push(WidgetMsg::SliderChanged(self.id));
-    //
-    //             println!("Value changed to: {}", self.value);
-    //         }
-    //     }
-    // }
-
     impl Widget for Slider {
 
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
@@ -428,18 +391,6 @@ pub mod gui_lib {
         }
     }
 
-    // impl Widget for Button {
-    //     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
-    //         let resp = ui.add_sized(
-    //             egui::vec2(self.width, self.height),
-    //             egui::Button::new(&self.label),
-    //         );
-    //
-    //         if resp.clicked() {
-    //             out.push(WidgetMsg::ButtonClicked(self.id));
-    //         }
-    //     }
-    // }
     //---------------------------------------------------------------------------
 
     #[derive(Debug, Clone, Copy, PartialEq)]
@@ -814,25 +765,18 @@ pub mod gui_lib {
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
-    //use super::gui_lib::Shape;
-    //use super::gui_lib::Widget;
-    //use crate::gui_lib::Widget;
-    //use super::gui_lib::{Button, Circle, Color32, Polyline, Rectangle, Canvas, Vec2};
-    //use super::gui_lib::{BasicCanvas, Button, Circle, LineStyle, Color32, Polyline, Rectangle};
-    use super::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider};
+    use crate::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider};
     use crate::gui_lib::{LineStyle::*, World};
-    //use crate::{custom_light_visuals, native_options, vec2};
-    //use crate::{custom_light_visuals};
-    //use crate::custom_light_visuals;
-    use crate::demo::WidgetMsg::SliderChanged;
-    use crate::gui_lib::{ButtonId, Shape, ShapeHandle, SliderId, Widget, WidgetMsg};
-    //use crate::gui_lib::WidgetMsg;
+    use crate::gui_lib::{ButtonId, Shape, ShapeHandle, SliderId, WidgetMsg};
     use eframe::egui::Context;
     use std::cell::RefCell;
     use std::rc::Rc;
 
     const SLIDER_GAUGE: SliderId = SliderId(1);
     const SLIDER_ANOTHER: SliderId = SliderId(2);
+
+    const BTN_STATE_A: ButtonId = ButtonId(1);
+    const BTN_STATE_B: ButtonId = ButtonId(2);
 
     #[derive(Debug)]
     struct Gauge {
@@ -862,10 +806,22 @@ pub mod demo {
         state: Signal,
     }
 
+    #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+    enum ThingState {
+        StateA,
+        StateB,
+        StateC,
+    }
+    #[derive(Debug)]
+    struct Thing {
+        state: ThingState,
+    }
+
     #[derive(Debug)]
     struct DemoWorld {
         state: i32,
         tl: TrafficLight,
+        thing: Thing,
         gauge: Gauge,
     }
 
@@ -883,7 +839,10 @@ pub mod demo {
                 tl: TrafficLight {
                     state: Signal::Stop,
                 },
-                gauge: Gauge { pointer: 0.0 },
+                thing: Thing {
+                    state: ThingState::StateC,
+                },
+                gauge: Gauge::new(),
             }
         }
 
@@ -949,7 +908,7 @@ pub mod demo {
                 eframe::egui::Pos2::new(400.0, 200.0),
                 eframe::egui::Vec2::new(150.0, 100.0),
             )));
-            sr.borrow_mut().set_fill_color(Color32::GOLD);
+            sr.borrow_mut().set_fill_color(Color32::LIGHT_GRAY);
             let sr_cln: ShapeHandle = sr.clone();
             canvas.add_shape(sr_cln);
 
@@ -965,6 +924,7 @@ pub mod demo {
                     eframe::egui::Pos2::new(250.0, 0.0),
                 ],
             )));
+            sp.borrow_mut().set_color(Color32::RED);
             sp.borrow_mut().set_line_width(2.0);
             sp.borrow_mut().set_line_width(4.0);
             //sp.borrow_mut().set_line_style(Dashed);
@@ -1001,8 +961,14 @@ pub mod demo {
             // let wb2 = Button::new(120.0, 40.0, "Push me".to_string());
             // canvas.widgets.push(Box::new(wb2));
 
-            let ws1 = Slider::new(SLIDER_GAUGE, "Slider", 0.0, 0.0..=100.0);
+            let ws1 = Slider::new(SLIDER_GAUGE, "Gauge", 0.0, 0.0..=100.0);
             canvas.add_widget(Box::new(ws1));
+
+            let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
+            canvas.add_widget(Box::new(wb_a));
+
+            let wb_b = Button::new(BTN_STATE_B, "State B", 120.0, 40.0);
+            canvas.add_widget(Box::new(wb_b));
 
             //canvas.put_on_top_of(&sc1, &sc2);  //TDJ test
             //canvas.put_on_top(&sc1);  //TDJ test
@@ -1036,7 +1002,7 @@ pub mod demo {
         canvas: DemoCanvas,
         msgs: Vec<WidgetMsg>,
         last_toggle: f64,
-        is_red: bool,
+        //is_red: bool,
     }
 
     fn update_canvas(canvas: &mut DemoCanvas, world: &DemoWorld) {
@@ -1050,9 +1016,19 @@ pub mod demo {
         canvas.sc2.borrow_mut().set_fill_color(c);
 
         let mut ah_pos = canvas.arrow_head.borrow_mut().location();
-        //ah_pos.x = world.gauge.pointer() as f32;
         ah_pos.x = 100.0 + 8.0 * (world.gauge.pointer() as f32);
         canvas.arrow_head.borrow_mut().move_to(ah_pos);
+
+
+        match world.thing.state {
+            ThingState::StateA => {
+                canvas.sr.borrow_mut().set_fill_color(Color32::GOLD);
+            }
+            ThingState::StateB => {
+                canvas.sr.borrow_mut().set_fill_color(Color32::CYAN);
+            }
+            _ => {}
+        }
     }
 
     // fn base(&self) -> &ShapeBase;
@@ -1071,24 +1047,10 @@ pub mod demo {
                 canvas: DemoCanvas::new(),
                 msgs: Vec::new(), //TDJ:wid is this good
                 last_toggle: 0.0, //For time-gating
-                is_red: true,
+                //is_red: true,
             }
         }
         //}
-
-        // pub fn run_demo() -> Result<(), eframe::Error> {
-        //     eframe::run_native(
-        //         "GUI Draw Example",
-        //         super::gui_lib::native_options(),
-        //         Box::new(|cc| {
-        //             // light theme (dark theme is default)
-        //             // before rendering, paint background using BasicCanvas::background_color
-        //             cc.egui_ctx.set_visuals(eframe::egui::Visuals::light());
-        //             let app = Box::new(DemoApp::new());
-        //             Ok(app)
-        //         }),
-        //     )
-        // }
 
         //impl DemoApp {
         fn handle_msg(&mut self, msg: WidgetMsg) {
@@ -1100,18 +1062,16 @@ pub mod demo {
                     self.handle_slider(id, value);
                 }
             }
-            //update_canvas(&mut self.canvas, &self.world);
         }
-        //}
 
         //impl DemoApp {
         fn handle_button(&mut self, id: ButtonId) {
             match id {
-                BTN_STEP => {
-                    //self.world.step();
+                BTN_STATE_A => {
+                    self.world.thing.state = ThingState::StateA;
                 }
-                BTN_RESET => {
-                    //self.world.reset();
+                BTN_STATE_B => {
+                    self.world.thing.state = ThingState::StateB;
                 }
                 _ => {}
             }
@@ -1119,31 +1079,16 @@ pub mod demo {
 
         fn handle_slider(&mut self, id: SliderId, value: f32) {
             match id {
-                SLIDER_RADIUS => {
-                    //self.world.circle_radius = value;
+                SLIDER_GAUGE => {
                     self.world.gauge.set_pointer(value.into());
                 }
-                SLIDER_SPEED => {
-                    //self.world.speed = value;
+                SLIDER_ANOTHER => {
+                    //Do something else
                 }
                 _ => {}
             }
         }
-    }
-
-    pub fn run_demo() -> Result<(), eframe::Error> {
-        eframe::run_native(
-            "GUI Draw Example",
-            super::gui_lib::native_options(),
-            Box::new(|cc| {
-                // light theme (dark theme is default)
-                // before rendering, paint background using BasicCanvas::background_color
-                cc.egui_ctx.set_visuals(eframe::egui::Visuals::light());
-                let app = Box::new(DemoApp::new());
-                Ok(app)
-            }),
-        )
-    }
+}
 
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
@@ -1204,6 +1149,21 @@ pub mod demo {
             // TDJ or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
         }
     }
+
+    pub fn run_demo() -> Result<(), eframe::Error> {
+        eframe::run_native(
+            "GUI Draw Example",
+            super::gui_lib::native_options(),
+            Box::new(|cc| {
+                // light theme (dark theme is default)
+                // before rendering, paint background using BasicCanvas::background_color
+                cc.egui_ctx.set_visuals(eframe::egui::Visuals::light());
+                let app = Box::new(DemoApp::new());
+                Ok(app)
+            }),
+        )
+    }
+
 } // module demo
 
 /// Exposed publicly
