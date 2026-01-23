@@ -316,7 +316,6 @@ pub mod gui_lib {
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>);
     }
 
-
     /// A customizable button component.
     ///
     /// # Fields
@@ -351,18 +350,40 @@ pub mod gui_lib {
     //     }
     // }
 
-    #[derive(Debug, Default)]
-    pub struct Slider {
-        id: SliderId,  //TDJ:wid
-        pub value: f32,
-        pub label: String,
-        //range: std::ops::RangeInclusive<f32>,
-    }
+    // #[derive(Debug, Default)]
+    // pub struct Slider {
+    //     id: SliderId,  //TDJ:wid
+    //     pub value: f32,
+    //     pub label: String,
+    //     //range: std::ops::RangeInclusive<f32>,
+    // }
 
+    //#[derive(Debug, Default)]
+    #[derive(Debug)]
+    pub struct Slider {
+        id: SliderId,
+        label: String,
+        value: f32,
+        range: std::ops::RangeInclusive<f32>,
+    }
     impl Slider {
         // Constructor method
-        pub fn new(id: SliderId, value: f32, label: String) -> Self {
-            Self { id, value, label }
+        // pub fn new(id: SliderId, value: f32, label: String) -> Self {
+        //     Self { id, value, label }
+        // }
+
+        pub fn new(
+            id: SliderId,
+            label: impl Into<String>,
+            value: f32,
+            range: std::ops::RangeInclusive<f32>,
+        ) -> Self {
+            Self {
+                id,
+                label: label.into(),
+                value,
+                range,
+            }
         }
 
         pub fn value(&self) -> f32 {
@@ -401,7 +422,8 @@ pub mod gui_lib {
     impl Widget for Slider {
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
             let resp = ui.add(
-                egui::Slider::new(&mut self.value, 0.0..=100.0).text("My value")
+                egui::Slider::new(&mut self.value, 0.0..=100.0)
+                    .text("My value")
                     .text(&self.label),
             );
 
@@ -806,14 +828,15 @@ pub mod demo {
     //use crate::{custom_light_visuals, native_options, vec2};
     //use crate::{custom_light_visuals};
     //use crate::custom_light_visuals;
-    use crate::gui_lib::{Shape, ShapeHandle, Widget, WidgetMsg, ButtonId, SliderId};
+    use crate::gui_lib::{ButtonId, Shape, ShapeHandle, SliderId, Widget, WidgetMsg};
+    use crate::demo::WidgetMsg::SliderChanged;
     //use crate::gui_lib::WidgetMsg;
     use eframe::egui::Context;
     use std::cell::RefCell;
     use std::rc::Rc;
 
     const SLIDER_GAUGE: SliderId = SliderId(1);
-    const SLIDER_ANOTHER:  SliderId = SliderId(2);
+    const SLIDER_ANOTHER: SliderId = SliderId(2);
 
     #[derive(Debug)]
     struct Gauge {
@@ -864,9 +887,7 @@ pub mod demo {
                 tl: TrafficLight {
                     state: Signal::Stop,
                 },
-                gauge: Gauge {
-                    pointer: 0.0,
-                }
+                gauge: Gauge { pointer: 0.0 },
             }
         }
 
@@ -884,7 +905,7 @@ pub mod demo {
         sc2: Rc<RefCell<Circle>>,
         sr: Rc<RefCell<Rectangle>>,
         sp: Rc<RefCell<Polyline>>,
-        pub arrow_head: Rc<RefCell<Polyline>>,  //TDJ: is pub needed?
+        pub arrow_head: Rc<RefCell<Polyline>>, //TDJ: is pub needed?
     }
 
     impl DemoCanvas {
@@ -986,8 +1007,10 @@ pub mod demo {
 
             //let ws1 = Slider::new(0.0, "Slider".to_string());
             //let ws1 = Slider::new(Slider::new(SliderId(1)),0.0, "Slider".to_string());
-            let ws1 = Slider::new(SliderId(1), 0.0, "Slider".to_string());
-             canvas.widgets.push(Box::new(ws1));
+            //let ws1 = Slider::new(SliderId(1), 0.0, "Slider".to_string());
+            //let ws1 = Slider::new(SliderChanged(SliderId, f32), 0.0, "Slider".to_string());
+            let ws1 = Slider::new(SliderId(1), "Slider".to_string(), 0.0, 0.0..=100.0);
+            canvas.widgets.push(Box::new(ws1));
 
             //canvas.put_on_top_of(&sc1, &sc2);  //TDJ test
             //canvas.put_on_top(&sc1);  //TDJ test
@@ -1036,7 +1059,7 @@ pub mod demo {
 
         let mut ah_pos = canvas.arrow_head.borrow_mut().location();
         //ah_pos.x = world.gauge.pointer() as f32;
-        ah_pos.x = 100.0 + 8.0*(world.gauge.pointer() as f32);
+        ah_pos.x = 100.0 + 8.0 * (world.gauge.pointer() as f32);
         canvas.arrow_head.borrow_mut().move_to(ah_pos);
     }
 
@@ -1059,23 +1082,23 @@ pub mod demo {
                 is_red: true,
             }
         }
-    //}
+        //}
 
-    // pub fn run_demo() -> Result<(), eframe::Error> {
-    //     eframe::run_native(
-    //         "GUI Draw Example",
-    //         super::gui_lib::native_options(),
-    //         Box::new(|cc| {
-    //             // light theme (dark theme is default)
-    //             // before rendering, paint background using BasicCanvas::background_color
-    //             cc.egui_ctx.set_visuals(eframe::egui::Visuals::light());
-    //             let app = Box::new(DemoApp::new());
-    //             Ok(app)
-    //         }),
-    //     )
-    // }
+        // pub fn run_demo() -> Result<(), eframe::Error> {
+        //     eframe::run_native(
+        //         "GUI Draw Example",
+        //         super::gui_lib::native_options(),
+        //         Box::new(|cc| {
+        //             // light theme (dark theme is default)
+        //             // before rendering, paint background using BasicCanvas::background_color
+        //             cc.egui_ctx.set_visuals(eframe::egui::Visuals::light());
+        //             let app = Box::new(DemoApp::new());
+        //             Ok(app)
+        //         }),
+        //     )
+        // }
 
-    //impl DemoApp {
+        //impl DemoApp {
         fn handle_msg(&mut self, msg: WidgetMsg) {
             match msg {
                 WidgetMsg::ButtonClicked(id) => {
@@ -1085,11 +1108,11 @@ pub mod demo {
                     self.handle_slider(id, value);
                 }
             }
-        //update_canvas(&mut self.canvas, &self.world);
+            //update_canvas(&mut self.canvas, &self.world);
         }
-    //}
+        //}
 
-    //impl DemoApp {
+        //impl DemoApp {
         fn handle_button(&mut self, id: ButtonId) {
             match id {
                 BTN_STEP => {
@@ -1164,9 +1187,11 @@ pub mod demo {
             // self.canvas.canvas.render_with_top_panel(ctx); // top panel and central panel
             // //self.canvas.canvas.render(ctx); // central panel only
 
-            self.msgs.clear();//TDJ:wid
+            self.msgs.clear(); //TDJ:wid
             //self.canvas.run(ui, &mut self.msgs);
-            self.canvas.canvas.render_with_top_panel(ctx, &mut self.msgs);
+            self.canvas
+                .canvas
+                .render_with_top_panel(ctx, &mut self.msgs);
 
             if !self.msgs.is_empty() {
                 // Move msgs out of self so we can mutably borrow self inside the loop.
