@@ -24,7 +24,20 @@ pub mod gui_lib {
     use std::cell::RefCell;
     use std::rc::Rc;
 
+    // Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
     pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
+
+    // enum for canvas layoutstyles
+    #[derive(Debug)]
+    pub enum LayoutStyle {
+        TopPanel,
+        SidePanel,
+        NoPanel,
+    }
+
+    // Examples of background colors. Any Color32 will do.
+    pub const BKG_EXAMPLE: Color32 = Color32::from_rgb(200, 200, 210);
+    pub const BKG_WINDOWS: Color32 = Color32::from_rgb(240, 240, 240);
 
     /// Constructs and returns a customized instance of `eframe::NativeOptions`.
     ///
@@ -56,16 +69,17 @@ pub mod gui_lib {
     /// UI components that implement the `Draw` trait.
     #[derive(Debug)]
     pub struct BasicCanvas {
+        layout: LayoutStyle,
         background_color: Color32,
         shapes: Vec<ShapeHandle>,
         pub widgets: Vec<Box<dyn Widget>>, // TDJ: make private
     }
-    //Color32::from_rgb(200, 200, 210)
+
     impl BasicCanvas {
-        pub fn new() -> Self {
+        pub fn new(layout: LayoutStyle, bkg: Color32) -> Self {
             BasicCanvas {
-                background_color: Color32::from_rgb(200, 200, 210),
-                //background_color: Color32::from_rgb(240, 240, 240), //Windows theme
+                layout: layout,
+                background_color: bkg,
                 shapes: Vec::new(),
                 widgets: Vec::new(),
             }
@@ -191,78 +205,18 @@ pub mod gui_lib {
 
         // Rendering canvas ---------------------------------------------
 
-        /// Renders all widgets and shapes in the CentralPanel.
-        // TDJ:wid
-        // pub fn render(&mut self, ctx: &Context) {
-        //     CentralPanel::default().show(ctx, |ui| {
-        //         let painter = ui.painter();
-        //         let rect = ui.available_rect_before_wrap();
-        //         painter.rect_filled(rect, 0.0, self.background_color);
-        //
-        //         for shape in &self.shapes {
-        //             shape.borrow().draw(&painter);
-        //         }
-        //         for widget in &mut self.widgets {
-        //             widget.invoke(ui);
-        //         }
-        //     });
-        // }
-        //
-        // /// Renders all widgets in SidePanel and shapes in the CentralPanel.
-        // pub fn render_with_side_panel(&mut self, ctx: &Context) {
-        //     egui::SidePanel::left("controls")
-        //         .resizable(true)
-        //         .default_width(180.0)
-        //         .show(ctx, |ui| {
-        //             //ui.heading("Controls");  // TDJ: only if you want side panel to be labelled
-        //             for widget in &mut self.widgets {
-        //                 widget.invoke(ui);
-        //             }
-        //         });
-        //
-        //     CentralPanel::default().show(ctx, |ui| {
-        //         let (response, painter) =
-        //             ui.allocate_painter(ui.available_size(), egui::Sense::hover());
-        //         let rect = response.rect;
-        //         painter.rect_filled(rect, 0.0, self.background_color);
-        //         // (response.rect).min is the top-left corner position
-        //         // of the rectangular area returned by ui.available_size()
-        //         let offset = response.rect.min.to_vec2(); // to top-left corner
-        //         for shape in &self.shapes {
-        //             shape.borrow().draw_at(&painter, offset);
-        //         }
-        //     });
-        // }
+        /// Renders all widgets and shapes and modifies Vec<WidgetMsg>
+        ///  to hold a sequence of tagged messages from any widgets invoked.
+        pub fn render(&mut self, ctx: &Context, out: &mut Vec<WidgetMsg>) {
+            match self.layout {
+                LayoutStyle::TopPanel => self.render_with_top_panel(ctx, out),
+                LayoutStyle::SidePanel => self.render_with_side_panel(ctx, out),
+                LayoutStyle::NoPanel => self.render_with_no_panel(ctx, out),
+            }
+        }
 
         /// Renders all widgets in TopBottomPanel and shapes in the CentralPanel.
-        // pub fn render_with_top_panel(&mut self, ctx: &Context) {
-        //     egui::TopBottomPanel::top("toolbar")
-        //         .resizable(true)
-        //         .default_height(48.0)
-        //         .show(ctx, |ui| {
-        //             ui.horizontal(|ui| {
-        //                 for widget in &mut self.widgets {
-        //                     widget.invoke(ui);
-        //                 }
-        //             });
-        //         });
-        //
-        //     CentralPanel::default().show(ctx, |ui| {
-        //         let (response, painter) =
-        //             ui.allocate_painter(ui.available_size(), egui::Sense::hover());
-        //         let rect = response.rect;
-        //         painter.rect_filled(rect, 0.0, self.background_color);
-        //         // (response.rect).min is the top-left corner position
-        //         // of the rectangular area returned by ui.available_size()
-        //         let offset = response.rect.min.to_vec2(); // to top-left corner
-        //         for shape in &self.shapes {
-        //             shape.borrow().draw_at(&painter, offset);
-        //         }
-        //     });
-        // }
-
-        //TDJ:wid
-        pub fn render_with_top_panel(&mut self, ctx: &Context, out: &mut Vec<WidgetMsg>) {
+        fn render_with_top_panel(&mut self, ctx: &Context, out: &mut Vec<WidgetMsg>) {
             egui::TopBottomPanel::top("toolbar")
                 .resizable(true)
                 .default_height(48.0)
@@ -284,6 +238,50 @@ pub mod gui_lib {
                 let offset = response.rect.min.to_vec2(); // to top-left corner
                 for shape in &self.shapes {
                     shape.borrow().draw_at(&painter, offset);
+                }
+            });
+        }
+
+        /// Renders all widgets in SidePanel and shapes in the CentralPanel.
+        fn render_with_side_panel(&mut self, ctx: &Context, out: &mut Vec<WidgetMsg>) {
+            egui::SidePanel::left("controls")
+                .resizable(true)
+                .default_width(180.0)
+                .show(ctx, |ui| {
+                    //ui.heading("Controls");  // TDJ: only if you want side panel to be labelled
+                    for widget in &mut self.widgets {
+                        //widget.invoke(ui);
+                        widget.invoke(ui, out);
+                    }
+                });
+
+            CentralPanel::default().show(ctx, |ui| {
+                let (response, painter) =
+                    ui.allocate_painter(ui.available_size(), egui::Sense::hover());
+                let rect = response.rect;
+                painter.rect_filled(rect, 0.0, self.background_color);
+                // (response.rect).min is the top-left corner position
+                // of the rectangular area returned by ui.available_size()
+                let offset = response.rect.min.to_vec2(); // to top-left corner
+                for shape in &self.shapes {
+                    shape.borrow().draw_at(&painter, offset);
+                }
+            });
+        }
+
+        /// Renders all shapes and widgets in the CentralPanel.
+        fn render_with_no_panel(&mut self, ctx: &Context, out: &mut Vec<WidgetMsg>) {
+            CentralPanel::default().show(ctx, |ui| {
+                let painter = ui.painter();
+                let rect = ui.available_rect_before_wrap();
+                painter.rect_filled(rect, 0.0, self.background_color);
+
+                for shape in &self.shapes {
+                    shape.borrow().draw(&painter);
+                }
+                for widget in &mut self.widgets {
+                    //widget.invoke(ui);
+                    widget.invoke(ui, out);
                 }
             });
         }
@@ -332,7 +330,7 @@ pub mod gui_lib {
                 label: label.into(),
                 width,
                 height,
-             }
+            }
         }
     }
 
@@ -378,12 +376,9 @@ pub mod gui_lib {
     }
 
     impl Widget for Slider {
-
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
-            let resp = ui.add(
-                egui::Slider::new(&mut self.value, self.range.clone())
-                    .text(&self.label),
-            );
+            let resp =
+                ui.add(egui::Slider::new(&mut self.value, self.range.clone()).text(&self.label));
 
             if resp.changed() {
                 out.push(WidgetMsg::SliderChanged(self.id, self.value));
@@ -677,18 +672,6 @@ pub mod gui_lib {
             );
         }
     }
-
-    // fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-    //     let center = self.base.location + canvas_offset;
-    //
-    //     painter.circle(
-    //         center,
-    //         self.radius,
-    //         self.base.fill_color,
-    //         egui::Stroke::new(self.base.line_width, self.base.color),
-    //     );
-    // }
-    //--------------------------------------------------------------
 } // closes mod gui_lib
 
 ///
@@ -766,14 +749,16 @@ pub mod gui_lib {
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
     use crate::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider};
-    use crate::gui_lib::{LineStyle::*, World};
     use crate::gui_lib::{ButtonId, Shape, ShapeHandle, SliderId, WidgetMsg};
+    use crate::gui_lib::{LineStyle::*, World};
+    use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
+    use crate::gui_lib::LayoutStyle::{TopPanel, SidePanel, NoPanel};
     use eframe::egui::Context;
     use std::cell::RefCell;
     use std::rc::Rc;
 
     const SLIDER_GAUGE: SliderId = SliderId(1);
-    const SLIDER_ANOTHER: SliderId = SliderId(2);
+    const SLIDER_ANOTHER: SliderId = SliderId(2);  // Not used in this demo
 
     const BTN_STATE_A: ButtonId = ButtonId(1);
     const BTN_STATE_B: ButtonId = ButtonId(2);
@@ -818,21 +803,21 @@ pub mod demo {
     }
 
     #[derive(Debug)]
-    struct DemoWorld {
+    struct TheWorld {
         state: i32,
         tl: TrafficLight,
         thing: Thing,
         gauge: Gauge,
     }
 
-    impl World for DemoWorld {
+    impl World for TheWorld {
         fn advance(&mut self) {
             self.state += 1;
             self.toggle_light();
         }
     }
 
-    impl DemoWorld {
+    impl TheWorld {
         fn new() -> Self {
             Self {
                 state: 0,
@@ -854,19 +839,19 @@ pub mod demo {
         }
     }
     #[derive(Debug)]
-    pub struct DemoCanvas {
+    pub struct TheCanvas {
         canvas: BasicCanvas,
         sc1: Rc<RefCell<Circle>>,
         sc2: Rc<RefCell<Circle>>,
         sr: Rc<RefCell<Rectangle>>,
         sp: Rc<RefCell<Polyline>>,
-        pub arrow_head: Rc<RefCell<Polyline>>, //TDJ: is pub needed?
+        arrow_head: Rc<RefCell<Polyline>>,
     }
 
-    impl DemoCanvas {
+    impl TheCanvas {
         pub fn new() -> Self {
             // New empty BasicCanvas
-            let mut canvas = BasicCanvas::new();
+            let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
 
             // Add shapes without handles to the canvas
             let mut y = 75.0;
@@ -886,7 +871,7 @@ pub mod demo {
                 y += 10.0;
             }
 
-            // // Add shapes with handles to the canvas
+            // Add shape with handle
             let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
                 eframe::egui::Pos2::new(200.0, 200.0),
                 //eframe::egui::Pos2::new(0.0, 0.0),  // to test origin
@@ -897,6 +882,7 @@ pub mod demo {
             let sc1_cln: ShapeHandle = sc1.clone();
             canvas.add_shape(sc1_cln);
 
+            // Add shape with handle
             let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
                 eframe::egui::Pos2::new(200.0, 200.0),
                 10.0,
@@ -904,6 +890,7 @@ pub mod demo {
             let sc2_cln: ShapeHandle = sc2.clone();
             canvas.add_shape(sc2_cln);
 
+            // Add shape with handle
             let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
                 eframe::egui::Pos2::new(400.0, 200.0),
                 eframe::egui::Vec2::new(150.0, 100.0),
@@ -912,6 +899,7 @@ pub mod demo {
             let sr_cln: ShapeHandle = sr.clone();
             canvas.add_shape(sr_cln);
 
+            // Add shape with handle
             let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
                 eframe::egui::Pos2::new(550.0, 200.0),
                 [
@@ -933,6 +921,7 @@ pub mod demo {
             let sp_cln: ShapeHandle = sp.clone();
             canvas.add_shape(sp_cln);
 
+            // Add shape with handle
             // TDJ: change to left upper corner when possible
             let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
                 eframe::egui::Pos2::new(500.0, 350.0),
@@ -942,6 +931,7 @@ pub mod demo {
             let gauge_cln: ShapeHandle = gauge.clone();
             canvas.add_shape(gauge_cln);
 
+            // Add shape with handle
             let arrow_head: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
                 eframe::egui::Pos2::new(100.0, 369.0),
                 [
@@ -954,13 +944,7 @@ pub mod demo {
             let arrow_head_cln: ShapeHandle = arrow_head.clone();
             canvas.add_shape(arrow_head_cln);
 
-            // Create and add widgets as Box<dyn Widget> TDJ:wid
-            // let wb1 = Button::new(120.0, 40.0, "Push me".to_string());
-            // canvas.widgets.push(Box::new(wb1));
-            //
-            // let wb2 = Button::new(120.0, 40.0, "Push me".to_string());
-            // canvas.widgets.push(Box::new(wb2));
-
+            // Create and add widgets as Box<dyn Widget>
             let ws1 = Slider::new(SLIDER_GAUGE, "Gauge", 0.0, 0.0..=100.0);
             canvas.add_widget(Box::new(ws1));
 
@@ -970,10 +954,7 @@ pub mod demo {
             let wb_b = Button::new(BTN_STATE_B, "State B", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_b));
 
-            //canvas.put_on_top_of(&sc1, &sc2);  //TDJ test
-            //canvas.put_on_top(&sc1);  //TDJ test
-
-            //Create the DemoCanvas
+            //Create the TheCanvas
             Self {
                 canvas,
                 sc1,
@@ -990,6 +971,32 @@ pub mod demo {
         pub fn canvas_mut(&mut self) -> &mut BasicCanvas {
             &mut self.canvas
         }
+
+        fn update(&mut self, world: &TheWorld) {
+            // Get state of traffic light and set appropriate color
+            let tlc = if world.tl.state == Signal::Stop {
+                Color32::RED
+            } else {
+                Color32::GREEN
+            };
+            self.sc2.borrow_mut().set_fill_color(tlc);
+
+            // Update gauge pointer
+            let mut ah_pos = self.arrow_head.borrow_mut().location();
+            ah_pos.x = 100.0 + 8.0 * (world.gauge.pointer() as f32);
+            self.arrow_head.borrow_mut().move_to(ah_pos);
+
+            // Update thing state, color coded
+            match world.thing.state {
+                ThingState::StateA => {
+                    self.sr.borrow_mut().set_fill_color(Color32::GOLD);
+                }
+                ThingState::StateB => {
+                    self.sr.borrow_mut().set_fill_color(Color32::CYAN);
+                }
+                _ => {}
+            }
+        }
     }
 
     /// Main application structure.
@@ -997,44 +1004,14 @@ pub mod demo {
     /// Represents the root of the application and contains
     /// the main canvas with all UI components.
     #[derive(Debug)]
-    struct DemoApp {
-        world: Box<DemoWorld>,
-        canvas: DemoCanvas,
+    struct TheApp {
+        world: Box<TheWorld>,
+        canvas: TheCanvas,
         msgs: Vec<WidgetMsg>,
         last_toggle: f64,
-        //is_red: bool,
     }
 
-    fn update_canvas(canvas: &mut DemoCanvas, world: &DemoWorld) {
-        // Get state of traffic light and set appropriate color
-        let c = if world.tl.state == Signal::Stop {
-            Color32::RED
-        } else {
-            Color32::GREEN
-        };
-        //Red light represents Stop signal. Green light represents Go signal
-        canvas.sc2.borrow_mut().set_fill_color(c);
-
-        let mut ah_pos = canvas.arrow_head.borrow_mut().location();
-        ah_pos.x = 100.0 + 8.0 * (world.gauge.pointer() as f32);
-        canvas.arrow_head.borrow_mut().move_to(ah_pos);
-
-
-        match world.thing.state {
-            ThingState::StateA => {
-                canvas.sr.borrow_mut().set_fill_color(Color32::GOLD);
-            }
-            ThingState::StateB => {
-                canvas.sr.borrow_mut().set_fill_color(Color32::CYAN);
-            }
-            _ => {}
-        }
-    }
-
-    // fn base(&self) -> &ShapeBase;
-    // fn base_mut(&mut self) -> &mut ShapeBase;
-
-    impl DemoApp {
+    impl TheApp {
         /// Creates a new instance of the application.
         ///
         /// # Returns
@@ -1043,16 +1020,16 @@ pub mod demo {
         /// and containing a sample button.
         pub fn new() -> Self {
             Self {
-                world: Box::new(DemoWorld::new()),
-                canvas: DemoCanvas::new(),
+                world: Box::new(TheWorld::new()),
+                canvas: TheCanvas::new(),
                 msgs: Vec::new(), //TDJ:wid is this good
                 last_toggle: 0.0, //For time-gating
-                //is_red: true,
+                                  //is_red: true,
             }
         }
         //}
 
-        //impl DemoApp {
+        //impl TheApp {
         fn handle_msg(&mut self, msg: WidgetMsg) {
             match msg {
                 WidgetMsg::ButtonClicked(id) => {
@@ -1064,7 +1041,7 @@ pub mod demo {
             }
         }
 
-        //impl DemoApp {
+        //impl TheApp {
         fn handle_button(&mut self, id: ButtonId) {
             match id {
                 BTN_STATE_A => {
@@ -1088,53 +1065,35 @@ pub mod demo {
                 _ => {}
             }
         }
-}
+    }
 
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
-
-    impl eframe::App for DemoApp {
+    impl eframe::App for TheApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-            // Demonstrate access to Shape sp
-
-            // TDJ: if using index instead of handle
-            // if let Some(s) = self.canvas.canvas.get_shape_mut(3) {
-            //     s.borrow_mut()
-            //         .move_to(eframe::egui::Pos2::new(550.0, 400.0));
-            // }
-
-            // // TDJ: If accessing last shape added
-            // if let Some(s) = self.canvas.canvas.get_top_shape_mut() {
-            //     s.borrow_mut().set_color(Color32::BLUE);
-            // }
-
             //Test of basic simulation/animation  //TDJ
             let now = ctx.input(|i| i.time);
-
             if now - self.last_toggle >= 0.5 {
                 self.last_toggle = now;
                 self.world.advance(); // advance world one tick
-                update_canvas(&mut self.canvas, &self.world);
-            }
+                self.canvas.update(&self.world);
 
-            //TDJ:wid
-            // // Render everything in the canvas
-            // //self.canvas.canvas.render_with_side_panel(ctx); // side panel and central panel
-            // self.canvas.canvas.render_with_top_panel(ctx); // top panel and central panel
-            // //self.canvas.canvas.render(ctx); // central panel only
+                // and if automatic redraws have been disabled:
+                // call: ctx.request_repaint(); // Redraw immediately after state change
+             }
 
-            self.msgs.clear(); //TDJ:wid
-            //self.canvas.run(ui, &mut self.msgs);
+            self.msgs.clear(); // establish invariant: Belt and suspenders
+            // Draw shapes and widgets on the canvas, and collect all messages from widgets
             self.canvas
                 .canvas
-                .render_with_top_panel(ctx, &mut self.msgs);
+                .render(ctx, &mut self.msgs);
 
             if !self.msgs.is_empty() {
                 // Move msgs out of self so we can mutably borrow self inside the loop.
                 let mut msgs = std::mem::take(&mut self.msgs);
 
-                //for msg in self.msgs.drain(..) {
+                // Handle messages
                 for msg in msgs.drain(..) {
                     self.handle_msg(msg);
                 }
@@ -1142,41 +1101,47 @@ pub mod demo {
                 self.msgs = msgs;
 
                 // Update canvas once after all state changes:
-                update_canvas(&mut self.canvas, &self.world);
+                self.canvas.update(&self.world);
+
+                // and if automatic redraws have been disabled:
+                // call: ctx.request_repaint(); // Redraw immediately after state change
+                // TDJ: actually this is not needed, because the canvas is updated in the loop
             }
 
+            // schedule the next frame redraw after 16 milliseconds (60 FPS)
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
-            // TDJ or: ctx.request_repaint_after(Duration::from_millis(500)) if you truly only want periodic frames
+
+            // or disable automatic updates (if no animation) by
+            // scheduling next animation check infrequently (in 0.5 seconds)
+            // by calling: ctx.request_repaint_after(std::time::Duration::from_millis(500));
+            // may also request a repaint explicitly when something changes
+            // by calling: ctx.request_repaint();
         }
     }
 
-    pub fn run_demo() -> Result<(), eframe::Error> {
+    pub fn run_the_app() -> Result<(), eframe::Error> {
         eframe::run_native(
             "GUI Draw Example",
-            super::gui_lib::native_options(),
+            crate::gui_lib::native_options(),
             Box::new(|cc| {
-                // light theme (dark theme is default)
-                // before rendering, paint background using BasicCanvas::background_color
-                cc.egui_ctx.set_visuals(eframe::egui::Visuals::light());
-                let app = Box::new(DemoApp::new());
+                cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme
+                let app = Box::new(TheApp::new());
                 Ok(app)
             }),
         )
     }
-
 } // module demo
 
-/// Exposed publicly
-//pub use demo::DemoApp;
-pub use eframe::egui::vec2;
+// /// Exposed publicly
+//pub use demo::TheApp;
+//pub use eframe::egui::vec2;
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
 //pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
 
-// Jan12: pre Widgets
-// -------------------------------------
-// if ui.add(egui::Slider::new(&mut my_f32_value, 0.0..=100.0).text("My value")).changed() {
-// // Code to run when the value changes
-// println!("Value changed to: {}", my_f32_value);
+// ----------------------------------
+// if !self.msgs.is_empty() {
+// // ... handle messages ...
+// self.canvas.update(&self.world);
+// ctx.request_repaint(); // Redraw immediately after state change
 // }
-
-// Ready to connect widgets
