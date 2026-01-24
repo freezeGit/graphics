@@ -1139,9 +1139,4 @@ pub mod demo {
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
 //pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
 
-// ----------------------------------
-// if !self.msgs.is_empty() {
-// // ... handle messages ...
-// self.canvas.update(&self.world);
-// ctx.request_repaint(); // Redraw immediately after state change
-// }
+// more
