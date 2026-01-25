@@ -1077,10 +1077,7 @@ pub mod demo {
             if now - self.last_toggle >= 0.5 {
                 self.last_toggle = now;
                 self.world.advance(); // advance world one tick
-                self.canvas.update(&self.world);
-
-                // and if automatic redraws have been disabled:
-                // call: ctx.request_repaint(); // Redraw immediately after state change
+                self.canvas.update(&self.world); // update canvas
              }
 
             self.msgs.clear(); // establish invariant: Belt and suspenders
@@ -1102,20 +1099,9 @@ pub mod demo {
 
                 // Update canvas once after all state changes:
                 self.canvas.update(&self.world);
-
-                // and if automatic redraws have been disabled:
-                // call: ctx.request_repaint(); // Redraw immediately after state change
-                // TDJ: actually this is not needed, because the canvas is updated in the loop
             }
-
             // schedule the next frame redraw after 16 milliseconds (60 FPS)
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
-
-            // or disable automatic updates (if no animation) by
-            // scheduling next animation check infrequently (in 0.5 seconds)
-            // by calling: ctx.request_repaint_after(std::time::Duration::from_millis(500));
-            // may also request a repaint explicitly when something changes
-            // by calling: ctx.request_repaint();
         }
     }
 
