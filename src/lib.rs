@@ -296,11 +296,20 @@ pub mod gui_lib {
 
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct SliderId(pub WidgetId);
+    #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub struct DragFloatId(pub WidgetId);
+
+    // #[derive(Debug, Clone, PartialEq)]
+    // pub enum WidgetMsg {
+    //     ButtonClicked(ButtonId),
+    //     SliderChanged(SliderId, f32),
+    // }
 
     #[derive(Debug, Clone, PartialEq)]
     pub enum WidgetMsg {
         ButtonClicked(ButtonId),
         SliderChanged(SliderId, f32),
+        DragFloatChanged(DragFloatId, f32),
     }
 
     /// Trait for invoking any widget in the UI.
@@ -347,7 +356,6 @@ pub mod gui_lib {
         }
     }
 
-    //#[derive(Debug, Default)]
     #[derive(Debug)]
     pub struct Slider {
         id: SliderId,
@@ -382,6 +390,45 @@ pub mod gui_lib {
 
             if resp.changed() {
                 out.push(WidgetMsg::SliderChanged(self.id, self.value));
+            }
+        }
+    }
+
+    #[derive(Debug)]
+    pub struct DragFloat {
+        id: DragFloatId,
+        //label: String,
+        value: f32,
+        //range: std::ops::RangeInclusive<f32>,
+    }
+    impl DragFloat {
+        pub fn new(
+            id: DragFloatId,
+            //label: impl Into<String>,
+            value: f32,
+            //range: std::ops::RangeInclusive<f32>,
+        ) -> Self {
+            Self {
+                id,
+                //label: label.into(),
+                value,
+                //range,
+            }
+        }
+
+        pub fn value(&self) -> f32 {
+            self.value
+        }
+    }
+
+    impl Widget for DragFloat {
+        fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
+            let resp =
+                //ui.add(egui::Slider::new(&mut self.value, self.range.clone()).text(&self.label));
+                ui.add(egui::DragValue::new(&mut self.value));
+
+            if resp.changed() {
+                out.push(WidgetMsg::DragFloatChanged(self.id, self.value));
             }
         }
     }
@@ -748,8 +795,8 @@ pub mod gui_lib {
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
-    use crate::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider};
-    use crate::gui_lib::{ButtonId, Shape, ShapeHandle, SliderId, WidgetMsg};
+    use crate::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider, DragFloat};
+    use crate::gui_lib::{ButtonId, Shape, ShapeHandle, SliderId, DragFloatId, WidgetMsg};
     use crate::gui_lib::{LineStyle::*, World};
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::LayoutStyle::{TopPanel, SidePanel, NoPanel};
@@ -759,6 +806,7 @@ pub mod demo {
 
     const SLIDER_GAUGE: SliderId = SliderId(1);
     const SLIDER_ANOTHER: SliderId = SliderId(2);  // Not used in this demo
+    const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
 
     const BTN_STATE_A: ButtonId = ButtonId(1);
     const BTN_STATE_B: ButtonId = ButtonId(2);
@@ -948,6 +996,9 @@ pub mod demo {
             let ws1 = Slider::new(SLIDER_GAUGE, "Gauge", 0.0, 0.0..=100.0);
             canvas.add_widget(Box::new(ws1));
 
+            let wdf1 = DragFloat::new(DRAGFLOAT_GAUGE, 0.0);
+            canvas.add_widget(Box::new(wdf1));
+
             let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_a));
 
@@ -1038,6 +1089,9 @@ pub mod demo {
                 WidgetMsg::SliderChanged(id, value) => {
                     self.handle_slider(id, value);
                 }
+                WidgetMsg::DragFloatChanged(id, value) => {
+                    self.handle_drag_float(id, value);
+                }
             }
         }
 
@@ -1061,6 +1115,15 @@ pub mod demo {
                 }
                 SLIDER_ANOTHER => {
                     //Do something else
+                }
+                _ => {}
+            }
+        }
+
+        fn handle_drag_float(&mut self, id: DragFloatId, value: f32) {
+            match id {
+                DRAGFLOAT_GAUGE => {
+                    self.world.gauge.set_pointer(value.into());
                 }
                 _ => {}
             }
