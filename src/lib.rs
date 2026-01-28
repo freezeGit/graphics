@@ -397,35 +397,49 @@ pub mod gui_lib {
     #[derive(Debug)]
     pub struct DragFloat {
         id: DragFloatId,
-        //label: String,
+        label: String,
         value: f32,
-        //range: std::ops::RangeInclusive<f32>,
+        range: std::ops::RangeInclusive<f32>,
+        decimal: usize,
+        speed: f64,
     }
     impl DragFloat {
         pub fn new(
             id: DragFloatId,
-            //label: impl Into<String>,
+            label: impl Into<String>,
             value: f32,
-            //range: std::ops::RangeInclusive<f32>,
+            range: std::ops::RangeInclusive<f32>,
         ) -> Self {
             Self {
                 id,
-                //label: label.into(),
+                label: label.into(),
                 value,
-                //range,
+                range,
+                decimal: 0,
+                speed: 1.0,
             }
         }
 
         pub fn value(&self) -> f32 {
             self.value
         }
+        pub fn set_decimal(&mut self, decimal: usize) {
+            self.decimal = decimal;
+        }
+        pub fn set_speed(&mut self, speed: f64) {
+            self.speed = speed;
+        }
     }
 
     impl Widget for DragFloat {
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
-            let resp =
-                //ui.add(egui::Slider::new(&mut self.value, self.range.clone()).text(&self.label));
-                ui.add(egui::DragValue::new(&mut self.value));
+            let resp = ui.add(
+                egui::DragValue::new(&mut self.value)
+                    .range(self.range.clone())
+                    .prefix(&self.label)
+                    .fixed_decimals(self.decimal)
+                    .speed(self.speed),
+            );
 
             if resp.changed() {
                 out.push(WidgetMsg::DragFloatChanged(self.id, self.value));
@@ -795,17 +809,19 @@ pub mod gui_lib {
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
-    use crate::gui_lib::{BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider, DragFloat};
-    use crate::gui_lib::{ButtonId, Shape, ShapeHandle, SliderId, DragFloatId, WidgetMsg};
-    use crate::gui_lib::{LineStyle::*, World};
+    use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
-    use crate::gui_lib::LayoutStyle::{TopPanel, SidePanel, NoPanel};
+    use crate::gui_lib::{
+        BasicCanvas, Button, Circle, Color32, DragFloat, Polyline, Rectangle, Slider,
+    };
+    use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, WidgetMsg};
+    use crate::gui_lib::{LineStyle::*, World};
     use eframe::egui::Context;
     use std::cell::RefCell;
     use std::rc::Rc;
 
     const SLIDER_GAUGE: SliderId = SliderId(1);
-    const SLIDER_ANOTHER: SliderId = SliderId(2);  // Not used in this demo
+    const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
     const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
 
     const BTN_STATE_A: ButtonId = ButtonId(1);
@@ -993,17 +1009,19 @@ pub mod demo {
             canvas.add_shape(arrow_head_cln);
 
             // Create and add widgets as Box<dyn Widget>
-            let ws1 = Slider::new(SLIDER_GAUGE, "Gauge", 0.0, 0.0..=100.0);
-            canvas.add_widget(Box::new(ws1));
-
-            let wdf1 = DragFloat::new(DRAGFLOAT_GAUGE, 0.0);
-            canvas.add_widget(Box::new(wdf1));
+            // let ws1 = Slider::new(SLIDER_GAUGE, "Gauge", 0.0, 0.0..=100.0);
+            // canvas.add_widget(Box::new(ws1));
 
             let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_a));
 
             let wb_b = Button::new(BTN_STATE_B, "State B", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_b));
+
+            let mut wdf1 = DragFloat::new(DRAGFLOAT_GAUGE, "Gauge = ", 0.0, 0.0..=100.0);
+            //wdf1.set_decimal(1);
+            //wdf1.set_speed(0.1);
+            canvas.add_widget(Box::new(wdf1));
 
             //Create the TheCanvas
             Self {
@@ -1141,13 +1159,11 @@ pub mod demo {
                 self.last_toggle = now;
                 self.world.advance(); // advance world one tick
                 self.canvas.update(&self.world); // update canvas
-             }
+            }
 
             self.msgs.clear(); // establish invariant: Belt and suspenders
             // Draw shapes and widgets on the canvas, and collect all messages from widgets
-            self.canvas
-                .canvas
-                .render(ctx, &mut self.msgs);
+            self.canvas.canvas.render(ctx, &mut self.msgs);
 
             if !self.msgs.is_empty() {
                 // Move msgs out of self so we can mutably borrow self inside the loop.
@@ -1188,4 +1204,4 @@ pub mod demo {
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
 //pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
 
-// Jan 25. Back from surface 
+// Jan 25. Back from surface
