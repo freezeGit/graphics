@@ -292,18 +292,16 @@ pub mod gui_lib {
     pub type WidgetId = u32;
 
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    //pub struct SpaceId(pub WidgetId);
+    pub struct SpaceId;
+
+    #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct ButtonId(pub WidgetId);
 
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct SliderId(pub WidgetId);
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct DragFloatId(pub WidgetId);
-
-    // #[derive(Debug, Clone, PartialEq)]
-    // pub enum WidgetMsg {
-    //     ButtonClicked(ButtonId),
-    //     SliderChanged(SliderId, f32),
-    // }
 
     #[derive(Debug, Clone, PartialEq)]
     pub enum WidgetMsg {
@@ -315,6 +313,27 @@ pub mod gui_lib {
     /// Trait for invoking any widget in the UI.
     pub trait Widget: std::fmt::Debug {
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>);
+    }
+
+    #[derive(Debug, Default)]
+    pub struct Space {
+        pub id: SpaceId,
+        pub size: f32,
+    }
+
+    impl Space {
+        pub fn new(id: SpaceId, size: f32) -> Self {
+            Self {
+                id,
+                size,
+            }
+        }
+    }
+
+    impl Widget for Space {
+        fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
+            ui.add_space(self.size);
+        }
     }
 
     /// A customizable button component.
@@ -812,14 +831,17 @@ pub mod demo {
     use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
-        BasicCanvas, Button, Circle, Color32, DragFloat, Polyline, Rectangle, Slider,
+        BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider, DragFloat, Space,
     };
-    use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, WidgetMsg};
+    use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, SpaceId, WidgetMsg};
     use crate::gui_lib::{LineStyle::*, World};
     use eframe::egui::Context;
     use std::cell::RefCell;
     use std::rc::Rc;
 
+    //const SPACE: SpaceId = SpaceId(1);
+    const SPACE: SpaceId = SpaceId;
+    //const SPACE: SpaceId;
     const SLIDER_GAUGE: SliderId = SliderId(1);
     const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
     const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
@@ -1015,6 +1037,9 @@ pub mod demo {
             let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_a));
 
+            let spc = Space::new(SPACE, 50.0);
+            canvas.add_widget(Box::new(spc));
+
             let wb_b = Button::new(BTN_STATE_B, "State B", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_b));
 
@@ -1204,4 +1229,4 @@ pub mod demo {
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
 //pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
 
-// Jan 25. Back from surface
+// Jan 28. Space
