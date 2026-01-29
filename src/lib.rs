@@ -119,7 +119,6 @@ pub mod gui_lib {
 
         /// Put shape `a` on top (i.e., draw last).
         /// Returns false if shape is not found in `self.shapes`.
-        //pub fn put_on_top();
         pub fn put_on_top<TA>(&mut self, a: &Rc<RefCell<TA>>) -> bool
         where
             TA: Shape + 'static,
@@ -292,10 +291,6 @@ pub mod gui_lib {
     pub type WidgetId = u32;
 
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-    //pub struct SpaceId(pub WidgetId);
-    pub struct SpaceId;
-
-    #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct ButtonId(pub WidgetId);
 
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -317,15 +312,14 @@ pub mod gui_lib {
 
     #[derive(Debug, Default)]
     pub struct Space {
-        pub id: SpaceId,
         pub size: f32,
     }
 
     impl Space {
-        pub fn new(id: SpaceId, size: f32) -> Self {
+        //pub fn new(id: SpaceId, size: f32) -> Self {
+        pub fn new(size: f32) -> Self {
             Self {
-                id,
-                size,
+                 size,
             }
         }
     }
@@ -333,6 +327,20 @@ pub mod gui_lib {
     impl Widget for Space {
         fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
             ui.add_space(self.size);
+        }
+    }
+
+    #[derive(Debug, Default)]
+    pub struct Separator;
+
+    impl Separator {
+        pub fn new() -> Self {
+            Self {}
+        }
+    }
+    impl Widget for Separator {
+        fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
+            ui.separator();
         }
     }
 
@@ -831,17 +839,14 @@ pub mod demo {
     use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
-        BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider, DragFloat, Space,
+        BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider, DragFloat, Space, Separator
     };
-    use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, SpaceId, WidgetMsg};
+    use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, WidgetMsg};
     use crate::gui_lib::{LineStyle::*, World};
     use eframe::egui::Context;
     use std::cell::RefCell;
     use std::rc::Rc;
 
-    //const SPACE: SpaceId = SpaceId(1);
-    const SPACE: SpaceId = SpaceId;
-    //const SPACE: SpaceId;
     const SLIDER_GAUGE: SliderId = SliderId(1);
     const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
     const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
@@ -938,6 +943,8 @@ pub mod demo {
         pub fn new() -> Self {
             // New empty BasicCanvas
             let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
+            //let mut canvas = BasicCanvas::new(SidePanel, BKG_EXAMPLE);
+            //let mut canvas = BasicCanvas::new(NoPanel, BKG_EXAMPLE);
 
             // Add shapes without handles to the canvas
             let mut y = 75.0;
@@ -1031,20 +1038,23 @@ pub mod demo {
             canvas.add_shape(arrow_head_cln);
 
             // Create and add widgets as Box<dyn Widget>
-            // let ws1 = Slider::new(SLIDER_GAUGE, "Gauge", 0.0, 0.0..=100.0);
-            // canvas.add_widget(Box::new(ws1));
-
             let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_a));
 
-            let spc = Space::new(SPACE, 50.0);
+            let spc = Space::new(150.0);
             canvas.add_widget(Box::new(spc));
 
             let wb_b = Button::new(BTN_STATE_B, "State B", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_b));
 
+            //let sep = Separator::new(NOMESSAGE);
+            let sep = Separator::new();
+            canvas.add_widget(Box::new(sep));
+            let sep = Separator::new();  // sep consumed, so can be reused
+            canvas.add_widget(Box::new(sep));
+
             let mut wdf1 = DragFloat::new(DRAGFLOAT_GAUGE, "Gauge = ", 0.0, 0.0..=100.0);
-            //wdf1.set_decimal(1);
+            wdf1.set_decimal(1);
             //wdf1.set_speed(0.1);
             canvas.add_widget(Box::new(wdf1));
 
@@ -1229,4 +1239,4 @@ pub mod demo {
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
 //pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
 
-// Jan 28. Space
+
