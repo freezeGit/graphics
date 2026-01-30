@@ -344,6 +344,25 @@ pub mod gui_lib {
         }
     }
 
+    #[derive(Debug, Default)]
+    pub struct Label {
+        pub text: String,
+    }
+
+    impl Label {
+        pub fn new(text: impl Into<String>,) -> Self {
+            Self {
+                text: text.into(),
+            }
+        }
+    }
+
+    impl Widget for Label {
+        fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
+            ui.label(&self.text);
+        }
+    }
+
     /// A customizable button component.
     ///
     /// # Fields
@@ -839,7 +858,8 @@ pub mod demo {
     use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
-        BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider, DragFloat, Space, Separator
+        BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider, DragFloat,
+        Space, Separator, Label,
     };
     use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, WidgetMsg};
     use crate::gui_lib::{LineStyle::*, World};
@@ -1038,25 +1058,26 @@ pub mod demo {
             canvas.add_shape(arrow_head_cln);
 
             // Create and add widgets as Box<dyn Widget>
+            canvas.add_widget(Box::new(Label::new("The App")));
+
+            let spc = Space::new(15.0);
+            canvas.add_widget(Box::new(spc));
+
             let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_a));
-
-            let spc = Space::new(150.0);
-            canvas.add_widget(Box::new(spc));
 
             let wb_b = Button::new(BTN_STATE_B, "State B", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_b));
 
-            //let sep = Separator::new(NOMESSAGE);
-            let sep = Separator::new();
-            canvas.add_widget(Box::new(sep));
-            let sep = Separator::new();  // sep consumed, so can be reused
-            canvas.add_widget(Box::new(sep));
+            canvas.add_widget(Box::new(Separator::new()));
 
             let mut wdf1 = DragFloat::new(DRAGFLOAT_GAUGE, "Gauge = ", 0.0, 0.0..=100.0);
             wdf1.set_decimal(1);
             //wdf1.set_speed(0.1);
             canvas.add_widget(Box::new(wdf1));
+
+            let sep = Separator::new();  // sep consumed, so can be reused
+            canvas.add_widget(Box::new(sep));
 
             //Create the TheCanvas
             Self {
