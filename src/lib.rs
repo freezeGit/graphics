@@ -20,7 +20,7 @@ pub mod gui_lib {
         Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2,
         Visuals, pos2, vec2,
     };
-    use egui::{CentralPanel, Context};
+    use egui::{CentralPanel, Context, RichText};
     use std::cell::RefCell;
     use std::rc::Rc;
 
@@ -318,9 +318,7 @@ pub mod gui_lib {
     impl Space {
         //pub fn new(id: SpaceId, size: f32) -> Self {
         pub fn new(size: f32) -> Self {
-            Self {
-                 size,
-            }
+            Self { size }
         }
     }
 
@@ -347,19 +345,23 @@ pub mod gui_lib {
     #[derive(Debug, Default)]
     pub struct Label {
         pub text: String,
+        pub color: Color32,
+        pub size: f32,
     }
 
     impl Label {
-        pub fn new(text: impl Into<String>,) -> Self {
+        pub fn new(text: impl Into<String>, color: Color32, size: f32) -> Self {
             Self {
                 text: text.into(),
+                color,
+                size,
             }
         }
     }
 
     impl Widget for Label {
         fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
-            ui.label(&self.text);
+            ui.label(RichText::new(&self.text).color(self.color).size(self.size));
         }
     }
 
@@ -858,8 +860,8 @@ pub mod demo {
     use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
-        BasicCanvas, Button, Circle, Color32, Polyline, Rectangle, Slider, DragFloat,
-        Space, Separator, Label,
+        BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator,
+        Slider, Space,
     };
     use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, WidgetMsg};
     use crate::gui_lib::{LineStyle::*, World};
@@ -1058,10 +1060,12 @@ pub mod demo {
             canvas.add_shape(arrow_head_cln);
 
             // Create and add widgets as Box<dyn Widget>
-            canvas.add_widget(Box::new(Label::new("The App")));
+            canvas.add_widget(Box::new(Space::new(15.0)));
 
-            let spc = Space::new(15.0);
-            canvas.add_widget(Box::new(spc));
+            let label1 = Label::new("The App", Color32::RED, 24.0);
+            canvas.add_widget(Box::new(label1));
+
+            canvas.add_widget(Box::new(Space::new(15.0)));
 
             let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_a));
@@ -1076,7 +1080,7 @@ pub mod demo {
             //wdf1.set_speed(0.1);
             canvas.add_widget(Box::new(wdf1));
 
-            let sep = Separator::new();  // sep consumed, so can be reused
+            let sep = Separator::new(); // sep consumed, so can be reused
             canvas.add_widget(Box::new(sep));
 
             //Create the TheCanvas
@@ -1259,5 +1263,3 @@ pub mod demo {
 //pub use eframe::egui::vec2;
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
 //pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
-
-
