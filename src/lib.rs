@@ -391,11 +391,24 @@ pub mod gui_lib {
         }
     }
 
+    // impl Widget for Button {
+    //     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
+    //         let resp = ui.add_sized(
+    //             egui::vec2(self.width, self.height),
+    //             egui::Button::new(&self.label),
+    //         );
+    //
+    //         if resp.clicked() {
+    //             out.push(WidgetMsg::ButtonClicked(self.id));
+    //         }
+    //     }
+    // }
+
     impl Widget for Button {
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
             let resp = ui.add_sized(
                 egui::vec2(self.width, self.height),
-                egui::Button::new(&self.label),
+                egui::Button::new(egui::RichText::new(&self.label).size(14.0).strong()),
             );
 
             if resp.clicked() {
@@ -866,6 +879,7 @@ pub mod demo {
     use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, WidgetMsg};
     use crate::gui_lib::{LineStyle::*, World};
     use eframe::egui::Context;
+    use egui::RichText;
     use std::cell::RefCell;
     use std::rc::Rc;
 
