@@ -1076,7 +1076,7 @@ pub mod demo {
             // Create and add widgets as Box<dyn Widget>
             canvas.add_widget(Box::new(Space::new(15.0)));
 
-            let label1 = Label::new("The App", Color32::RED, 24.0);
+            let label1 = Label::new("The App", Color32::RED, 20.0);
             canvas.add_widget(Box::new(label1));
 
             canvas.add_widget(Box::new(Space::new(15.0)));
