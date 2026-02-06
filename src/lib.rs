@@ -20,7 +20,7 @@ pub mod gui_lib {
         Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2,
         Visuals, pos2, vec2,
     };
-    use egui::{CentralPanel, Context, RichText};
+    use egui::{CentralPanel, Context, RichText, FontId};
     use std::cell::RefCell;
     use std::rc::Rc;
 
@@ -794,6 +794,64 @@ pub mod gui_lib {
             );
         }
     }
+    #[derive(Debug, Default)]
+    pub struct Text {
+        base: ShapeBase,
+        //pub radius: f32,
+    }
+
+    impl Text {
+        // Constructor method
+        pub fn new(top_left: Pos2) -> Self {
+            Self {
+                base: {
+                    ShapeBase {
+                        location: top_left,
+                        ..Default::default()
+                    }
+                },
+                //radius: radius,
+            }
+        }
+    }
+
+    impl Shape for Text {
+        fn base(&self) -> &ShapeBase {
+            &self.base
+        }
+        fn base_mut(&mut self) -> &mut ShapeBase {
+            &mut self.base
+        }
+
+        fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+            //let center = self.base.location + canvas_offset;
+            let tl = self.base.location + canvas_offset;
+
+            painter.text(
+                tl,
+                egui::Align2::LEFT_TOP,
+                "Status: RUNNING",
+                FontId::proportional(20.0),
+                Color32::WHITE,
+            );
+
+            // painter.text(
+            //     Pos2::new(100.0, 50.0),
+            //     egui::Align2::LEFT_TOP,
+            //     "Status: RUNNING",
+            //     FontId::proportional(20.0),
+            //     Color32::YELLOW,
+            // );
+
+            // painter.circle(
+            //     center,
+            //     self.radius,
+            //     self.base.fill_color,
+            //     egui::Stroke::new(self.base.line_width, self.base.color),
+            // );
+        }
+    }
+
 } // closes mod gui_lib
 
 ///
@@ -874,7 +932,7 @@ pub mod demo {
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
         BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator,
-        Slider, Space,
+        Slider, Space, Text,
     };
     use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, WidgetMsg};
     use crate::gui_lib::{LineStyle::*, World};
@@ -1072,6 +1130,16 @@ pub mod demo {
             arrow_head.borrow_mut().set_line_width(2.0);
             let arrow_head_cln: ShapeHandle = arrow_head.clone();
             canvas.add_shape(arrow_head_cln);
+
+            let stxt: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+                eframe::egui::Pos2::new(400.0, 500.0),
+                //eframe::egui::Pos2::new(0.0, 0.0),  // to test origin
+                //75.0,
+            )));
+            //sc1.borrow_mut().set_line_width(4.0);
+            //sc1.borrow_mut().set_fill_color(Color32::GRAY);
+            let stxt_cln: ShapeHandle = sc1.clone();
+            canvas.add_shape(stxt_cln);
 
             // Create and add widgets as Box<dyn Widget>
             canvas.add_widget(Box::new(Space::new(15.0)));
