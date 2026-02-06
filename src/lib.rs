@@ -832,7 +832,7 @@ pub mod gui_lib {
                 egui::Align2::LEFT_TOP,
                 "Status: RUNNING",
                 FontId::proportional(20.0),
-                Color32::WHITE,
+                Color32::BLACK,
             );
 
             // painter.text(
@@ -1132,13 +1132,13 @@ pub mod demo {
             canvas.add_shape(arrow_head_cln);
 
             let stxt: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-                eframe::egui::Pos2::new(400.0, 500.0),
+                eframe::egui::Pos2::new(40.0, 40.0),
                 //eframe::egui::Pos2::new(0.0, 0.0),  // to test origin
                 //75.0,
             )));
             //sc1.borrow_mut().set_line_width(4.0);
             //sc1.borrow_mut().set_fill_color(Color32::GRAY);
-            let stxt_cln: ShapeHandle = sc1.clone();
+            let stxt_cln: ShapeHandle = stxt.clone();
             canvas.add_shape(stxt_cln);
 
             // Create and add widgets as Box<dyn Widget>
