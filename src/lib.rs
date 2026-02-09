@@ -20,7 +20,8 @@ pub mod gui_lib {
         Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2,
         Visuals, pos2, vec2,
     };
-    use egui::{CentralPanel, Context, RichText, FontId};
+    //use egui::{CentralPanel, Context, FontId, RichText};
+    use egui::{CentralPanel, Context, RichText};
     use std::cell::RefCell;
     use std::rc::Rc;
 
@@ -794,26 +795,19 @@ pub mod gui_lib {
             );
         }
     }
-
-    //impl Label {
-    //     pub fn new(text: impl Into<String>, color: Color32, size: f32) -> Self {
-    //         Self {
-    //             text: text.into(),
-    //             color,
-    //             size,
-    //         }
-    //     }
-    // }
-
-    // impl Widget for Label {
-    //     fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
-    //         ui.label(RichText::new(&self.text).color(self.color).size(self.size));
-    //     }
-    // }
-    #[derive(Debug, Default)]
+    #[derive(Debug)]
+    pub enum TextFont {
+        Proportional,
+        Monospace,
+    }
+    //#[derive(Debug, Default)]
+    #[derive(Debug)]
     pub struct Text {
         base: ShapeBase,
         text: String,
+        color: Color32,
+        size: f32,
+        font: TextFont,
     }
 
     impl Text {
@@ -825,8 +819,27 @@ pub mod gui_lib {
                         ..Default::default()
                     }
                 },
-        text: text.into(),
+                text: text.into(),
+                color: Color32::BLACK,
+                size: 24.0,
+                font: TextFont::Proportional,
             }
+        }
+
+        pub fn set_text(&mut self, text: impl Into<String>) {
+            self.text = text.into();
+        }
+
+        pub fn set_color(&mut self, color: Color32) {
+            self.color = color;
+        }
+
+        pub fn set_size(&mut self, size: f32) {
+            self.size = size;
+        }
+
+        pub fn set_font(&mut self, font: TextFont) {
+            self.font = font;
         }
     }
 
@@ -841,17 +854,22 @@ pub mod gui_lib {
         fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
             //let center = self.base.location + canvas_offset;
             let tl = self.base.location + canvas_offset;
+            let font_id = match self.font {
+                TextFont::Proportional => egui::FontId::proportional(self.size),
+                TextFont::Monospace => egui::FontId::monospace(self.size),
+            };
 
-             painter.text(
+            painter.text(
                 tl,
                 egui::Align2::LEFT_TOP,
                 self.text.as_str(),
-                FontId::proportional(20.0),
-                Color32::BLACK,
+                //FontId::proportional(20.0),
+                font_id,
+                //Color32::BLACK,
+                self.color,
             );
         }
     }
-
 } // closes mod gui_lib
 
 ///
@@ -929,6 +947,7 @@ pub mod gui_lib {
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
     use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
+    use crate::gui_lib::TextFont;
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
         BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator,
@@ -1055,20 +1074,19 @@ pub mod demo {
                 )));
                 //vee.borrow_mut().set_line_width(4.0);
                 let vee_cln: ShapeHandle = vee.clone();
-                canvas.add_shape(vee_cln);
+                canvas.add_shape(vee_cln as ShapeHandle);
                 y += 10.0;
             }
 
             // Add shape with handle
             let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
                 eframe::egui::Pos2::new(200.0, 200.0),
-                //eframe::egui::Pos2::new(0.0, 0.0),  // to test origin
                 75.0,
             )));
             sc1.borrow_mut().set_line_width(4.0);
             sc1.borrow_mut().set_fill_color(Color32::GRAY);
             let sc1_cln: ShapeHandle = sc1.clone();
-            canvas.add_shape(sc1_cln);
+            canvas.add_shape(sc1_cln as ShapeHandle);
 
             // Add shape with handle
             let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
@@ -1076,7 +1094,7 @@ pub mod demo {
                 10.0,
             )));
             let sc2_cln: ShapeHandle = sc2.clone();
-            canvas.add_shape(sc2_cln);
+            canvas.add_shape(sc2_cln as ShapeHandle);
 
             // Add shape with handle
             let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
@@ -1085,7 +1103,7 @@ pub mod demo {
             )));
             sr.borrow_mut().set_fill_color(Color32::LIGHT_GRAY);
             let sr_cln: ShapeHandle = sr.clone();
-            canvas.add_shape(sr_cln);
+            canvas.add_shape(sr_cln as ShapeHandle);
 
             // Add shape with handle
             let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
@@ -1107,7 +1125,7 @@ pub mod demo {
             sp.borrow_mut().set_line_style(Dotted);
             //sp.borrow_mut().set_line_style(Solid);
             let sp_cln: ShapeHandle = sp.clone();
-            canvas.add_shape(sp_cln);
+            canvas.add_shape(sp_cln as ShapeHandle);
 
             // Add shape with handle
             // TDJ: change to left upper corner when possible
@@ -1117,7 +1135,7 @@ pub mod demo {
             )));
             gauge.borrow_mut().set_fill_color(Color32::LIGHT_GRAY);
             let gauge_cln: ShapeHandle = gauge.clone();
-            canvas.add_shape(gauge_cln);
+            canvas.add_shape(gauge_cln as ShapeHandle);
 
             // Add shape with handle
             let arrow_head: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
@@ -1130,16 +1148,17 @@ pub mod demo {
             )));
             arrow_head.borrow_mut().set_line_width(2.0);
             let arrow_head_cln: ShapeHandle = arrow_head.clone();
-            canvas.add_shape(arrow_head_cln);
+            canvas.add_shape(arrow_head_cln as ShapeHandle);
 
+            // Add shape with handle
             let stxt: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-                eframe::egui::Pos2::new(40.0, 40.0),
-                "Testing",
-             )));
+                eframe::egui::Pos2::new(350.0, 100.0),
+                "Waiting",
+            )));
             let stxt_cln: ShapeHandle = stxt.clone();
-            canvas.add_shape(stxt_cln);
+            canvas.add_shape(stxt_cln as ShapeHandle);
 
-            // Create and add widgets as Box<dyn Widget>
+            // ---- Create and add widgets as Box<dyn Widget>
             canvas.add_widget(Box::new(Space::new(15.0)));
 
             let label1 = Label::new("The App", Color32::RED, 20.0);
@@ -1200,9 +1219,11 @@ pub mod demo {
             match world.thing.state {
                 ThingState::StateA => {
                     self.sr.borrow_mut().set_fill_color(Color32::GOLD);
+                    self.stxt.borrow_mut().set_text("State A");
                 }
                 ThingState::StateB => {
                     self.sr.borrow_mut().set_fill_color(Color32::CYAN);
+                    self.stxt.borrow_mut().set_text("State B");
                 }
                 _ => {}
             }
