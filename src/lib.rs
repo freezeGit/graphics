@@ -794,15 +794,30 @@ pub mod gui_lib {
             );
         }
     }
+
+    //impl Label {
+    //     pub fn new(text: impl Into<String>, color: Color32, size: f32) -> Self {
+    //         Self {
+    //             text: text.into(),
+    //             color,
+    //             size,
+    //         }
+    //     }
+    // }
+
+    // impl Widget for Label {
+    //     fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
+    //         ui.label(RichText::new(&self.text).color(self.color).size(self.size));
+    //     }
+    // }
     #[derive(Debug, Default)]
     pub struct Text {
         base: ShapeBase,
-        //pub radius: f32,
+        text: String,
     }
 
     impl Text {
-        // Constructor method
-        pub fn new(top_left: Pos2) -> Self {
+        pub fn new(top_left: Pos2, text: impl Into<String>) -> Self {
             Self {
                 base: {
                     ShapeBase {
@@ -810,7 +825,7 @@ pub mod gui_lib {
                         ..Default::default()
                     }
                 },
-                //radius: radius,
+        text: text.into(),
             }
         }
     }
@@ -827,28 +842,13 @@ pub mod gui_lib {
             //let center = self.base.location + canvas_offset;
             let tl = self.base.location + canvas_offset;
 
-            painter.text(
+             painter.text(
                 tl,
                 egui::Align2::LEFT_TOP,
-                "Status: RUNNING",
+                self.text.as_str(),
                 FontId::proportional(20.0),
                 Color32::BLACK,
             );
-
-            // painter.text(
-            //     Pos2::new(100.0, 50.0),
-            //     egui::Align2::LEFT_TOP,
-            //     "Status: RUNNING",
-            //     FontId::proportional(20.0),
-            //     Color32::YELLOW,
-            // );
-
-            // painter.circle(
-            //     center,
-            //     self.radius,
-            //     self.base.fill_color,
-            //     egui::Stroke::new(self.base.line_width, self.base.color),
-            // );
         }
     }
 
@@ -1031,6 +1031,7 @@ pub mod demo {
         sr: Rc<RefCell<Rectangle>>,
         sp: Rc<RefCell<Polyline>>,
         arrow_head: Rc<RefCell<Polyline>>,
+        stxt: Rc<RefCell<Text>>,
     }
 
     impl TheCanvas {
@@ -1133,11 +1134,8 @@ pub mod demo {
 
             let stxt: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
                 eframe::egui::Pos2::new(40.0, 40.0),
-                //eframe::egui::Pos2::new(0.0, 0.0),  // to test origin
-                //75.0,
-            )));
-            //sc1.borrow_mut().set_line_width(4.0);
-            //sc1.borrow_mut().set_fill_color(Color32::GRAY);
+                "Testing",
+             )));
             let stxt_cln: ShapeHandle = stxt.clone();
             canvas.add_shape(stxt_cln);
 
@@ -1173,6 +1171,7 @@ pub mod demo {
                 sr,
                 sp,
                 arrow_head,
+                stxt,
             }
         }
 
