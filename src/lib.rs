@@ -1248,7 +1248,7 @@ pub mod demo {
         /// # Returns
         /// A new `DemoApp` instance initialized with a default canvas
         /// containing several shapes
-        /// and containing a sample button.
+        /// and widgets.
         pub fn new() -> Self {
             Self {
                 world: Box::new(TheWorld::new()),
