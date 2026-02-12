@@ -1230,35 +1230,55 @@ pub mod demo {
         }
     }
 
+    #[derive(Default, Debug)]
+    struct Timer {
+        last_time: f64,
+    }
+
+    impl Timer {
+        pub fn is_time(&mut self, ctx: &Context) -> bool {
+            let mut retn = false;
+            let now = ctx.input(|i| i.time);
+            if now - self.last_time >= 0.5 {
+                self.last_time = now;
+                retn = true;
+            }
+            retn
+        }
+    }
+
     /// Main application structure.
     ///
     /// Represents the root of the application and contains
-    /// the main canvas with all UI components.
+    /// the main canvas with all UI components
+    /// and if used, a World or Model struct containing program data and logic.
     #[derive(Debug)]
     struct TheApp {
         world: Box<TheWorld>,
         canvas: TheCanvas,
         msgs: Vec<WidgetMsg>,
-        last_toggle: f64,
+        timer: Timer,
+        //last_toggle: f64,
     }
 
     impl TheApp {
-        /// Creates a new instance of the application.
+        /// Creates a new instance of the application
+        /// intended to demonstrate usage of gui_lib.
         ///
         /// # Returns
-        /// A new `DemoApp` instance initialized with a default canvas
-        /// containing several shapes
-        /// and widgets.
+        /// A new `DemoApp` instance initialized with a canvas
+        /// and world.
+
         pub fn new() -> Self {
             Self {
                 world: Box::new(TheWorld::new()),
                 canvas: TheCanvas::new(),
                 msgs: Vec::new(), //TDJ:wid is this good
-                last_toggle: 0.0, //For time-gating
+                timer: Timer::default(),
+                //last_toggle: 0.0, //For time-gating
                                   //is_red: true,
             }
         }
-        //}
 
         //impl TheApp {
         fn handle_msg(&mut self, msg: WidgetMsg) {
@@ -1316,9 +1336,7 @@ pub mod demo {
     impl eframe::App for TheApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             //Test of basic simulation/animation  //TDJ
-            let now = ctx.input(|i| i.time);
-            if now - self.last_toggle >= 0.5 {
-                self.last_toggle = now;
+            if self.timer.is_time(ctx) {
                 self.world.advance(); // advance world one tick
                 self.canvas.update(&self.world); // update canvas
             }
