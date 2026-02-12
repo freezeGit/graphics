@@ -58,6 +58,34 @@ pub mod gui_lib {
     }
     //----------------------------------------------------------
 
+    //#[derive(Default, Debug)]
+    #[derive(Debug)]
+    pub struct Timer {
+        interval: f64,
+        last_time: f64,
+    }
+
+    impl Timer {
+        pub fn new(interval: f64) -> Self {
+            Timer {
+                interval,
+                last_time: 0.0,
+            }
+        }
+
+        pub fn is_time(&mut self, ctx: &Context) -> bool {
+            let mut retn = false;
+            let now = ctx.input(|i| i.time);
+            if now - self.last_time >= self.interval {
+                self.last_time = now;
+                retn = true;
+            }
+            retn
+        }
+    }
+
+    //------------------------------------
+
     /// A trait that represents a world with the ability to advance its state.
     pub trait World: std::fmt::Debug {
         fn advance(&mut self);
@@ -951,7 +979,7 @@ pub mod demo {
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
         BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator,
-        Slider, Space, Text,
+        Slider, Space, Text, Timer,
     };
     use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, WidgetMsg};
     use crate::gui_lib::{LineStyle::*, World};
@@ -959,7 +987,6 @@ pub mod demo {
     use egui::RichText;
     use std::cell::RefCell;
     use std::rc::Rc;
-
     const SLIDER_GAUGE: SliderId = SliderId(1);
     const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
     const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
@@ -1230,22 +1257,22 @@ pub mod demo {
         }
     }
 
-    #[derive(Default, Debug)]
-    struct Timer {
-        last_time: f64,
-    }
-
-    impl Timer {
-        pub fn is_time(&mut self, ctx: &Context) -> bool {
-            let mut retn = false;
-            let now = ctx.input(|i| i.time);
-            if now - self.last_time >= 0.5 {
-                self.last_time = now;
-                retn = true;
-            }
-            retn
-        }
-    }
+    // #[derive(Default, Debug)]
+    // struct Timer {
+    //     last_time: f64,
+    // }
+    //
+    // impl Timer {
+    //     pub fn is_time(&mut self, ctx: &Context) -> bool {
+    //         let mut retn = false;
+    //         let now = ctx.input(|i| i.time);
+    //         if now - self.last_time >= 0.5 {
+    //             self.last_time = now;
+    //             retn = true;
+    //         }
+    //         retn
+    //     }
+    // }
 
     /// Main application structure.
     ///
@@ -1274,9 +1301,7 @@ pub mod demo {
                 world: Box::new(TheWorld::new()),
                 canvas: TheCanvas::new(),
                 msgs: Vec::new(), //TDJ:wid is this good
-                timer: Timer::default(),
-                //last_toggle: 0.0, //For time-gating
-                                  //is_red: true,
+                timer: Timer::new(0.5),
             }
         }
 
@@ -1341,7 +1366,8 @@ pub mod demo {
                 self.canvas.update(&self.world); // update canvas
             }
 
-            self.msgs.clear(); // establish invariant: Belt and suspenders
+            // establish invariant: Belt and suspenders
+            self.msgs.clear();
             // Draw shapes and widgets on the canvas, and collect all messages from widgets
             self.canvas.canvas.render(ctx, &mut self.msgs);
 
