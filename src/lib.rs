@@ -63,6 +63,7 @@ pub mod gui_lib {
     pub struct Timer {
         interval: f64,
         last_time: f64,
+        running: bool,
     }
 
     impl Timer {
@@ -70,18 +71,39 @@ pub mod gui_lib {
             Timer {
                 interval,
                 last_time: 0.0,
+                running: true,
             }
         }
 
+        // pub fn is_time(&mut self, ctx: &Context) -> bool {
+        //     let mut retn = false;
+        //     let now = ctx.input(|i| i.time);
+        //     if now - self.last_time >= self.interval {
+        //         self.last_time = now;
+        //         retn = true;
+        //     }
+        //     retn
+        // }
+
         pub fn is_time(&mut self, ctx: &Context) -> bool {
             let mut retn = false;
-            let now = ctx.input(|i| i.time);
-            if now - self.last_time >= self.interval {
-                self.last_time = now;
-                retn = true;
+            if self.running {
+                let now = ctx.input(|i| i.time);
+                if now - self.last_time >= self.interval {
+                    self.last_time = now;
+                    retn = true;
+                }
             }
             retn
         }
+
+        pub fn set_interval(&mut self, interval: f64) {
+            self.interval = interval;
+        }
+
+        pub fn run(&mut self) { self.running = true; }
+
+        pub fn pause(&mut self) { self.running  = false; }
     }
 
     //------------------------------------
@@ -1042,6 +1064,7 @@ pub mod demo {
     }
 
     impl World for TheWorld {
+        // Advance the world one step
         fn advance(&mut self) {
             self.state += 1;
             self.toggle_light();
@@ -1257,23 +1280,6 @@ pub mod demo {
         }
     }
 
-    // #[derive(Default, Debug)]
-    // struct Timer {
-    //     last_time: f64,
-    // }
-    //
-    // impl Timer {
-    //     pub fn is_time(&mut self, ctx: &Context) -> bool {
-    //         let mut retn = false;
-    //         let now = ctx.input(|i| i.time);
-    //         if now - self.last_time >= 0.5 {
-    //             self.last_time = now;
-    //             retn = true;
-    //         }
-    //         retn
-    //     }
-    // }
-
     /// Main application structure.
     ///
     /// Represents the root of the application and contains
@@ -1358,17 +1364,27 @@ pub mod demo {
     // The eframe::App trait is the bridge between your custom application logic
     // and the eframe framework that handles all the platform-specific details
     // of creating a window and running an event loop.
+    //
+    // In this demonstration app a timer loop is used to advance the world at a rate
+    // different from the frame rate of the event loop. This allows better control of
+    // running a simulation. For a simpler simulation the world can advance with the
+    // frame rate.
+    // The frame rate should be set for smooth widget interaction.
+    // If there is no simulation there is no need to call world.advance.
+    // For a basic program there is no need for a world object. All state and logic
+    // can live directly in the TheApp.
     impl eframe::App for TheApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-            //Test of basic simulation/animation  //TDJ
+            // ----Simulation/animation
             if self.timer.is_time(ctx) {
                 self.world.advance(); // advance world one tick
                 self.canvas.update(&self.world); // update canvas
             }
 
-            // establish invariant: Belt and suspenders
-            self.msgs.clear();
-            // Draw shapes and widgets on the canvas, and collect all messages from widgets
+            // -----Establish event loop
+            self.msgs.clear(); // establish invariant: Belt and suspenders
+            // Draw shapes and widgets on the canvas,
+            // and collect all messages from widgets
             self.canvas.canvas.render(ctx, &mut self.msgs);
 
             if !self.msgs.is_empty() {
@@ -1396,7 +1412,6 @@ pub mod demo {
             crate::gui_lib::native_options(),
             Box::new(|cc| {
                 cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
-                //cc.egui_ctx.set_visuals(eframe::egui::Visuals::dark()); //dark theme
                 let app = Box::new(TheApp::new());
                 Ok(app)
             }),
