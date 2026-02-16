@@ -71,19 +71,9 @@ pub mod gui_lib {
             Timer {
                 interval,
                 last_time: 0.0,
-                running: true,
+                running: false,
             }
         }
-
-        // pub fn is_time(&mut self, ctx: &Context) -> bool {
-        //     let mut retn = false;
-        //     let now = ctx.input(|i| i.time);
-        //     if now - self.last_time >= self.interval {
-        //         self.last_time = now;
-        //         retn = true;
-        //     }
-        //     retn
-        // }
 
         pub fn is_time(&mut self, ctx: &Context) -> bool {
             let mut retn = false;
@@ -96,14 +86,22 @@ pub mod gui_lib {
             }
             retn
         }
-
+        pub fn interval(&self) -> f64 {
+            self.interval
+        }
         pub fn set_interval(&mut self, interval: f64) {
             self.interval = interval;
         }
 
-        pub fn run(&mut self) { self.running = true; }
-
-        pub fn pause(&mut self) { self.running  = false; }
+        pub fn is_running(&self) -> bool {
+            self.running
+        }
+        pub fn run(&mut self) {
+            self.running = true;
+        }
+        pub fn pause(&mut self) {
+            self.running = false;
+        }
     }
 
     //------------------------------------
@@ -1013,8 +1011,11 @@ pub mod demo {
     const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
     const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
 
+    //const BTN_RESET: ButtonId = ButtonId(2);
+    //const BTN_STOP: ButtonId = ButtonId(3);
     const BTN_STATE_A: ButtonId = ButtonId(1);
     const BTN_STATE_B: ButtonId = ButtonId(2);
+    const BTN_RUN_PAUSE: ButtonId = ButtonId(3);
 
     #[derive(Debug)]
     struct Gauge {
@@ -1143,6 +1144,7 @@ pub mod demo {
                 eframe::egui::Pos2::new(200.0, 200.0),
                 10.0,
             )));
+            sc2.borrow_mut().set_fill_color(Color32::RED);
             let sc2_cln: ShapeHandle = sc2.clone();
             canvas.add_shape(sc2_cln as ShapeHandle);
 
@@ -1215,6 +1217,9 @@ pub mod demo {
             canvas.add_widget(Box::new(label1));
 
             canvas.add_widget(Box::new(Space::new(15.0)));
+
+            let wb_run = Button::new(BTN_RUN_PAUSE, "Run/Pause", 120.0, 40.0);
+            canvas.add_widget(Box::new(wb_run));
 
             let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_a));
@@ -1291,7 +1296,6 @@ pub mod demo {
         canvas: TheCanvas,
         msgs: Vec<WidgetMsg>,
         timer: Timer,
-        //last_toggle: f64,
     }
 
     impl TheApp {
@@ -1326,9 +1330,15 @@ pub mod demo {
             }
         }
 
-        //impl TheApp {
         fn handle_button(&mut self, id: ButtonId) {
             match id {
+                BTN_RUN_PAUSE => {
+                    if self.timer.is_running() {
+                        self.timer.pause();
+                    } else {
+                        self.timer.run();
+                    }
+                }
                 BTN_STATE_A => {
                     self.world.thing.state = ThingState::StateA;
                 }
