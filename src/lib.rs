@@ -1371,18 +1371,19 @@ pub mod demo {
         }
     }
 
-    // The eframe::App trait is the bridge between your custom application logic
-    // and the eframe framework that handles all the platform-specific details
-    // of creating a window and running an event loop.
-    //
-    // In this demonstration app a timer loop is used to advance the world at a rate
-    // different from the frame rate of the event loop. This allows better control of
-    // running a simulation. For a simpler simulation the world can advance with the
-    // frame rate.
-    // The frame rate should be set for smooth widget interaction.
-    // If there is no simulation there is no need to call world.advance.
-    // For a basic program there is no need for a world object. All state and logic
-    // can live directly in the TheApp.
+    /// The eframe::App trait is the bridge between your custom application logic
+    /// and the eframe framework that handles all the platform-specific details
+    /// of creating a window and running an event loop.
+    ///
+    /// In this demonstration app a timer loop is used to advance the world at a rate
+    /// slower than the frame rate of the event loop. This allows better control of
+    /// running a simulation. For a simpler simulation the world can advance with the
+    /// frame rate.
+    /// The frame rate should be set for smooth widget interaction. Typically 60 FPS,
+    /// (16 millisecond interval) but can be faster if the simulation is fast enough.
+    /// If there is no simulation there is no need to call world.advance.
+    /// For a basic program there is no need for a world object. All state and logic
+    /// can live directly in the TheApp.
     impl eframe::App for TheApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
             // ----Simulation/animation
