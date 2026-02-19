@@ -121,7 +121,7 @@ pub mod gui_lib {
         layout: LayoutStyle,
         background_color: Color32,
         shapes: Vec<ShapeHandle>,
-        pub widgets: Vec<Box<dyn Widget>>, // TDJ: make private
+        widgets: Vec<Box<dyn Widget>>,
     }
 
     impl BasicCanvas {
@@ -296,7 +296,7 @@ pub mod gui_lib {
                 .resizable(true)
                 .default_width(180.0)
                 .show(ctx, |ui| {
-                    //ui.heading("Controls");  // TDJ: only if you want side panel to be labelled
+                    //ui.heading("Controls");  // only if you want side panel to be labelled
                     for widget in &mut self.widgets {
                         //widget.invoke(ui);
                         widget.invoke(ui, out);
@@ -439,19 +439,6 @@ pub mod gui_lib {
             }
         }
     }
-
-    // impl Widget for Button {
-    //     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
-    //         let resp = ui.add_sized(
-    //             egui::vec2(self.width, self.height),
-    //             egui::Button::new(&self.label),
-    //         );
-    //
-    //         if resp.clicked() {
-    //             out.push(WidgetMsg::ButtonClicked(self.id));
-    //         }
-    //     }
-    // }
 
     impl Widget for Button {
         fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
@@ -1011,11 +998,10 @@ pub mod demo {
     const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
     const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
 
-    //const BTN_RESET: ButtonId = ButtonId(2);
-    //const BTN_STOP: ButtonId = ButtonId(3);
     const BTN_STATE_A: ButtonId = ButtonId(1);
     const BTN_STATE_B: ButtonId = ButtonId(2);
     const BTN_RUN_PAUSE: ButtonId = ButtonId(3);
+    const BTN_ABOUT: ButtonId = ButtonId(4);
 
     #[derive(Debug)]
     struct Gauge {
@@ -1219,6 +1205,7 @@ pub mod demo {
             canvas.add_widget(Box::new(Space::new(15.0)));
 
             let wb_run = Button::new(BTN_RUN_PAUSE, "Run/Pause", 120.0, 40.0);
+            //let wb_run = Button::new(BTN_RUN_PAUSE,None, 0.0, 0.0);
             canvas.add_widget(Box::new(wb_run));
 
             let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
@@ -1236,6 +1223,9 @@ pub mod demo {
 
             let sep = Separator::new(); // sep consumed, so can be reused
             canvas.add_widget(Box::new(sep));
+
+            let wb_about = Button::new(BTN_ABOUT, "About", 120.0, 40.0);
+            canvas.add_widget(Box::new(wb_about));
 
             //Create the TheCanvas
             Self {
@@ -1285,6 +1275,14 @@ pub mod demo {
         }
     }
 
+    #[derive(Debug)]
+    enum ActiveDialog {
+        None,
+        About,
+        ConfirmReset,
+        Settings { speed: f32, name: String },
+    }
+
     /// Main application structure.
     ///
     /// Represents the root of the application and contains
@@ -1295,6 +1293,7 @@ pub mod demo {
         world: Box<TheWorld>,
         canvas: TheCanvas,
         msgs: Vec<WidgetMsg>,
+        dialog: ActiveDialog,
         timer: Timer,
     }
 
@@ -1310,7 +1309,8 @@ pub mod demo {
             Self {
                 world: Box::new(TheWorld::new()),
                 canvas: TheCanvas::new(),
-                msgs: Vec::new(), //TDJ:wid is this good
+                msgs: Vec::new(),
+                dialog: ActiveDialog::None,
                 timer: Timer::new(0.5),
             }
         }
@@ -1332,6 +1332,9 @@ pub mod demo {
 
         fn handle_button(&mut self, id: ButtonId) {
             match id {
+                BTN_ABOUT => {
+                    self.dialog = ActiveDialog::About;
+                }
                 BTN_RUN_PAUSE => {
                     if self.timer.is_running() {
                         self.timer.pause();
@@ -1412,8 +1415,103 @@ pub mod demo {
                 // Update canvas once after all state changes:
                 self.canvas.update(&self.world);
             }
+
+            // Display the active dialog. (Draw modal last)
+            self.draw_dialog(ctx);
+
             // schedule the next frame redraw after 16 milliseconds (60 FPS)
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        }
+    }
+
+    impl TheApp {
+        fn draw_dialog(&mut self, ctx: &egui::Context) {
+            match &mut self.dialog {
+                ActiveDialog::None => {}
+
+                ActiveDialog::About => {
+                    let mut close = false;
+
+                    egui::Modal::new(egui::Id::new("about_dialog")).show(ctx, |ui| {
+                        ui.heading("About");
+                        ui.separator();
+                        ui.label("gui_lib demo v0.1");
+                        ui.label("Written in Rust + egui");
+
+                        ui.add_space(10.0);
+
+                        if ui.button("OK").clicked() {
+                            close = true;
+                        }
+                    });
+
+                    if close {
+                        self.dialog = ActiveDialog::None;
+                    }
+                }
+
+                // ActiveDialog::ConfirmReset => {
+                //     let mut close = false;
+                //
+                //     egui::Modal::new(egui::Id::new("confim_reset")).show(ctx, |ui| {
+                //         ui.label("Reset simulation?");
+                //
+                //         ui.horizontal(|ui| {
+                //             if ui.button("Yes").clicked() {
+                //                 //self.world.reset(); //TDJ What is this
+                //                 self.canvas.update(&self.world);
+                //                 close = true;
+                //             }
+                //             if ui.button("No").clicked() {
+                //                 close = true;
+                //             }
+                //         });
+                //     });
+                //
+                //     if close {
+                //         self.dialog = ActiveDialog::None;
+                //     }
+                // }
+
+                // ActiveDialog::Settings { speed, name } => {
+                //     let mut close = false;
+                //
+                //     //egui::Modal::new("settings_dialog")
+                //     egui::Modal::new(egui::Id::new("settings_dialog")).show(ctx, |ui| {
+                //         ui.heading("Settings");
+                //
+                //         ui.horizontal(|ui| {
+                //             ui.label("Speed:");
+                //             ui.add(egui::DragValue::new(speed).speed(0.1));
+                //         });
+                //
+                //         ui.horizontal(|ui| {
+                //             ui.label("Name:");
+                //             ui.text_edit_singleline(name);
+                //         });
+                //
+                //         ui.add_space(10.0);
+                //
+                //         ui.horizontal(|ui| {
+                //             if ui.button("OK").clicked() {
+                //                 //self.world.speed = *speed;  // TDJ Why this
+                //                 //self.world.name = name.clone(); // TDJ Why this
+                //                 self.canvas.update(&self.world);
+                //                 close = true;
+                //             }
+                //
+                //             if ui.button("Cancel").clicked() {
+                //                 close = true;
+                //             }
+                //         });
+                //     });
+                //
+                //     if close {
+                //         self.dialog = ActiveDialog::None;
+                //     }
+                // }
+                _ => {}
+            }
         }
     }
 
