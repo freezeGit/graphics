@@ -1002,6 +1002,7 @@ pub mod demo {
     const BTN_STATE_B: ButtonId = ButtonId(2);
     const BTN_RUN_PAUSE: ButtonId = ButtonId(3);
     const BTN_ABOUT: ButtonId = ButtonId(4);
+    const BTN_ENTER_NAME: ButtonId = ButtonId(5);
 
     #[derive(Debug)]
     struct Gauge {
@@ -1224,6 +1225,9 @@ pub mod demo {
             let sep = Separator::new(); // sep consumed, so can be reused
             canvas.add_widget(Box::new(sep));
 
+            let wb_enter_name = Button::new(BTN_ENTER_NAME, "Enter Name", 120.0, 40.0);
+            canvas.add_widget(Box::new(wb_enter_name));
+
             let wb_about = Button::new(BTN_ABOUT, "About", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_about));
 
@@ -1279,8 +1283,15 @@ pub mod demo {
     enum ActiveDialog {
         None,
         About,
+        EnterName {
+            title: String,
+            value: String, // buffer the user edits
+        },
         ConfirmReset,
-        Settings { speed: f32, name: String },
+        Settings {
+            speed: f32,
+            name: String,
+        },
     }
 
     /// Main application structure.
@@ -1335,6 +1346,13 @@ pub mod demo {
                 BTN_ABOUT => {
                     self.dialog = ActiveDialog::About;
                 }
+                BTN_ENTER_NAME => {
+                    self.dialog = ActiveDialog::EnterName {
+                        title: "Enter name:".to_string(),
+                        value: "John".to_string(),
+                        //value: self.world.name.clone(), // preload from world (optional)
+                    };
+                }
                 BTN_RUN_PAUSE => {
                     if self.timer.is_running() {
                         self.timer.pause();
@@ -1348,6 +1366,7 @@ pub mod demo {
                 BTN_STATE_B => {
                     self.world.thing.state = ThingState::StateB;
                 }
+
                 _ => {}
             }
         }
@@ -1416,7 +1435,7 @@ pub mod demo {
                 self.canvas.update(&self.world);
             }
 
-            // Display the active dialog. (Draw modal last)
+            // Display the active dialog. (Draw it last)
             self.draw_dialog(ctx);
 
             // schedule the next frame redraw after 16 milliseconds (60 FPS)
@@ -1450,66 +1469,34 @@ pub mod demo {
                     }
                 }
 
-                // ActiveDialog::ConfirmReset => {
-                //     let mut close = false;
-                //
-                //     egui::Modal::new(egui::Id::new("confim_reset")).show(ctx, |ui| {
-                //         ui.label("Reset simulation?");
-                //
-                //         ui.horizontal(|ui| {
-                //             if ui.button("Yes").clicked() {
-                //                 //self.world.reset(); //TDJ What is this
-                //                 self.canvas.update(&self.world);
-                //                 close = true;
-                //             }
-                //             if ui.button("No").clicked() {
-                //                 close = true;
-                //             }
-                //         });
-                //     });
-                //
-                //     if close {
-                //         self.dialog = ActiveDialog::None;
-                //     }
-                // }
+                ActiveDialog::EnterName { title, value } => {
+                    let mut close = false;
 
-                // ActiveDialog::Settings { speed, name } => {
-                //     let mut close = false;
-                //
-                //     //egui::Modal::new("settings_dialog")
-                //     egui::Modal::new(egui::Id::new("settings_dialog")).show(ctx, |ui| {
-                //         ui.heading("Settings");
-                //
-                //         ui.horizontal(|ui| {
-                //             ui.label("Speed:");
-                //             ui.add(egui::DragValue::new(speed).speed(0.1));
-                //         });
-                //
-                //         ui.horizontal(|ui| {
-                //             ui.label("Name:");
-                //             ui.text_edit_singleline(name);
-                //         });
-                //
-                //         ui.add_space(10.0);
-                //
-                //         ui.horizontal(|ui| {
-                //             if ui.button("OK").clicked() {
-                //                 //self.world.speed = *speed;  // TDJ Why this
-                //                 //self.world.name = name.clone(); // TDJ Why this
-                //                 self.canvas.update(&self.world);
-                //                 close = true;
-                //             }
-                //
-                //             if ui.button("Cancel").clicked() {
-                //                 close = true;
-                //             }
-                //         });
-                //     });
-                //
-                //     if close {
-                //         self.dialog = ActiveDialog::None;
-                //     }
-                // }
+                    egui::Modal::new(egui::Id::new("enter_name_dialog")).show(ctx, |ui| {
+                        ui.heading(title);
+                        ui.separator();
+
+                        ui.label("Name:");
+                        ui.text_edit_singleline(value);
+
+                        ui.add_space(10.0);
+                        ui.horizontal(|ui| {
+                            if ui.button("OK").clicked() {
+                                //self.world.name = value.clone(); // commit
+                                self.canvas.update(&self.world);
+                                close = true;
+                            }
+                            if ui.button("Cancel").clicked() {
+                                close = true;
+                            }
+                        });
+                    });
+
+                    if close {
+                        self.dialog = ActiveDialog::None;
+                    }
+                }
+
                 _ => {}
             }
         }
@@ -1533,3 +1520,66 @@ pub mod demo {
 //pub use eframe::egui::vec2;
 //pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
 //pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
+
+
+// Some unused dialog stuff:
+// ActiveDialog::ConfirmReset => {
+//     let mut close = false;
+//
+//     egui::Modal::new(egui::Id::new("confim_reset")).show(ctx, |ui| {
+//         ui.label("Reset simulation?");
+//
+//         ui.horizontal(|ui| {
+//             if ui.button("Yes").clicked() {
+//                 //self.world.reset(); //TDJ What is this
+//                 self.canvas.update(&self.world);
+//                 close = true;
+//             }
+//             if ui.button("No").clicked() {
+//                 close = true;
+//             }
+//         });
+//     });
+//
+//     if close {
+//         self.dialog = ActiveDialog::None;
+//     }
+// }
+
+// ActiveDialog::Settings { speed, name } => {
+//     let mut close = false;
+//
+//     //egui::Modal::new("settings_dialog")
+//     egui::Modal::new(egui::Id::new("settings_dialog")).show(ctx, |ui| {
+//         ui.heading("Settings");
+//
+//         ui.horizontal(|ui| {
+//             ui.label("Speed:");
+//             ui.add(egui::DragValue::new(speed).speed(0.1));
+//         });
+//
+//         ui.horizontal(|ui| {
+//             ui.label("Name:");
+//             ui.text_edit_singleline(name);
+//         });
+//
+//         ui.add_space(10.0);
+//
+//         ui.horizontal(|ui| {
+//             if ui.button("OK").clicked() {
+//                 //self.world.speed = *speed;  // TDJ Why this
+//                 //self.world.name = name.clone(); // TDJ Why this
+//                 self.canvas.update(&self.world);
+//                 close = true;
+//             }
+//
+//             if ui.button("Cancel").clicked() {
+//                 close = true;
+//             }
+//         });
+//     });
+//
+//     if close {
+//         self.dialog = ActiveDialog::None;
+//     }
+// }
