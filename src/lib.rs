@@ -996,6 +996,7 @@ pub mod demo {
     use std::rc::Rc;
     const SLIDER_GAUGE: SliderId = SliderId(1);
     const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
+
     const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
 
     const BTN_STATE_A: ButtonId = ButtonId(1);
@@ -1049,6 +1050,7 @@ pub mod demo {
         tl: TrafficLight,
         thing: Thing,
         gauge: Gauge,
+        name: String,
     }
 
     impl World for TheWorld {
@@ -1070,6 +1072,9 @@ pub mod demo {
                     state: ThingState::StateC,
                 },
                 gauge: Gauge::new(),
+                //name: String::new("Steve"),
+                //name: "Name: Steve".to_string(),
+                name: "Steve".to_string(),
             }
         }
 
@@ -1089,6 +1094,7 @@ pub mod demo {
         sp: Rc<RefCell<Polyline>>,
         arrow_head: Rc<RefCell<Polyline>>,
         stxt: Rc<RefCell<Text>>,
+        stxtname: Rc<RefCell<Text>>,
     }
 
     impl TheCanvas {
@@ -1191,11 +1197,22 @@ pub mod demo {
 
             // Add shape with handle
             let stxt: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-                eframe::egui::Pos2::new(350.0, 100.0),
-                "Waiting",
+                //eframe::egui::Pos2::new(350.0, 100.0),
+                eframe::egui::Pos2::new(325.0, 100.0),
+                "Unspecified state",
             )));
+            stxt.borrow_mut().set_color(Color32::DARK_GREEN);
             let stxt_cln: ShapeHandle = stxt.clone();
             canvas.add_shape(stxt_cln as ShapeHandle);
+
+            // Add shape with handle
+            let stxtname: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+                eframe::egui::Pos2::new(325.0, 60.0),
+                "Name: Steve",
+            )));
+            //stxtname.borrow_mut().set_color(Color32::DARK_GREEN);
+            let stxtname_cln: ShapeHandle = stxtname.clone();
+            canvas.add_shape(stxtname_cln as ShapeHandle);
 
             // ---- Create and add widgets as Box<dyn Widget>
             canvas.add_widget(Box::new(Space::new(15.0)));
@@ -1240,6 +1257,7 @@ pub mod demo {
                 sp,
                 arrow_head,
                 stxt,
+                stxtname,
             }
         }
 
@@ -1276,6 +1294,10 @@ pub mod demo {
                 }
                 _ => {}
             }
+            //let name: String = world.name.clone();
+            //let name: String = "Name: ".to_owned() + &world.name.clone();
+            let name: String = "Name: ".to_owned() + &world.name.clone();
+            self.stxtname.borrow_mut().set_text(name);
         }
     }
 
@@ -1349,8 +1371,8 @@ pub mod demo {
                 BTN_ENTER_NAME => {
                     self.dialog = ActiveDialog::EnterName {
                         title: "Enter name:".to_string(),
-                        value: "John".to_string(),
-                        //value: self.world.name.clone(), // preload from world (optional)
+                        //value: "John".to_string(),
+                        value: self.world.name.clone(), // preload from world (optional)
                     };
                 }
                 BTN_RUN_PAUSE => {
@@ -1482,7 +1504,9 @@ pub mod demo {
                         ui.add_space(10.0);
                         ui.horizontal(|ui| {
                             if ui.button("OK").clicked() {
-                                //self.world.name = value.clone(); // commit
+                                //self.world.name = value.clone();
+                                //self.world.name = "Name: ".to_owned() + &value.clone();
+                                self.world.name = value.clone();
                                 self.canvas.update(&self.world);
                                 close = true;
                             }
