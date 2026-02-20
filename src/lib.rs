@@ -1454,7 +1454,7 @@ pub mod demo {
                     egui::Modal::new(egui::Id::new("about_dialog")).show(ctx, |ui| {
                         ui.heading("About");
                         ui.separator();
-                        ui.label("gui_lib demo v0.1");
+                        ui.label("gui_lib demo v0.1\n");
                         ui.label("Written in Rust + egui");
 
                         ui.add_space(10.0);
@@ -1476,7 +1476,7 @@ pub mod demo {
                         ui.heading(title);
                         ui.separator();
 
-                        ui.label("Name:");
+                        ui.label("\nName:");
                         ui.text_edit_singleline(value);
 
                         ui.add_space(10.0);
