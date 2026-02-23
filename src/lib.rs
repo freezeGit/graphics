@@ -347,11 +347,20 @@ pub mod gui_lib {
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct DragFloatId(pub WidgetId);
 
+    pub type DialogId = u32; // TDJd
+
+    #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub struct TextEntryId(pub DialogId);
+
     #[derive(Debug, Clone, PartialEq)]
     pub enum WidgetMsg {
+        // Widget outcomes:
         ButtonClicked(ButtonId),
         SliderChanged(SliderId, f32),
         DragFloatChanged(DragFloatId, f32),
+        // Dialog outcomes:
+        DialogAcceptedText(TextEntryId, String),  //TDJd
+        //DialogCanceled(TextEntryId),  // TDJd
     }
 
     /// Trait for invoking any widget in the UI.
@@ -543,6 +552,137 @@ pub mod gui_lib {
             }
         }
     }
+
+    // ------------------------------
+
+    // TDJd
+    pub trait Dialog: std::fmt::Debug {
+        /// Returns true if it closed this frame.
+        fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
+    }
+    // pub trait Dialog: std::fmt::Debug {
+    //     fn do_modal(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) -> bool;
+    // }
+
+    // pub trait Widget: std::fmt::Debug {
+    //     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>);
+    // }
+
+    #[derive(Debug)]
+    pub struct TextEntry {
+        egui_id: egui::Id,  // What for? Why are fields pub?
+        id: TextEntryId,
+        title: String,
+        prompt: String,
+        text: String,
+    }
+    impl TextEntry {
+        pub fn new(
+            id: TextEntryId,
+            title: impl Into<String>,
+            prompt: impl Into<String>,
+            text: impl Into<String>,
+        ) -> Self {
+            Self {
+                egui_id: egui::Id::new(("text_entry_dialog", id)),
+                id,
+                title: title.into(),
+                prompt: prompt.into(),
+                text: text.into(),
+            }
+        }
+
+        // pub fn text(&self) -> String {
+        //     self.text
+        // }
+
+    }
+
+    //TDJd
+    impl Dialog for TextEntry {
+        fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+            let mut close = false;
+
+            egui::Modal::new(self.egui_id).show(ctx, |ui| {
+                ui.heading(&self.title);
+                ui.separator();
+
+                ui.label(&self.prompt);
+                ui.text_edit_singleline(&mut self.text);
+
+                ui.add_space(10.0);
+                ui.horizontal(|ui| {
+                    if ui.button("OK").clicked() {
+                        out.push(WidgetMsg::DialogAcceptedText(self.id, self.text.clone()));
+                        close = true;
+                    }
+                    if ui.button("Cancel").clicked() {
+                        close = true;
+                    }
+                });
+            });
+
+            close
+        }
+    }
+
+    // impl Dialog for TextEntry {
+    //     /// Returns true if it closed this frame.
+    //     //fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+    //     //fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+    //     //TDJd
+    //     //fn do_modal(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) -> bool {
+    //     fn do_modal(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) -> bool {
+    //         let mut close = false;
+    //
+    //         //egui::Modal::new(self.egui_id).show(ctx, |ui| {
+    //         //TDJd
+    //         egui::Modal::new(self.egui_id).show(ui.ctx(), |ui| {
+    //             ui.heading(&self.title);
+    //             ui.separator();
+    //
+    //             ui.label(&self.prompt);
+    //             ui.text_edit_singleline(&mut self.text);
+    //
+    //             ui.add_space(10.0);
+    //             ui.horizontal(|ui| {
+    //                 if ui.button("OK").clicked() {
+    //                     out.push(WidgetMsg::DialogAcceptedText(
+    //                         //self.dialog_id,
+    //                         self.id,
+    //                         self.text.clone(),
+    //                     ));
+    //                     close = true;
+    //                 }
+    //                 if ui.button("Cancel").clicked() {
+    //                     //out.push(WidgetMsg::DialogCanceled(self.dialog_id)); TDJd
+    //                     close = true;
+    //                 }
+    //             });
+    //         });
+    //
+    //         close
+    //     }
+    // }
+
+
+
+    // impl Dialog for TextEntry {
+    //     fn do_modal(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
+    //         let resp = ui.add(
+    //             egui::DragValue::new(&mut self.value)
+    //                 .range(self.range.clone())
+    //                 .prefix(&self.label)
+    //                 .fixed_decimals(self.decimal)
+    //                 .speed(self.speed),
+    //         );
+    //
+    //         if resp.changed() {
+    //             out.push(WidgetMsg::DragFloatChanged(self.id, self.value));
+    //         }
+    //     }
+    // }
+
 
     //---------------------------------------------------------------------------
 
@@ -982,13 +1122,13 @@ pub mod gui_lib {
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
     use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
-    use crate::gui_lib::TextFont;
+    use crate::gui_lib::{Dialog, DialogId, TextFont};
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
         BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator,
-        Slider, Space, Text, Timer,
+        Slider, Space, Text, Timer, TextEntry,
     };
-    use crate::gui_lib::{ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, WidgetMsg};
+    use crate::gui_lib::{ButtonId, DragFloatId, TextEntryId, Shape, ShapeHandle, SliderId, WidgetMsg};
     use crate::gui_lib::{LineStyle::*, World};
     use eframe::egui::Context;
     use egui::RichText;
@@ -1004,6 +1144,9 @@ pub mod demo {
     const BTN_RUN_PAUSE: ButtonId = ButtonId(3);
     const BTN_ABOUT: ButtonId = ButtonId(4);
     const BTN_ENTER_NAME: ButtonId = ButtonId(5);
+
+    //const DLG_ENTER_NAME: DialogId = 1;
+    const DLG_ENTER_NAME: TextEntryId = TextEntryId(1);
 
     #[derive(Debug)]
     struct Gauge {
@@ -1301,20 +1444,29 @@ pub mod demo {
         }
     }
 
-    #[derive(Debug)]
-    enum ActiveDialog {
-        None,
-        About,
-        EnterName {
-            title: String,
-            value: String, // buffer the user edits
-        },
-        ConfirmReset,
-        Settings {
-            speed: f32,
-            name: String,
-        },
-    }
+    // #[derive(Debug)]
+    // enum ActiveDialog {
+    //     None,
+    //     About,
+    //     EnterName {
+    //         title: String,
+    //         value: String, // buffer the user edits
+    //     },
+    //     ConfirmReset,
+    //     Settings {
+    //         speed: f32,
+    //         name: String,
+    //     },
+    // }
+// TDJd
+#[derive(Debug)]
+enum ActiveDialog {
+    None,
+    //About(gui_lib::MessageBox),           // if you make one later
+    About,           // if you make one later
+    //EnterName(gui_lib::TextEntry),
+    EnterName(TextEntry),
+}
 
     /// Main application structure.
     ///
@@ -1360,6 +1512,18 @@ pub mod demo {
                 WidgetMsg::DragFloatChanged(id, value) => {
                     self.handle_drag_float(id, value);
                 }
+                WidgetMsg::DialogAcceptedText(id, text) => {
+                    // Handle text dialog acceptance
+                    match id {
+                        DLG_ENTER_NAME => {
+                            self.world.name = text.clone();
+                            //self.canvas.update(&self.world);
+                        }
+                        _ => {}
+                    }
+                }
+
+                _ => {}
             }
         }
 
@@ -1368,13 +1532,51 @@ pub mod demo {
                 BTN_ABOUT => {
                     self.dialog = ActiveDialog::About;
                 }
+                // BTN_ENTER_NAME => {
+                //     self.dialog = ActiveDialog::EnterName {
+                //         title: "Enter name:".to_string(),
+                //         //value: "John".to_string(),
+                //         value: self.world.name.clone(), // preload from world (optional)
+                //     };
+                // }
+                // TDJd
                 BTN_ENTER_NAME => {
-                    self.dialog = ActiveDialog::EnterName {
-                        title: "Enter name:".to_string(),
-                        //value: "John".to_string(),
-                        value: self.world.name.clone(), // preload from world (optional)
-                    };
+                    self.dialog = ActiveDialog::EnterName(
+                        //gui_lib::TextEntryDialog::new(
+                        TextEntry::new(
+                            //"enter_name_dialog",
+                            DLG_ENTER_NAME,
+                            "Enter name",
+                            "Name:",
+                            self.world.name.clone(),
+                        )
+                    );
                 }
+                // BTN_ENTER_NAME => {
+                //     self.dialog = ActiveDialog::EnterName(
+                //         //gui_lib::TextEntryDialog::new(
+                //         TextEntry::new(
+                //             //"enter_name_dialog",
+                //             DLG_ENTER_NAME,
+                //             "Enter name",
+                //             "Name:",
+                //             self.world.name.clone(),
+                //         )
+                //     );
+                // }
+                // BTN_ENTER_NAME => {
+                //     self.dialog = ActiveDialog::EnterName(
+                //         //gui_lib::TextEntryDialog::new(
+                //         TextEntry::new(
+                //             "enter_name_dialog",
+                //             DLG_ENTER_NAME,
+                //             "Enter name",
+                //             "Name:",
+                //             self.world.name.clone(),
+                //         )
+                //     );
+                // }
+                //DLG_ENTER_NAME
                 BTN_RUN_PAUSE => {
                     if self.timer.is_running() {
                         self.timer.pause();
@@ -1413,7 +1615,90 @@ pub mod demo {
                 _ => {}
             }
         }
+
+        fn draw_dialog(&mut self, ctx: &egui::Context) {
+            let mut close = false;
+
+            match &mut self.dialog {
+                ActiveDialog::None => {}
+
+                ActiveDialog::About => {
+                    //let mut close = false;
+
+                    egui::Modal::new(egui::Id::new("about_dialog")).show(ctx, |ui| {
+                        ui.heading("About");
+                        ui.separator();
+                        ui.label("gui_lib demo v0.1\n");
+                        ui.label("Written in Rust + egui");
+
+                        ui.add_space(10.0);
+
+                        if ui.button("OK").clicked() {
+                            close = true;
+                        }
+                    });
+
+                    // if close {
+                    //     self.dialog = ActiveDialog::None;
+                    // }
+                }
+
+                // TDJd
+                //ActiveDialog::EnterName(TextEntry) => TextEntry.do_modal(ctx, &mut self.msgs),
+                // ActiveDialog::EnterName(TextEntry) => {
+                //     let mut close = false;
+                //     close = self.dialog.do_modal(ctx, &mut self.msgs);
+                //     if close {
+                //         self.dialog = ActiveDialog::None;
+                //     }
+                // }
+
+                ActiveDialog::EnterName(dlg) => {
+                    close = dlg.do_modal(ctx, &mut self.msgs);
+                    // if close {
+                    //     self.dialog = ActiveDialog::None;
+                    // }
+                }
+
+                // ActiveDialog::EnterName { title, value } => {
+                //     let mut close = false;
+                //
+                //     egui::Modal::new(egui::Id::new("enter_name_dialog")).show(ctx, |ui| {
+                //         ui.heading(title);
+                //         ui.separator();
+                //
+                //         ui.label("\nName:");
+                //         ui.text_edit_singleline(value);
+                //
+                //         ui.add_space(10.0);
+                //         ui.horizontal(|ui| {
+                //             if ui.button("OK").clicked() {
+                //                 //self.world.name = value.clone();
+                //                 //self.world.name = "Name: ".to_owned() + &value.clone();
+                //                 self.world.name = value.clone();
+                //                 self.canvas.update(&self.world);
+                //                 close = true;
+                //             }
+                //             if ui.button("Cancel").clicked() {
+                //                 close = true;
+                //             }
+                //         });
+                //     });
+                // }
+                //
+                //     if close {
+                //         self.dialog = ActiveDialog::None;
+                //     }
+                // }
+
+                _ => {}
+            }
+                if close {
+                    self.dialog = ActiveDialog::None;
+                }
+        }
     }
+    //}
 
     /// The eframe::App trait is the bridge between your custom application logic
     /// and the eframe framework that handles all the platform-specific details
@@ -1442,6 +1727,9 @@ pub mod demo {
             // and collect all messages from widgets
             self.canvas.canvas.render(ctx, &mut self.msgs);
 
+            // (3) collect messages from dialog (pushes into the SAME self.msgs)
+            self.draw_dialog(ctx);
+
             if !self.msgs.is_empty() {
                 // Move msgs out of self so we can mutably borrow self inside the loop.
                 let mut msgs = std::mem::take(&mut self.msgs);
@@ -1458,73 +1746,75 @@ pub mod demo {
             }
 
             // Display the active dialog. (Draw it last)
-            self.draw_dialog(ctx);
+            //self.draw_dialog(ctx);
 
             // schedule the next frame redraw after 16 milliseconds (60 FPS)
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
         }
     }
 
-    impl TheApp {
-        fn draw_dialog(&mut self, ctx: &egui::Context) {
-            match &mut self.dialog {
-                ActiveDialog::None => {}
-
-                ActiveDialog::About => {
-                    let mut close = false;
-
-                    egui::Modal::new(egui::Id::new("about_dialog")).show(ctx, |ui| {
-                        ui.heading("About");
-                        ui.separator();
-                        ui.label("gui_lib demo v0.1\n");
-                        ui.label("Written in Rust + egui");
-
-                        ui.add_space(10.0);
-
-                        if ui.button("OK").clicked() {
-                            close = true;
-                        }
-                    });
-
-                    if close {
-                        self.dialog = ActiveDialog::None;
-                    }
-                }
-
-                ActiveDialog::EnterName { title, value } => {
-                    let mut close = false;
-
-                    egui::Modal::new(egui::Id::new("enter_name_dialog")).show(ctx, |ui| {
-                        ui.heading(title);
-                        ui.separator();
-
-                        ui.label("\nName:");
-                        ui.text_edit_singleline(value);
-
-                        ui.add_space(10.0);
-                        ui.horizontal(|ui| {
-                            if ui.button("OK").clicked() {
-                                //self.world.name = value.clone();
-                                //self.world.name = "Name: ".to_owned() + &value.clone();
-                                self.world.name = value.clone();
-                                self.canvas.update(&self.world);
-                                close = true;
-                            }
-                            if ui.button("Cancel").clicked() {
-                                close = true;
-                            }
-                        });
-                    });
-
-                    if close {
-                        self.dialog = ActiveDialog::None;
-                    }
-                }
-
-                _ => {}
-            }
-        }
-    }
+    // impl TheApp {
+    //
+    // }
+    //     fn draw_dialog(&mut self, ctx: &egui::Context) {
+    //         match &mut self.dialog {
+    //             ActiveDialog::None => {}
+    //
+    //             ActiveDialog::About => {
+    //                 let mut close = false;
+    //
+    //                 egui::Modal::new(egui::Id::new("about_dialog")).show(ctx, |ui| {
+    //                     ui.heading("About");
+    //                     ui.separator();
+    //                     ui.label("gui_lib demo v0.1\n");
+    //                     ui.label("Written in Rust + egui");
+    //
+    //                     ui.add_space(10.0);
+    //
+    //                     if ui.button("OK").clicked() {
+    //                         close = true;
+    //                     }
+    //                 });
+    //
+    //                 if close {
+    //                     self.dialog = ActiveDialog::None;
+    //                 }
+    //             }
+    //
+    //             ActiveDialog::EnterName { title, value } => {
+    //                 let mut close = false;
+    //
+    //                 egui::Modal::new(egui::Id::new("enter_name_dialog")).show(ctx, |ui| {
+    //                     ui.heading(title);
+    //                     ui.separator();
+    //
+    //                     ui.label("\nName:");
+    //                     ui.text_edit_singleline(value);
+    //
+    //                     ui.add_space(10.0);
+    //                     ui.horizontal(|ui| {
+    //                         if ui.button("OK").clicked() {
+    //                             //self.world.name = value.clone();
+    //                             //self.world.name = "Name: ".to_owned() + &value.clone();
+    //                             self.world.name = value.clone();
+    //                             self.canvas.update(&self.world);
+    //                             close = true;
+    //                         }
+    //                         if ui.button("Cancel").clicked() {
+    //                             close = true;
+    //                         }
+    //                     });
+    //                 });
+    //
+    //                 if close {
+    //                     self.dialog = ActiveDialog::None;
+    //                 }
+    //             }
+    //
+    //             _ => {}
+    //         }
+    //     }
+    // }
 
     pub fn run_the_app() -> Result<(), eframe::Error> {
         eframe::run_native(
