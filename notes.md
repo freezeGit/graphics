@@ -848,3 +848,72 @@ use eframe::egui::{CentralPanel, Context};
 
     // ... existing code ...
 }
+
+ -------------------------------------------------
+// /// Exposed publicly
+//pub use demo::TheApp;
+//pub use eframe::egui::vec2;
+//pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
+//pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
+
+// Some unused dialog stuff:
+// ActiveDialog::ConfirmReset => {
+//     let mut close = false;
+//
+//     egui::Modal::new(egui::Id::new("confim_reset")).show(ctx, |ui| {
+//         ui.label("Reset simulation?");
+//
+//         ui.horizontal(|ui| {
+//             if ui.button("Yes").clicked() {
+//                 //self.world.reset(); //TDJ What is this
+//                 self.canvas.update(&self.world);
+//                 close = true;
+//             }
+//             if ui.button("No").clicked() {
+//                 close = true;
+//             }
+//         });
+//     });
+//
+//     if close {
+//         self.dialog = ActiveDialog::None;
+//     }
+// }
+
+// ActiveDialog::Settings { speed, name } => {
+//     let mut close = false;
+//
+//     //egui::Modal::new("settings_dialog")
+//     egui::Modal::new(egui::Id::new("settings_dialog")).show(ctx, |ui| {
+//         ui.heading("Settings");
+//
+//         ui.horizontal(|ui| {
+//             ui.label("Speed:");
+//             ui.add(egui::DragValue::new(speed).speed(0.1));
+//         });
+//
+//         ui.horizontal(|ui| {
+//             ui.label("Name:");
+//             ui.text_edit_singleline(name);
+//         });
+//
+//         ui.add_space(10.0);
+//
+//         ui.horizontal(|ui| {
+//             if ui.button("OK").clicked() {
+//                 //self.world.speed = *speed;  // TDJ Why this
+//                 //self.world.name = name.clone(); // TDJ Why this
+//                 self.canvas.update(&self.world);
+//                 close = true;
+//             }
+//
+//             if ui.button("Cancel").clicked() {
+//                 close = true;
+//             }
+//         });
+//     });
+//
+//     if close {
+//         self.dialog = ActiveDialog::None;
+//     }
+// }

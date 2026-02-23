@@ -11,8 +11,9 @@
 /// Module containing GUI components and utilities.
 ///
 /// This module provides basic building blocks for creating GUI applications,
-/// including buttons, canvass and visual styling utilities. It implements
-/// a custom drawing system through the `Draw` trait.
+/// including buttons, canvas and visual styling utilities. It implements
+/// a custom drawing system through the `Draw` trait. It implements a custom widget system through the
+/// 'Widget' trait, and a custom modal dialog system through th 'do_modal' trait.
 
 pub mod gui_lib {
     //use eframe::egui::Response;
@@ -58,7 +59,6 @@ pub mod gui_lib {
     }
     //----------------------------------------------------------
 
-    //#[derive(Default, Debug)]
     #[derive(Debug)]
     pub struct Timer {
         interval: f64,
@@ -359,7 +359,7 @@ pub mod gui_lib {
         SliderChanged(SliderId, f32),
         DragFloatChanged(DragFloatId, f32),
         // Dialog outcomes:
-        DialogAcceptedText(TextEntryId, String),  //TDJd
+        DialogAcceptedText(TextEntryId, String),
         //DialogCanceled(TextEntryId),  // TDJd
     }
 
@@ -374,7 +374,6 @@ pub mod gui_lib {
     }
 
     impl Space {
-        //pub fn new(id: SpaceId, size: f32) -> Self {
         pub fn new(size: f32) -> Self {
             Self { size }
         }
@@ -438,7 +437,6 @@ pub mod gui_lib {
     }
 
     impl Button {
-        // Constructor method
         pub fn new(id: ButtonId, label: impl Into<String>, width: f32, height: f32) -> Self {
             Self {
                 id,
@@ -555,22 +553,14 @@ pub mod gui_lib {
 
     // ------------------------------
 
-    // TDJd
     pub trait Dialog: std::fmt::Debug {
         /// Returns true if it closed this frame.
         fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
     }
-    // pub trait Dialog: std::fmt::Debug {
-    //     fn do_modal(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) -> bool;
-    // }
-
-    // pub trait Widget: std::fmt::Debug {
-    //     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>);
-    // }
 
     #[derive(Debug)]
     pub struct TextEntry {
-        egui_id: egui::Id,  // What for? Why are fields pub?
+        egui_id: egui::Id, // What for? Why are fields pub?
         id: TextEntryId,
         title: String,
         prompt: String,
@@ -591,14 +581,8 @@ pub mod gui_lib {
                 text: text.into(),
             }
         }
-
-        // pub fn text(&self) -> String {
-        //     self.text
-        // }
-
     }
 
-    //TDJd
     impl Dialog for TextEntry {
         fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
             let mut close = false;
@@ -625,64 +609,6 @@ pub mod gui_lib {
             close
         }
     }
-
-    // impl Dialog for TextEntry {
-    //     /// Returns true if it closed this frame.
-    //     //fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
-    //     //fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
-    //     //TDJd
-    //     //fn do_modal(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) -> bool {
-    //     fn do_modal(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) -> bool {
-    //         let mut close = false;
-    //
-    //         //egui::Modal::new(self.egui_id).show(ctx, |ui| {
-    //         //TDJd
-    //         egui::Modal::new(self.egui_id).show(ui.ctx(), |ui| {
-    //             ui.heading(&self.title);
-    //             ui.separator();
-    //
-    //             ui.label(&self.prompt);
-    //             ui.text_edit_singleline(&mut self.text);
-    //
-    //             ui.add_space(10.0);
-    //             ui.horizontal(|ui| {
-    //                 if ui.button("OK").clicked() {
-    //                     out.push(WidgetMsg::DialogAcceptedText(
-    //                         //self.dialog_id,
-    //                         self.id,
-    //                         self.text.clone(),
-    //                     ));
-    //                     close = true;
-    //                 }
-    //                 if ui.button("Cancel").clicked() {
-    //                     //out.push(WidgetMsg::DialogCanceled(self.dialog_id)); TDJd
-    //                     close = true;
-    //                 }
-    //             });
-    //         });
-    //
-    //         close
-    //     }
-    // }
-
-
-
-    // impl Dialog for TextEntry {
-    //     fn do_modal(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
-    //         let resp = ui.add(
-    //             egui::DragValue::new(&mut self.value)
-    //                 .range(self.range.clone())
-    //                 .prefix(&self.label)
-    //                 .fixed_decimals(self.decimal)
-    //                 .speed(self.speed),
-    //         );
-    //
-    //         if resp.changed() {
-    //             out.push(WidgetMsg::DragFloatChanged(self.id, self.value));
-    //         }
-    //     }
-    // }
-
 
     //---------------------------------------------------------------------------
 
@@ -1054,12 +980,12 @@ pub mod gui_lib {
 /// framework and a custom `gui_lib` library to render various graphical components.
 ///
 /// # Modules
-/// - The `demo` module defines an application structure (`DemoApp`) and its behavior.
+/// - The `demo` module defines an application structure (`TheApp`) and its behavior.
 /// - Uses utilities and components from the `gui_lib` module.
 ///
 /// # Components
 ///
-/// ## DemoApp
+/// ## TheApp
 /// The main structure and entry point of the application.
 /// - Contains a `Canvas` for holding a collection of shapes.
 /// - Provides methods for creating and updating the UI.
@@ -1072,6 +998,8 @@ pub mod gui_lib {
 /// - `Circle`: A circular shape with customizable size, fill color, and outline.
 /// - `Rectangle`: A rectangular shape with customizable size, position, and fill color.
 /// - `Polyline`: A series of connected line segments with customizable line width and color.
+/// - `Text`: A text label with customizable position, color, and font size.
+///  - Other Shapes can be added as needed.
 ///
 /// # Animation
 /// - Demonstrates basic animations and state toggles using time-based checks.
@@ -1080,10 +1008,10 @@ pub mod gui_lib {
 /// # Usage
 ///
 /// ## Running the Application
-/// Call the `run_demo()` function to start the application.
+/// Call the `run_the_app()` function to start the application.
 /// It initializes an `eframe` native window and sets up the demo layout and visuals.
 ///
-/// demo::run_demo()
+/// demo::run_the_app()
 ///
 /// ## Modifying Shapes
 /// The application supports dynamic modification of shape properties, such as:
@@ -1095,14 +1023,15 @@ pub mod gui_lib {
 /// - Use the `Shape` trait to define custom graphical components.
 ///
 /// # Example
-/// use super::demo::run_demo;
+/// use super::demo::run_the_app;
 ///
 /// fn main() -> Result<(), eframe::Error> {
-///     run_demo()
+///    run_the_app()
 /// }
 ///
 /// # Notes
-/// - `ctx.request_repaint_after()` ensures smooth animations by updating the frame at a fixed interval.
+/// - `ctx.request_repaint_after()` ensures smooth interface by updating the frame at a fixed interval.
+/// - Animations may be run with a second (slower) Timer loop.
 ///
 /// # Modules Used:
 /// - Uses core functionality from:
@@ -1122,13 +1051,15 @@ pub mod gui_lib {
 /// using the components defined in the `gui_lib` module.
 pub mod demo {
     use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
-    use crate::gui_lib::{Dialog, DialogId, TextFont};
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
         BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator,
-        Slider, Space, Text, Timer, TextEntry,
+        Slider, Space, Text, TextEntry, Timer,
     };
-    use crate::gui_lib::{ButtonId, DragFloatId, TextEntryId, Shape, ShapeHandle, SliderId, WidgetMsg};
+    use crate::gui_lib::{
+        ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, TextEntryId, WidgetMsg,
+    };
+    use crate::gui_lib::{Dialog, DialogId, TextFont};
     use crate::gui_lib::{LineStyle::*, World};
     use eframe::egui::Context;
     use egui::RichText;
@@ -1215,8 +1146,6 @@ pub mod demo {
                     state: ThingState::StateC,
                 },
                 gauge: Gauge::new(),
-                //name: String::new("Steve"),
-                //name: "Name: Steve".to_string(),
                 name: "Steve".to_string(),
             }
         }
@@ -1259,7 +1188,6 @@ pub mod demo {
                         eframe::egui::Pos2::new(20.0, 0.0),
                     ],
                 )));
-                //vee.borrow_mut().set_line_width(4.0);
                 let vee_cln: ShapeHandle = vee.clone();
                 canvas.add_shape(vee_cln as ShapeHandle);
                 y += 10.0;
@@ -1437,36 +1365,20 @@ pub mod demo {
                 }
                 _ => {}
             }
-            //let name: String = world.name.clone();
-            //let name: String = "Name: ".to_owned() + &world.name.clone();
+
+            //Update name
             let name: String = "Name: ".to_owned() + &world.name.clone();
             self.stxtname.borrow_mut().set_text(name);
         }
     }
 
-    // #[derive(Debug)]
-    // enum ActiveDialog {
-    //     None,
-    //     About,
-    //     EnterName {
-    //         title: String,
-    //         value: String, // buffer the user edits
-    //     },
-    //     ConfirmReset,
-    //     Settings {
-    //         speed: f32,
-    //         name: String,
-    //     },
-    // }
-// TDJd
-#[derive(Debug)]
-enum ActiveDialog {
-    None,
-    //About(gui_lib::MessageBox),           // if you make one later
-    About,           // if you make one later
-    //EnterName(gui_lib::TextEntry),
-    EnterName(TextEntry),
-}
+    #[derive(Debug)]
+    enum ActiveDialog {
+        None,
+        //About(gui_lib::MessageBox),           // if you make one later
+        About, // if you make one later
+        EnterName(TextEntry),
+    }
 
     /// Main application structure.
     ///
@@ -1487,7 +1399,7 @@ enum ActiveDialog {
         /// intended to demonstrate usage of gui_lib.
         ///
         /// # Returns
-        /// A new `DemoApp` instance initialized with a canvas
+        /// A new `TheApp` instance initialized with a canvas
         /// and world.
 
         pub fn new() -> Self {
@@ -1532,14 +1444,6 @@ enum ActiveDialog {
                 BTN_ABOUT => {
                     self.dialog = ActiveDialog::About;
                 }
-                // BTN_ENTER_NAME => {
-                //     self.dialog = ActiveDialog::EnterName {
-                //         title: "Enter name:".to_string(),
-                //         //value: "John".to_string(),
-                //         value: self.world.name.clone(), // preload from world (optional)
-                //     };
-                // }
-                // TDJd
                 BTN_ENTER_NAME => {
                     self.dialog = ActiveDialog::EnterName(
                         //gui_lib::TextEntryDialog::new(
@@ -1549,34 +1453,9 @@ enum ActiveDialog {
                             "Enter name",
                             "Name:",
                             self.world.name.clone(),
-                        )
+                        ),
                     );
                 }
-                // BTN_ENTER_NAME => {
-                //     self.dialog = ActiveDialog::EnterName(
-                //         //gui_lib::TextEntryDialog::new(
-                //         TextEntry::new(
-                //             //"enter_name_dialog",
-                //             DLG_ENTER_NAME,
-                //             "Enter name",
-                //             "Name:",
-                //             self.world.name.clone(),
-                //         )
-                //     );
-                // }
-                // BTN_ENTER_NAME => {
-                //     self.dialog = ActiveDialog::EnterName(
-                //         //gui_lib::TextEntryDialog::new(
-                //         TextEntry::new(
-                //             "enter_name_dialog",
-                //             DLG_ENTER_NAME,
-                //             "Enter name",
-                //             "Name:",
-                //             self.world.name.clone(),
-                //         )
-                //     );
-                // }
-                //DLG_ENTER_NAME
                 BTN_RUN_PAUSE => {
                     if self.timer.is_running() {
                         self.timer.pause();
@@ -1623,8 +1502,6 @@ enum ActiveDialog {
                 ActiveDialog::None => {}
 
                 ActiveDialog::About => {
-                    //let mut close = false;
-
                     egui::Modal::new(egui::Id::new("about_dialog")).show(ctx, |ui| {
                         ui.heading("About");
                         ui.separator();
@@ -1637,21 +1514,7 @@ enum ActiveDialog {
                             close = true;
                         }
                     });
-
-                    // if close {
-                    //     self.dialog = ActiveDialog::None;
-                    // }
                 }
-
-                // TDJd
-                //ActiveDialog::EnterName(TextEntry) => TextEntry.do_modal(ctx, &mut self.msgs),
-                // ActiveDialog::EnterName(TextEntry) => {
-                //     let mut close = false;
-                //     close = self.dialog.do_modal(ctx, &mut self.msgs);
-                //     if close {
-                //         self.dialog = ActiveDialog::None;
-                //     }
-                // }
 
                 ActiveDialog::EnterName(dlg) => {
                     close = dlg.do_modal(ctx, &mut self.msgs);
@@ -1660,45 +1523,13 @@ enum ActiveDialog {
                     // }
                 }
 
-                // ActiveDialog::EnterName { title, value } => {
-                //     let mut close = false;
-                //
-                //     egui::Modal::new(egui::Id::new("enter_name_dialog")).show(ctx, |ui| {
-                //         ui.heading(title);
-                //         ui.separator();
-                //
-                //         ui.label("\nName:");
-                //         ui.text_edit_singleline(value);
-                //
-                //         ui.add_space(10.0);
-                //         ui.horizontal(|ui| {
-                //             if ui.button("OK").clicked() {
-                //                 //self.world.name = value.clone();
-                //                 //self.world.name = "Name: ".to_owned() + &value.clone();
-                //                 self.world.name = value.clone();
-                //                 self.canvas.update(&self.world);
-                //                 close = true;
-                //             }
-                //             if ui.button("Cancel").clicked() {
-                //                 close = true;
-                //             }
-                //         });
-                //     });
-                // }
-                //
-                //     if close {
-                //         self.dialog = ActiveDialog::None;
-                //     }
-                // }
-
                 _ => {}
             }
-                if close {
-                    self.dialog = ActiveDialog::None;
-                }
+            if close {
+                self.dialog = ActiveDialog::None;
+            }
         }
     }
-    //}
 
     /// The eframe::App trait is the bridge between your custom application logic
     /// and the eframe framework that handles all the platform-specific details
@@ -1706,8 +1537,8 @@ enum ActiveDialog {
     ///
     /// In this demonstration app a timer loop is used to advance the world at a rate
     /// slower than the frame rate of the event loop. This allows better control of
-    /// running a simulation. For a simpler simulation the world can advance with the
-    /// frame rate.
+    /// running a simulation. For a simpler simulation the world might just advance
+    /// with the frame rate.
     /// The frame rate should be set for smooth widget interaction. Typically 60 FPS,
     /// (16 millisecond interval) but can be faster if the simulation is fast enough.
     /// If there is no simulation there is no need to call world.advance.
@@ -1727,13 +1558,15 @@ enum ActiveDialog {
             // and collect all messages from widgets
             self.canvas.canvas.render(ctx, &mut self.msgs);
 
-            // (3) collect messages from dialog (pushes into the SAME self.msgs)
+            // collect messages from active dialog (pushes into the SAME self.msgs)
+            // Must be after render, so that dialogs can be drawn on top of everything else
+            // and before handle_msg, so that dialogs can be closed by the user.
             self.draw_dialog(ctx);
 
+            // Handle messages if any exist
             if !self.msgs.is_empty() {
                 // Move msgs out of self so we can mutably borrow self inside the loop.
                 let mut msgs = std::mem::take(&mut self.msgs);
-
                 // Handle messages
                 for msg in msgs.drain(..) {
                     self.handle_msg(msg);
@@ -1744,77 +1577,10 @@ enum ActiveDialog {
                 // Update canvas once after all state changes:
                 self.canvas.update(&self.world);
             }
-
-            // Display the active dialog. (Draw it last)
-            //self.draw_dialog(ctx);
-
             // schedule the next frame redraw after 16 milliseconds (60 FPS)
             ctx.request_repaint_after(std::time::Duration::from_millis(16));
         }
     }
-
-    // impl TheApp {
-    //
-    // }
-    //     fn draw_dialog(&mut self, ctx: &egui::Context) {
-    //         match &mut self.dialog {
-    //             ActiveDialog::None => {}
-    //
-    //             ActiveDialog::About => {
-    //                 let mut close = false;
-    //
-    //                 egui::Modal::new(egui::Id::new("about_dialog")).show(ctx, |ui| {
-    //                     ui.heading("About");
-    //                     ui.separator();
-    //                     ui.label("gui_lib demo v0.1\n");
-    //                     ui.label("Written in Rust + egui");
-    //
-    //                     ui.add_space(10.0);
-    //
-    //                     if ui.button("OK").clicked() {
-    //                         close = true;
-    //                     }
-    //                 });
-    //
-    //                 if close {
-    //                     self.dialog = ActiveDialog::None;
-    //                 }
-    //             }
-    //
-    //             ActiveDialog::EnterName { title, value } => {
-    //                 let mut close = false;
-    //
-    //                 egui::Modal::new(egui::Id::new("enter_name_dialog")).show(ctx, |ui| {
-    //                     ui.heading(title);
-    //                     ui.separator();
-    //
-    //                     ui.label("\nName:");
-    //                     ui.text_edit_singleline(value);
-    //
-    //                     ui.add_space(10.0);
-    //                     ui.horizontal(|ui| {
-    //                         if ui.button("OK").clicked() {
-    //                             //self.world.name = value.clone();
-    //                             //self.world.name = "Name: ".to_owned() + &value.clone();
-    //                             self.world.name = value.clone();
-    //                             self.canvas.update(&self.world);
-    //                             close = true;
-    //                         }
-    //                         if ui.button("Cancel").clicked() {
-    //                             close = true;
-    //                         }
-    //                     });
-    //                 });
-    //
-    //                 if close {
-    //                     self.dialog = ActiveDialog::None;
-    //                 }
-    //             }
-    //
-    //             _ => {}
-    //         }
-    //     }
-    // }
 
     pub fn run_the_app() -> Result<(), eframe::Error> {
         eframe::run_native(
@@ -1829,73 +1595,3 @@ enum ActiveDialog {
     }
 } // module demo
 
-// /// Exposed publicly
-//pub use demo::TheApp;
-//pub use eframe::egui::vec2;
-//pub use gui_lib::{Button, Draw, Canvas, custom_light_visuals};
-//pub use gui_lib::{BasicCanvas, Button, custom_light_visuals};
-
-
-// Some unused dialog stuff:
-// ActiveDialog::ConfirmReset => {
-//     let mut close = false;
-//
-//     egui::Modal::new(egui::Id::new("confim_reset")).show(ctx, |ui| {
-//         ui.label("Reset simulation?");
-//
-//         ui.horizontal(|ui| {
-//             if ui.button("Yes").clicked() {
-//                 //self.world.reset(); //TDJ What is this
-//                 self.canvas.update(&self.world);
-//                 close = true;
-//             }
-//             if ui.button("No").clicked() {
-//                 close = true;
-//             }
-//         });
-//     });
-//
-//     if close {
-//         self.dialog = ActiveDialog::None;
-//     }
-// }
-
-// ActiveDialog::Settings { speed, name } => {
-//     let mut close = false;
-//
-//     //egui::Modal::new("settings_dialog")
-//     egui::Modal::new(egui::Id::new("settings_dialog")).show(ctx, |ui| {
-//         ui.heading("Settings");
-//
-//         ui.horizontal(|ui| {
-//             ui.label("Speed:");
-//             ui.add(egui::DragValue::new(speed).speed(0.1));
-//         });
-//
-//         ui.horizontal(|ui| {
-//             ui.label("Name:");
-//             ui.text_edit_singleline(name);
-//         });
-//
-//         ui.add_space(10.0);
-//
-//         ui.horizontal(|ui| {
-//             if ui.button("OK").clicked() {
-//                 //self.world.speed = *speed;  // TDJ Why this
-//                 //self.world.name = name.clone(); // TDJ Why this
-//                 self.canvas.update(&self.world);
-//                 close = true;
-//             }
-//
-//             if ui.button("Cancel").clicked() {
-//                 close = true;
-//             }
-//         });
-//     });
-//
-//     if close {
-//         self.dialog = ActiveDialog::None;
-//     }
-// }
-
-//xxx
