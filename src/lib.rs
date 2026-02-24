@@ -1375,7 +1375,6 @@ pub mod demo {
     #[derive(Debug)]
     enum ActiveDialog {
         None,
-        //About(gui_lib::MessageBox),           // if you make one later
         About, // if you make one later
         EnterName(TextEntry),
     }
@@ -1425,16 +1424,8 @@ pub mod demo {
                     self.handle_drag_float(id, value);
                 }
                 WidgetMsg::DialogAcceptedText(id, text) => {
-                    // Handle text dialog acceptance
-                    match id {
-                        DLG_ENTER_NAME => {
-                            self.world.name = text.clone();
-                            //self.canvas.update(&self.world);
-                        }
-                        _ => {}
-                    }
-                }
-
+                    self.handle_text_entry(id, text);
+                 }
                 _ => {}
             }
         }
@@ -1445,16 +1436,13 @@ pub mod demo {
                     self.dialog = ActiveDialog::About;
                 }
                 BTN_ENTER_NAME => {
-                    self.dialog = ActiveDialog::EnterName(
-                        //gui_lib::TextEntryDialog::new(
-                        TextEntry::new(
-                            //"enter_name_dialog",
-                            DLG_ENTER_NAME,
-                            "Enter name",
-                            "Name:",
-                            self.world.name.clone(),
-                        ),
-                    );
+                    self.dialog = ActiveDialog::EnterName(TextEntry::new(
+                        //"enter_name_dialog",
+                        DLG_ENTER_NAME,
+                        "Enter name",
+                        "Name:",
+                        self.world.name.clone(),
+                    ));
                 }
                 BTN_RUN_PAUSE => {
                     if self.timer.is_running() {
@@ -1495,6 +1483,15 @@ pub mod demo {
             }
         }
 
+        fn handle_text_entry(&mut self, id: TextEntryId, text: String) {
+            match id {
+                DLG_ENTER_NAME => {
+                    self.world.name = text.clone();
+                }
+                _ => {}
+            }
+        }
+
         fn draw_dialog(&mut self, ctx: &egui::Context) {
             let mut close = false;
 
@@ -1518,9 +1515,6 @@ pub mod demo {
 
                 ActiveDialog::EnterName(dlg) => {
                     close = dlg.do_modal(ctx, &mut self.msgs);
-                    // if close {
-                    //     self.dialog = ActiveDialog::None;
-                    // }
                 }
 
                 _ => {}
@@ -1558,7 +1552,7 @@ pub mod demo {
             // and collect all messages from widgets
             self.canvas.canvas.render(ctx, &mut self.msgs);
 
-            // collect messages from active dialog (pushes into the SAME self.msgs)
+            // collect messages from the active dialog (pushes into the SAME self.msgs)
             // Must be after render, so that dialogs can be drawn on top of everything else
             // and before handle_msg, so that dialogs can be closed by the user.
             self.draw_dialog(ctx);
@@ -1594,4 +1588,3 @@ pub mod demo {
         )
     }
 } // module demo
-
