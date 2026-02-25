@@ -347,10 +347,14 @@ pub mod gui_lib {
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct DragFloatId(pub WidgetId);
 
+    // -------------------------------
+
     pub type DialogId = u32; // TDJd
 
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
     pub struct TextEntryDlgId(pub DialogId);
+    #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+    pub struct DragFloatDlgId(pub DialogId);
 
     #[derive(Debug, Clone, PartialEq)]
     pub enum WidgetMsg {
@@ -361,6 +365,7 @@ pub mod gui_lib {
         // Dialog outcomes:
         DialogAcceptedText(TextEntryDlgId, String),
         //DialogCanceled(TextEntryDlgId),  // TDJd
+        //DialogAcceptedDragFloat(DragFloatDlgId, f32),  // TDJd
     }
 
     /// Trait for invoking any widget in the UI.
@@ -566,6 +571,7 @@ pub mod gui_lib {
         prompt: String,
         text: String,
     }
+
     impl TextEntryDlg {
         pub fn new(
             id: TextEntryDlgId,
@@ -609,6 +615,59 @@ pub mod gui_lib {
             close
         }
     }
+
+    #[derive(Debug)]
+    pub struct DragFloatDlg {
+        egui_id: egui::Id,
+        id: DragFloatDlgId,
+        title: String,
+        prompt: String,
+        value: f32,
+    }
+
+    impl DragFloatDlg {
+        pub fn new(
+            id: DragFloatDlgId,
+            title: impl Into<String>,
+            prompt: impl Into<String>,
+            value: f32,
+        ) -> Self {
+            Self {
+                egui_id: egui::Id::new(("text_entry_dialog", id)),
+                id,
+                title: title.into(),
+                prompt: prompt.into(),
+                value,
+            }
+        }
+    }
+    //
+    // impl Dialog for TextEntryDlg {
+    //     fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+    //         let mut close = false;
+    //
+    //         egui::Modal::new(self.egui_id).show(ctx, |ui| {
+    //             ui.heading(&self.title);
+    //             ui.separator();
+    //
+    //             ui.label(&self.prompt);
+    //             ui.text_edit_singleline(&mut self.text);
+    //
+    //             ui.add_space(10.0);
+    //             ui.horizontal(|ui| {
+    //                 if ui.button("OK").clicked() {
+    //                     out.push(WidgetMsg::DialogAcceptedText(self.id, self.text.clone()));
+    //                     close = true;
+    //                 }
+    //                 if ui.button("Cancel").clicked() {
+    //                     close = true;
+    //                 }
+    //             });
+    //         });
+    //
+    //         close
+    //     }
+    // }
 
     //---------------------------------------------------------------------------
 
