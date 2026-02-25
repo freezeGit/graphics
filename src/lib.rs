@@ -350,7 +350,7 @@ pub mod gui_lib {
     pub type DialogId = u32; // TDJd
 
     #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-    pub struct TextEntryId(pub DialogId);
+    pub struct TextEntryDlgId(pub DialogId);
 
     #[derive(Debug, Clone, PartialEq)]
     pub enum WidgetMsg {
@@ -359,8 +359,8 @@ pub mod gui_lib {
         SliderChanged(SliderId, f32),
         DragFloatChanged(DragFloatId, f32),
         // Dialog outcomes:
-        DialogAcceptedText(TextEntryId, String),
-        //DialogCanceled(TextEntryId),  // TDJd
+        DialogAcceptedText(TextEntryDlgId, String),
+        //DialogCanceled(TextEntryDlgId),  // TDJd
     }
 
     /// Trait for invoking any widget in the UI.
@@ -559,16 +559,16 @@ pub mod gui_lib {
     }
 
     #[derive(Debug)]
-    pub struct TextEntry {
+    pub struct TextEntryDlg {
         egui_id: egui::Id, // What for? Why are fields pub?
-        id: TextEntryId,
+        id: TextEntryDlgId,
         title: String,
         prompt: String,
         text: String,
     }
-    impl TextEntry {
+    impl TextEntryDlg {
         pub fn new(
-            id: TextEntryId,
+            id: TextEntryDlgId,
             title: impl Into<String>,
             prompt: impl Into<String>,
             text: impl Into<String>,
@@ -583,7 +583,7 @@ pub mod gui_lib {
         }
     }
 
-    impl Dialog for TextEntry {
+    impl Dialog for TextEntryDlg {
         fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
             let mut close = false;
 
@@ -1054,10 +1054,10 @@ pub mod demo {
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
         BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator,
-        Slider, Space, Text, TextEntry, Timer,
+        Slider, Space, Text, TextEntryDlg, Timer,
     };
     use crate::gui_lib::{
-        ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, TextEntryId, WidgetMsg,
+        ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, TextEntryDlgId, WidgetMsg,
     };
     use crate::gui_lib::{Dialog, DialogId, TextFont};
     use crate::gui_lib::{LineStyle::*, World};
@@ -1077,7 +1077,7 @@ pub mod demo {
     const BTN_ENTER_NAME: ButtonId = ButtonId(5);
 
     //const DLG_ENTER_NAME: DialogId = 1;
-    const DLG_ENTER_NAME: TextEntryId = TextEntryId(1);
+    const DLG_ENTER_NAME: TextEntryDlgId = TextEntryDlgId(1);
 
     #[derive(Debug)]
     struct Gauge {
@@ -1167,6 +1167,7 @@ pub mod demo {
         arrow_head: Rc<RefCell<Polyline>>,
         stxt: Rc<RefCell<Text>>,
         stxtname: Rc<RefCell<Text>>,
+        stxtval: Rc<RefCell<Text>>,
     }
 
     impl TheCanvas {
@@ -1267,23 +1268,29 @@ pub mod demo {
             canvas.add_shape(arrow_head_cln as ShapeHandle);
 
             // Add shape with handle
-            let stxt: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-                //eframe::egui::Pos2::new(350.0, 100.0),
-                eframe::egui::Pos2::new(325.0, 100.0),
-                "Unspecified state",
-            )));
+            let stxt: Rc<RefCell<Text>> =
+                Rc::new(RefCell::new(Text::new(egui::Pos2::new(345.0, 175.0), "")));
             stxt.borrow_mut().set_color(Color32::DARK_GREEN);
             let stxt_cln: ShapeHandle = stxt.clone();
             canvas.add_shape(stxt_cln as ShapeHandle);
 
             // Add shape with handle
             let stxtname: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-                eframe::egui::Pos2::new(325.0, 60.0),
+                egui::Pos2::new(325.0, 60.0),
+                //egui::Pos2::new(300.0, 75.0),
                 "Name: Steve",
             )));
-            //stxtname.borrow_mut().set_color(Color32::DARK_GREEN);
             let stxtname_cln: ShapeHandle = stxtname.clone();
             canvas.add_shape(stxtname_cln as ShapeHandle);
+
+            // Add shape with handle
+            let stxtval: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+                eframe::egui::Pos2::new(325.0, 100.0),
+                format!("{}{}", "Value: ", 0.0),
+            )));
+            //stxtval.borrow_mut().set_color(Color32::DARK_GREEN);
+            let stxtval_cln: ShapeHandle = stxtval.clone();
+            canvas.add_shape(stxtval_cln as ShapeHandle);
 
             // ---- Create and add widgets as Box<dyn Widget>
             canvas.add_widget(Box::new(Space::new(15.0)));
@@ -1329,6 +1336,7 @@ pub mod demo {
                 arrow_head,
                 stxt,
                 stxtname,
+                stxtval,
             }
         }
 
@@ -1369,6 +1377,12 @@ pub mod demo {
             //Update name
             let name: String = "Name: ".to_owned() + &world.name.clone();
             self.stxtname.borrow_mut().set_text(name);
+
+            //Update val_string
+            let val = 42.3;
+            //let val_string: String = val.to_string();
+            let val_string: String = format!("{}{}", "Value: ", val);
+            self.stxtval.borrow_mut().set_text(val_string);
         }
     }
 
@@ -1376,7 +1390,7 @@ pub mod demo {
     enum ActiveDialog {
         None,
         About, // if you make one later
-        EnterName(TextEntry),
+        EnterName(TextEntryDlg),
     }
 
     /// Main application structure.
@@ -1425,7 +1439,7 @@ pub mod demo {
                 }
                 WidgetMsg::DialogAcceptedText(id, text) => {
                     self.handle_text_entry(id, text);
-                 }
+                }
                 _ => {}
             }
         }
@@ -1436,7 +1450,7 @@ pub mod demo {
                     self.dialog = ActiveDialog::About;
                 }
                 BTN_ENTER_NAME => {
-                    self.dialog = ActiveDialog::EnterName(TextEntry::new(
+                    self.dialog = ActiveDialog::EnterName(TextEntryDlg::new(
                         //"enter_name_dialog",
                         DLG_ENTER_NAME,
                         "Enter name",
@@ -1483,7 +1497,7 @@ pub mod demo {
             }
         }
 
-        fn handle_text_entry(&mut self, id: TextEntryId, text: String) {
+        fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
             match id {
                 DLG_ENTER_NAME => {
                     self.world.name = text.clone();
