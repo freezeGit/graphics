@@ -652,13 +652,11 @@ pub mod gui_lib {
                 ui.separator();
 
                 ui.label(&self.prompt);
-                //ui.text_edit_singleline(&mut self.text);
                 ui.add(egui::DragValue::new(&mut self.value));
 
                 ui.add_space(10.0);
                 ui.horizontal(|ui| {
                     if ui.button("OK").clicked() {
-                        //out.push(WidgetMsg::DialogAcceptedDragFloat(self.id, self.value.clone()));
                         out.push(WidgetMsg::DialogAcceptedDragFloat(self.id, self.value));
                         close = true;
                     }
