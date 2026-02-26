@@ -365,7 +365,7 @@ pub mod gui_lib {
         // Dialog outcomes:
         DialogAcceptedText(TextEntryDlgId, String),
         //DialogCanceled(TextEntryDlgId),  // TDJd
-        //DialogAcceptedDragFloat(DragFloatDlgId, f32),  // TDJd
+        DialogAcceptedDragFloat(DragFloatDlgId, f32),  // TDJd
     }
 
     /// Trait for invoking any widget in the UI.
@@ -603,6 +603,7 @@ pub mod gui_lib {
                 ui.add_space(10.0);
                 ui.horizontal(|ui| {
                     if ui.button("OK").clicked() {
+                        //out.push(WidgetMsg::DialogAcceptedText(self.id, self.text.clone()));
                         out.push(WidgetMsg::DialogAcceptedText(self.id, self.text.clone()));
                         close = true;
                     }
@@ -641,33 +642,35 @@ pub mod gui_lib {
             }
         }
     }
-    //
-    // impl Dialog for TextEntryDlg {
-    //     fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
-    //         let mut close = false;
-    //
-    //         egui::Modal::new(self.egui_id).show(ctx, |ui| {
-    //             ui.heading(&self.title);
-    //             ui.separator();
-    //
-    //             ui.label(&self.prompt);
-    //             ui.text_edit_singleline(&mut self.text);
-    //
-    //             ui.add_space(10.0);
-    //             ui.horizontal(|ui| {
-    //                 if ui.button("OK").clicked() {
-    //                     out.push(WidgetMsg::DialogAcceptedText(self.id, self.text.clone()));
-    //                     close = true;
-    //                 }
-    //                 if ui.button("Cancel").clicked() {
-    //                     close = true;
-    //                 }
-    //             });
-    //         });
-    //
-    //         close
-    //     }
-    // }
+
+    impl Dialog for DragFloatDlg {
+        fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+            let mut close = false;
+
+            egui::Modal::new(self.egui_id).show(ctx, |ui| {
+                ui.heading(&self.title);
+                ui.separator();
+
+                ui.label(&self.prompt);
+                //ui.text_edit_singleline(&mut self.text);
+                ui.add(egui::DragValue::new(&mut self.value));
+
+                ui.add_space(10.0);
+                ui.horizontal(|ui| {
+                    if ui.button("OK").clicked() {
+                        //out.push(WidgetMsg::DialogAcceptedDragFloat(self.id, self.value.clone()));
+                        out.push(WidgetMsg::DialogAcceptedDragFloat(self.id, self.value));
+                        close = true;
+                    }
+                    if ui.button("Cancel").clicked() {
+                        close = true;
+                    }
+                });
+            });
+
+            close
+        }
+    }
 
     //---------------------------------------------------------------------------
 
@@ -1113,10 +1116,10 @@ pub mod demo {
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
         BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator,
-        Slider, Space, Text, TextEntryDlg, Timer,
+        Slider, Space, Text, TextEntryDlg, DragFloatDlg, Timer,
     };
     use crate::gui_lib::{
-        ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, TextEntryDlgId, WidgetMsg,
+        ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, TextEntryDlgId, DragFloatDlgId, WidgetMsg,
     };
     use crate::gui_lib::{Dialog, DialogId, TextFont};
     use crate::gui_lib::{LineStyle::*, World};
@@ -1134,9 +1137,11 @@ pub mod demo {
     const BTN_RUN_PAUSE: ButtonId = ButtonId(3);
     const BTN_ABOUT: ButtonId = ButtonId(4);
     const BTN_ENTER_NAME: ButtonId = ButtonId(5);
+    const BTN_ENTER_VALUE: ButtonId = ButtonId(6);
 
     //const DLG_ENTER_NAME: DialogId = 1;
     const DLG_ENTER_NAME: TextEntryDlgId = TextEntryDlgId(1);
+    const DLG_ENTER_VALUE: DragFloatDlgId = DragFloatDlgId(1);
 
     #[derive(Debug)]
     struct Gauge {
@@ -1179,17 +1184,18 @@ pub mod demo {
 
     #[derive(Debug)]
     struct TheWorld {
-        state: i32,
+        //state: i32,
         tl: TrafficLight,
         thing: Thing,
         gauge: Gauge,
         name: String,
+        value: f64,
     }
 
     impl World for TheWorld {
         // Advance the world one step
         fn advance(&mut self) {
-            self.state += 1;
+            //self.state += 1;
             self.toggle_light();
         }
     }
@@ -1197,7 +1203,7 @@ pub mod demo {
     impl TheWorld {
         fn new() -> Self {
             Self {
-                state: 0,
+                //state: 0,
                 tl: TrafficLight {
                     state: Signal::Stop,
                 },
@@ -1206,6 +1212,7 @@ pub mod demo {
                 },
                 gauge: Gauge::new(),
                 name: "Steve".to_string(),
+                value: 0.0,
             }
         }
 
@@ -1382,6 +1389,9 @@ pub mod demo {
             let wb_enter_name = Button::new(BTN_ENTER_NAME, "Enter Name", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_enter_name));
 
+            let wb_enter_value = Button::new(BTN_ENTER_VALUE, "Enter Value", 120.0, 40.0);
+            canvas.add_widget(Box::new(wb_enter_value));
+
             let wb_about = Button::new(BTN_ABOUT, "About", 120.0, 40.0);
             canvas.add_widget(Box::new(wb_about));
 
@@ -1438,8 +1448,8 @@ pub mod demo {
             self.stxtname.borrow_mut().set_text(name);
 
             //Update val_string
-            let val = 42.3;
-            //let val_string: String = val.to_string();
+            //let val = 42.3;
+            let val = world.value;
             let val_string: String = format!("{}{}", "Value: ", val);
             self.stxtval.borrow_mut().set_text(val_string);
         }
@@ -1450,6 +1460,7 @@ pub mod demo {
         None,
         About, // if you make one later
         EnterName(TextEntryDlg),
+        EnterValue(DragFloatDlg),
     }
 
     /// Main application structure.
@@ -1499,6 +1510,9 @@ pub mod demo {
                 WidgetMsg::DialogAcceptedText(id, text) => {
                     self.handle_text_entry(id, text);
                 }
+                WidgetMsg::DialogAcceptedDragFloat(id, val  ) => {
+                    self.handle_drag_float_dlg(id, val);
+                }
                 _ => {}
             }
         }
@@ -1515,6 +1529,17 @@ pub mod demo {
                         "Enter name",
                         "Name:",
                         self.world.name.clone(),
+                    ));
+                }
+                BTN_ENTER_VALUE => {
+                    self.dialog = ActiveDialog::EnterValue(DragFloatDlg::new(
+                        //"enter_name_dialog",
+                        DLG_ENTER_VALUE,
+                        "Enter value",
+                        "Value:",
+                        //self.world.name.clone(),
+                        //self.world.value.into(),
+                        self.world.value as f32,
                     ));
                 }
                 BTN_RUN_PAUSE => {
@@ -1565,6 +1590,16 @@ pub mod demo {
             }
         }
 
+        fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
+            match id {
+                DLG_ENTER_VALUE => {
+                    //self.world.name = text.clone();
+                    self.world.value = val as f64;
+                }
+                _ => {}
+            }
+        }
+
         fn draw_dialog(&mut self, ctx: &egui::Context) {
             let mut close = false;
 
@@ -1587,6 +1622,10 @@ pub mod demo {
                 }
 
                 ActiveDialog::EnterName(dlg) => {
+                    close = dlg.do_modal(ctx, &mut self.msgs);
+                }
+
+                ActiveDialog::EnterValue(dlg) => {
                     close = dlg.do_modal(ctx, &mut self.msgs);
                 }
 
