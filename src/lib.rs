@@ -617,6 +617,18 @@ pub mod gui_lib {
         }
     }
 
+    // #[derive(Debug)]
+    // pub struct DragFloatDlg {
+    //     egui_id: egui::Id,
+    //     id: DragFloatDlgId,
+    //     title: String,
+    //     prompt: String,
+    //     value: f32,
+    //     range: std::ops::RangeInclusive<f32>,
+    //     decimal: usize,
+    //     speed: f64,
+    // }
+
     #[derive(Debug)]
     pub struct DragFloatDlg {
         egui_id: egui::Id,
@@ -624,18 +636,37 @@ pub mod gui_lib {
         title: String,
         prompt: String,
         value: f32,
-        range: std::ops::RangeInclusive<f32>,
+        //range: std::ops::RangeInclusive<f32>,
         decimal: usize,
         speed: f64,
     }
 
     impl DragFloatDlg {
+        // pub fn new(
+        //     id: DragFloatDlgId,
+        //     title: impl Into<String>,
+        //     prompt: impl Into<String>,
+        //     value: f32,
+        //     range: std::ops::RangeInclusive<f32>,
+        // ) -> Self {
+        //     Self {
+        //         egui_id: egui::Id::new(("text_entry_dialog", id)),
+        //         id,
+        //         title: title.into(),
+        //         prompt: prompt.into(),
+        //         value,
+        //         range,
+        //         decimal: 0,
+        //         speed: 1.0,
+        //     }
+        // }
+
         pub fn new(
             id: DragFloatDlgId,
             title: impl Into<String>,
             prompt: impl Into<String>,
             value: f32,
-            range: std::ops::RangeInclusive<f32>,
+            //range: std::ops::RangeInclusive<f32>,
         ) -> Self {
             Self {
                 egui_id: egui::Id::new(("text_entry_dialog", id)),
@@ -643,7 +674,7 @@ pub mod gui_lib {
                 title: title.into(),
                 prompt: prompt.into(),
                 value,
-                range,
+                //range,
                 decimal: 0,
                 speed: 1.0,
             }
@@ -667,7 +698,7 @@ pub mod gui_lib {
                 ui.label(&self.prompt);
                 ui.add(
                     egui::DragValue::new(&mut self.value)
-                        .range(self.range.clone())
+                        //.range(self.range.clone())
                         .fixed_decimals(self.decimal)
                         .speed(self.speed),
                 );
@@ -1557,17 +1588,25 @@ pub mod demo {
                 //         0.0..=100.0,
                 //     ));
                 //   }
+                // BTN_ENTER_VALUE => {
+                //     let mut dlg = DragFloatDlg::new(
+                //         DLG_ENTER_VALUE,
+                //         "Enter value",
+                //         "Value:",
+                //         self.world.value as f32,
+                //         0.0..=100.0,
+                //     );
+
                 BTN_ENTER_VALUE => {
                     let mut dlg = DragFloatDlg::new(
                         DLG_ENTER_VALUE,
                         "Enter value",
                         "Value:",
                         self.world.value as f32,
-                        0.0..=100.0,
+                        //0.0..=100.0,
                     );
-
-                    dlg.set_speed(5.0);
-
+                    //dlg.set_speed(5.0);
+                    dlg.set_decimal(2);
                     self.dialog = ActiveDialog::EnterValue(dlg);
                 }
                 BTN_RUN_PAUSE => {
