@@ -365,7 +365,7 @@ pub mod gui_lib {
         // Dialog outcomes:
         DialogAcceptedText(TextEntryDlgId, String),
         //DialogCanceled(TextEntryDlgId),  // TDJd
-        DialogAcceptedDragFloat(DragFloatDlgId, f32),  // TDJd
+        DialogAcceptedDragFloat(DragFloatDlgId, f32), // TDJd
     }
 
     /// Trait for invoking any widget in the UI.
@@ -624,6 +624,9 @@ pub mod gui_lib {
         title: String,
         prompt: String,
         value: f32,
+        range: std::ops::RangeInclusive<f32>,
+        decimal: usize,
+        speed: f64,
     }
 
     impl DragFloatDlg {
@@ -632,6 +635,7 @@ pub mod gui_lib {
             title: impl Into<String>,
             prompt: impl Into<String>,
             value: f32,
+            range: std::ops::RangeInclusive<f32>,
         ) -> Self {
             Self {
                 egui_id: egui::Id::new(("text_entry_dialog", id)),
@@ -639,7 +643,17 @@ pub mod gui_lib {
                 title: title.into(),
                 prompt: prompt.into(),
                 value,
+                range,
+                decimal: 0,
+                speed: 1.0,
             }
+        }
+
+        pub fn set_decimal(&mut self, decimal: usize) {
+            self.decimal = decimal;
+        }
+        pub fn set_speed(&mut self, speed: f64) {
+            self.speed = speed;
         }
     }
 
@@ -650,10 +664,13 @@ pub mod gui_lib {
             egui::Modal::new(self.egui_id).show(ctx, |ui| {
                 ui.heading(&self.title);
                 ui.separator();
-
                 ui.label(&self.prompt);
-                ui.add(egui::DragValue::new(&mut self.value));
-
+                ui.add(
+                    egui::DragValue::new(&mut self.value)
+                        .range(self.range.clone())
+                        .fixed_decimals(self.decimal)
+                        .speed(self.speed),
+                );
                 ui.add_space(10.0);
                 ui.horizontal(|ui| {
                     if ui.button("OK").clicked() {
@@ -1113,11 +1130,12 @@ pub mod demo {
     use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
     use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
     use crate::gui_lib::{
-        BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator,
-        Slider, Space, Text, TextEntryDlg, DragFloatDlg, Timer,
+        BasicCanvas, Button, Circle, Color32, DragFloat, DragFloatDlg, Label, Polyline, Rectangle,
+        Separator, Slider, Space, Text, TextEntryDlg, Timer,
     };
     use crate::gui_lib::{
-        ButtonId, DragFloatId, Shape, ShapeHandle, SliderId, TextEntryDlgId, DragFloatDlgId, WidgetMsg,
+        ButtonId, DragFloatDlgId, DragFloatId, Shape, ShapeHandle, SliderId, TextEntryDlgId,
+        WidgetMsg,
     };
     use crate::gui_lib::{Dialog, DialogId, TextFont};
     use crate::gui_lib::{LineStyle::*, World};
@@ -1150,6 +1168,7 @@ pub mod demo {
         fn new() -> Self {
             Self { pointer: 0.0 }
         }
+
         fn pointer(&self) -> f64 {
             self.pointer
         }
@@ -1508,7 +1527,7 @@ pub mod demo {
                 WidgetMsg::DialogAcceptedText(id, text) => {
                     self.handle_text_entry(id, text);
                 }
-                WidgetMsg::DialogAcceptedDragFloat(id, val  ) => {
+                WidgetMsg::DialogAcceptedDragFloat(id, val) => {
                     self.handle_drag_float_dlg(id, val);
                 }
                 _ => {}
@@ -1529,16 +1548,27 @@ pub mod demo {
                         self.world.name.clone(),
                     ));
                 }
+                // BTN_ENTER_VALUE => {
+                //     self.dialog = ActiveDialog::EnterValue(DragFloatDlg::new(
+                //         DLG_ENTER_VALUE,
+                //         "Enter value",
+                //         "Value:",
+                //         self.world.value as f32,
+                //         0.0..=100.0,
+                //     ));
+                //   }
                 BTN_ENTER_VALUE => {
-                    self.dialog = ActiveDialog::EnterValue(DragFloatDlg::new(
-                        //"enter_name_dialog",
+                    let mut dlg = DragFloatDlg::new(
                         DLG_ENTER_VALUE,
                         "Enter value",
                         "Value:",
-                        //self.world.name.clone(),
-                        //self.world.value.into(),
                         self.world.value as f32,
-                    ));
+                        0.0..=100.0,
+                    );
+
+                    dlg.set_speed(5.0);
+
+                    self.dialog = ActiveDialog::EnterValue(dlg);
                 }
                 BTN_RUN_PAUSE => {
                     if self.timer.is_running() {
