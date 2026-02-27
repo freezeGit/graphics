@@ -96,9 +96,18 @@ pub mod gui_lib {
         pub fn is_running(&self) -> bool {
             self.running
         }
+
+        // Frozen time
+        // pub fn run(&mut self, ctx: &Context) {
+        //     self.running = true;
+        //     self.last_time = ctx.input(|i| i.time);
+        // }
+
+        // Not using "frozen time" because ctx may not be available easily.
         pub fn run(&mut self) {
             self.running = true;
         }
+
         pub fn pause(&mut self) {
             self.running = false;
         }
@@ -1511,6 +1520,12 @@ pub mod demo {
         EnterValue(DragFloatDlg),
     }
 
+    impl ActiveDialog {
+        pub fn is_active(&self) -> bool {
+            !matches!(self, ActiveDialog::None)
+        }
+    }
+
     /// Main application structure.
     ///
     /// Represents the root of the application and contains
@@ -1579,33 +1594,14 @@ pub mod demo {
                         self.world.name.clone(),
                     ));
                 }
-                // BTN_ENTER_VALUE => {
-                //     self.dialog = ActiveDialog::EnterValue(DragFloatDlg::new(
-                //         DLG_ENTER_VALUE,
-                //         "Enter value",
-                //         "Value:",
-                //         self.world.value as f32,
-                //         0.0..=100.0,
-                //     ));
-                //   }
-                // BTN_ENTER_VALUE => {
-                //     let mut dlg = DragFloatDlg::new(
-                //         DLG_ENTER_VALUE,
-                //         "Enter value",
-                //         "Value:",
-                //         self.world.value as f32,
-                //         0.0..=100.0,
-                //     );
-
                 BTN_ENTER_VALUE => {
                     let mut dlg = DragFloatDlg::new(
                         DLG_ENTER_VALUE,
                         "Enter value",
                         "Value:",
                         self.world.value as f32,
-                        //0.0..=100.0,
                     );
-                    //dlg.set_speed(5.0);
+                    dlg.set_speed(0.1);
                     dlg.set_decimal(2);
                     self.dialog = ActiveDialog::EnterValue(dlg);
                 }
@@ -1719,7 +1715,7 @@ pub mod demo {
     /// can live directly in the TheApp.
     impl eframe::App for TheApp {
         fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-            // ----Simulation/animation
+            // ----Simulation/animation. Not needed for all programs.
             if self.timer.is_time(ctx) {
                 self.world.advance(); // advance world one tick
                 self.canvas.update(&self.world); // update canvas
@@ -1732,9 +1728,16 @@ pub mod demo {
             self.canvas.canvas.render(ctx, &mut self.msgs);
 
             // collect messages from the active dialog (pushes into the SAME self.msgs)
-            // Must be after render, so that dialogs can be drawn on top of everything else
-            // and before handle_msg, so that dialogs can be closed by the user.
+            // Must be after render and before handle_msg,
+            // so that dialogs can be closed by the user.
             self.draw_dialog(ctx);
+
+
+            // if self.dialog.is_active() {
+            //     self.timer.pause();
+            //     self.draw_dialog(ctx);
+            //     self.timer.run();
+            // }
 
             // Handle messages if any exist
             if !self.msgs.is_empty() {
