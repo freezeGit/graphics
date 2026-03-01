@@ -88,6 +88,7 @@ use eframe::egui::Context;
 use egui::RichText;
 use std::cell::RefCell;
 use std::rc::Rc;
+
 const SLIDER_GAUGE: SliderId = SliderId(1);
 const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
 

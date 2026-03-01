@@ -13,15 +13,16 @@
 /// including buttons, canvas and visual styling utilities. It implements
 /// a custom drawing system through the `Draw` trait. It implements a custom widget system through the
 /// 'Widget' trait, and a custom modal dialog system through th 'do_modal' trait.
-//use eframe::egui::Response;
+
 pub use eframe::egui::{
-    Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2, Visuals,
+    self as egui,
+    Button as EguiButton,
+    Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2, Visuals,
     pos2, vec2,
 };
-//use egui::{CentralPanel, Context, FontId, RichText};
+
 use egui::{CentralPanel, Context, RichText};
-use std::cell::RefCell;
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 // Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
 pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
