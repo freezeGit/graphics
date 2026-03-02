@@ -35,7 +35,7 @@ pub use ids::{
     DialogId, MessageBoxDlgId, TextEntryDlgId, DragFloatDlgId,
     WidgetMsg,
 };
-pub use shapes::{LineStyle, Shape, ShapeBase, Polyline};
+pub use shapes::{LineStyle, Shape, ShapeBase, Polyline, Circle};
 
 // Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
 pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
@@ -367,7 +367,6 @@ pub trait Dialog: std::fmt::Debug {
 #[derive(Debug)]
 pub struct MessageBoxDlg {
     egui_id: egui::Id,
-    //id: MessageBoxDlgId,
     title: String,
     text: String,
 }
@@ -380,8 +379,6 @@ impl MessageBoxDlg {
     ) -> Self {
         Self {
             egui_id: egui::Id::new(("message_box_dialog", id)),
-            //egui_id: egui::Id::new(("message_box_dialog")),
-            //id,
             title: title.into(),
             text: text.into(),
         }
@@ -533,56 +530,6 @@ impl Dialog for DragFloatDlg {
     }
 }
 
-/// A customizable Circle component.
-///
-/// # Fields
-/// * `position` - position of the circle center (: eframe::egui::Pos2)
-/// * `radius` - The radius of the button
-#[derive(Debug, Default)]
-pub struct Circle {
-    base: ShapeBase,
-    pub radius: f32,
-}
-
-impl Circle {
-    // Constructor method
-    pub fn new(center: Pos2, radius: f32) -> Self {
-        Self {
-            base: {
-                ShapeBase {
-                    location: center,
-                    ..Default::default()
-                }
-            },
-            radius: radius,
-        }
-    }
-}
-
-impl Shape for Circle {
-    fn base(&self) -> &ShapeBase {
-        &self.base
-    }
-    fn base_mut(&mut self) -> &mut ShapeBase {
-        &mut self.base
-    }
-
-    fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-        //let center = self.base.location + canvas_offset;
-        let center = self.base.location() + canvas_offset;
-
-        painter.circle(
-            center,
-            self.radius,
-            //self.base.fill_color,
-            self.base.fill_color(),
-            //egui::Stroke::new(self.base.line_width, self.base.color),
-            //egui::Stroke::new(self.base.line_width(), self.base.color),
-            egui::Stroke::new(self.base.line_width(), self.base.color()),
-        );
-    }
-}
-
 #[derive(Debug, Default)]
 pub struct Rectangle {
     base: ShapeBase,
@@ -612,15 +559,11 @@ impl Shape for Rectangle {
     }
 
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-        //let rect = Rect::from_center_size(self.base.location + canvas_offset, self.size);
         let rect = Rect::from_center_size(self.base.location() + canvas_offset, self.size);
         painter.rect(
             rect,
-            CornerRadius::ZERO,   // or CornerRadius::same(r)
-            //self.base.fill_color, // fill
-            self.base.fill_color(), // fill
-            //Stroke::new(self.base.line_width, self.base.color), // border
-            //Stroke::new(self.base.line_width(), self.base.color), // border
+            CornerRadius::ZERO,
+            self.base.fill_color(),
             Stroke::new(self.base.line_width(), self.base.color()), // border
             StrokeKind::Outside,  // Outside / Inside / Middle
         );
