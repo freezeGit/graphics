@@ -627,21 +627,15 @@ impl eframe::App for TheApp {
         // -----Establish event loop
         self.msgs.clear(); // establish invariant: Belt and suspenders
         // Draw shapes and widgets on the canvas,
-        // and collect all messages from widgets
+        // and collect all messages from widgets (pushes into self.msgs)
         self.canvas.canvas.render(ctx, &mut self.msgs);
 
-        // collect messages from the active dialog (pushes into the SAME self.msgs)
+        // ------- collect messages from the active dialog (pushes into self.msgs)
         // Must be after render and before handle_msg,
         // so that dialogs can be closed by the user.
         self.draw_dialog(ctx);
 
-        // if self.dialog.is_active() {
-        //     self.timer.pause();
-        //     self.draw_dialog(ctx);
-        //     self.timer.run();
-        // }
-
-        // Handle messages if any exist
+        // ------------ Handle messages if any exist
         if !self.msgs.is_empty() {
             // Move msgs out of self so we can mutably borrow self inside the loop.
             let mut msgs = std::mem::take(&mut self.msgs);
@@ -649,13 +643,14 @@ impl eframe::App for TheApp {
             for msg in msgs.drain(..) {
                 self.handle_msg(msg);
             }
-            // Put the buffer back (empty, but keeps its capacity).
+            // --------- Put the buffer back (empty, but keeps its capacity).
             self.msgs = msgs;
 
-            // Update canvas once after all state changes:
+            // ----- Update canvas once after all state changes:
             self.canvas.update(&self.world);
         }
         // schedule the next frame redraw after 16 milliseconds (60 FPS)
+        // Frame rate can be set faster or slower than 60 FPS.
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 }

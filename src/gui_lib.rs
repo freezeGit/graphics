@@ -367,20 +367,21 @@ pub trait Dialog: std::fmt::Debug {
 #[derive(Debug)]
 pub struct MessageBoxDlg {
     egui_id: egui::Id,
-    id: MessageBoxDlgId,
+    //id: MessageBoxDlgId,
     title: String,
     text: String,
 }
 
 impl MessageBoxDlg {
     pub fn new(
-        id: MessageBoxDlgId,
+        id: MessageBoxDlgId, // TDJ id is used to create unique egui::Id. Is this necessary?
         title: impl Into<String>,
         text: impl Into<String>,
     ) -> Self {
         Self {
-            egui_id: egui::Id::new(("text_entry_dialog", id)),
-            id,
+            egui_id: egui::Id::new(("message_box_dialog", id)),
+            //egui_id: egui::Id::new(("message_box_dialog")),
+            //id,
             title: title.into(),
             text: text.into(),
         }
@@ -388,7 +389,7 @@ impl MessageBoxDlg {
 }
 
 impl Dialog for MessageBoxDlg {
-    fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+    fn do_modal(&mut self, ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
         let mut close = false;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
@@ -473,7 +474,6 @@ pub struct DragFloatDlg {
     title: String,
     prompt: String,
     value: f32,
-    //range: std::ops::RangeInclusive<f32>,
     decimal: usize,
     speed: f64,
 }
@@ -484,7 +484,6 @@ impl DragFloatDlg {
         title: impl Into<String>,
         prompt: impl Into<String>,
         value: f32,
-        //range: std::ops::RangeInclusive<f32>,
     ) -> Self {
         Self {
             egui_id: egui::Id::new(("text_entry_dialog", id)),
@@ -492,7 +491,6 @@ impl DragFloatDlg {
             title: title.into(),
             prompt: prompt.into(),
             value,
-            //range,
             decimal: 0,
             speed: 1.0,
         }
@@ -516,7 +514,6 @@ impl Dialog for DragFloatDlg {
             ui.label(&self.prompt);
             ui.add(
                 egui::DragValue::new(&mut self.value)
-                    //.range(self.range.clone())
                     .fixed_decimals(self.decimal)
                     .speed(self.speed),
             );
