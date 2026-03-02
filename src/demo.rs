@@ -76,11 +76,12 @@
 use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
 use crate::gui_lib::{
-    BasicCanvas, Button, Circle, Color32, DragFloat, DragFloatDlg, Label, Polyline, Rectangle,
+    BasicCanvas, Button, Circle, Color32, DragFloat, MessageBoxDlg, DragFloatDlg, Label, Polyline, Rectangle,
     Separator, Slider, Space, Text, TextEntryDlg, Timer,
 };
 use crate::gui_lib::{
-    ButtonId, DragFloatDlgId, DragFloatId, Shape, ShapeHandle, SliderId, TextEntryDlgId, WidgetMsg,
+    ButtonId, DragFloatDlgId, DragFloatId, Shape, ShapeHandle, SliderId, MessageBoxDlgId,
+    TextEntryDlgId, WidgetMsg,
 };
 use crate::gui_lib::{Dialog, DialogId, TextFont};
 use crate::gui_lib::{LineStyle::*, World};
@@ -102,6 +103,7 @@ const BTN_ENTER_NAME: ButtonId = ButtonId(5);
 const BTN_ENTER_VALUE: ButtonId = ButtonId(6);
 
 //const DLG_ENTER_NAME: DialogId = 1;
+const DLG_ABOUT: MessageBoxDlgId = MessageBoxDlgId(1);
 const DLG_ENTER_NAME: TextEntryDlgId = TextEntryDlgId(1);
 const DLG_ENTER_VALUE: DragFloatDlgId = DragFloatDlgId(1);
 
@@ -315,6 +317,7 @@ impl TheCanvas {
         // Add shape with handle
         let stxtval: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             eframe::egui::Pos2::new(325.0, 100.0),
+            //format!("{}{}", "Value: ", 0.0),
             format!("{}{}", "Value: ", 0.0),
         )));
         //stxtval.borrow_mut().set_color(Color32::DARK_GREEN);
@@ -413,7 +416,8 @@ impl TheCanvas {
         //Update val_string
         //let val = 42.3;
         let val = world.value;
-        let val_string: String = format!("{}{}", "Value: ", val);
+        //let val_string: String = format!("{}{}", "Value: ", val);
+        let val_string: String = format!("{}{:.2}", "Value: ", val);
         self.stxtval.borrow_mut().set_text(val_string);
     }
 }
@@ -421,7 +425,7 @@ impl TheCanvas {
 #[derive(Debug)]
 enum ActiveDialog {
     None,
-    About, // if you make one later
+    About(MessageBoxDlg),
     EnterName(TextEntryDlg),
     EnterValue(DragFloatDlg),
 }
@@ -485,11 +489,16 @@ impl TheApp {
             _ => {}
         }
     }
-
+    // ui.label("gui_lib demo v0.1\n");
+    // ui.label("Written in Rust + egui");
     fn handle_button(&mut self, id: ButtonId) {
         match id {
             BTN_ABOUT => {
-                self.dialog = ActiveDialog::About;
+                self.dialog = ActiveDialog::About(MessageBoxDlg::new(
+                     DLG_ABOUT,
+                    "About",
+                    "gui_lib demo v0.1\nWritten in Rust + egui",
+                ));
             }
             BTN_ENTER_NAME => {
                 self.dialog = ActiveDialog::EnterName(TextEntryDlg::new(
@@ -507,8 +516,8 @@ impl TheApp {
                     "Value:",
                     self.world.value as f32,
                 );
-                dlg.set_speed(0.1);
-                dlg.set_decimal(2);
+                dlg.set_speed(1.0);
+                dlg.set_decimal(1);
                 self.dialog = ActiveDialog::EnterValue(dlg);
             }
             BTN_RUN_PAUSE => {
@@ -562,7 +571,6 @@ impl TheApp {
     fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
         match id {
             DLG_ENTER_VALUE => {
-                //self.world.name = text.clone();
                 self.world.value = val as f64;
             }
             _ => {}
@@ -575,19 +583,8 @@ impl TheApp {
         match &mut self.dialog {
             ActiveDialog::None => {}
 
-            ActiveDialog::About => {
-                egui::Modal::new(egui::Id::new("about_dialog")).show(ctx, |ui| {
-                    ui.heading("About");
-                    ui.separator();
-                    ui.label("gui_lib demo v0.1\n");
-                    ui.label("Written in Rust + egui");
-
-                    ui.add_space(10.0);
-
-                    if ui.button("OK").clicked() {
-                        close = true;
-                    }
-                });
+            ActiveDialog::About(dlg) => {
+                close = dlg.do_modal(ctx, &mut self.msgs);
             }
 
             ActiveDialog::EnterName(dlg) => {

@@ -32,39 +32,6 @@ impl Shape for Polyline {
         &mut self.base
     }
 
-
-    //     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-    //         let translation = self.base.location.to_vec2() + canvas_offset;
-    //
-    //         let points = self.base.points_translated(translation);
-    //         let stroke = egui::Stroke::new(self.base.line_width, self.base.color);
-    //
-    //         match self.base.line_style {
-    //             LineStyle::Solid => {
-    //                 painter.add(eframe::epaint::PathShape::line(points, stroke));
-    //             }
-    //             LineStyle::Dashed => {
-    //                 let shapes = eframe::egui::Shape::dashed_line(
-    //                     &points,
-    //                     stroke,
-    //                     self.base.dash_length(),
-    //                     self.base.dash_gap(),
-    //                 );
-    //                 painter.extend(shapes);
-    //             }
-    //             LineStyle::Dotted => {
-    //                 let shapes = eframe::egui::Shape::dotted_line(
-    //                     &points,
-    //                     self.base.color,
-    //                     self.base.dot_spacing(),
-    //                     self.base.dot_radius(),
-    //                 );
-    //                 painter.extend(shapes);
-    //             }
-    //         }
-    //     }
-    // }
-
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
         //let translation = self.base.location.to_vec2() + canvas_offset;
         let translation = self.base.location().to_vec2() + canvas_offset;

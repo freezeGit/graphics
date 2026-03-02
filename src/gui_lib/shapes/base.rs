@@ -1,7 +1,6 @@
 // base.rs
 
 use crate::gui_lib::egui::{self, Color32, Pos2, Vec2};
-//use crate::gui_lib::{Color32, Pos2, Vec2};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LineStyle {
@@ -90,7 +89,7 @@ impl Default for ShapeBase {
 }
 
 impl ShapeBase {
-    /// Create a new, empty ShapeBase with default values.
+    // /// Create a new, empty ShapeBase with default values.
     // pub fn new() -> Self {
     //     Self::default()
     // }
@@ -145,98 +144,3 @@ impl ShapeBase {
         1.0 + (2.0 * self.line_width)
     }
 }
-
-// --------------------------------------------------
-// /// A customizable Polyline component.
-// ///
-// /// # Fields
-// /// * `position` - position of the circle center (: eframe::egui::Pos2)
-// /// * `radius` - The radius of the button
-// #[derive(Debug, Default)]
-// pub struct Polyline {
-//     base: ShapeBase,
-// }
-//
-// impl Polyline {
-//     pub fn new(location: Pos2, points: impl IntoIterator<Item = Pos2>) -> Self {
-//         Self {
-//             base: ShapeBase {
-//                 location,
-//                 points: points.into_iter().collect(),
-//                 ..Default::default()
-//             },
-//         }
-//     }
-// }
-//
-// impl Shape for Polyline {
-//     fn base(&self) -> &ShapeBase {
-//         &self.base
-//     }
-//     fn base_mut(&mut self) -> &mut ShapeBase {
-//         &mut self.base
-//     }
-//
-//
-// //     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-// //         let translation = self.base.location.to_vec2() + canvas_offset;
-// //
-// //         let points = self.base.points_translated(translation);
-// //         let stroke = egui::Stroke::new(self.base.line_width, self.base.color);
-// //
-// //         match self.base.line_style {
-// //             LineStyle::Solid => {
-// //                 painter.add(eframe::epaint::PathShape::line(points, stroke));
-// //             }
-// //             LineStyle::Dashed => {
-// //                 let shapes = eframe::egui::Shape::dashed_line(
-// //                     &points,
-// //                     stroke,
-// //                     self.base.dash_length(),
-// //                     self.base.dash_gap(),
-// //                 );
-// //                 painter.extend(shapes);
-// //             }
-// //             LineStyle::Dotted => {
-// //                 let shapes = eframe::egui::Shape::dotted_line(
-// //                     &points,
-// //                     self.base.color,
-// //                     self.base.dot_spacing(),
-// //                     self.base.dot_radius(),
-// //                 );
-// //                 painter.extend(shapes);
-// //             }
-// //         }
-// //     }
-// // }
-//
-// fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-//     let translation = self.base.location.to_vec2() + canvas_offset;
-//
-//     let points = self.base.points_translated(translation);
-//     let stroke = egui::Stroke::new(self.base.line_width, self.base.color);
-//
-//     match self.base.line_style {
-//         LineStyle::Solid => {
-//             painter.add(egui::epaint::PathShape::line(points, stroke));
-//         }
-//         LineStyle::Dashed => {
-//             let shapes = egui::Shape::dashed_line(
-//                 &points,
-//                 stroke,
-//                 self.base.dash_length(),
-//                 self.base.dash_gap(),
-//             );
-//             painter.extend(shapes);
-//         }
-//         LineStyle::Dotted => {
-//             let shapes = egui::Shape::dotted_line(
-//                 &points,
-//                 self.base.color,
-//                 self.base.dot_spacing(),
-//                 self.base.dot_radius(),
-//             );
-//             painter.extend(shapes);
-//         }
-//     }
-// }

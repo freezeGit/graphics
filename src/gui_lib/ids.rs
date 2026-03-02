@@ -16,6 +16,9 @@ pub struct DragFloatId(pub WidgetId);
 pub type DialogId = u32;
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct MessageBoxDlgId(pub DialogId);
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TextEntryDlgId(pub DialogId);
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]

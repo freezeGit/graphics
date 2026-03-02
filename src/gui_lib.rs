@@ -32,13 +32,10 @@ pub mod shapes;
 pub use widgets::{Widget, Space, Separator, Label, Button, Slider, DragFloat};
 pub use ids::{
     WidgetId, ButtonId, SliderId, DragFloatId,
-    DialogId, TextEntryDlgId, DragFloatDlgId,
+    DialogId, MessageBoxDlgId, TextEntryDlgId, DragFloatDlgId,
     WidgetMsg,
 };
 pub use shapes::{LineStyle, Shape, ShapeBase, Polyline};
-
-// use egui::{CentralPanel, Context, RichText};
-// use std::{cell::RefCell, rc::Rc};
 
 // Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
 pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
@@ -358,226 +355,6 @@ impl BasicCanvas {
     }
 }
 
-//-------------------------------------------------------------------
-
-// pub type WidgetId = u32;
-//
-// #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-// pub struct ButtonId(pub WidgetId);
-//
-// #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-// pub struct SliderId(pub WidgetId);
-// #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-// pub struct DragFloatId(pub WidgetId);
-//
-// // -------------------------------
-//
-// pub type DialogId = u32; // TDJd
-//
-// #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-// pub struct TextEntryDlgId(pub DialogId);
-// #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-// pub struct DragFloatDlgId(pub DialogId);
-//
-// #[derive(Debug, Clone, PartialEq)]
-// pub enum WidgetMsg {
-//     // Widget outcomes:
-//     ButtonClicked(ButtonId),
-//     SliderChanged(SliderId, f32),
-//     DragFloatChanged(DragFloatId, f32),
-//     // Dialog outcomes:
-//     DialogAcceptedText(TextEntryDlgId, String),
-//     //DialogCanceled(TextEntryDlgId),  // TDJd
-//     DialogAcceptedDragFloat(DragFloatDlgId, f32), // TDJd
-// }
-
-// /// Trait for invoking any widget in the UI.
-// pub trait Widget: std::fmt::Debug {
-//     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>);
-// }
-
-// #[derive(Debug, Default)]
-// pub struct Space {
-//     pub size: f32,
-// }
-//
-// impl Space {
-//     pub fn new(size: f32) -> Self {
-//         Self { size }
-//     }
-// }
-//
-// impl Widget for Space {
-//     fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
-//         ui.add_space(self.size);
-//     }
-// }
-//
-// #[derive(Debug, Default)]
-// pub struct Separator;
-//
-// impl Separator {
-//     pub fn new() -> Self {
-//         Self {}
-//     }
-// }
-// impl Widget for Separator {
-//     fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
-//         ui.separator();
-//     }
-// }
-//
-// #[derive(Debug, Default)]
-// pub struct Label {
-//     pub text: String,
-//     pub color: Color32,
-//     pub size: f32,
-// }
-//
-// impl Label {
-//     pub fn new(text: impl Into<String>, color: Color32, size: f32) -> Self {
-//         Self {
-//             text: text.into(),
-//             color,
-//             size,
-//         }
-//     }
-// }
-//
-// impl Widget for Label {
-//     fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {
-//         ui.label(RichText::new(&self.text).color(self.color).size(self.size));
-//     }
-// }
-
-// /// A customizable button component.
-// ///
-// /// # Fields
-// /// * `width` - The width of the button in pixels
-// /// * `height` - The height of the button in pixels
-// /// * `label` - The text displayed on the button
-// #[derive(Debug, Default)]
-// pub struct Button {
-//     pub id: ButtonId,
-//     pub label: String,
-//     pub width: f32,
-//     pub height: f32,
-// }
-//
-// impl Button {
-//     pub fn new(id: ButtonId, label: impl Into<String>, width: f32, height: f32) -> Self {
-//         Self {
-//             id,
-//             label: label.into(),
-//             width,
-//             height,
-//         }
-//     }
-// }
-
-// impl Widget for Button {
-//     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
-//         let resp = ui.add_sized(
-//             egui::vec2(self.width, self.height),
-//             egui::Button::new(egui::RichText::new(&self.label).size(14.0).strong()),
-//         );
-//
-//         if resp.clicked() {
-//             out.push(WidgetMsg::ButtonClicked(self.id));
-//         }
-//     }
-// }
-
-// #[derive(Debug)]
-// pub struct Slider {
-//     id: SliderId,
-//     label: String,
-//     value: f32,
-//     range: std::ops::RangeInclusive<f32>,
-// }
-// impl Slider {
-//     pub fn new(
-//         id: SliderId,
-//         label: impl Into<String>,
-//         value: f32,
-//         range: std::ops::RangeInclusive<f32>,
-//     ) -> Self {
-//         Self {
-//             id,
-//             label: label.into(),
-//             value,
-//             range,
-//         }
-//     }
-//
-//     pub fn value(&self) -> f32 {
-//         self.value
-//     }
-// }
-//
-// impl Widget for Slider {
-//     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
-//         let resp = ui.add(egui::Slider::new(&mut self.value, self.range.clone()).text(&self.label));
-//
-//         if resp.changed() {
-//             out.push(WidgetMsg::SliderChanged(self.id, self.value));
-//         }
-//     }
-// }
-
-// #[derive(Debug)]
-// pub struct DragFloat {
-//     id: DragFloatId,
-//     label: String,
-//     value: f32,
-//     range: std::ops::RangeInclusive<f32>,
-//     decimal: usize,
-//     speed: f64,
-// }
-// impl DragFloat {
-//     pub fn new(
-//         id: DragFloatId,
-//         label: impl Into<String>,
-//         value: f32,
-//         range: std::ops::RangeInclusive<f32>,
-//     ) -> Self {
-//         Self {
-//             id,
-//             label: label.into(),
-//             value,
-//             range,
-//             decimal: 0,
-//             speed: 1.0,
-//         }
-//     }
-
-//     pub fn value(&self) -> f32 {
-//         self.value
-//     }
-//     pub fn set_decimal(&mut self, decimal: usize) {
-//         self.decimal = decimal;
-//     }
-//     pub fn set_speed(&mut self, speed: f64) {
-//         self.speed = speed;
-//     }
-// }
-
-// impl Widget for DragFloat {
-//     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>) {
-//         let resp = ui.add(
-//             egui::DragValue::new(&mut self.value)
-//                 .range(self.range.clone())
-//                 .prefix(&self.label)
-//                 .fixed_decimals(self.decimal)
-//                 .speed(self.speed),
-//         );
-//
-//         if resp.changed() {
-//             out.push(WidgetMsg::DragFloatChanged(self.id, self.value));
-//         }
-//     }
-// }
-
 // ------------------------------
 
 pub trait Dialog: std::fmt::Debug {
@@ -585,9 +362,58 @@ pub trait Dialog: std::fmt::Debug {
     fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
 }
 
+// -------------------------------------
+
+#[derive(Debug)]
+pub struct MessageBoxDlg {
+    egui_id: egui::Id,
+    id: MessageBoxDlgId,
+    title: String,
+    text: String,
+}
+
+impl MessageBoxDlg {
+    pub fn new(
+        id: MessageBoxDlgId,
+        title: impl Into<String>,
+        text: impl Into<String>,
+    ) -> Self {
+        Self {
+            egui_id: egui::Id::new(("text_entry_dialog", id)),
+            id,
+            title: title.into(),
+            text: text.into(),
+        }
+    }
+}
+
+impl Dialog for MessageBoxDlg {
+    fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+        let mut close = false;
+
+        egui::Modal::new(self.egui_id).show(ctx, |ui| {
+            ui.heading(&self.title);
+            ui.separator();
+
+            ui.label(&self.text);
+
+            ui.add_space(10.0);
+            ui.horizontal(|ui| {
+                if ui.button("OK").clicked() {
+                    close = true;
+                }
+            });
+        });
+
+        close
+    }
+}
+
+// -------------------------------------
+
 #[derive(Debug)]
 pub struct TextEntryDlg {
-    egui_id: egui::Id, // What for? Why are fields pub?
+    egui_id: egui::Id,
     id: TextEntryDlgId,
     title: String,
     prompt: String,
@@ -639,18 +465,7 @@ impl Dialog for TextEntryDlg {
     }
 }
 
-// #[derive(Debug)]
-// pub struct DragFloatDlg {
-//     egui_id: egui::Id,
-//     id: DragFloatDlgId,
-//     title: String,
-//     prompt: String,
-//     value: f32,
-//     range: std::ops::RangeInclusive<f32>,
-//     decimal: usize,
-//     speed: f64,
-// }
-
+// -------------------------------------------
 #[derive(Debug)]
 pub struct DragFloatDlg {
     egui_id: egui::Id,
@@ -664,26 +479,7 @@ pub struct DragFloatDlg {
 }
 
 impl DragFloatDlg {
-    // pub fn new(
-    //     id: DragFloatDlgId,
-    //     title: impl Into<String>,
-    //     prompt: impl Into<String>,
-    //     value: f32,
-    //     range: std::ops::RangeInclusive<f32>,
-    // ) -> Self {
-    //     Self {
-    //         egui_id: egui::Id::new(("text_entry_dialog", id)),
-    //         id,
-    //         title: title.into(),
-    //         prompt: prompt.into(),
-    //         value,
-    //         range,
-    //         decimal: 0,
-    //         speed: 1.0,
-    //     }
-    // }
-
-    pub fn new(
+        pub fn new(
         id: DragFloatDlgId,
         title: impl Into<String>,
         prompt: impl Into<String>,
@@ -739,207 +535,6 @@ impl Dialog for DragFloatDlg {
         close
     }
 }
-
-//---------------------------------------------------------------------------
-
-// #[derive(Debug, Clone, Copy, PartialEq)]
-// pub enum LineStyle {
-//     Solid,
-//     Dashed,
-//     Dotted,
-//     //Dashed { dash: f32, gap: f32 },
-//     //Dotted { spacing: f32, radius: f32 },
-// }
-
-/// Base struct for all shapes.
-// #[derive(Debug)]
-// pub struct ShapeBase {
-//     location: Pos2,
-//     points: Vec<Pos2>,
-//     color: Color32,
-//     fill_color: Color32,
-//     line_width: f32,
-//     line_style: LineStyle,
-// }
-
-// pub trait Shape: std::fmt::Debug {
-//     fn base(&self) -> &ShapeBase;
-//     fn base_mut(&mut self) -> &mut ShapeBase;
-//
-//     /// Draw in *canvas-local* coordinates, translated by `canvas_offset`
-//     /// where `canvas_offset` is the screen-space top-left of the canvas.
-//     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2);
-//
-//     /// Convenience: draw with canvas at (0,0)
-//     fn draw(&self, painter: &egui::Painter) {
-//         self.draw_at(painter, egui::Vec2::ZERO);
-//     }
-//
-//     fn location(&self) -> Pos2 {
-//         self.base().location()
-//     }
-//
-//     fn move_to(&mut self, location: Pos2) {
-//         self.base_mut().move_to(location)
-//     }
-//
-//     fn color(&self) -> Color32 {
-//         self.base().color()
-//     }
-//     fn set_color(&mut self, col: Color32) {
-//         self.base_mut().set_color(col)
-//     }
-//
-//     fn fill_color(&self) -> Color32 {
-//         self.base().fill_color()
-//     }
-//     fn set_fill_color(&mut self, col: Color32) {
-//         self.base_mut().set_fill_color(col)
-//     }
-//
-//     fn line_width(&self) -> f32 {
-//         self.base().line_width()
-//     }
-//     fn set_line_width(&mut self, lw: f32) {
-//         self.base_mut().set_line_width(lw)
-//     }
-//     fn set_line_style(&mut self, ls: LineStyle) {
-//         self.base_mut().set_line_style(ls)
-//     }
-// }
-//
-// impl Default for ShapeBase {
-//     fn default() -> Self {
-//         Self {
-//             location: Pos2::default(),
-//             points: Vec::new(),
-//             color: Color32::BLACK,
-//             fill_color: Color32::TRANSPARENT,
-//             line_width: 2.0,
-//             line_style: LineStyle::Solid,
-//             //line_style: LineStyle::Dashed { dash: 8.0, gap: 4.0 },
-//             //line_style: LineStyle::Dashed,
-//             //line_style: LineStyle::Dotted { spacing: 8.0, radius: 2.0 },
-//             //line_style: LineStyle::Dotted,
-//         }
-//     }
-// }
-//
-// impl ShapeBase {
-//     /// Create a new, empty ShapeBase with default values.
-//     // pub fn new() -> Self {
-//     //     Self::default()
-//     // }
-//     pub fn location(&self) -> Pos2 {
-//         self.location
-//     }
-//     pub fn move_to(&mut self, location: Pos2) {
-//         self.location = location;
-//     }
-//     pub fn color(&self) -> Color32 {
-//         self.color
-//     }
-//     pub fn set_color(&mut self, col: Color32) {
-//         self.color = col;
-//     }
-//
-//     pub fn fill_color(&self) -> Color32 {
-//         self.fill_color
-//     }
-//     pub fn set_fill_color(&mut self, col: Color32) {
-//         self.fill_color = col;
-//     }
-//
-//     pub fn line_width(&self) -> f32 {
-//         self.line_width
-//     }
-//     pub fn set_line_width(&mut self, lw: f32) {
-//         self.line_width = lw;
-//     }
-//
-//     pub fn set_line_style(&mut self, ls: LineStyle) {
-//         self.line_style = ls;
-//     }
-//
-//     pub(crate) fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
-//         self.points.iter().map(|p| *p + offset).collect()
-//     }
-//
-//     pub(crate) fn dash_length(&self) -> f32 {
-//         4.0 * self.line_width
-//     }
-//     pub(crate) fn dash_gap(&self) -> f32 {
-//         1.0 + (2.0 * self.line_width)
-//     }
-//     pub(crate) fn dot_radius(&self) -> f32 {
-//         self.line_width / 2.0
-//     }
-//     pub(crate) fn dot_spacing(&self) -> f32 {
-//         1.0 + (2.0 * self.line_width)
-//     }
-// }
-
-// /// A customizable Polyline component.
-// ///
-// /// # Fields
-// /// * `position` - position of the circle center (: eframe::egui::Pos2)
-// /// * `radius` - The radius of the button
-// #[derive(Debug, Default)]
-// pub struct Polyline {
-//     base: ShapeBase,
-// }
-//
-// impl Polyline {
-//     pub fn new(location: Pos2, points: impl IntoIterator<Item = Pos2>) -> Self {
-//         Self {
-//             base: ShapeBase {
-//                 location,
-//                 points: points.into_iter().collect(),
-//                 ..Default::default()
-//             },
-//         }
-//     }
-// }
-//
-// impl Shape for Polyline {
-//     fn base(&self) -> &ShapeBase {
-//         &self.base
-//     }
-//     fn base_mut(&mut self) -> &mut ShapeBase {
-//         &mut self.base
-//     }
-//
-//     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-//         let translation = self.base.location.to_vec2() + canvas_offset;
-//
-//         let points = self.base.points_translated(translation);
-//         let stroke = egui::Stroke::new(self.base.line_width, self.base.color);
-//
-//         match self.base.line_style {
-//             LineStyle::Solid => {
-//                 painter.add(eframe::epaint::PathShape::line(points, stroke));
-//             }
-//             LineStyle::Dashed => {
-//                 let shapes = eframe::egui::Shape::dashed_line(
-//                     &points,
-//                     stroke,
-//                     self.base.dash_length(),
-//                     self.base.dash_gap(),
-//                 );
-//                 painter.extend(shapes);
-//             }
-//             LineStyle::Dotted => {
-//                 let shapes = eframe::egui::Shape::dotted_line(
-//                     &points,
-//                     self.base.color,
-//                     self.base.dot_spacing(),
-//                     self.base.dot_radius(),
-//                 );
-//                 painter.extend(shapes);
-//             }
-//         }
-//     }
-// }
 
 /// A customizable Circle component.
 ///
@@ -1111,8 +706,3 @@ impl Shape for Text {
     }
 }
 
-// pub use ids::{
-//     WidgetId, ButtonId, SliderId, DragFloatId,
-//     DialogId, TextEntryDlgId, DragFloatDlgId,
-//     WidgetMsg,
-// };
