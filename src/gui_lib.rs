@@ -35,7 +35,7 @@ pub use ids::{
     DialogId, MessageBoxDlgId, TextEntryDlgId, DragFloatDlgId,
     WidgetMsg,
 };
-pub use shapes::{LineStyle, Shape, ShapeBase, Polyline, Circle};
+pub use shapes::{LineStyle, Shape, ShapeBase, Polyline, Circle, Rectangle};
 
 // Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
 pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
@@ -530,45 +530,6 @@ impl Dialog for DragFloatDlg {
     }
 }
 
-#[derive(Debug, Default)]
-pub struct Rectangle {
-    base: ShapeBase,
-    pub size: Vec2,
-}
-impl Rectangle {
-    pub fn new(center: Pos2, size: Vec2) -> Self {
-        Rectangle {
-            base: {
-                ShapeBase {
-                    location: center,
-                    ..Default::default()
-                }
-            },
-            //location: center,
-            size: size,
-        }
-    }
-}
-
-impl Shape for Rectangle {
-    fn base(&self) -> &ShapeBase {
-        &self.base
-    }
-    fn base_mut(&mut self) -> &mut ShapeBase {
-        &mut self.base
-    }
-
-    fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-        let rect = Rect::from_center_size(self.base.location() + canvas_offset, self.size);
-        painter.rect(
-            rect,
-            CornerRadius::ZERO,
-            self.base.fill_color(),
-            Stroke::new(self.base.line_width(), self.base.color()), // border
-            StrokeKind::Outside,  // Outside / Inside / Middle
-        );
-    }
-}
 #[derive(Debug)]
 pub enum TextFont {
     Proportional,

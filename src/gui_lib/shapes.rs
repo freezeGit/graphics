@@ -3,10 +3,12 @@
 pub mod base;
 pub mod polyline;
 pub mod circle;
+pub mod rectangle;
 
 pub use base::{LineStyle, Shape, ShapeBase};
 pub use polyline::Polyline;
 pub use circle::Circle;
+pub use rectangle::Rectangle;
 
 // Planned Shapes:
 // - Polyline
