@@ -1,10 +1,7 @@
 // text.rs
 
-//use crate::gui_lib::{Color32, Pos2, Shape, ShapeBase, TextFont}; //TDJ
-
 use crate::gui_lib::egui::{self, Color32, Pos2};
 use crate::gui_lib::shapes::base::{Shape, ShapeBase};
-//use crate::gui_lib::TextFont;
 
 #[derive(Debug)]
 pub enum TextFont {

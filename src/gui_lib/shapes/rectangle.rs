@@ -10,16 +10,21 @@ pub struct Rectangle {
     pub size: Vec2,
 }
 impl Rectangle {
-    pub fn new(center: Pos2, size: Vec2) -> Self {
+     pub fn new(top_left: Pos2, size: Vec2) -> Self {
         Rectangle {
             base: {
                 ShapeBase {
-                    location: center,
+                    location: top_left,
                     ..Default::default()
                 }
             },
-            size: size,
+            size,
         }
+    }
+
+    pub fn new_from_center(center: Pos2, size: Vec2) -> Self {
+        let top_left = Pos2::new(center.x - size.x/2.0, center.y - size.y/2.0);
+        Self::new(top_left, size)
     }
 }
 
@@ -32,7 +37,7 @@ impl Shape for Rectangle {
     }
 
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-        let rect = Rect::from_center_size(self.base.location() + canvas_offset, self.size);
+        let rect = Rect::from_min_size(self.base.location() + canvas_offset, self.size);
         painter.rect(
             rect,
             CornerRadius::ZERO,

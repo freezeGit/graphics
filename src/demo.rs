@@ -246,7 +246,8 @@ impl TheCanvas {
         canvas.add_shape(sc2_cln as ShapeHandle);
 
         // Add shape with handle
-        let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+        let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
+        //let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
             eframe::egui::Pos2::new(400.0, 200.0),
             eframe::egui::Vec2::new(150.0, 100.0),
         )));
@@ -278,7 +279,8 @@ impl TheCanvas {
 
         // Add shape with handle
         // TDJ: change to left upper corner when possible
-        let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+        //let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+        let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
             eframe::egui::Pos2::new(500.0, 350.0),
             eframe::egui::Vec2::new(850.0, 50.0),
         )));
