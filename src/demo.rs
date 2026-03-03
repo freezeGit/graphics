@@ -76,14 +76,15 @@
 use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
 use crate::gui_lib::{
-    BasicCanvas, Button, Circle, Color32, DragFloat, MessageBoxDlg, DragFloatDlg, Label, Polyline, Rectangle,
-    Separator, Slider, Space, Text, TextEntryDlg, Timer,
+    BasicCanvas, Button, Circle, Color32, DragFloat, DragFloatDlg, Label, MessageBoxDlg, Polyline,
+    Rectangle, Separator, Slider, Space, Text, TextEntryDlg, Timer,
 };
 use crate::gui_lib::{
-    ButtonId, DragFloatDlgId, DragFloatId, Shape, ShapeHandle, SliderId, MessageBoxDlgId,
+    ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, Shape, ShapeHandle, SliderId,
     TextEntryDlgId, WidgetMsg,
 };
-use crate::gui_lib::{Dialog, DialogId, TextFont};
+//use crate::gui_lib::{Dialog, DialogId, TextFont};
+use crate::gui_lib::{Dialog, DialogId};
 use crate::gui_lib::{LineStyle::*, World};
 use eframe::egui::Context;
 use egui::RichText;
@@ -495,7 +496,7 @@ impl TheApp {
         match id {
             BTN_ABOUT => {
                 self.dialog = ActiveDialog::About(MessageBoxDlg::new(
-                     DLG_ABOUT,
+                    DLG_ABOUT,
                     "About",
                     "gui_lib demo v0.1\nWritten in Rust + egui",
                 ));

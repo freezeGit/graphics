@@ -13,29 +13,25 @@
 /// including buttons, canvas and visual styling utilities. It implements
 /// a custom drawing system through the `Draw` trait. It implements a custom widget system through the
 /// 'Widget' trait, and a custom modal dialog system through th 'do_modal' trait.
-
 // ---- Public re-exports ----
 pub use eframe::egui::{
-    self as egui,
-    Button as EguiButton,
-    Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui, Vec2, Visuals,
-    pos2, vec2,
+    self as egui, Button as EguiButton, Color32, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Ui,
+    Vec2, Visuals, pos2, vec2,
 };
 use eframe::egui::{CentralPanel, Context, RichText};
 use std::{cell::RefCell, rc::Rc};
 // ---- Submodules ----
 pub mod ids;
-pub mod widgets;
 pub mod shapes;
+pub mod widgets;
 
 // ---- Public API ----
-pub use widgets::{Widget, Space, Separator, Label, Button, Slider, DragFloat};
 pub use ids::{
-    WidgetId, ButtonId, SliderId, DragFloatId,
-    DialogId, MessageBoxDlgId, TextEntryDlgId, DragFloatDlgId,
-    WidgetMsg,
+    ButtonId, DialogId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, SliderId, TextEntryDlgId,
+    WidgetId, WidgetMsg,
 };
-pub use shapes::{LineStyle, Shape, ShapeBase, Polyline, Circle, Rectangle};
+pub use shapes::{Circle, LineStyle, Polyline, Rectangle, Shape, ShapeBase, Text};
+pub use widgets::{Button, DragFloat, Label, Separator, Slider, Space, Widget};
 
 // Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
 pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
@@ -107,12 +103,6 @@ impl Timer {
     pub fn is_running(&self) -> bool {
         self.running
     }
-
-    // Frozen time
-    // pub fn run(&mut self, ctx: &Context) {
-    //     self.running = true;
-    //     self.last_time = ctx.input(|i| i.time);
-    // }
 
     // Not using "frozen time" because ctx may not be available easily.
     pub fn run(&mut self) {
@@ -476,7 +466,7 @@ pub struct DragFloatDlg {
 }
 
 impl DragFloatDlg {
-        pub fn new(
+    pub fn new(
         id: DragFloatDlgId,
         title: impl Into<String>,
         prompt: impl Into<String>,
@@ -529,81 +519,3 @@ impl Dialog for DragFloatDlg {
         close
     }
 }
-
-#[derive(Debug)]
-pub enum TextFont {
-    Proportional,
-    Monospace,
-}
-//#[derive(Debug, Default)]
-#[derive(Debug)]
-pub struct Text {
-    base: ShapeBase,
-    text: String,
-    color: Color32,
-    size: f32,
-    font: TextFont,
-}
-
-impl Text {
-    pub fn new(top_left: Pos2, text: impl Into<String>) -> Self {
-        Self {
-            base: {
-                ShapeBase {
-                    location: top_left,
-                    ..Default::default()
-                }
-            },
-            text: text.into(),
-            color: Color32::BLACK,
-            size: 24.0,
-            font: TextFont::Proportional,
-        }
-    }
-
-    pub fn set_text(&mut self, text: impl Into<String>) {
-        self.text = text.into();
-    }
-
-    pub fn set_color(&mut self, color: Color32) {
-        self.color = color;
-    }
-
-    pub fn set_size(&mut self, size: f32) {
-        self.size = size;
-    }
-
-    pub fn set_font(&mut self, font: TextFont) {
-        self.font = font;
-    }
-}
-
-impl Shape for Text {
-    fn base(&self) -> &ShapeBase {
-        &self.base
-    }
-    fn base_mut(&mut self) -> &mut ShapeBase {
-        &mut self.base
-    }
-
-    fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-        //let center = self.base.location + canvas_offset;
-        //let tl = self.base.location + canvas_offset;
-        let tl = self.base.location() + canvas_offset;
-        let font_id = match self.font {
-            TextFont::Proportional => egui::FontId::proportional(self.size),
-            TextFont::Monospace => egui::FontId::monospace(self.size),
-        };
-
-        painter.text(
-            tl,
-            egui::Align2::LEFT_TOP,
-            self.text.as_str(),
-            //FontId::proportional(20.0),
-            font_id,
-            //Color32::BLACK,
-            self.color,
-        );
-    }
-}
-

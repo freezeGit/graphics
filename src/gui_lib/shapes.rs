@@ -1,14 +1,16 @@
 // src/gui_lib/shapes.rs
 
 pub mod base;
-pub mod polyline;
 pub mod circle;
+pub mod polyline;
 pub mod rectangle;
+pub mod text;
 
 pub use base::{LineStyle, Shape, ShapeBase};
-pub use polyline::Polyline;
 pub use circle::Circle;
+pub use polyline::Polyline;
 pub use rectangle::Rectangle;
+pub use text::Text;
 
 // Planned Shapes:
 // - Polyline
@@ -32,4 +34,3 @@ pub use rectangle::Rectangle;
 // Discussion in ChatGPT
 // - Rust question/Modular structure refactor
 //  "allow dashed and dotted lines"
-

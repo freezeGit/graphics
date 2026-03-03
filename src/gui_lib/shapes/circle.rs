@@ -26,7 +26,6 @@ impl Circle {
         let center = Pos2::new(tl.x + radius, tl.y + radius);
         Self::new(center, radius)
     }
-
 }
 
 impl Shape for Circle {
@@ -48,4 +47,3 @@ impl Shape for Circle {
         );
     }
 }
-

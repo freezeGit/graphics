@@ -1,8 +1,8 @@
 // src/gui_lib/widgets.rs
 
-use egui::RichText;
 use crate::gui_lib::Color32;
 use crate::gui_lib::ids::{ButtonId, DragFloatId, SliderId, WidgetMsg};
+use egui::RichText;
 
 /// Trait for invoking any widget in the UI.
 pub trait Widget: std::fmt::Debug {
@@ -34,7 +34,9 @@ impl Widget for Space {
 pub struct Separator;
 
 impl Separator {
-    pub fn new() -> Self { Self }
+    pub fn new() -> Self {
+        Self
+    }
 }
 impl Widget for Separator {
     fn invoke(&mut self, ui: &mut egui::Ui, _out: &mut Vec<WidgetMsg>) {

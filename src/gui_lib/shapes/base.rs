@@ -63,7 +63,7 @@ pub trait Shape: std::fmt::Debug {
     fn set_line_width(&mut self, lw: f32) {
         self.base_mut().set_line_width(lw)
     }
-    fn line_style(&self) -> LineStyle{
+    fn line_style(&self) -> LineStyle {
         self.base().line_style
     }
     fn set_line_style(&mut self, ls: LineStyle) {
@@ -120,7 +120,7 @@ impl ShapeBase {
         self.line_width = lw;
     }
 
-    pub fn line_style(&self) -> LineStyle{
+    pub fn line_style(&self) -> LineStyle {
         self.line_style
     }
     pub fn set_line_style(&mut self, ls: LineStyle) {

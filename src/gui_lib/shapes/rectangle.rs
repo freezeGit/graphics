@@ -18,7 +18,6 @@ impl Rectangle {
                     ..Default::default()
                 }
             },
-            //location: center,
             size: size,
         }
     }
@@ -39,7 +38,7 @@ impl Shape for Rectangle {
             CornerRadius::ZERO,
             self.base.fill_color(),
             Stroke::new(self.base.line_width(), self.base.color()), // border
-            StrokeKind::Outside,  // Outside / Inside / Middle
+            StrokeKind::Outside,                                    // Outside / Inside / Middle
         );
     }
 }
