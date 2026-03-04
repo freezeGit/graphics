@@ -10,7 +10,7 @@ pub use base::{LineStyle, Shape, ShapeBase};
 pub use circle::Circle;
 pub use polyline::Polyline;
 pub use rectangle::Rectangle;
-pub use text::Text;
+pub use text::{Text, TextFont};
 
 // Planned Shapes:
 // - Polyline

@@ -3,7 +3,8 @@
 use crate::gui_lib::egui::{self, Color32, Pos2};
 use crate::gui_lib::shapes::base::{Shape, ShapeBase};
 
-#[derive(Debug)]
+/// For Text, `base.location` is the top-left anchor used with Align2::LEFT_TOP.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TextFont {
     Proportional,
     Monospace,
@@ -14,7 +15,6 @@ pub enum TextFont {
 pub struct Text {
     base: ShapeBase,
     text: String,
-    color: Color32,
     size: f32,
     font: TextFont,
 }
@@ -22,31 +22,33 @@ pub struct Text {
 impl Text {
     pub fn new(top_left: Pos2, text: impl Into<String>) -> Self {
         Self {
-            base: {
-                ShapeBase {
-                    location: top_left,
-                    ..Default::default()
-                }
+            base: ShapeBase {
+                location: top_left,
+                ..Default::default()
             },
             text: text.into(),
-            color: Color32::BLACK,
+            //color: Color32::BLACK,
             size: 24.0,
             font: TextFont::Proportional,
         }
     }
 
+    pub fn text(&self) -> &str { &self.text }
     pub fn set_text(&mut self, text: impl Into<String>) {
         self.text = text.into();
     }
 
+    pub fn color(&self) -> Color32 { self.base.color() }
     pub fn set_color(&mut self, color: Color32) {
-        self.color = color;
+        self.base_mut().set_color(color);
     }
 
+    pub fn size(&self) -> f32 { self.size }
     pub fn set_size(&mut self, size: f32) {
         self.size = size;
     }
 
+    pub fn font(&self) -> TextFont { self.font }
     pub fn set_font(&mut self, font: TextFont) {
         self.font = font;
     }
@@ -72,7 +74,7 @@ impl Shape for Text {
             egui::Align2::LEFT_TOP,
             self.text.as_str(),
             font_id,
-            self.color,
+            self.base.color,
         );
     }
 }
