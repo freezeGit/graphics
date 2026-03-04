@@ -73,12 +73,21 @@
 ///
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
-use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
+
+// TDJ Cleanup imports
 use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
+use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
+
 use crate::gui_lib::{
     BasicCanvas, Button, Circle, Color32, DragFloat, DragFloatDlg, Label, MessageBoxDlg, Polyline,
     Rectangle, Separator, Slider, Space, Text, TextEntryDlg, Timer,
 };
+// pub use eframe::egui::{
+//     self as egui,
+//     Color32, Pos2, Vec2, Rect, Stroke, StrokeKind,
+//     CornerRadius, Ui, Visuals,
+//     pos2, vec2,
+// };
 use crate::gui_lib::{
     ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, Shape, ShapeHandle, SliderId,
     TextEntryDlgId, WidgetMsg,
