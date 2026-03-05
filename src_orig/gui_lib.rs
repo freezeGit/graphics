@@ -55,8 +55,8 @@ pub fn native_options() -> eframe::NativeOptions {
 }
 //----------------------------------------------------------
 
-/// A trait that represents a world with the ability to advance its state.
-pub trait World: std::fmt::Debug {
-    fn advance(&mut self);
-}
+
+// pub trait World: std::fmt::Debug {
+//     fn advance(&mut self);
+// }
 

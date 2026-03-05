@@ -74,11 +74,13 @@
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
 
-// TDJ Cleanup imports
-use crate::gui_lib::{BKG_EXAMPLE, BKG_WINDOWS};
-use crate::gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
+use ::gui_lib as gl;
 
-use crate::gui_lib::{
+// TDJ Cleanup imports
+use gl::{BKG_EXAMPLE, BKG_WINDOWS};
+use gl::LayoutStyle::{NoPanel, SidePanel, TopPanel};
+
+use gl::{
     BasicCanvas, Button, Circle, Color32, DragFloat, DragFloatDlg, Label, MessageBoxDlg, Polyline,
     Rectangle, Separator, Slider, Space, Text, TextEntryDlg, Timer,
 };
@@ -88,15 +90,15 @@ use crate::gui_lib::{
 //     CornerRadius, Ui, Visuals,
 //     pos2, vec2,
 // };
-use crate::gui_lib::{
+use gl::{
     ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, Shape, ShapeHandle, SliderId,
     TextEntryDlgId, WidgetMsg,
 };
-//use crate::gui_lib::{Dialog, DialogId, TextFont};
-use crate::gui_lib::{Dialog, DialogId};
-use crate::gui_lib::{LineStyle::*, World};
-use eframe::egui::Context;
-use egui::RichText;
+//use gui_lib::{Dialog, DialogId, TextFont};
+use gl::{Dialog, DialogId};
+//use gl::{LineStyle::*, World};
+use gl::{LineStyle::*};
+use gl::egui::{Context, RichText};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -167,13 +169,13 @@ struct TheWorld {
     value: f64,
 }
 
-impl World for TheWorld {
-    // Advance the world one step
-    fn advance(&mut self) {
-        //self.state += 1;
-        self.toggle_light();
-    }
-}
+// impl World for TheWorld {
+//     // Advance the world one step
+//     fn advance(&mut self) {
+//         //self.state += 1;
+//         self.toggle_light();
+//     }
+// }
 
 impl TheWorld {
     fn new() -> Self {
@@ -189,6 +191,11 @@ impl TheWorld {
             name: "Steve".to_string(),
             value: 0.0,
         }
+    }
+
+    fn advance(&mut self) {
+        //self.state += 1;
+        self.toggle_light();
     }
 
     fn toggle_light(&mut self) {
@@ -670,7 +677,8 @@ impl eframe::App for TheApp {
 pub fn run_the_app() -> Result<(), eframe::Error> {
     eframe::run_native(
         "GUI Draw Example",
-        crate::gui_lib::native_options(),
+        gl::native_options(),
+        //eframe::NativeOptions::default(),
         Box::new(|cc| {
             cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
             let app = Box::new(TheApp::new());
