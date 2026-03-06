@@ -254,3 +254,15 @@ pub fn run_the_app() -> Result<(), eframe::Error> {
     )
 }
 
+// pub fn run_the_app() -> Result<(), eframe::Error> {
+//     eframe::run_native(
+//         "GUI Draw Example",
+//         gl::native_options(),
+//         //eframe::NativeOptions::default(),
+//         Box::new(|cc| {
+//             cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
+//             let app = Box::new(TheApp::new());
+//             Ok(app)
+//         }),
+//     )
+// }
