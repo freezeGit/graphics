@@ -1,11 +1,11 @@
 // lib.rs
 
-pub mod canvas;
-pub mod dialogs;
-pub mod ids;
-pub mod shapes;
-pub mod timer;
-pub mod widgets;
+mod canvas;
+mod dialogs;
+mod ids;
+mod shapes;
+mod timer;
+mod widgets;
 
 // Public API re-exports (nice for both demo apps AND your internal modules)
 // IDs and message types
