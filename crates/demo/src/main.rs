@@ -9,11 +9,10 @@
 //new stuff
 // ----------------------------
 mod ids;
-// mod world;
+mod world;
 // mod canvas;
 // mod app;
-//
-mod demo; // optional, only if you keep run_the_app in demo.rs
+mod demo; // optional. Shrink and delete finally
 
 fn main() -> Result<(), eframe::Error> {
     demo::run_the_app()

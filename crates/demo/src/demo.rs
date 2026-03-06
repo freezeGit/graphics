@@ -75,6 +75,10 @@
 /// using the components defined in the `gui_lib` module.
 
 use crate::ids::*;
+use crate::world::TheWorld;
+use crate::world::Signal;
+use crate::world::ThingState;
+
 
 use ::gui_lib as gl;
 
@@ -86,12 +90,7 @@ use gl::{
     BasicCanvas, Button, Circle, Color32, DragFloat, DragFloatDlg, Label, MessageBoxDlg, Polyline,
     Rectangle, Separator, Slider, Space, Text, TextEntryDlg, Timer,
 };
-// pub use eframe::egui::{
-//     self as egui,
-//     Color32, Pos2, Vec2, Rect, Stroke, StrokeKind,
-//     CornerRadius, Ui, Visuals,
-//     pos2, vec2,
-// };
+
 use gl::{
     ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, Shape, ShapeHandle, SliderId,
     TextEntryDlgId, WidgetMsg,
@@ -121,92 +120,84 @@ use std::rc::Rc;
 // const DLG_ENTER_NAME: TextEntryDlgId = TextEntryDlgId(1);
 // const DLG_ENTER_VALUE: DragFloatDlgId = DragFloatDlgId(1);
 
-#[derive(Debug)]
-struct Gauge {
-    pointer: f64,
-}
+// #[derive(Debug)]
+// struct Gauge {
+//     pointer: f64,
+// }
+//
+// impl Gauge {
+//     fn new() -> Self {
+//         Self { pointer: 0.0 }
+//     }
+//
+//     fn pointer(&self) -> f64 {
+//         self.pointer
+//     }
+//
+//     fn set_pointer(&mut self, pointer: f64) {
+//         self.pointer = pointer;
+//     }
+// }
 
-impl Gauge {
-    fn new() -> Self {
-        Self { pointer: 0.0 }
-    }
-
-    fn pointer(&self) -> f64 {
-        self.pointer
-    }
-
-    fn set_pointer(&mut self, pointer: f64) {
-        self.pointer = pointer;
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-enum Signal {
-    Stop,
-    Go,
-}
-#[derive(Debug)]
-struct TrafficLight {
-    state: Signal,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-enum ThingState {
-    StateA,
-    StateB,
-    StateC,
-}
-#[derive(Debug)]
-struct Thing {
-    state: ThingState,
-}
-
-#[derive(Debug)]
-struct TheWorld {
-    //state: i32,
-    tl: TrafficLight,
-    thing: Thing,
-    gauge: Gauge,
-    name: String,
-    value: f64,
-}
-
-// impl World for TheWorld {
-//     // Advance the world one step
+// #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+// enum Signal {
+//     Stop,
+//     Go,
+// }
+// #[derive(Debug)]
+// struct TrafficLight {
+//     state: Signal,
+// }
+//
+// #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+// enum ThingState {
+//     StateA,
+//     StateB,
+//     StateC,
+// }
+// #[derive(Debug)]
+// struct Thing {
+//     state: ThingState,
+// }
+//
+// #[derive(Debug)]
+// struct TheWorld {
+//     //state: i32,
+//     tl: TrafficLight,
+//     thing: Thing,
+//     gauge: Gauge,
+//     name: String,
+//     value: f64,
+// }
+//
+// impl TheWorld {
+//     fn new() -> Self {
+//         Self {
+//             //state: 0,
+//             tl: TrafficLight {
+//                 state: Signal::Stop,
+//             },
+//             thing: Thing {
+//                 state: ThingState::StateC,
+//             },
+//             gauge: Gauge::new(),
+//             name: "Steve".to_string(),
+//             value: 0.0,
+//         }
+//     }
+//
 //     fn advance(&mut self) {
 //         //self.state += 1;
 //         self.toggle_light();
 //     }
+//
+//     fn toggle_light(&mut self) {
+//         self.tl.state = match self.tl.state {
+//             Signal::Stop => Signal::Go,
+//             Signal::Go => Signal::Stop,
+//         };
+//     }
 // }
-
-impl TheWorld {
-    fn new() -> Self {
-        Self {
-            //state: 0,
-            tl: TrafficLight {
-                state: Signal::Stop,
-            },
-            thing: Thing {
-                state: ThingState::StateC,
-            },
-            gauge: Gauge::new(),
-            name: "Steve".to_string(),
-            value: 0.0,
-        }
-    }
-
-    fn advance(&mut self) {
-        //self.state += 1;
-        self.toggle_light();
-    }
-
-    fn toggle_light(&mut self) {
-        self.tl.state = match self.tl.state {
-            Signal::Stop => Signal::Go,
-            Signal::Go => Signal::Stop,
-        };
-    }
-}
 #[derive(Debug)]
 pub struct TheCanvas {
     canvas: BasicCanvas,
