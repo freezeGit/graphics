@@ -1,3 +1,8 @@
+//! Program state and simulation logic.
+//!
+//! This module defines `TheWorld` and related types.
+//! It deliberately has no dependency on gui_lib or egui.
+
 // world.rs
 
 #[derive(Debug)]

@@ -1,3 +1,10 @@
+//! ## Application
+//! The main structure and entry point of the application.
+//! - Contains a `Canvas` for holding a collection of shapes.
+//! - Provides methods for creating and updating the UI.
+//! - May contain a 'World" (or 'Model' or 'Document') 
+//!   which contains all  non-gui program data and logic
+
 // app.rs
 
 use ::gui_lib as gl;

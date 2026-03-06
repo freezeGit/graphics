@@ -1,3 +1,11 @@
+//! ## Canvas
+//! A container for rendering and managing graphical shapes 
+//! and interactive widgets.
+//! - Manages a collection of shapes using the `Shape` trait.
+//! - Supports dynamic updates of shape properties.
+//! - Manages a collection of widgets using the `Widget` trait.
+//! - Integrates with the `gui_lib` library for rendering.
+
 // canvas.rs
 
 use std::cell::RefCell;
