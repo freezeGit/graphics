@@ -10,8 +10,8 @@
 // ----------------------------
 mod ids;
 mod world;
-// mod canvas;
-// mod app;
+mod canvas;
+mod app;
 mod demo; // optional. Shrink and delete finally
 
 fn main() -> Result<(), eframe::Error> {

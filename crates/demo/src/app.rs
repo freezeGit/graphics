@@ -1,0 +1,3 @@
+// app.rs
+
+struct xxxxx{}
