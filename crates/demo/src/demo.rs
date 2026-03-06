@@ -74,6 +74,8 @@
 /// This module defines the demo application structure and its behavior,
 /// using the components defined in the `gui_lib` module.
 
+use crate::ids::*;
+
 use ::gui_lib as gl;
 
 // TDJ Cleanup imports
@@ -102,22 +104,22 @@ use gl::egui::{Context, RichText};
 use std::cell::RefCell;
 use std::rc::Rc;
 
-const SLIDER_GAUGE: SliderId = SliderId(1);
-const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
-
-const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
-
-const BTN_STATE_A: ButtonId = ButtonId(1);
-const BTN_STATE_B: ButtonId = ButtonId(2);
-const BTN_RUN_PAUSE: ButtonId = ButtonId(3);
-const BTN_ABOUT: ButtonId = ButtonId(4);
-const BTN_ENTER_NAME: ButtonId = ButtonId(5);
-const BTN_ENTER_VALUE: ButtonId = ButtonId(6);
-
-//const DLG_ENTER_NAME: DialogId = 1;
-const DLG_ABOUT: MessageBoxDlgId = MessageBoxDlgId(1);
-const DLG_ENTER_NAME: TextEntryDlgId = TextEntryDlgId(1);
-const DLG_ENTER_VALUE: DragFloatDlgId = DragFloatDlgId(1);
+// const SLIDER_GAUGE: SliderId = SliderId(1);
+// const SLIDER_ANOTHER: SliderId = SliderId(2); // Not used in this demo
+//
+// const DRAGFLOAT_GAUGE: DragFloatId = DragFloatId(1);
+//
+// const BTN_STATE_A: ButtonId = ButtonId(1);
+// const BTN_STATE_B: ButtonId = ButtonId(2);
+// const BTN_RUN_PAUSE: ButtonId = ButtonId(3);
+// const BTN_ABOUT: ButtonId = ButtonId(4);
+// const BTN_ENTER_NAME: ButtonId = ButtonId(5);
+// const BTN_ENTER_VALUE: ButtonId = ButtonId(6);
+//
+// //const DLG_ENTER_NAME: DialogId = 1;
+// const DLG_ABOUT: MessageBoxDlgId = MessageBoxDlgId(1);
+// const DLG_ENTER_NAME: TextEntryDlgId = TextEntryDlgId(1);
+// const DLG_ENTER_VALUE: DragFloatDlgId = DragFloatDlgId(1);
 
 #[derive(Debug)]
 struct Gauge {
