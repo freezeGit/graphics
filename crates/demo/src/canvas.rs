@@ -1,10 +1,7 @@
-//! ## Canvas
+//! ## module Canvas
+//! Declation for struct TheCanvas: 
 //! A container for rendering and managing graphical shapes
 //! and interactive widgets.
-//! - Manages a collection of shapes using the `Shape` trait.
-//! - Supports dynamic updates of shape properties.
-//! - Manages a collection of widgets using the `Widget` trait.
-//! - Integrates with the `gui_lib` library for rendering.
 
 // canvas.rs
 
@@ -24,12 +21,19 @@ use crate::ids::{
 };
 use crate::world::{Signal, TheWorld, ThingState};
 
+/// ## struct Canvas
+/// A container for rendering and managing graphical shapes
+/// and interactive widgets.
+/// - Manages a collection of shapes using the `Shape` trait.
+/// - Supports dynamic updates of shape properties.
+/// - Manages a collection of widgets using the `Widget` trait.
+/// - Integrates with the `gui_lib` library for rendering.
 #[derive(Debug)]
 pub(crate) struct TheCanvas {
     pub(crate) canvas: BasicCanvas,
-    sc1: Rc<RefCell<Circle>>,
-    sc2: Rc<RefCell<Circle>>,
-    sr: Rc<RefCell<Rectangle>>,
+    circle1: Rc<RefCell<Circle>>,
+    circle2: Rc<RefCell<Circle>>,
+    rect: Rc<RefCell<Rectangle>>,
     sp: Rc<RefCell<Polyline>>,
     arrow_head: Rc<RefCell<Polyline>>,
     stxt: Rc<RefCell<Text>>,
@@ -45,7 +49,7 @@ impl TheCanvas {
         //let mut canvas = BasicCanvas::new(SidePanel, BKG_EXAMPLE);
         //let mut canvas = BasicCanvas::new(NoPanel, BKG_EXAMPLE);
 
-        // Add shapes without handles to the canvas
+        // Add shapes as ShapeHandle's to the canvas (in BasicCanvas::Vec<ShapeHandle>)
         let mut y = 75.0;
         for _ in 0..22 {
             //note: vee will be lost. It will not be a field in Self
@@ -57,41 +61,38 @@ impl TheCanvas {
                     eframe::egui::Pos2::new(20.0, 0.0),
                 ],
             )));
+            // Add shape as handle to the canvas (in Vec shapes)
             let vee_cln: ShapeHandle = vee.clone();
             canvas.add_shape(vee_cln as ShapeHandle);
             y += 10.0;
         }
 
-        // Add shape with handle
-        let sc1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+        // Add shape with handle. Also declared as a field in TheCanvas
+        let circle1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
             eframe::egui::Pos2::new(200.0, 200.0),
             75.0,
         )));
-        sc1.borrow_mut().set_line_width(4.0);
-        sc1.borrow_mut().set_fill_color(Color32::GRAY);
-        let sc1_cln: ShapeHandle = sc1.clone();
-        canvas.add_shape(sc1_cln as ShapeHandle);
+        circle1.borrow_mut().set_line_width(4.0);
+        circle1.borrow_mut().set_fill_color(Color32::GRAY);
+        let circle1_cln: ShapeHandle = circle1.clone();
+        canvas.add_shape(circle1_cln as ShapeHandle);
 
-        // Add shape with handle
-        let sc2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+        let circle2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
             eframe::egui::Pos2::new(200.0, 200.0),
             10.0,
         )));
-        sc2.borrow_mut().set_fill_color(Color32::RED);
-        let sc2_cln: ShapeHandle = sc2.clone();
-        canvas.add_shape(sc2_cln as ShapeHandle);
+        circle2.borrow_mut().set_fill_color(Color32::RED);
+        let circle2_cln: ShapeHandle = circle2.clone();
+        canvas.add_shape(circle2_cln as ShapeHandle);
 
-        // Add shape with handle
-        let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
-            //let sr: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+        let rect: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
             eframe::egui::Pos2::new(400.0, 200.0),
             eframe::egui::Vec2::new(150.0, 100.0),
         )));
-        sr.borrow_mut().set_fill_color(Color32::LIGHT_GRAY);
-        let sr_cln: ShapeHandle = sr.clone();
-        canvas.add_shape(sr_cln as ShapeHandle);
+        rect.borrow_mut().set_fill_color(Color32::LIGHT_GRAY);
+        let rect_cln: ShapeHandle = rect.clone();
+        canvas.add_shape(rect_cln as ShapeHandle);
 
-        // Add shape with handle
         let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
             eframe::egui::Pos2::new(550.0, 200.0),
             [
@@ -203,9 +204,9 @@ impl TheCanvas {
         //Create the TheCanvas
         Self {
             canvas,
-            sc1,
-            sc2,
-            sr,
+            circle1,
+            circle2,
+            rect,
             sp,
             arrow_head,
             stxt,
@@ -230,7 +231,7 @@ impl TheCanvas {
         } else {
             Color32::GREEN
         };
-        self.sc2.borrow_mut().set_fill_color(tlc);
+        self.circle2.borrow_mut().set_fill_color(tlc);
 
         // Update gauge pointer
         let mut ah_pos = self.arrow_head.borrow_mut().location();
@@ -240,11 +241,11 @@ impl TheCanvas {
         // Update thing state, color coded
         match world.thing.state {
             ThingState::StateA => {
-                self.sr.borrow_mut().set_fill_color(Color32::GOLD);
+                self.rect.borrow_mut().set_fill_color(Color32::GOLD);
                 self.stxt.borrow_mut().set_text("State A");
             }
             ThingState::StateB => {
-                self.sr.borrow_mut().set_fill_color(Color32::CYAN);
+                self.rect.borrow_mut().set_fill_color(Color32::CYAN);
                 self.stxt.borrow_mut().set_text("State B");
             }
             _ => {}

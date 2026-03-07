@@ -1,5 +1,4 @@
-//! ## Application
-//! The main structure and entry point of the application.
+//! ## Application. struct TheApp is the main structure and entry point of the application.
 //! - Contains a `Canvas` for holding a collection of shapes.
 //! - Provides methods for creating and updating the UI.
 //! - May contain a 'World" (or 'Model' or 'Document')
@@ -10,15 +9,15 @@
 use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
-    ButtonId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, SliderId, TextEntryDlg,
-    TextEntryDlgId, Timer, Dialog, WidgetMsg,
+    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, SliderId,
+    TextEntryDlg, TextEntryDlgId, Timer, WidgetMsg,
 };
 
+use crate::canvas::TheCanvas;
 use crate::ids::{
     BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
     DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
 };
-use crate::canvas::TheCanvas;
 use crate::world::{TheWorld, ThingState};
 
 /// Main application structure.
@@ -40,8 +39,8 @@ impl TheApp {
     /// intended to demonstrate usage of gui_lib.
     ///
     /// # Returns
-    /// A new `TheApp` instance initialized with a canvas
-    /// and world.
+    /// A new `TheApp` instance initialized with a canvas and wold
+    /// as well as a vec of messages, an active dialog, and a timer.
 
     fn new() -> Self {
         Self {
@@ -53,7 +52,7 @@ impl TheApp {
         }
     }
 
-    //impl TheApp {
+    // What to do with messages from widgets and dialogs.
     fn handle_msg(&mut self, msg: WidgetMsg) {
         match msg {
             WidgetMsg::ButtonClicked(id) => {
@@ -234,14 +233,17 @@ impl eframe::App for TheApp {
             // ----- Update canvas once after all state changes:
             self.canvas.update(&self.world);
         }
+        // If there are background processes or animation:
         // schedule the next frame redraw after 16 milliseconds (60 FPS)
         // Frame rate can be set faster or slower than 60 FPS.
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        //By default, egui is reactive, meaning it only repaints when there's an
+        // input event (like mouse movement or a key press).
     }
 }
 
 // -----------------------------
-
+/// enum ActiveDialog holds the currently active dialog.
 #[derive(Debug)]
 enum ActiveDialog {
     None,
@@ -258,6 +260,8 @@ impl ActiveDialog {
 
 // ----------------------------------
 
+/// fn run_the_app() starts a native (desktop) app.
+/// Calls eframe::run_native() to create TheApp
 pub fn run_the_app() -> Result<(), eframe::Error> {
     eframe::run_native(
         "gui_lib demo",
@@ -270,4 +274,3 @@ pub fn run_the_app() -> Result<(), eframe::Error> {
         }),
     )
 }
-
