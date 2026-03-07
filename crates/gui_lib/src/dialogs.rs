@@ -1,11 +1,9 @@
 // dialogs.rs
 
-// use crate::gui_lib::egui;
-// use crate::gui_lib::ids::{
-//     MessageBoxDlgId, TextEntryDlgId, DragFloatDlgId, WidgetMsg
-// };
 use crate::egui;
 use crate::ids::{DragFloatDlgId, MessageBoxDlgId, TextEntryDlgId, WidgetMsg};
+
+// -----------------------------
 pub trait Dialog: std::fmt::Debug {
     /// Returns true if it closed this frame.
     fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;

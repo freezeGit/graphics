@@ -47,7 +47,6 @@ pub(crate) struct Thing {
 
 #[derive(Debug)]
 pub(crate) struct TheWorld {
-    //state: i32,
     pub(crate) tl: TrafficLight,
     pub(crate) thing: Thing,
     pub(crate) gauge: Gauge,

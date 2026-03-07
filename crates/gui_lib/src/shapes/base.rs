@@ -1,6 +1,5 @@
 // base.rs
 
-//use crate::gui_lib::egui::{self, Color32, Pos2, Vec2};
 use crate::egui::{self, Color32, Pos2, Vec2};
 
 #[derive(Debug, Clone, Copy, PartialEq)]

@@ -1,8 +1,5 @@
 // src/gui_lib/widgets.rs
 
-// use crate::gui_lib::Color32;
-// use crate::gui_lib::ids::{ButtonId, DragFloatId, SliderId, WidgetMsg};
-// use egui::RichText;
 use crate::Color32;
 use crate::egui::RichText;
 use crate::ids::{ButtonId, DragFloatId, SliderId, WidgetMsg};

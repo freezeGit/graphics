@@ -1,7 +1,5 @@
 // text.rs
 
-// use crate::gui_lib::egui::{self, Color32, Pos2};
-// use crate::gui_lib::shapes::base::{Shape, ShapeBase};
 use crate::egui::{self, Color32, Pos2};
 use crate::shapes::base::{Shape, ShapeBase};
 

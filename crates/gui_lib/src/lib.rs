@@ -18,11 +18,11 @@ pub use canvas::*;
 pub use dialogs::*;
 //pub use ids::WidgetMsg;          // WidgetMsg lives in ids.rs
 pub use shapes::base::{Shape, ShapeBase}; // because Shape + ShapeBase live in shapes/base.rs
-pub use shapes::*; // re-export Circle/Rectangle/etc (and maybe more)
+pub use shapes::*; // re-export Circle/Rectangle/etc
 pub use timer::*;
 pub use widgets::{Widget, *}; // Widget trait lives in widgets.rs (and any other widget types)
 
-// Handy egui re-exports (optional but consistent with your style)
+// Handy egui re-exports
 pub use eframe::egui::{self, Color32, Context, Pos2, Rect, Stroke, Ui, Vec2};
 
 pub fn native_options() -> eframe::NativeOptions {

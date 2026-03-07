@@ -1,6 +1,5 @@
 // polyline.rs
-// use crate::gui_lib::egui::{self, Color32, Pos2, Vec2};
-// use crate::gui_lib::shapes::base::{LineStyle, Shape, ShapeBase};
+
 use crate::egui::{self, Color32, Pos2, Vec2};
 use crate::shapes::base::{LineStyle, Shape, ShapeBase};
 

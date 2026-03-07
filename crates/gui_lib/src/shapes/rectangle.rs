@@ -1,7 +1,5 @@
 // rectangle.rs
 
-// use crate::gui_lib::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
-// use crate::gui_lib::shapes::base::{Shape, ShapeBase};
 use crate::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
 use crate::shapes::base::{Shape, ShapeBase};
 

@@ -12,7 +12,6 @@ pub struct SliderId(pub WidgetId);
 pub struct DragFloatId(pub WidgetId);
 
 // -------------------------------
-
 pub type DialogId = u32;
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -24,6 +23,7 @@ pub struct TextEntryDlgId(pub DialogId);
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DragFloatDlgId(pub DialogId);
 
+// ----------------------------------
 #[derive(Debug, Clone, PartialEq)]
 pub enum WidgetMsg {
     // Widget outcomes:

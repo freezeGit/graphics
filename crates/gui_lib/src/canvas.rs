@@ -2,10 +2,11 @@
 
 use std::cell::RefCell;
 use std::rc::Rc;
-//use crate::gui_lib::{Shape, Widget, WidgetMsg,Color32};
+
 use crate::egui;
-use crate::{Color32, Shape, Widget, WidgetMsg};
 use eframe::egui::{CentralPanel, Context, RichText};
+
+use crate::{Color32, Shape, Widget, WidgetMsg};
 
 // Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
 pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
