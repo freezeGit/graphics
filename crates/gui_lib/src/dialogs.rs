@@ -5,9 +5,7 @@
 //     MessageBoxDlgId, TextEntryDlgId, DragFloatDlgId, WidgetMsg
 // };
 use crate::egui;
-use crate::ids::{
-    MessageBoxDlgId, TextEntryDlgId, DragFloatDlgId, WidgetMsg
-};
+use crate::ids::{DragFloatDlgId, MessageBoxDlgId, TextEntryDlgId, WidgetMsg};
 pub trait Dialog: std::fmt::Debug {
     /// Returns true if it closed this frame.
     fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
@@ -180,4 +178,3 @@ impl Dialog for DragFloatDlg {
 }
 
 // ------------------------------------------------
-

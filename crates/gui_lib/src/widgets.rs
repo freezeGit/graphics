@@ -4,8 +4,8 @@
 // use crate::gui_lib::ids::{ButtonId, DragFloatId, SliderId, WidgetMsg};
 // use egui::RichText;
 use crate::Color32;
-use crate::ids::{ButtonId, DragFloatId, SliderId, WidgetMsg};
 use crate::egui::RichText;
+use crate::ids::{ButtonId, DragFloatId, SliderId, WidgetMsg};
 
 /// Trait for invoking any widget in the UI.
 pub trait Widget: std::fmt::Debug {

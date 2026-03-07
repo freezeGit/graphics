@@ -1,5 +1,5 @@
 //! ## Canvas
-//! A container for rendering and managing graphical shapes 
+//! A container for rendering and managing graphical shapes
 //! and interactive widgets.
 //! - Manages a collection of shapes using the `Shape` trait.
 //! - Supports dynamic updates of shape properties.
@@ -8,14 +8,19 @@
 
 // canvas.rs
 
-use std::cell::RefCell;
-use std::rc::Rc;
-use gui_lib::{BasicCanvas, Shape, Button, Circle, Color32, DragFloat, Label, Polyline,
-              Rectangle, Separator, ShapeHandle, Space, Text, BKG_EXAMPLE};
+use crate::ids::{
+    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B,
+    DRAGFLOAT_GAUGE,
+};
+use crate::world::{Signal, TheWorld, ThingState};
 use gui_lib::LayoutStyle::TopPanel;
 use gui_lib::LineStyle::Dotted;
-use crate::ids::{BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DRAGFLOAT_GAUGE};
-use crate::world::{Signal, TheWorld, ThingState};
+use gui_lib::{
+    BKG_EXAMPLE, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
+    Separator, Shape, ShapeHandle, Space, Text,
+};
+use std::cell::RefCell;
+use std::rc::Rc;
 
 #[derive(Debug)]
 pub(crate) struct TheCanvas {
@@ -208,7 +213,7 @@ impl TheCanvas {
     }
 
     //TDJ: not used. Wat is fn for?
-    pub(crate)fn canvas(&self) -> &BasicCanvas {
+    pub(crate) fn canvas(&self) -> &BasicCanvas {
         &self.canvas
     }
     //TDJ: not used. Wat is fn for?
@@ -254,4 +259,4 @@ impl TheCanvas {
         let val_string: String = format!("{}{:.2}", "Value: ", val);
         self.stxtval.borrow_mut().set_text(val_string);
     }
-}  // end of impl TheCanvas
+} // end of impl TheCanvas

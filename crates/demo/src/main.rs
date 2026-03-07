@@ -72,10 +72,10 @@
 //! This application returns an `eframe::Error` if initialization or event handling fails.
 // main.rs
 
+mod app;
+mod canvas;
 mod ids;
 mod world;
-mod canvas;
-mod app;
 
 fn main() -> Result<(), eframe::Error> {
     app::run_the_app()

@@ -1,10 +1,7 @@
 //! ids used to identify widgets and dialogs
 
 use ::gui_lib as gl;
-use gl::{
-    ButtonId, SliderId, DragFloatId, DragFloatDlgId,
-    MessageBoxDlgId, TextEntryDlgId,
-};
+use gl::{ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, SliderId, TextEntryDlgId};
 
 // ---------- Widget ids
 pub(crate) const SLIDER_GAUGE: SliderId = SliderId(1);

@@ -2,18 +2,24 @@
 //! The main structure and entry point of the application.
 //! - Contains a `Canvas` for holding a collection of shapes.
 //! - Provides methods for creating and updating the UI.
-//! - May contain a 'World" (or 'Model' or 'Document') 
+//! - May contain a 'World" (or 'Model' or 'Document')
 //!   which contains all  non-gui program data and logic
 
 // app.rs
 
+use crate::canvas::TheCanvas;
+use crate::ids::{
+    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
+    DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
+};
+use crate::world::{TheWorld, ThingState};
 use ::gui_lib as gl;
 use egui::Context;
-use gui_lib::{ButtonId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, SliderId, TextEntryDlg, TextEntryDlgId, Timer, WidgetMsg};
-use crate::canvas::TheCanvas;
-use crate::ids::{BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT, DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE};
-use crate::world::{TheWorld, ThingState};
 use gui_lib::Dialog;
+use gui_lib::{
+    ButtonId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, SliderId, TextEntryDlg,
+    TextEntryDlgId, Timer, WidgetMsg,
+};
 
 #[derive(Debug)]
 enum ActiveDialog {

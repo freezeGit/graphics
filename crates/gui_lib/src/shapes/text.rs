@@ -35,22 +35,30 @@ impl Text {
         }
     }
 
-    pub fn text(&self) -> &str { &self.text }
+    pub fn text(&self) -> &str {
+        &self.text
+    }
     pub fn set_text(&mut self, text: impl Into<String>) {
         self.text = text.into();
     }
 
-    pub fn color(&self) -> Color32 { self.base.color() }
+    pub fn color(&self) -> Color32 {
+        self.base.color()
+    }
     pub fn set_color(&mut self, color: Color32) {
         self.base_mut().set_color(color);
     }
 
-    pub fn size(&self) -> f32 { self.size }
+    pub fn size(&self) -> f32 {
+        self.size
+    }
     pub fn set_size(&mut self, size: f32) {
         self.size = size;
     }
 
-    pub fn font(&self) -> TextFont { self.font }
+    pub fn font(&self) -> TextFont {
+        self.font
+    }
     pub fn set_font(&mut self, font: TextFont) {
         self.font = font;
     }

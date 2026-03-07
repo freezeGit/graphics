@@ -5,7 +5,6 @@
 use crate::egui::{self, Pos2};
 use crate::shapes::base::{Shape, ShapeBase};
 
-
 /// A customizable Circle component.
 
 #[derive(Debug, Default)]
