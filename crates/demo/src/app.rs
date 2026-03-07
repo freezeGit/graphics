@@ -7,33 +7,19 @@
 
 // app.rs
 
-use crate::canvas::TheCanvas;
+use ::gui_lib as gl;
+use egui::Context;
+use gui_lib::{
+    ButtonId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, SliderId, TextEntryDlg,
+    TextEntryDlgId, Timer, Dialog, WidgetMsg,
+};
+
 use crate::ids::{
     BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
     DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
 };
+use crate::canvas::TheCanvas;
 use crate::world::{TheWorld, ThingState};
-use ::gui_lib as gl;
-use egui::Context;
-use gui_lib::Dialog;
-use gui_lib::{
-    ButtonId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, SliderId, TextEntryDlg,
-    TextEntryDlgId, Timer, WidgetMsg,
-};
-
-#[derive(Debug)]
-enum ActiveDialog {
-    None,
-    About(MessageBoxDlg),
-    EnterName(TextEntryDlg),
-    EnterValue(DragFloatDlg),
-}
-
-impl ActiveDialog {
-    pub fn is_active(&self) -> bool {
-        !matches!(self, ActiveDialog::None)
-    }
-}
 
 /// Main application structure.
 ///
@@ -41,7 +27,7 @@ impl ActiveDialog {
 /// the main canvas with all UI components
 /// and if used, a World or Model struct containing program data and logic.
 #[derive(Debug)]
-pub struct TheApp {
+struct TheApp {
     world: Box<TheWorld>,
     canvas: TheCanvas,
     msgs: Vec<WidgetMsg>,
@@ -57,7 +43,7 @@ impl TheApp {
     /// A new `TheApp` instance initialized with a canvas
     /// and world.
 
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
@@ -254,9 +240,27 @@ impl eframe::App for TheApp {
     }
 }
 
+// -----------------------------
+
+#[derive(Debug)]
+enum ActiveDialog {
+    None,
+    About(MessageBoxDlg),
+    EnterName(TextEntryDlg),
+    EnterValue(DragFloatDlg),
+}
+
+impl ActiveDialog {
+    pub fn is_active(&self) -> bool {
+        !matches!(self, ActiveDialog::None)
+    }
+}
+
+// ----------------------------------
+
 pub fn run_the_app() -> Result<(), eframe::Error> {
     eframe::run_native(
-        "GUI Draw Example",
+        "gui_lib demo",
         gl::native_options(),
         //eframe::NativeOptions::default(),
         Box::new(|cc| {
@@ -267,15 +271,3 @@ pub fn run_the_app() -> Result<(), eframe::Error> {
     )
 }
 
-// pub fn run_the_app() -> Result<(), eframe::Error> {
-//     eframe::run_native(
-//         "GUI Draw Example",
-//         gl::native_options(),
-//         //eframe::NativeOptions::default(),
-//         Box::new(|cc| {
-//             cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme
-//             let app = Box::new(TheApp::new());
-//             Ok(app)
-//         }),
-//     )
-// }

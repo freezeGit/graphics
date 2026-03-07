@@ -8,19 +8,21 @@
 
 // canvas.rs
 
-use crate::ids::{
-    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B,
-    DRAGFLOAT_GAUGE,
-};
-use crate::world::{Signal, TheWorld, ThingState};
+use std::cell::RefCell;
+use std::rc::Rc;
+
 use gui_lib::LayoutStyle::TopPanel;
 use gui_lib::LineStyle::Dotted;
 use gui_lib::{
     BKG_EXAMPLE, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
     Separator, Shape, ShapeHandle, Space, Text,
 };
-use std::cell::RefCell;
-use std::rc::Rc;
+
+use crate::ids::{
+    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B,
+    DRAGFLOAT_GAUGE,
+};
+use crate::world::{Signal, TheWorld, ThingState};
 
 #[derive(Debug)]
 pub(crate) struct TheCanvas {
