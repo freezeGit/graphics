@@ -1,5 +1,5 @@
 //! ## module Canvas
-//! Declation for struct TheCanvas: 
+//! Declation for struct TheCanvas:
 //! A container for rendering and managing graphical shapes
 //! and interactive widgets.
 
@@ -42,7 +42,10 @@ pub(crate) struct TheCanvas {
 }
 
 impl TheCanvas {
-    pub(crate) fn new() -> Self {
+    //! Constructor for TheCanvas.
+    //!
+    //! This is where Shapes and Widgets are added to create the original graphical display
+        pub(crate) fn new() -> Self {
         // New empty BasicCanvas
         let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
         // Other possibilities:
@@ -224,6 +227,11 @@ impl TheCanvas {
         &mut self.canvas
     }
 
+    /// Update the state of the canvas based on the current world state.
+    /// This method is called by the `TheApp` to update the canvas with the latest world state.
+    /// Note that this method does not modify the world state.
+    /// The world does not know about the canvas (nor about egui). This is important to keep the
+    /// separation of concerns. Program data and logic is encapsulated in the `TheWorld` struct.
     pub(crate) fn update(&mut self, world: &TheWorld) {
         // Get state of traffic light and set appropriate color
         let tlc = if world.tl.state == Signal::Stop {

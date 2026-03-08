@@ -45,6 +45,9 @@ pub(crate) struct Thing {
     pub(crate) state: ThingState,
 }
 
+/// Encapsulates program data and logic.
+/// No dependence on gui_lb
+/// No dependence on the app struct or the canvas struct.
 #[derive(Debug)]
 pub(crate) struct TheWorld {
     pub(crate) tl: TrafficLight,

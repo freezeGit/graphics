@@ -52,7 +52,7 @@ impl TheApp {
         }
     }
 
-    // What to do with messages from widgets and dialogs.
+    /// What to do with messages from widgets and dialogs.
     fn handle_msg(&mut self, msg: WidgetMsg) {
         match msg {
             WidgetMsg::ButtonClicked(id) => {
@@ -73,8 +73,7 @@ impl TheApp {
             _ => {}
         }
     }
-    // ui.label("gui_lib demo v0.1\n");
-    // ui.label("Written in Rust + egui");
+
     fn handle_button(&mut self, id: ButtonId) {
         match id {
             BTN_ABOUT => {
@@ -161,6 +160,9 @@ impl TheApp {
         }
     }
 
+    /// Draw the active dialog, if any.
+    /// Note: Simulation will continue to run while the dialog is open.
+    /// If this is not desired, use button wb_run to pause the simulation first.
     fn draw_dialog(&mut self, ctx: &egui::Context) {
         let mut close = false;
 
@@ -190,6 +192,11 @@ impl TheApp {
 /// The eframe::App trait is the bridge between your custom application logic
 /// and the eframe framework that handles all the platform-specific details
 /// of creating a window and running an event loop.
+/// It is called each time the UI needs repainting
+///
+/// If there are background processes or animation:
+/// you can schedule the next frame redraw after 16 milliseconds (60 FPS)
+/// for smooth responsiveness.
 ///
 /// In this demonstration app a timer loop is used to advance the world at a rate
 /// slower than the frame rate of the event loop. This allows better control of
@@ -197,7 +204,12 @@ impl TheApp {
 /// with the frame rate.
 /// The frame rate should be set for smooth widget interaction. Typically 60 FPS,
 /// (16 millisecond interval) but can be faster if the simulation is fast enough.
+///
 /// If there is no simulation there is no need to call world.advance.
+/// By default (if ctx.request_repaint() or ctx.request_repaint_after() is not called)
+/// egui is reactive, meaning it only repaints when there's an input event
+/// (like mouse movement or a key press).
+///
 /// For a basic program there is no need for a world object. All state and logic
 /// can live directly in the TheApp.
 impl eframe::App for TheApp {
@@ -233,12 +245,9 @@ impl eframe::App for TheApp {
             // ----- Update canvas once after all state changes:
             self.canvas.update(&self.world);
         }
-        // If there are background processes or animation:
-        // schedule the next frame redraw after 16 milliseconds (60 FPS)
-        // Frame rate can be set faster or slower than 60 FPS.
+        // Redraw after 16 milliseconds (60 FPS)
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
-        //By default, egui is reactive, meaning it only repaints when there's an
-        // input event (like mouse movement or a key press).
+
     }
 }
 

@@ -7,7 +7,7 @@
 //!
 //! ## TheApp
 //! The main structure and entry point of the application.
-//! - Contains a `Canvas` for holding a collection of shapes.
+//! - Contains a `Canvas` for holding a collection of shapes and widgets.
 //! - Provides methods for creating and updating the UI.
 //!
 //! ## TheCanvas
@@ -27,6 +27,9 @@
 //! - `Button`: A clickable button with customizable text and color.
 //! - `Space`: A space between widgets.
 //! - `Label`: A text label with customizable text and color.
+//!
+//! ## enum ActiveDialog
+//! -- contains the active dialog.
 //!
 //! ## Shapes
 //! Custom shapes implemented via the `gui_lib::Shape` trait:
@@ -52,7 +55,7 @@
 //! ## Modifying Shapes
 //! The application supports dynamic modification of shape properties, such as:
 //! - Color, size, and position.
-//! These can be altered within the `update` method using the shape trait's API.
+//! These can be altered within the `Canvas::update` method using the shape trait's API.
 //!
 //! ## Extending Functionality
 //! - Additional shapes and widgets can be added to the `Canvas`.
@@ -60,7 +63,10 @@
 //!
 //! # Notes
 //! - `ctx.request_repaint_after()` ensures smooth interface by updating the frame at a fixed interval.
-//! - Animations may be run with a second (slower) Timer loop.
+//! Animations may be run with a second (slower) Timer loop.
+//! - If ctx.request_repaint() or ctx.request_repaint_after() is not called
+//! egui is reactive, meaning it only repaints when there's an input event
+//! (like mouse movement or a key press).
 //!
 //! # Modules Used:
 //! - Uses core functionality from:
