@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/gui_lib",
+    "crates/sbx",
     "crates/demo"
 ]
 
