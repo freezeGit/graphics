@@ -12,7 +12,11 @@ pub struct Circle {
 }
 
 impl Circle {
+
     pub fn new(center: Pos2, radius: f32) -> Self {
+        Self::new_from_center(center, radius)
+    }
+    pub fn new_from_center(center: Pos2, radius: f32) -> Self {
         Self {
             base: ShapeBase {
                 location: center,

@@ -17,19 +17,32 @@ pub struct Text {
     text: String,
     size: f32,
     font: TextFont,
+    place: egui::Align2,
 }
-
 impl Text {
     pub fn new(top_left: Pos2, text: impl Into<String>) -> Self {
+        Self::new_from_top_left(top_left, text)
+    }
+
+    pub fn new_from_top_left(top_left: Pos2, text: impl Into<String>) -> Self {
+        Self::new_from_place(egui::Align2::LEFT_TOP, top_left, text)
+    }
+
+    pub fn new_from_center(center: Pos2, text: impl Into<String>) -> Self {
+        Self::new_from_place(egui::Align2::CENTER_CENTER, center, text)
+    }
+
+    // Private so as to limit number of placement choices
+    fn new_from_place(place: egui::Align2, location: Pos2, text: impl Into<String>) -> Self {
         Self {
             base: ShapeBase {
-                location: top_left,
+                location,
                 ..Default::default()
             },
             text: text.into(),
-            //color: Color32::BLACK,
             size: 24.0,
             font: TextFont::Proportional,
+            place,
         }
     }
 
@@ -69,7 +82,7 @@ impl Shape for Text {
     fn base_mut(&mut self) -> &mut ShapeBase {
         &mut self.base
     }
-
+    
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
         let tl = self.base.location() + canvas_offset;
         let font_id = match self.font {
@@ -79,7 +92,7 @@ impl Shape for Text {
 
         painter.text(
             tl,
-            egui::Align2::LEFT_TOP,
+            self.place,
             self.text.as_str(),
             font_id,
             self.base.color,
