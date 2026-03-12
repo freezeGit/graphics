@@ -11,6 +11,7 @@ use crate::shapes::base::{LineStyle, Shape, ShapeBase};
 #[derive(Debug, Default)]
 pub struct Polyline {
     base: ShapeBase,
+    points: Vec<Pos2>,
 }
 
 impl Polyline {
@@ -18,10 +19,15 @@ impl Polyline {
         Self {
             base: ShapeBase {
                 location,
-                points: points.into_iter().collect(),
+                //points: points.into_iter().collect(),
                 ..Default::default()
             },
+            points: points.into_iter().collect(),
         }
+    }
+
+    fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
+        self.points.iter().map(|p| *p + offset).collect()
     }
 }
 
@@ -37,9 +43,8 @@ impl Shape for Polyline {
         //let translation = self.base.location.to_vec2() + canvas_offset;
         let translation = self.base.location().to_vec2() + canvas_offset;
 
-        let points = self.base.points_translated(translation);
-        //let stroke = egui::Stroke::new(self.base.line_width, self.base.color);
-        //let stroke = egui::Stroke::new(self.base.line_width(), self.base.color);
+        //let points = self.base.points_translated(translation);
+        let points = self.points_translated(translation);
         let stroke = egui::Stroke::new(self.base.line_width(), self.base.color());
 
         match self.base.line_style() {

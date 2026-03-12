@@ -1,12 +1,14 @@
 // src/gui_lib/shapes.rs
 
 pub mod base;
+pub mod line;
 pub mod circle;
 pub mod polyline;
 pub mod rectangle;
 pub mod text;
 
 pub use base::{LineStyle, Shape, ShapeBase};
+pub use line::Line;
 pub use circle::Circle;
 pub use polyline::Polyline;
 pub use rectangle::Rectangle;
