@@ -9,11 +9,11 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use gui_lib::LayoutStyle::TopPanel;
-use gui_lib::LineStyle::Dotted;
 use gui_lib::{
     BKG_EXAMPLE, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
     Separator, Shape, ShapeHandle, Space, Text,
 };
+use gui_lib::{LineStyle::Dashed, LineStyle::Dotted, LineStyle::Solid};
 
 use crate::ids::{
     BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B,
@@ -45,7 +45,7 @@ impl TheCanvas {
     //! Constructor for TheCanvas.
     //!
     //! This is where Shapes and Widgets are added to create the original graphical display
-        pub(crate) fn new() -> Self {
+    pub(crate) fn new() -> Self {
         // New empty BasicCanvas
         let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
         // Other possibilities:
@@ -117,9 +117,6 @@ impl TheCanvas {
         let sp_cln: ShapeHandle = sp.clone();
         canvas.add_shape(sp_cln as ShapeHandle);
 
-        // Add shape with handle
-        // TDJ: change to left upper corner when possible
-        //let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
         let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
             eframe::egui::Pos2::new(500.0, 350.0),
             eframe::egui::Vec2::new(850.0, 50.0),
@@ -128,7 +125,6 @@ impl TheCanvas {
         let gauge_cln: ShapeHandle = gauge.clone();
         canvas.add_shape(gauge_cln as ShapeHandle);
 
-        // Add shape with handle
         let arrow_head: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
             eframe::egui::Pos2::new(100.0, 369.0),
             [
@@ -141,14 +137,12 @@ impl TheCanvas {
         let arrow_head_cln: ShapeHandle = arrow_head.clone();
         canvas.add_shape(arrow_head_cln as ShapeHandle);
 
-        // Add shape with handle
         let stxt: Rc<RefCell<Text>> =
             Rc::new(RefCell::new(Text::new(egui::Pos2::new(345.0, 175.0), "")));
         stxt.borrow_mut().set_color(Color32::DARK_GREEN);
         let stxt_cln: ShapeHandle = stxt.clone();
         canvas.add_shape(stxt_cln as ShapeHandle);
 
-        // Add shape with handle
         let stxtname: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(325.0, 60.0),
             //egui::Pos2::new(300.0, 75.0),
@@ -157,13 +151,10 @@ impl TheCanvas {
         let stxtname_cln: ShapeHandle = stxtname.clone();
         canvas.add_shape(stxtname_cln as ShapeHandle);
 
-        // Add shape with handle
         let stxtval: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             eframe::egui::Pos2::new(325.0, 100.0),
-            //format!("{}{}", "Value: ", 0.0),
-            format!("{}{}", "Value: ", 0.0),
+            format!("{}{:.2}", "Value: ", 0.0),
         )));
-        //stxtval.borrow_mut().set_color(Color32::DARK_GREEN);
         let stxtval_cln: ShapeHandle = stxtval.clone();
         canvas.add_shape(stxtval_cln as ShapeHandle);
 
@@ -264,9 +255,7 @@ impl TheCanvas {
         self.stxtname.borrow_mut().set_text(name);
 
         //Update val_string
-        //let val = 42.3;
         let val = world.value;
-        //let val_string: String = format!("{}{}", "Value: ", val);
         let val_string: String = format!("{}{:.2}", "Value: ", val);
         self.stxtval.borrow_mut().set_text(val_string);
     }

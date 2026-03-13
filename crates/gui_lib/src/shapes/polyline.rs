@@ -6,8 +6,9 @@ use crate::shapes::base::{LineStyle, Shape, ShapeBase};
 /// A customizable Polyline component.
 ///
 /// # Fields
-/// * `position` - position of the circle center (: eframe::egui::Pos2)
-/// * `radius` - The radius of the button
+/// * location: Pos2 - All points will be plotted relative to 'location'.
+///                  - Any point Pos2::ZERO will be plotted at 'location'.
+/// * points: Vec<Pos2> - The points to be joined to form the polyline.
 #[derive(Debug, Default)]
 pub struct Polyline {
     base: ShapeBase,
@@ -19,16 +20,15 @@ impl Polyline {
         Self {
             base: ShapeBase {
                 location,
-                //points: points.into_iter().collect(),
                 ..Default::default()
             },
             points: points.into_iter().collect(),
         }
     }
 
-    fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
-        self.points.iter().map(|p| *p + offset).collect()
-    }
+    // fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
+    //     self.points.iter().map(|p| *p + offset).collect()
+    // }
 }
 
 impl Shape for Polyline {
@@ -40,20 +40,18 @@ impl Shape for Polyline {
     }
 
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-        //let translation = self.base.location.to_vec2() + canvas_offset;
         let translation = self.base.location().to_vec2() + canvas_offset;
-
-        //let points = self.base.points_translated(translation);
-        let points = self.points_translated(translation);
+        let points_trans = self.points.iter().map(|p| *p + translation).collect();
         let stroke = egui::Stroke::new(self.base.line_width(), self.base.color());
 
         match self.base.line_style() {
             LineStyle::Solid => {
-                painter.add(egui::epaint::PathShape::line(points, stroke));
+                //painter.add(egui::epaint::PathShape::line(points_trans, stroke));
+                painter.line(points_trans, stroke);
             }
             LineStyle::Dashed => {
                 let shapes = egui::Shape::dashed_line(
-                    &points,
+                    &points_trans,
                     stroke,
                     self.base.dash_length(),
                     self.base.dash_gap(),
@@ -62,8 +60,7 @@ impl Shape for Polyline {
             }
             LineStyle::Dotted => {
                 let shapes = egui::Shape::dotted_line(
-                    &points,
-                    //self.base.color,
+                    &points_trans,
                     self.base.color(),
                     self.base.dot_spacing(),
                     self.base.dot_radius(),

@@ -15,61 +15,11 @@ pub enum LineStyle {
 #[derive(Debug)]
 pub struct ShapeBase {
     pub(crate) location: Pos2,
-    //pub(crate) points: Vec<Pos2>,
     pub(crate) color: Color32,
     pub(crate) fill_color: Color32,
     pub(crate) line_width: f32,
     pub(crate) line_style: LineStyle,
 }
-
-// pub trait Shape: std::fmt::Debug {
-//     fn base(&self) -> &ShapeBase;
-//     fn base_mut(&mut self) -> &mut ShapeBase;
-//
-//     /// Draw in *canvas-local* coordinates, translated by `canvas_offset`
-//     /// where `canvas_offset` is the screen-space top-left of the canvas.
-//     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2);
-//
-//     /// Convenience: draw with canvas at (0,0)
-//     fn draw(&self, painter: &egui::Painter) {
-//         self.draw_at(painter, egui::Vec2::ZERO);
-//     }
-//
-//     fn location(&self) -> Pos2 {
-//         self.base().location()
-//     }
-//
-//     fn move_to(&mut self, location: Pos2) {
-//         self.base_mut().move_to(location)
-//     }
-//
-//     fn color(&self) -> Color32 {
-//         self.base().color()
-//     }
-//     fn set_color(&mut self, col: Color32) {
-//         self.base_mut().set_color(col)
-//     }
-//
-//     fn fill_color(&self) -> Color32 {
-//         self.base().fill_color()
-//     }
-//     fn set_fill_color(&mut self, col: Color32) {
-//         self.base_mut().set_fill_color(col)
-//     }
-//
-//     fn line_width(&self) -> f32 {
-//         self.base().line_width()
-//     }
-//     fn set_line_width(&mut self, lw: f32) {
-//         self.base_mut().set_line_width(lw)
-//     }
-//     fn line_style(&self) -> LineStyle {
-//         self.base().line_style
-//     }
-//     fn set_line_style(&mut self, ls: LineStyle) {
-//         self.base_mut().set_line_style(ls)
-//     }
-// }
 
 impl Default for ShapeBase {
     fn default() -> Self {
@@ -126,11 +76,6 @@ impl ShapeBase {
     pub fn set_line_style(&mut self, ls: LineStyle) {
         self.line_style = ls;
     }
-
-    // pub(crate) fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
-    //     self.points.iter().map(|p| *p + offset).collect()
-    // }
-
     pub(crate) fn dash_length(&self) -> f32 {
         4.0 * self.line_width
     }
