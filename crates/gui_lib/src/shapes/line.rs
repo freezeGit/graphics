@@ -88,7 +88,7 @@ impl Shape for Line {
         match self.base.line_style() {
             LineStyle::Solid => {
                 painter.line_segment([start, end], stroke);
-            }
+            },
             LineStyle::Dashed => {
                 let shapes = egui::Shape::dashed_line(
                     &[start, end],
@@ -97,7 +97,7 @@ impl Shape for Line {
                     self.base.dash_gap(),
                 );
                 painter.extend(shapes);
-            }
+            },
             LineStyle::Dotted => {
                 let shapes = egui::Shape::dotted_line(
                     &[start, end],
@@ -106,7 +106,7 @@ impl Shape for Line {
                     self.base.dot_radius(),
                 );
                 painter.extend(shapes);
-            }
+            },
         }
     }
 } // impl Shape for Line

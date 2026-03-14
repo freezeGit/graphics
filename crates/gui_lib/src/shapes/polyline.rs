@@ -25,10 +25,6 @@ impl Polyline {
             points: points.into_iter().collect(),
         }
     }
-
-    // fn points_translated(&self, offset: Vec2) -> Vec<Pos2> {
-    //     self.points.iter().map(|p| *p + offset).collect()
-    // }
 }
 
 impl Shape for Polyline {
@@ -41,13 +37,14 @@ impl Shape for Polyline {
 
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
         let translation = self.base.location().to_vec2() + canvas_offset;
-        let points_trans = self.points.iter().map(|p| *p + translation).collect();
+        let points_trans: Vec<egui::Pos2> =
+            self.points.iter().map(|p| *p + translation).collect();
         let stroke = egui::Stroke::new(self.base.line_width(), self.base.color());
 
         match self.base.line_style() {
             LineStyle::Solid => {
                 painter.line(points_trans, stroke);
-            }
+            },
             LineStyle::Dashed => {
                 let shapes = egui::Shape::dashed_line(
                     &points_trans,
@@ -56,7 +53,7 @@ impl Shape for Polyline {
                     self.base.dash_gap(),
                 );
                 painter.extend(shapes);
-            }
+            },
             LineStyle::Dotted => {
                 let shapes = egui::Shape::dotted_line(
                     &points_trans,
@@ -65,7 +62,7 @@ impl Shape for Polyline {
                     self.base.dot_radius(),
                 );
                 painter.extend(shapes);
-            }
+            },
         }
     }
 }

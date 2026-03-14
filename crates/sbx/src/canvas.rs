@@ -158,7 +158,7 @@ impl TheCanvas {
             Pos2::new(100.0, 600.0),
             Vec2::new(200.0, -100.0),
         )));
-        //line_test.borrow_mut().set_line_width(3.0);
+        line_test.borrow_mut().set_line_width(4.0);
         //line_test.borrow_mut().set_line_style(Dashed);
         line_test.borrow_mut().set_line_style(Dotted);
         line_test.borrow_mut().set_color(Color32::RED);
@@ -169,23 +169,28 @@ impl TheCanvas {
             Pos2::new(300.0, 500.0),
             Vec2::new(200.0, -100.0),
         )));
-        //line_test2.borrow_mut().set_line_width(3.0);
+        line_test2.borrow_mut().set_line_width(4.0);
         //line_test2.borrow_mut().set_line_style(Dashed);
         //line_test2.borrow_mut().set_line_style(Dotted);
         line_test2.borrow_mut().set_color(Color32::RED);
         let line_test2_cln: ShapeHandle = line_test2.clone();
         canvas.add_shape(line_test2_cln as ShapeHandle);
 
+        let circle_test: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+            Pos2::new(700.0, 500.0),
+            100.0,
+        )));
+        circle_test.borrow_mut().set_line_width(4.0);
+        circle_test.borrow_mut().set_line_style(Dashed);
+        //circle_test.borrow_mut().set_line_style(Dotted);
+        circle_test.borrow_mut().set_color(Color32::RED);
+        circle_test.borrow_mut().set_fill_color(Color32::LIGHT_BLUE);
 
+        circle_test.borrow_mut().move_to(Pos2::new(900.0, 600.0));
 
-        // let line_test: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new_from_angle(
-        //     Pos2::new(100.0, 600.0),
-        //     -1.0,
-        //     400.0,
-        // )));
-        // line_test.borrow_mut().set_color(Color32::RED);
-        // let line_test_cln: ShapeHandle = line_test.clone();
-        // canvas.add_shape(line_test_cln as ShapeHandle);
+        let circle_test_cln: ShapeHandle = circle_test.clone();
+        canvas.add_shape(circle_test_cln as ShapeHandle);
+
 
         // ---- Create and add widgets as Box<dyn Widget>
         canvas.add_widget(Box::new(Space::new(15.0)));
@@ -274,14 +279,14 @@ impl TheCanvas {
                 self.stxt.borrow_mut().set_text("State A");
                 self.line_test.borrow_mut().set_length( 400.0);
                 self.line_test.borrow_mut().set_angle( 0.0 );
-            }
+            },
             ThingState::StateB => {
                 self.rect.borrow_mut().set_fill_color(Color32::CYAN);
                 self.stxt.borrow_mut().set_text("State B");
                 self.line_test.borrow_mut().set_length(100.0);
                 self.line_test.borrow_mut().set_angle( -1.5 );
-            }
-            _ => {}
+            },
+            _ => {},
         }
 
         //Update name

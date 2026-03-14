@@ -57,20 +57,20 @@ impl TheApp {
         match msg {
             WidgetMsg::ButtonClicked(id) => {
                 self.handle_button(id);
-            }
+            },
             WidgetMsg::SliderChanged(id, value) => {
                 self.handle_slider(id, value);
-            }
+            },
             WidgetMsg::DragFloatChanged(id, value) => {
                 self.handle_drag_float(id, value);
-            }
+            },
             WidgetMsg::DialogAcceptedText(id, text) => {
                 self.handle_text_entry(id, text);
-            }
+            },
             WidgetMsg::DialogAcceptedDragFloat(id, val) => {
                 self.handle_drag_float_dlg(id, val);
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 
@@ -82,7 +82,7 @@ impl TheApp {
                     "About",
                     "gui_lib demo v0.1\nWritten in Rust + egui",
                 ));
-            }
+            },
             BTN_ENTER_NAME => {
                 self.dialog = ActiveDialog::EnterName(TextEntryDlg::new(
                     //"enter_name_dialog",
@@ -91,7 +91,7 @@ impl TheApp {
                     "Name:",
                     self.world.name.clone(),
                 ));
-            }
+            },
             BTN_ENTER_VALUE => {
                 let mut dlg = DragFloatDlg::new(
                     DLG_ENTER_VALUE,
@@ -102,22 +102,22 @@ impl TheApp {
                 dlg.set_speed(1.0);
                 dlg.set_decimal(1);
                 self.dialog = ActiveDialog::EnterValue(dlg);
-            }
+            },
             BTN_RUN_PAUSE => {
                 if self.timer.is_running() {
                     self.timer.pause();
                 } else {
                     self.timer.run();
                 }
-            }
+            },
             BTN_STATE_A => {
                 self.world.thing.state = ThingState::StateA;
-            }
+            },
             BTN_STATE_B => {
                 self.world.thing.state = ThingState::StateB;
-            }
+            },
 
-            _ => {}
+            _ => {},
         }
     }
 
@@ -125,11 +125,11 @@ impl TheApp {
         match id {
             SLIDER_GAUGE => {
                 self.world.gauge.set_pointer(value.into());
-            }
+            },
             SLIDER_ANOTHER => {
                 //Do something else
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 
@@ -137,8 +137,8 @@ impl TheApp {
         match id {
             DRAGFLOAT_GAUGE => {
                 self.world.gauge.set_pointer(value.into());
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 
@@ -146,8 +146,8 @@ impl TheApp {
         match id {
             DLG_ENTER_NAME => {
                 self.world.name = text.clone();
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 
@@ -155,8 +155,8 @@ impl TheApp {
         match id {
             DLG_ENTER_VALUE => {
                 self.world.value = val as f64;
-            }
-            _ => {}
+            },
+            _ => {},
         }
     }
 
@@ -167,21 +167,21 @@ impl TheApp {
         let mut close = false;
 
         match &mut self.dialog {
-            ActiveDialog::None => {}
+            ActiveDialog::None => {},
 
             ActiveDialog::About(dlg) => {
                 close = dlg.do_modal(ctx, &mut self.msgs);
-            }
+            },
 
             ActiveDialog::EnterName(dlg) => {
                 close = dlg.do_modal(ctx, &mut self.msgs);
-            }
+            },
 
             ActiveDialog::EnterValue(dlg) => {
                 close = dlg.do_modal(ctx, &mut self.msgs);
-            }
+            },
 
-            _ => {}
+            _ => {},
         }
         if close {
             self.dialog = ActiveDialog::None;

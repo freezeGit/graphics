@@ -86,8 +86,11 @@ impl ShapeBase {
         // Diameter of 1.33 times line width looks better
         self.line_width / 1.5
     }
+    // pub(crate) fn dot_spacing(&self) -> f32 {
+    //     1.0 + (2.0 * self.line_width)
+    // }
     pub(crate) fn dot_spacing(&self) -> f32 {
-        1.0 + (2.0 * self.line_width)
+        1.0 + (2.5 * self.line_width)
     }
 }
 
