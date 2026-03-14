@@ -107,7 +107,7 @@ impl TheCanvas {
             ],
         )));
         sp.borrow_mut().set_color(Color32::RED);
-        sp.borrow_mut().set_line_width(2.0);
+        //sp.borrow_mut().set_line_width(2.0);
         sp.borrow_mut().set_line_width(4.0);
         //sp.borrow_mut().set_line_style(Dashed);
         sp.borrow_mut().set_line_style(Dotted);
@@ -158,9 +158,25 @@ impl TheCanvas {
             Pos2::new(100.0, 600.0),
             Vec2::new(200.0, -100.0),
         )));
+        //line_test.borrow_mut().set_line_width(3.0);
+        //line_test.borrow_mut().set_line_style(Dashed);
+        line_test.borrow_mut().set_line_style(Dotted);
         line_test.borrow_mut().set_color(Color32::RED);
         let line_test_cln: ShapeHandle = line_test.clone();
         canvas.add_shape(line_test_cln as ShapeHandle);
+
+        let line_test2: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+            Pos2::new(300.0, 500.0),
+            Vec2::new(200.0, -100.0),
+        )));
+        //line_test2.borrow_mut().set_line_width(3.0);
+        //line_test2.borrow_mut().set_line_style(Dashed);
+        //line_test2.borrow_mut().set_line_style(Dotted);
+        line_test2.borrow_mut().set_color(Color32::RED);
+        let line_test2_cln: ShapeHandle = line_test2.clone();
+        canvas.add_shape(line_test2_cln as ShapeHandle);
+
+
 
         // let line_test: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new_from_angle(
         //     Pos2::new(100.0, 600.0),

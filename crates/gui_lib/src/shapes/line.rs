@@ -1,20 +1,32 @@
+//! Module Line
+//! Contains struct Line
+
 // line.rs
 
-use crate::Circle;
 use crate::egui::{self, Pos2, Vec2};
 use crate::shapes::base::{Shape, ShapeBase};
+use crate::{Circle, LineStyle};
 
+/// Struct Line
+///
+/// A line segment with a start point and a vector. line segment with a start point and a vector.
 #[derive(Debug, Default)]
 pub struct Line {
     base: ShapeBase,
-    pub vctr: Vec2,
+    vctr: Vec2,
 }
 
 impl Line {
+    /// Create a new Line.
+    ///
+    /// # Arguments
+    /// * `start` - The start point
+    /// * `vctr` - The vector
     pub fn new(start: Pos2, vctr: Vec2) -> Self {
         Self::new_from_vector(start, vctr)
     }
 
+    /// Create a new Line from start point and vector.
     pub fn new_from_vector(start: Pos2, vctr: Vec2) -> Self {
         Self {
             base: ShapeBase {
@@ -25,10 +37,12 @@ impl Line {
         }
     }
 
+    /// Create a new Line from start point and end point.
     pub fn new_from_points(start: Pos2, end: Pos2) -> Self {
         Self::new_from_vector(start, end - start)
     }
 
+    /// Create a new Line from start point and angle and length.
     pub fn new_from_angle(start: Pos2, angle: f32, length: f32) -> Self {
         Self::new_from_vector(start, Vec2::angled(angle) * length)
     }
@@ -57,6 +71,7 @@ impl Line {
     }
 }
 
+/// Implement trait Shape for Line.
 impl Shape for Line {
     fn base(&self) -> &ShapeBase {
         &self.base
@@ -68,28 +83,30 @@ impl Shape for Line {
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
         let start = self.base.location() + canvas_offset;
         let end = start + self.vctr;
+        let stroke = egui::Stroke::new(self.base.line_width(), self.base.color());
 
-        painter.line_segment(
-            [start, end],
-            egui::Stroke::new(self.base.line_width(), self.base.color()),
-        );
+        match self.base.line_style() {
+            LineStyle::Solid => {
+                painter.line_segment([start, end], stroke);
+            }
+            LineStyle::Dashed => {
+                let shapes = egui::Shape::dashed_line(
+                    &[start, end],
+                    stroke,
+                    self.base.dash_length(),
+                    self.base.dash_gap(),
+                );
+                painter.extend(shapes);
+            }
+            LineStyle::Dotted => {
+                let shapes = egui::Shape::dotted_line(
+                    &[start, end],
+                    self.base.color(),
+                    self.base.dot_spacing(),
+                    self.base.dot_radius(),
+                );
+                painter.extend(shapes);
+            }
+        }
     }
-}
-
-// In
-// egui, angles for rotation (e.g., in images) are typically represented in radians, with positive values indicating clockwise rotation. You can calculate the angle of a 2D vector using the .angle() method on a Vec2. For rotating images, use ImageOptions to specify the angle (in radians) and the rotation origin.
-// Here are the key details for handling angles in egui:
-//
-// Radians: All rotation functions use radians, not degrees.
-// Direction: A positive angle rotates clockwise.
-// Vector Angle: egui::Vec2 has an .angle() method that returns the angle of the vector.
-// Image Rotation: Use egui::Image::new(...).rotate(angle, origin) to rotate images. origin is a Vec2 in normalized UV space (e.g., Vec2::splat(0.5) for the center).
-// egui_probe: In egui_probe, you can use #[egui_probe(as angle)] to render a float as an angle.
-//
-// Example usage (Image Rotation):
-// rust
-//
-// ui.add(
-// egui::Image::new(texture_id)
-// .rotate(std::f32::consts::TAU / 4.0, egui::Vec2::splat(0.5)) // 90 deg clockwise
-// );
+} // impl Shape for Line
