@@ -46,7 +46,6 @@ impl Shape for Polyline {
 
         match self.base.line_style() {
             LineStyle::Solid => {
-                //painter.add(egui::epaint::PathShape::line(points_trans, stroke));
                 painter.line(points_trans, stroke);
             }
             LineStyle::Dashed => {
@@ -70,3 +69,6 @@ impl Shape for Polyline {
         }
     }
 }
+
+
+

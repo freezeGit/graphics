@@ -8,10 +8,7 @@
 
 use ::gui_lib as gl;
 use egui::Context;
-use gui_lib::{
-    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, SliderId,
-    TextEntryDlg, TextEntryDlgId, Timer, WidgetMsg,
-};
+use gui_lib::{ButtonId, Color32, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, SliderId, TextEntryDlg, TextEntryDlgId, Timer, WidgetMsg};
 
 use crate::canvas::TheCanvas;
 use crate::ids::{
