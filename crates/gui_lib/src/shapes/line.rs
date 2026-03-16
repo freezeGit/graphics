@@ -9,7 +9,7 @@ use crate::{Circle, LineStyle};
 
 /// Struct Line
 ///
-/// A line segment with a start point and a vector. line segment with a start point and a vector.
+/// A line segment with a start point and a vector. 
 #[derive(Debug, Default)]
 pub struct Line {
     base: ShapeBase,
@@ -50,22 +50,20 @@ impl Line {
     pub fn vector(&self) -> Vec2 {
         self.vctr
     }
-
     pub fn set_vector(&mut self, vector: Vec2) {
         self.vctr = vector;
     }
     pub fn length(&self) -> f32 {
         self.vctr.length()
     }
-
     pub fn set_length(&mut self, length: f32) {
-        self.vctr = self.vctr.normalized() * length;
+        if self.vctr.length_sq() > 0.0 {
+            self.vctr = self.vctr.normalized() * length;
+        }
     }
-
     pub fn angle(&self) -> f32 {
         self.vctr.angle()
     }
-
     pub fn set_angle(&mut self, angle: f32) {
         self.vctr = Vec2::angled(angle) * self.vctr.length();
     }

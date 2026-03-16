@@ -277,14 +277,19 @@ impl TheCanvas {
             ThingState::StateA => {
                 self.rect.borrow_mut().set_fill_color(Color32::GOLD);
                 self.stxt.borrow_mut().set_text("State A");
+                self.stxt.borrow_mut().set_vertical();
                 self.line_test.borrow_mut().set_length( 400.0);
                 self.line_test.borrow_mut().set_angle( 0.0 );
+                //self.rect.borrow_mut().set_width( 400.0 );
             },
             ThingState::StateB => {
                 self.rect.borrow_mut().set_fill_color(Color32::CYAN);
                 self.stxt.borrow_mut().set_text("State B");
+                self.stxt.borrow_mut().set_horizontal();
+                self.stxt.borrow_mut().set_size(48.0);
                 self.line_test.borrow_mut().set_length(100.0);
                 self.line_test.borrow_mut().set_angle( -1.5 );
+                //self.rect.borrow_mut().move_to( Pos2::new(400.0, 500.0) );
             },
             _ => {},
         }
