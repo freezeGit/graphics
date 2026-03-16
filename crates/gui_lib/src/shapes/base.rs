@@ -1,3 +1,4 @@
+//! ## Module base contains the ShapeBase struct and the Shape trait.
 // base.rs
 
 use crate::egui::{self, Color32, Pos2, Vec2};
@@ -12,6 +13,9 @@ pub enum LineStyle {
 }
 
 /// Base struct for all shapes.
+///
+/// Implementations of the `Shape` trait use this struct to store common properties.
+/// ShapeBase methods are available for any Shape.
 #[derive(Debug)]
 pub struct ShapeBase {
     pub(crate) location: Pos2,
@@ -86,14 +90,34 @@ impl ShapeBase {
         // Diameter of 1.33 times line width looks better
         self.line_width / 1.5
     }
-    // pub(crate) fn dot_spacing(&self) -> f32 {
-    //     1.0 + (2.0 * self.line_width)
-    // }
     pub(crate) fn dot_spacing(&self) -> f32 {
         1.0 + (2.5 * self.line_width)
     }
 }
 
+/// trait Shape is implemented by all shapes.
+///
+/// Importantly, all shapes can call the draw_at() function, which draws the shape.
+///
+/// This trait represents a generic geometric shape with properties like
+/// location, color, line width, and additional rendering behaviors.
+///
+/// Types implementing this trait must define methods to access and
+/// modify a `ShapeBase` and provide the ability to render themselves on
+/// a canvas using `egui::Painter`.
+///
+/// # Requirements
+/// The trait requires implementors to manage shape properties via the `ShapeBase`:
+/// - Location (`Pos2`)
+/// - Stroke color (`Color32`)
+/// - Fill color (`Color32`)
+/// - Line width (`f32`)
+/// - Line style (`LineStyle`)
+///
+/// # Methods
+/// - **Drawing**: Render the shape in either canvas-local or default coordinates.
+/// - **State Management**: Get or set the shape's base properties.
+/// pub
 pub trait Shape: std::fmt::Debug {
     fn base(&self) -> &ShapeBase;
     fn base_mut(&mut self) -> &mut ShapeBase;

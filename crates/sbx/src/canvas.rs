@@ -280,7 +280,9 @@ impl TheCanvas {
                 self.stxt.borrow_mut().set_vertical();
                 self.line_test.borrow_mut().set_length( 400.0);
                 self.line_test.borrow_mut().set_angle( 0.0 );
-                //self.rect.borrow_mut().set_width( 400.0 );
+                self.rect.borrow_mut().set_width( 400.0 );
+                self.rect.borrow_mut().set_line_style( Dashed );
+                self.circle1.borrow_mut().set_radius( 25.0 );
             },
             ThingState::StateB => {
                 self.rect.borrow_mut().set_fill_color(Color32::CYAN);

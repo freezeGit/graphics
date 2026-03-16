@@ -1,3 +1,6 @@
+//! ## module Polyline
+//! A customizable Polyline component.
+//!
 // polyline.rs
 
 use crate::egui::{self, Color32, Pos2, Vec2};

@@ -1,11 +1,22 @@
+//! gui_lib
+//!
+//! A small immediate-mode GUI helper library built on top of `egui`.
+//!
+//! Provides:
+//! - simple canvas drawing (Circle, Line, Rectangle, Text, etc.)
+//! - widgets (Button, Slider, DragFloat, etc.)
+//! - basic dialogs
+//! - timer support for simulation loops
+//!
+//! Designed for small simulation and visualization applications.
 // lib.rs
 
-mod canvas;
-mod dialogs;
-mod ids;
-mod shapes;
-mod timer;
-mod widgets;
+pub mod canvas;
+pub mod dialogs;
+pub mod ids;
+pub mod shapes;
+pub mod timer;
+pub mod widgets;
 
 
 // Public API re-exports (nice for both demo apps AND your internal modules)

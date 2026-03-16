@@ -1,4 +1,4 @@
-//! Module Line
+//! ## Module Line
 //! Contains struct Line
 
 // line.rs

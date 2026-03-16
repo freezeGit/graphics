@@ -34,7 +34,14 @@ impl Circle {
         Self::new(center, radius)
     }
 
-    fn draw_circle(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+    pub fn radius(&self) -> f32 {
+        self.radius
+    }
+    pub fn set_radius(&mut self, r: f32) {
+        self.radius = r;
+    }
+    // --------- Private functions ---------
+    fn draw_solid_circle(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
         let center = self.base.location() + canvas_offset;
 
         painter.circle(
@@ -45,7 +52,7 @@ impl Circle {
         );
     }
 
-    fn draw_fancy_circle(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+    fn draw_broken_circle(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
         let center = self.base.location() + canvas_offset;
         let translation = self.base.location().to_vec2() + canvas_offset;
         let stroke = egui::Stroke::new(self.base.line_width(), self.base.color());
@@ -82,13 +89,6 @@ impl Circle {
             LineStyle::Solid => {},
         }
     }
-
-    fn radius(&self) -> f32 {
-        self.radius
-    }
-    fn set_radius(&mut self, r: f32) {
-        self.radius = r;
-    }
 } // impl Circle
 
 impl Shape for Circle {
@@ -101,9 +101,9 @@ impl Shape for Circle {
 
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
         if self.base.line_style() == LineStyle::Solid {
-            self.draw_circle(painter, canvas_offset);
+            self.draw_solid_circle(painter, canvas_offset);
         } else {
-            self.draw_fancy_circle(painter, canvas_offset);
+            self.draw_broken_circle(painter, canvas_offset);
         }
     }
 } // impl Shape

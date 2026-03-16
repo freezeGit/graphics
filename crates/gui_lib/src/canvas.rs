@@ -1,3 +1,5 @@
+//! ## Module canvas contains the BasicCanvas struct and the Canvas trait.
+//!
 // canvas.rs
 
 use std::cell::RefCell;
