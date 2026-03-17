@@ -1,3 +1,5 @@
+//! ## Module timer contains the Timer struct.
+//!
 // timer.rs
 
 use crate::Context;

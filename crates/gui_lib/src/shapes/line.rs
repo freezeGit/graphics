@@ -1,11 +1,11 @@
-//! ## Module Line
+//! ## Module line
 //! Contains struct Line
 
 // line.rs
 
-use crate::egui::{self, Pos2, Vec2};
-use crate::shapes::base::{Shape, ShapeBase};
-use crate::{Circle, LineStyle};
+use crate::egui::{self, Pos2, Vec2,};
+use crate::shapes::base::{Shape, ShapeBase,};
+use crate::{LineStyle};
 
 /// Struct Line
 ///
@@ -70,6 +70,8 @@ impl Line {
 }
 
 /// Implement trait Shape for Line.
+///
+/// Make trait [`Shape`] methods available.
 impl Shape for Line {
     fn base(&self) -> &ShapeBase {
         &self.base

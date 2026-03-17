@@ -1,3 +1,5 @@
+//! ## Module widgets contains the Widget trait and various widgets.
+//!
 // src/gui_lib/widgets.rs
 
 use crate::Color32;
@@ -71,7 +73,8 @@ impl Widget for Label {
 // Button
 // ============================================================
 
-/// A customizable button component.
+/// A customizable button widget.
+/// Emits WidgetMsg::ButtonClicked(self.id)
 #[derive(Debug, Default)]
 pub struct Button {
     pub id: ButtonId,
@@ -149,6 +152,9 @@ impl Widget for Slider {
 // DragFloat
 // ============================================================
 
+/// A customizable DragFloat widget.
+/// Allows user input of floating point value.
+/// Emits WidgetMsg::DragFloatChanged(self.id, self.value)
 #[derive(Debug)]
 pub struct DragFloat {
     id: DragFloatId,

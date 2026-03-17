@@ -30,6 +30,9 @@ impl Polyline {
     }
 }
 
+/// Implement trait Shape for Polyline.
+///
+/// Make trait [`Shape`] methods available.
 impl Shape for Polyline {
     fn base(&self) -> &ShapeBase {
         &self.base
@@ -39,6 +42,10 @@ impl Shape for Polyline {
     }
 
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+        if self.points.len() < 2 {
+            return;
+        }
+        
         let translation = self.base.location().to_vec2() + canvas_offset;
         let points_trans: Vec<egui::Pos2> =
             self.points.iter().map(|p| *p + translation).collect();

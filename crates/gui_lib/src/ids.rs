@@ -1,3 +1,5 @@
+//! ## Module ids contains the WidgetId, ButtonId, SliderId, DragFloatId, etc.
+//!
 // src/gui_lib/ids.rs
 
 pub type WidgetId = u32;

@@ -10,8 +10,8 @@ use std::rc::Rc;
 
 use gui_lib::LayoutStyle::TopPanel;
 use gui_lib::{
-    BKG_EXAMPLE, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Polyline, Rectangle,
-    Separator, Shape, ShapeHandle, Space, Text,
+    BKG_EXAMPLE, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Lines, Polyline,
+    Rectangle, Separator, Shape, ShapeHandle, Space, Text,
 };
 use gui_lib::{LineStyle::Dashed, LineStyle::Dotted, LineStyle::Solid};
 use gui_lib::{Pos2, Vec2};
@@ -40,7 +40,9 @@ pub(crate) struct TheCanvas {
     stxt: Rc<RefCell<Text>>,
     stxtname: Rc<RefCell<Text>>,
     stxtval: Rc<RefCell<Text>>,
-    pub(crate) line_test: Rc<RefCell<Line>>,
+    //pub(crate) line_test: Rc<RefCell<Line>>,
+    line_test: Rc<RefCell<Line>>,
+    lines_test: Rc<RefCell<Lines>>,
 }
 
 impl TheCanvas {
@@ -176,10 +178,8 @@ impl TheCanvas {
         let line_test2_cln: ShapeHandle = line_test2.clone();
         canvas.add_shape(line_test2_cln as ShapeHandle);
 
-        let circle_test: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-            Pos2::new(700.0, 500.0),
-            100.0,
-        )));
+        let circle_test: Rc<RefCell<Circle>> =
+            Rc::new(RefCell::new(Circle::new(Pos2::new(700.0, 500.0), 100.0)));
         circle_test.borrow_mut().set_line_width(4.0);
         circle_test.borrow_mut().set_line_style(Dashed);
         //circle_test.borrow_mut().set_line_style(Dotted);
@@ -191,6 +191,20 @@ impl TheCanvas {
         let circle_test_cln: ShapeHandle = circle_test.clone();
         canvas.add_shape(circle_test_cln as ShapeHandle);
 
+        let lines_test: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
+            Pos2::new(100.0, 400.0),
+            vec![
+                [Pos2::new(0.0, 0.0), Pos2::new(200.0, 300.0)],
+                [Pos2::new(15.0, 50.0), Pos2::new(250.0, 200.0)],
+                [Pos2::new(10.0, 80.0), Pos2::new(200.0, 250.0)],
+            ],
+        )));
+        //lines_test.borrow_mut().set_line_width(4.0);
+        //line_test2.borrow_mut().set_line_style(Dashed);
+        //line_test2.borrow_mut().set_line_style(Dotted);
+        //lines_test.borrow_mut().set_color(Color32::RED);
+        let lines_test_cln: ShapeHandle = lines_test.clone();
+        canvas.add_shape(lines_test_cln as ShapeHandle);
 
         // ---- Create and add widgets as Box<dyn Widget>
         canvas.add_widget(Box::new(Space::new(15.0)));
@@ -230,6 +244,7 @@ impl TheCanvas {
         canvas.add_widget(Box::new(wb_about));
 
         //Create the TheCanvas
+        // Some shapes as data fields
         Self {
             canvas,
             circle1,
@@ -241,6 +256,7 @@ impl TheCanvas {
             stxtname,
             stxtval,
             line_test,
+            lines_test,
         }
     }
 
@@ -278,22 +294,24 @@ impl TheCanvas {
                 self.rect.borrow_mut().set_fill_color(Color32::GOLD);
                 self.stxt.borrow_mut().set_text("State A");
                 self.stxt.borrow_mut().set_vertical();
-                self.line_test.borrow_mut().set_length( 400.0);
-                self.line_test.borrow_mut().set_angle( 0.0 );
-                self.rect.borrow_mut().set_width( 400.0 );
-                self.rect.borrow_mut().set_line_style( Dashed );
-                self.circle1.borrow_mut().set_radius( 25.0 );
-            },
+                self.line_test.borrow_mut().set_length(400.0);
+                self.line_test.borrow_mut().set_angle(0.0);
+                self.rect.borrow_mut().set_width(400.0);
+                self.rect.borrow_mut().set_line_style(Dashed);
+                self.circle1.borrow_mut().set_radius(25.0);
+                self.lines_test.borrow_mut().set_color(Color32::DARK_GREEN);
+                self.lines_test.borrow_mut().move_to(Pos2::new(250.0, 500.0));
+            }
             ThingState::StateB => {
                 self.rect.borrow_mut().set_fill_color(Color32::CYAN);
                 self.stxt.borrow_mut().set_text("State B");
                 self.stxt.borrow_mut().set_horizontal();
                 self.stxt.borrow_mut().set_size(48.0);
                 self.line_test.borrow_mut().set_length(100.0);
-                self.line_test.borrow_mut().set_angle( -1.5 );
+                self.line_test.borrow_mut().set_angle(-1.5);
                 //self.rect.borrow_mut().move_to( Pos2::new(400.0, 500.0) );
-            },
-            _ => {},
+            }
+            _ => {}
         }
 
         //Update name

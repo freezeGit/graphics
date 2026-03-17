@@ -8,8 +8,6 @@ pub enum LineStyle {
     Solid,
     Dashed,
     Dotted,
-    //Dashed { dash: f32, gap: f32 },
-    //Dotted { spacing: f32, radius: f32 },
 }
 
 /// Base struct for all shapes.

@@ -96,6 +96,9 @@ impl Text {
     }
 }
 
+/// Implement trait Shape for Text.
+///
+/// Make trait [`Shape`] methods available.
 impl Shape for Text {
     fn base(&self) -> &ShapeBase {
         &self.base

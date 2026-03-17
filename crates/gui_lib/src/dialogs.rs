@@ -1,3 +1,5 @@
+//! ## Module dialogs contains the Dialog trait and the various dialog types.
+//!
 // dialogs.rs
 
 use crate::egui;
@@ -10,6 +12,7 @@ pub trait Dialog: std::fmt::Debug {
 }
 
 // -----------------------------
+/// Displays a message box with a title and text.
 #[derive(Debug)]
 pub struct MessageBoxDlg {
     egui_id: egui::Id,
@@ -54,6 +57,9 @@ impl Dialog for MessageBoxDlg {
 }
 
 // --------------------------------------
+/// Displays a dialog with a title, prompt, and text entry field.
+/// Returns the text entered by the user.
+/// Emits WidgetMsg::DialogAcceptedText(self.id, self.text.clone()).
 #[derive(Debug)]
 pub struct TextEntryDlg {
     egui_id: egui::Id,
@@ -109,6 +115,9 @@ impl Dialog for TextEntryDlg {
 }
 
 // ------------------------------------------
+/// Displays a dialog with a title, prompt, and floating point value entry field.
+/// Returns the value entered by the user.
+/// Emits WidgetMsg::DialogAcceptedDragFloat(self.id, self.value).
 #[derive(Debug)]
 pub struct DragFloatDlg {
     egui_id: egui::Id,

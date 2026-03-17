@@ -118,6 +118,9 @@ impl Rectangle {
     }
 } //impl Rectangle
 
+/// Implement trait Shape for Rectangle.
+///
+/// Make trait [`Shape`] methods available.
 impl Shape for Rectangle {
     fn base(&self) -> &ShapeBase {
         &self.base

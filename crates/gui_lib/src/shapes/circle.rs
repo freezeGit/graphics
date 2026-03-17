@@ -91,6 +91,9 @@ impl Circle {
     }
 } // impl Circle
 
+/// Implement trait Shape for Circle.
+///
+/// Make trait [`Shape`] methods available.
 impl Shape for Circle {
     fn base(&self) -> &ShapeBase {
         &self.base
