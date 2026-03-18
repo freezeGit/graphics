@@ -269,12 +269,15 @@ impl ActiveDialog {
 
 // ----------------------------------
 
-/// fn run_the_app() starts a native (desktop) app.
+/// function run_the_app() starts a native (desktop) app.
 /// Calls eframe::run_native() to create TheApp
+/// Change constants xv and yv to adjust the width and height of the viewport.
+const xwvp: f32 = 1200.0;  // Width of viewport in pixels.
+const ywvp: f32 = 800.0;  // Height of viewport in pixels.
 pub fn run_the_app() -> Result<(), eframe::Error> {
     eframe::run_native(
-        "gui_lib demo",
-        gl::native_options(),
+        "gui_lib sbx",
+        gl::native_options(xwvp, ywvp),
         //eframe::NativeOptions::default(),
         Box::new(|cc| {
             cc.egui_ctx.set_visuals(eframe::egui::Visuals::light()); //light theme

@@ -1,4 +1,4 @@
-//! ## Module base contains the ShapeBase struct and the Shape trait.
+//! ## Module base contains the [`ShapeBase`] struct and the [`Shape`] trait.
 // base.rs
 
 use crate::egui::{self, Color32, Pos2, Vec2};

@@ -1,4 +1,4 @@
-//! ## Module shapes contains the Shape trait and various shapes.
+//! ## Module shapes contains module [`base`] and various shapes modules.
 //!!    
 // src/gui_lib/shapes.rs
 

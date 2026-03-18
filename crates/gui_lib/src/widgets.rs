@@ -1,4 +1,4 @@
-//! ## Module widgets contains the Widget trait and various widgets.
+//! ## Module widgets contains the [`Widget`] trait and various widgets.
 //!
 // src/gui_lib/widgets.rs
 
@@ -7,6 +7,7 @@ use crate::egui::RichText;
 use crate::ids::{ButtonId, DragFloatId, SliderId, WidgetMsg};
 
 /// Trait for invoking any widget in the UI.
+/// Outputs a vector of [`WidgetMsg`]s.
 pub trait Widget: std::fmt::Debug {
     fn invoke(&mut self, ui: &mut egui::Ui, out: &mut Vec<WidgetMsg>);
 }
@@ -15,6 +16,7 @@ pub trait Widget: std::fmt::Debug {
 // Simple widgets (no messages)
 // ============================================================
 
+/// Creates space between widgets
 #[derive(Debug, Default)]
 pub struct Space {
     pub size: f32,
@@ -32,6 +34,7 @@ impl Widget for Space {
     }
 }
 
+/// Creatws a line separating widgets
 #[derive(Debug, Default)]
 pub struct Separator;
 
@@ -46,6 +49,7 @@ impl Widget for Separator {
     }
 }
 
+/// Text output widget
 #[derive(Debug, Default)]
 pub struct Label {
     pub text: String,
@@ -110,7 +114,8 @@ impl Widget for Button {
 // ============================================================
 // Slider
 // ============================================================
-
+/// A customizable DragFloat widget.
+/// Depreciated
 #[derive(Debug)]
 pub struct Slider {
     id: SliderId,
