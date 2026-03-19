@@ -6,9 +6,29 @@ use crate::egui;
 use crate::ids::{DragFloatDlgId, MessageBoxDlgId, TextEntryDlgId, WidgetMsg};
 
 // -----------------------------
+/// Trait for all dialogs.
 pub trait Dialog: std::fmt::Debug {
-    /// Returns true if it closed this frame.
-    fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
+    /// Displays the dialog and pushes its [`WidgetMsg>`] into `out`.
+    ///
+    /// Returns true when ready to close
+    //fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
+    fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
+}
+// -----------------------------
+/// Does nothing.
+#[derive(Debug)]
+pub struct NilDlg;
+
+// impl NilDlg {
+//     pub fn new() -> Self {
+//         Self {}
+//     }
+// }
+
+impl Dialog for NilDlg {
+    fn invoke_modal(&mut self, ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
+        false
+    }
 }
 
 // -----------------------------
@@ -35,7 +55,7 @@ impl MessageBoxDlg {
 }
 
 impl Dialog for MessageBoxDlg {
-    fn do_modal(&mut self, ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
+    fn invoke_modal(&mut self, ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
         let mut close = false;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
@@ -58,7 +78,7 @@ impl Dialog for MessageBoxDlg {
 
 // --------------------------------------
 /// Displays a dialog with a title, prompt, and text entry field.
-/// Returns the text entered by the user.
+/// Outputs the text entered by the user.
 /// Emits WidgetMsg::DialogAcceptedText(self.id, self.text.clone()).
 #[derive(Debug)]
 pub struct TextEntryDlg {
@@ -87,7 +107,7 @@ impl TextEntryDlg {
 }
 
 impl Dialog for TextEntryDlg {
-    fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+    fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
         let mut close = false;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
@@ -116,7 +136,7 @@ impl Dialog for TextEntryDlg {
 
 // ------------------------------------------
 /// Displays a dialog with a title, prompt, and floating point value entry field.
-/// Returns the value entered by the user.
+/// Outputs the value entered by the user.
 /// Emits WidgetMsg::DialogAcceptedDragFloat(self.id, self.value).
 #[derive(Debug)]
 pub struct DragFloatDlg {
@@ -156,7 +176,7 @@ impl DragFloatDlg {
 }
 
 impl Dialog for DragFloatDlg {
-    fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+    fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
         let mut close = false;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {

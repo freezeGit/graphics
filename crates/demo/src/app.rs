@@ -170,15 +170,15 @@ impl TheApp {
             ActiveDialog::None => {},
 
             ActiveDialog::About(dlg) => {
-                close = dlg.do_modal(ctx, &mut self.msgs);
+                close = dlg.invoke_modal(ctx, &mut self.msgs);
             },
 
             ActiveDialog::EnterName(dlg) => {
-                close = dlg.do_modal(ctx, &mut self.msgs);
+                close = dlg.invoke_modal(ctx, &mut self.msgs);
             },
 
             ActiveDialog::EnterValue(dlg) => {
-                close = dlg.do_modal(ctx, &mut self.msgs);
+                close = dlg.invoke_modal(ctx, &mut self.msgs);
             },
 
             _ => {},

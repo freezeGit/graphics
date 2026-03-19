@@ -9,7 +9,7 @@ use std::rc::Rc;
 use crate::egui;
 use eframe::egui::{CentralPanel, Context, RichText};
 
-use crate::{Color32, Shape, Widget, WidgetMsg};
+use crate::{Color32, Dialog, NilDlg, Shape, Widget, WidgetMsg};
 
 /// Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
 ///
@@ -40,6 +40,8 @@ pub struct BasicCanvas {
     background_color: Color32,
     shapes: Vec<ShapeHandle>, // Vec<Rc<RefCell<dyn Shape>>>
     widgets: Vec<Box<dyn Widget>>,
+    pub dialog: Box<dyn Dialog>,
+    // dialog: Option<Box<dyn Widget>>,
 }
 
 impl BasicCanvas {
@@ -49,6 +51,7 @@ impl BasicCanvas {
             background_color: bkg,
             shapes: Vec::new(),
             widgets: Vec::new(),
+            dialog: Box::new(NilDlg),
         }
     }
 
@@ -170,19 +173,28 @@ impl BasicCanvas {
     }
 
     // Dialog in canvas --------------------------------------------------
-    // Code to move a dialog to the canvas
-    // Code to invoke the dialog
-    // ---> TBJ: not yet implemented
+    /// Set the [`Dialog`] to be active in the canvas.
+    pub fn set_dialog(&mut self, d: Box<dyn Dialog>) {
+        self.dialog = d;
+    }
 
     // Rendering canvas ---------------------------------------------
 
-    /// Renders all widgets and shapes and modifies the vector `out`
-    /// to hold a sequence of tagged messages of type [`WidgetMsg`] from the widgets invoked.
+    /// Renders all widgets and shapes, and the dialog.
+    ///
+    /// Modifies the vector `out`
+    /// to hold a sequence of tagged messages of type [`WidgetMsg`].
+    /// If the dialog is closed after bring invoked, set the dialog to [`NilDlg`].
     pub fn render(&mut self, ctx: &Context, out: &mut Vec<WidgetMsg>) {
         match self.layout {
             LayoutStyle::TopPanel => self.render_with_top_panel(ctx, out),
             LayoutStyle::SidePanel => self.render_with_side_panel(ctx, out),
             LayoutStyle::NoPanel => self.render_with_no_panel(ctx, out),
+        }
+        // The dialog is rendered last, so it will be on top of everything else.
+        // LayoutStyle is not relevant here.
+        if self.dialog.invoke_modal(ctx, out) {
+            self.set_dialog(Box::new(NilDlg));
         }
     }
 
