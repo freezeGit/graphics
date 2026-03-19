@@ -10,8 +10,7 @@ use crate::ids::{DragFloatDlgId, MessageBoxDlgId, TextEntryDlgId, WidgetMsg};
 pub trait Dialog: std::fmt::Debug {
     /// Displays the dialog and pushes its [`WidgetMsg>`] into `out`.
     ///
-    /// Returns true when ready to close
-    //fn do_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
+    /// Returns true when the dialog is closed.
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
 }
 // -----------------------------
@@ -19,13 +18,8 @@ pub trait Dialog: std::fmt::Debug {
 #[derive(Debug)]
 pub struct NilDlg;
 
-// impl NilDlg {
-//     pub fn new() -> Self {
-//         Self {}
-//     }
-// }
-
 impl Dialog for NilDlg {
+    /// Does nothing. Returns false because there is nothing to close.
     fn invoke_modal(&mut self, ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
         false
     }

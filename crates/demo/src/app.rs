@@ -30,7 +30,7 @@ struct TheApp {
     world: Box<TheWorld>,
     canvas: TheCanvas,
     msgs: Vec<WidgetMsg>,
-    dialog: ActiveDialog,
+    //dialog: ActiveDialog,
     timer: Timer,
 }
 
@@ -47,51 +47,51 @@ impl TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
-            dialog: ActiveDialog::None,
+            //dialog: ActiveDialog::None,
             timer: Timer::new(0.5),
         }
     }
 
-    /// What to do with messages from widgets and dialogs.
+    // Handle messages --------------------------
+
+    /// What to do with [`WidgetMsg`] messages from widgets and dialogs.
+    /// This is the only communication between the GUI and the program code.
+    /// In this demo app program data and logic are encapsulated in struct TheWorld.
     fn handle_msg(&mut self, msg: WidgetMsg) {
         match msg {
             WidgetMsg::ButtonClicked(id) => {
                 self.handle_button(id);
-            },
-            WidgetMsg::SliderChanged(id, value) => {
-                self.handle_slider(id, value);
-            },
+            }
             WidgetMsg::DragFloatChanged(id, value) => {
                 self.handle_drag_float(id, value);
-            },
+            }
             WidgetMsg::DialogAcceptedText(id, text) => {
                 self.handle_text_entry(id, text);
-            },
+            }
             WidgetMsg::DialogAcceptedDragFloat(id, val) => {
                 self.handle_drag_float_dlg(id, val);
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 
     fn handle_button(&mut self, id: ButtonId) {
         match id {
             BTN_ABOUT => {
-                self.dialog = ActiveDialog::About(MessageBoxDlg::new(
+                self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
                     "gui_lib demo v0.1\nWritten in Rust + egui",
-                ));
-            },
+                )));
+            }
             BTN_ENTER_NAME => {
-                self.dialog = ActiveDialog::EnterName(TextEntryDlg::new(
-                    //"enter_name_dialog",
+                self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
                     DLG_ENTER_NAME,
                     "Enter name",
                     "Name:",
                     self.world.name.clone(),
-                ));
-            },
+                )));
+            }
             BTN_ENTER_VALUE => {
                 let mut dlg = DragFloatDlg::new(
                     DLG_ENTER_VALUE,
@@ -101,35 +101,23 @@ impl TheApp {
                 );
                 dlg.set_speed(1.0);
                 dlg.set_decimal(1);
-                self.dialog = ActiveDialog::EnterValue(dlg);
-            },
+                self.canvas.canvas.set_dialog(Box::new(dlg));
+            }
             BTN_RUN_PAUSE => {
                 if self.timer.is_running() {
                     self.timer.pause();
                 } else {
                     self.timer.run();
                 }
-            },
+            }
             BTN_STATE_A => {
                 self.world.thing.state = ThingState::StateA;
-            },
+            }
             BTN_STATE_B => {
                 self.world.thing.state = ThingState::StateB;
-            },
+            }
 
-            _ => {},
-        }
-    }
-
-    fn handle_slider(&mut self, id: SliderId, value: f32) {
-        match id {
-            SLIDER_GAUGE => {
-                self.world.gauge.set_pointer(value.into());
-            },
-            SLIDER_ANOTHER => {
-                //Do something else
-            },
-            _ => {},
+            _ => {}
         }
     }
 
@@ -137,8 +125,8 @@ impl TheApp {
         match id {
             DRAGFLOAT_GAUGE => {
                 self.world.gauge.set_pointer(value.into());
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 
@@ -146,8 +134,8 @@ impl TheApp {
         match id {
             DLG_ENTER_NAME => {
                 self.world.name = text.clone();
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 
@@ -155,44 +143,21 @@ impl TheApp {
         match id {
             DLG_ENTER_VALUE => {
                 self.world.value = val as f64;
-            },
-            _ => {},
-        }
-    }
-
-    /// Draw the active dialog, if any.
-    /// Note: Simulation will continue to run while the dialog is open.
-    /// If this is not desired, use button wb_run to pause the simulation first.
-    fn draw_dialog(&mut self, ctx: &egui::Context) {
-        let mut close = false;
-
-        match &mut self.dialog {
-            ActiveDialog::None => {},
-
-            ActiveDialog::About(dlg) => {
-                close = dlg.invoke_modal(ctx, &mut self.msgs);
-            },
-
-            ActiveDialog::EnterName(dlg) => {
-                close = dlg.invoke_modal(ctx, &mut self.msgs);
-            },
-
-            ActiveDialog::EnterValue(dlg) => {
-                close = dlg.invoke_modal(ctx, &mut self.msgs);
-            },
-
-            _ => {},
-        }
-        if close {
-            self.dialog = ActiveDialog::None;
+            }
+            _ => {}
         }
     }
 }
 
+// eframe::App trait -------------------------------
+
 /// The eframe::App trait is the bridge between your custom application logic
 /// and the eframe framework that handles all the platform-specific details
 /// of creating a window and running an event loop.
-/// It is called each time the UI needs repainting
+///
+/// Function update is called each time the UI needs repainting
+///
+/// [fn update](https://docs.rs/eframe/latest/eframe/trait.App.html#tymethod.update)
 ///
 /// If there are background processes or animation:
 /// you can schedule the next frame redraw after 16 milliseconds (60 FPS)
@@ -226,11 +191,6 @@ impl eframe::App for TheApp {
         // and collect all messages from widgets (pushes into self.msgs)
         self.canvas.canvas.render(ctx, &mut self.msgs);
 
-        // ------- collect messages from the active dialog (pushes into self.msgs)
-        // Must be after render and before handle_msg,
-        // so that dialogs can be closed by the user.
-        self.draw_dialog(ctx);
-
         // ------------ Handle messages if any exist
         if !self.msgs.is_empty() {
             // Move msgs out of self so we can mutably borrow self inside the loop.
@@ -246,24 +206,9 @@ impl eframe::App for TheApp {
             self.canvas.update(&self.world);
         }
         // Redraw after 16 milliseconds (60 FPS)
+        // See documentation for other options:
+        // https://docs.rs/eframe/0.16.0/eframe/struct.Context.html#method.request_repaint_after
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
-
-    }
-}
-
-// -----------------------------
-/// enum ActiveDialog holds the currently active dialog.
-#[derive(Debug)]
-enum ActiveDialog {
-    None,
-    About(MessageBoxDlg),
-    EnterName(TextEntryDlg),
-    EnterValue(DragFloatDlg),
-}
-
-impl ActiveDialog {
-    pub fn is_active(&self) -> bool {
-        !matches!(self, ActiveDialog::None)
     }
 }
 
@@ -272,8 +217,8 @@ impl ActiveDialog {
 /// function run_the_app() starts a native (desktop) app.
 /// Calls eframe::run_native() to create TheApp
 /// Change constants xv and yv to adjust the width and height of the viewport.
-const xwvp: f32 = 1200.0;  // Width of viewport in pixels.
-const ywvp: f32 = 800.0;  // Height of viewport in pixels.
+const xwvp: f32 = 1200.0; // Width of viewport in pixels.
+const ywvp: f32 = 800.0; // Height of viewport in pixels.
 pub fn run_the_app() -> Result<(), eframe::Error> {
     eframe::run_native(
         "gui_lib sbx",
