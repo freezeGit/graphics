@@ -10,7 +10,7 @@ use std::rc::Rc;
 
 use gui_lib::LayoutStyle::TopPanel;
 use gui_lib::{
-    BKG_EXAMPLE, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Lines, Polyline,
+    BKG_EXAMPLE, BKG_WINDOWS, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Lines, Polyline,
     Rectangle, Separator, Shape, ShapeHandle, Space, Text,
 };
 use gui_lib::{LineStyle::Dashed, LineStyle::Dotted, LineStyle::Solid};
@@ -53,6 +53,7 @@ impl TheCanvas {
         // New empty BasicCanvas
         let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
         // Other possibilities:
+        //let mut canvas = BasicCanvas::new(TopPanel, BKG_WINDOWS);
         //let mut canvas = BasicCanvas::new(SidePanel, BKG_EXAMPLE);
         //let mut canvas = BasicCanvas::new(NoPanel, BKG_EXAMPLE);
 

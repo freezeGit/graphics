@@ -11,7 +11,9 @@ use eframe::egui::{CentralPanel, Context, RichText};
 
 use crate::{Color32, Shape, Widget, WidgetMsg};
 
-// Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
+/// Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
+///
+/// [`ShapeHandle`] = Rc<RefCell<dyn Shape>>
 pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
 
 // enum for canvas layoutstyles
@@ -36,7 +38,7 @@ pub const BKG_WINDOWS: Color32 = Color32::from_rgb(240, 240, 240);
 pub struct BasicCanvas {
     layout: LayoutStyle,
     background_color: Color32,
-    shapes: Vec<ShapeHandle>,
+    shapes: Vec<ShapeHandle>, // Vec<Rc<RefCell<dyn Shape>>>
     widgets: Vec<Box<dyn Widget>>,
 }
 
@@ -66,7 +68,7 @@ impl BasicCanvas {
         self.background_color = color;
     }
 
-    /// Add a shape to the canvas.
+    /// Add a [`Shape`] to the canvas.
     pub fn add_shape(&mut self, s: ShapeHandle) {
         self.shapes.push(s);
     }
@@ -162,15 +164,20 @@ impl BasicCanvas {
 
     // Widgets in canvas --------------------------------------------------
 
-    /// Add a widget to the canvas
+    /// Add a [`Widget`] to the canvas
     pub fn add_widget(&mut self, w: Box<dyn Widget>) {
         self.widgets.push(w);
     }
 
+    // Dialog in canvas --------------------------------------------------
+    // Code to move a dialog to the canvas
+    // Code to invoke the dialog
+    // ---> TBJ: not yet implemented
+
     // Rendering canvas ---------------------------------------------
 
-    /// Renders all widgets and shapes and modifies Vec<WidgetMsg>
-    ///  to hold a sequence of tagged messages from any widgets invoked.
+    /// Renders all widgets and shapes and modifies the vector `out`
+    /// to hold a sequence of tagged messages of type [`WidgetMsg`] from the widgets invoked.
     pub fn render(&mut self, ctx: &Context, out: &mut Vec<WidgetMsg>) {
         match self.layout {
             LayoutStyle::TopPanel => self.render_with_top_panel(ctx, out),
