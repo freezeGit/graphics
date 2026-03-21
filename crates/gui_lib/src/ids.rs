@@ -1,5 +1,5 @@
 //! ## Module ids contains IDs for all the widgets and dialogs
-//! ## and enum WidgetMsg
+//! ## and enum WidgetMsg for emitted mesages
 // src/gui_lib/ids.rs
 
 // WidgetId - unique ID for each widget.
@@ -30,7 +30,7 @@ pub struct TextEntryDlgId(pub DialogId);
 pub struct DragFloatDlgId(pub DialogId);
 
 // ----------------------------------
-// WidgetMsg - enum for all messages emitted from widgets and dialogs.
+/// WidgetMsg - enum for all messages emitted from widgets and dialogs.
 #[derive(Debug, Clone, PartialEq)]
 pub enum WidgetMsg {
     // Widget outcomes:

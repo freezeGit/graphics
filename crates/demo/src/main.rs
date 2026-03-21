@@ -98,6 +98,7 @@ const YHVP: f32 = 800.0; // Height of viewport in pixels.
 /// Function run_the_app() starts a native (desktop) app.
 ///
 /// Calls eframe::run_native() to create TheApp.
+/// Returns an error [`eframe::Error`] if the app fails to start.
 /// Change constant APP_NAME to change the name of the app.
 /// Change constants XWVP and YHVP to adjust the width and height of the viewport.
 /// This function can be modified to change the theme.
