@@ -43,10 +43,14 @@ pub struct BasicCanvas {
     dialog: Box<dyn Dialog>,
 }
 
+/// BasicCanvas provides underlying structure and functionality for any user canvas.
+/// Shapes are stored in BasicCanvas::Vec<ShapeHandle> (type ShapeHandle = Rc<RefCell<dyn Shape>>)
+/// and are drawn dynamically by iterating through the vector
+
 impl BasicCanvas {
     pub fn new(layout: LayoutStyle, bkg: Color32) -> Self {
         BasicCanvas {
-            layout: layout,
+            layout,
             background_color: bkg,
             shapes: Vec::new(),
             widgets: Vec::new(),

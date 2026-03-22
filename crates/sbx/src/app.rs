@@ -23,7 +23,7 @@ use crate::world::{TheWorld, ThingState};
 /// Main application structure.
 ///
 /// Represents the root of the application and contains
-/// the main canvas with all UI components
+/// the canvas with all UI components
 /// and if used, a World or Model struct containing program data and logic.
 #[derive(Debug)]
 pub struct TheApp {
@@ -34,10 +34,10 @@ pub struct TheApp {
 }
 
 impl TheApp {
-    /// Creates a new instance of the application
+    /// # Creates a new instance of the application
     /// intended to demonstrate usage of gui_lib.
     ///
-    /// # Returns
+    /// Returns
     /// A new `TheApp` instance initialized with a canvas and wold
     /// as well as a vec of messages, an active dialog, and a timer.
 
@@ -46,11 +46,11 @@ impl TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
-                        timer: Timer::new(0.5),
+            timer: Timer::new(0.5),
         }
     }
 
-    // What to do with messages from widgets and dialogs.
+    /// What to do with messages from widgets and dialogs.
     fn handle_msg(&mut self, msg: WidgetMsg) {
         match msg {
             WidgetMsg::ButtonClicked(id) => {

@@ -10,8 +10,8 @@ use std::rc::Rc;
 
 use gui_lib::LayoutStyle::TopPanel;
 use gui_lib::{
-    BKG_EXAMPLE, BKG_WINDOWS, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Lines, Polyline,
-    Rectangle, Separator, Shape, ShapeHandle, Space, Text,
+    BKG_EXAMPLE, BKG_WINDOWS, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Lines,
+    Polyline, Rectangle, Separator, Shape, ShapeHandle, Space, Text,
 };
 use gui_lib::{LineStyle::Dashed, LineStyle::Dotted, LineStyle::Solid};
 use gui_lib::{Pos2, Vec2};
@@ -32,10 +32,10 @@ use crate::world::{Signal, TheWorld, ThingState};
 #[derive(Debug)]
 pub(crate) struct TheCanvas {
     pub(crate) canvas: BasicCanvas,
-    circle1: Rc<RefCell<Circle>>,
-    circle2: Rc<RefCell<Circle>>,
+    //tl_circle1: Rc<RefCell<Circle>>,
+    tl_circle2: Rc<RefCell<Circle>>,
     rect: Rc<RefCell<Rectangle>>,
-    sp: Rc<RefCell<Polyline>>,
+    //poly: Rc<RefCell<Polyline>>,
     arrow_head: Rc<RefCell<Polyline>>,
     stxt: Rc<RefCell<Text>>,
     stxtname: Rc<RefCell<Text>>,
@@ -51,112 +51,118 @@ impl TheCanvas {
     //! This is where Shapes and Widgets are added to create the original graphical display
     pub(crate) fn new() -> Self {
         // New empty BasicCanvas
-        let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
-        // Other possibilities:
+        // ----- Other possibilities:
         //let mut canvas = BasicCanvas::new(TopPanel, BKG_WINDOWS);
         //let mut canvas = BasicCanvas::new(SidePanel, BKG_EXAMPLE);
         //let mut canvas = BasicCanvas::new(NoPanel, BKG_EXAMPLE);
+        let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
 
-        // Add shapes as ShapeHandle's to the canvas (in BasicCanvas::Vec<ShapeHandle>)
+        // ---- Create shapes as Rc<RefCell<T>> and push clone into BasicCanvas::Vec<ShapeHandle>
+
+        // Add a Rectangle to the canvas
+        // rect is a Rc<RefCell<T>> pointing to a concrete struct (in this case, a Rectangle)
+        let rect: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
+            eframe::egui::Pos2::new(400.0, 200.0),
+            eframe::egui::Vec2::new(150.0, 100.0),
+        )));
+        rect.borrow_mut().set_fill_color(Color32::LIGHT_GRAY); // using RefCell interior mutability
+        // cloning increases the ref count of the Rc
+        // coercion to ShapeHandle happens automatically
+        // pushed into BasicCanvas::Vec<ShapeHandle>
+        canvas.add_shape(rect.clone());
+
+        // Add a series of Polylines to the canvas
         let mut y = 75.0;
         for _ in 0..22 {
-            //note: vee will be lost. It will not be a field in Self
+            //note: vee will be lost. It will not be used to initialize a field in Self
             let vee: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-                Pos2::new(150.0, y),
+                eframe::egui::Pos2::new(150.0, y),
                 [
-                    Pos2::new(0.0, 0.0),
-                    Pos2::new(10.0, 10.0),
-                    Pos2::new(20.0, 0.0),
+                    eframe::egui::Pos2::new(0.0, 0.0),
+                    eframe::egui::Pos2::new(10.0, 10.0),
+                    eframe::egui::Pos2::new(20.0, 0.0),
                 ],
             )));
-            // Add shape as handle to the canvas (in Vec shapes)
-            let vee_cln: ShapeHandle = vee.clone();
-            canvas.add_shape(vee_cln as ShapeHandle);
+            // Push each polyline sequentially into BasicCanvas::Vec<ShapeHandle>
+            canvas.add_shape(vee.clone()); // coercion happens automatically
             y += 10.0;
         }
 
-        // Add shape with handle. Also declared as a field in TheCanvas
-        let circle1: Rc<RefCell<Circle>> =
-            Rc::new(RefCell::new(Circle::new(Pos2::new(200.0, 200.0), 75.0)));
-        circle1.borrow_mut().set_line_width(4.0);
-        circle1.borrow_mut().set_fill_color(Color32::GRAY);
-        let circle1_cln: ShapeHandle = circle1.clone();
-        canvas.add_shape(circle1_cln as ShapeHandle);
-
-        let circle2: Rc<RefCell<Circle>> =
-            Rc::new(RefCell::new(Circle::new(Pos2::new(200.0, 200.0), 10.0)));
-        circle2.borrow_mut().set_fill_color(Color32::RED);
-        let circle2_cln: ShapeHandle = circle2.clone();
-        canvas.add_shape(circle2_cln as ShapeHandle);
-
-        let rect: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
-            Pos2::new(400.0, 200.0),
-            Vec2::new(150.0, 100.0),
+        // Add the bottom traffic light circle to the canvas
+        // tl_circle1 is not used to initialize a field in Self
+        // and it will go out of scope and be dropped.
+        let tl_circle1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+            eframe::egui::Pos2::new(200.0, 200.0),
+            75.0,
         )));
-        rect.borrow_mut().set_fill_color(Color32::LIGHT_GRAY);
-        let rect_cln: ShapeHandle = rect.clone();
-        canvas.add_shape(rect_cln as ShapeHandle);
+        tl_circle1.borrow_mut().set_line_width(4.0);
+        tl_circle1.borrow_mut().set_fill_color(Color32::GRAY);
+        canvas.add_shape(tl_circle1.clone()); // coercion happens automatically
 
-        let sp: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-            Pos2::new(550.0, 200.0),
+        // Add the top traffic light circle to the canvas
+        let tl_circle2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+            eframe::egui::Pos2::new(200.0, 200.0),
+            10.0,
+        )));
+        tl_circle2.borrow_mut().set_fill_color(Color32::RED);
+        // Will be drawn on top of tl_circle1 because of z-order
+        canvas.add_shape(tl_circle2.clone()); // coercion happens automatically
+
+        // Add a dotted polyline to the canvas
+        let poly: ShapeHandle = Rc::new(RefCell::new(Polyline::new(
+            eframe::egui::Pos2::new(550.0, 200.0),
             [
-                Pos2::new(0.0, 0.0),
-                Pos2::new(25.0, 50.0),
-                Pos2::new(75.0, -50.0),
-                Pos2::new(125.0, 50.0),
-                Pos2::new(175.0, -50.0),
-                Pos2::new(225.0, 50.0),
-                Pos2::new(250.0, 0.0),
+                eframe::egui::Pos2::new(0.0, 0.0),
+                eframe::egui::Pos2::new(25.0, 50.0),
+                eframe::egui::Pos2::new(75.0, -50.0),
+                eframe::egui::Pos2::new(125.0, 50.0),
+                eframe::egui::Pos2::new(175.0, -50.0),
+                eframe::egui::Pos2::new(225.0, 50.0),
+                eframe::egui::Pos2::new(250.0, 0.0),
             ],
         )));
-        sp.borrow_mut().set_color(Color32::RED);
-        //sp.borrow_mut().set_line_width(2.0);
-        sp.borrow_mut().set_line_width(4.0);
-        //sp.borrow_mut().set_line_style(Dashed);
-        sp.borrow_mut().set_line_style(Dotted);
-        //sp.borrow_mut().set_line_style(Solid);
-        let sp_cln: ShapeHandle = sp.clone();
-        canvas.add_shape(sp_cln as ShapeHandle);
+        poly.borrow_mut().set_color(Color32::RED);
+        poly.borrow_mut().set_line_width(2.0);
+        poly.borrow_mut().set_line_width(4.0);
+        poly.borrow_mut().set_line_style(Dotted);
+        canvas.add_shape(poly); // coercion happens automatically
 
+        // Add gauge rectangle
         let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
-            Pos2::new(500.0, 350.0),
-            Vec2::new(850.0, 50.0),
+            eframe::egui::Pos2::new(500.0, 350.0),
+            eframe::egui::Vec2::new(850.0, 50.0),
         )));
         gauge.borrow_mut().set_fill_color(Color32::LIGHT_GRAY);
-        let gauge_cln: ShapeHandle = gauge.clone();
-        canvas.add_shape(gauge_cln as ShapeHandle);
+        canvas.add_shape(gauge); // coercion happens automatically
 
         let arrow_head: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-            Pos2::new(100.0, 369.0),
+            eframe::egui::Pos2::new(100.0, 369.0),
             [
-                Pos2::new(-4.0, 0.0),
-                Pos2::new(0.0, -39.0),
-                Pos2::new(4.0, 0.0),
+                eframe::egui::Pos2::new(-4.0, 0.0),
+                eframe::egui::Pos2::new(0.0, -39.0),
+                eframe::egui::Pos2::new(4.0, 0.0),
             ],
         )));
         arrow_head.borrow_mut().set_line_width(2.0);
-        let arrow_head_cln: ShapeHandle = arrow_head.clone();
-        canvas.add_shape(arrow_head_cln as ShapeHandle);
+        canvas.add_shape(arrow_head.clone()); // coercion happens automatically
 
-        let stxt: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(Pos2::new(345.0, 175.0), "")));
-        stxt.borrow_mut().set_color(Color32::DARK_GREEN);
-        let stxt_cln: ShapeHandle = stxt.clone();
-        canvas.add_shape(stxt_cln as ShapeHandle);
+        // Add text to describe the state of the thing
+        let stxt = Rc::new(RefCell::new(Text::new(egui::Pos2::new(345.0, 175.0), "")));
+        canvas.add_shape(stxt.clone()); // coercion happens automatically
 
+        // Add text to display name.
         let stxtname: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            Pos2::new(325.0, 60.0),
+            egui::Pos2::new(325.0, 60.0),
             "Name: Steve",
         )));
-        let stxtname_cln: ShapeHandle = stxtname.clone();
-        canvas.add_shape(stxtname_cln as ShapeHandle);
+        canvas.add_shape(stxtname.clone()); // coercion happens automatically
 
+        // Add text to display value.
         let stxtval: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            Pos2::new(325.0, 100.0),
+            eframe::egui::Pos2::new(325.0, 100.0),
             format!("{}{:.2}", "Value: ", 0.0),
         )));
-        let stxtval_cln: ShapeHandle = stxtval.clone();
-        canvas.add_shape(stxtval_cln as ShapeHandle);
-
+        
         let line_test: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
             Pos2::new(100.0, 600.0),
             Vec2::new(200.0, -100.0),
@@ -248,10 +254,9 @@ impl TheCanvas {
         // Some shapes as data fields
         Self {
             canvas,
-            circle1,
-            circle2,
+            //tl_circle1,
+            tl_circle2,
             rect,
-            sp,
             arrow_head,
             stxt,
             stxtname,
@@ -282,7 +287,7 @@ impl TheCanvas {
         } else {
             Color32::GREEN
         };
-        self.circle2.borrow_mut().set_fill_color(tlc);
+        self.tl_circle2.borrow_mut().set_fill_color(tlc);
 
         // Update gauge pointer
         let mut ah_pos = self.arrow_head.borrow_mut().location();
@@ -299,9 +304,11 @@ impl TheCanvas {
                 self.line_test.borrow_mut().set_angle(0.0);
                 self.rect.borrow_mut().set_width(400.0);
                 self.rect.borrow_mut().set_line_style(Dashed);
-                self.circle1.borrow_mut().set_radius(25.0);
+                //self.tl_circle1.borrow_mut().set_radius(25.0);
                 self.lines_test.borrow_mut().set_color(Color32::DARK_GREEN);
-                self.lines_test.borrow_mut().move_to(Pos2::new(250.0, 500.0));
+                self.lines_test
+                    .borrow_mut()
+                    .move_to(Pos2::new(250.0, 500.0));
             }
             ThingState::StateB => {
                 self.rect.borrow_mut().set_fill_color(Color32::CYAN);

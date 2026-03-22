@@ -8,8 +8,8 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use gui_lib::LayoutStyle::{TopPanel, SidePanel, NoPanel,};
-use gui_lib::LineStyle::{Solid, Dashed,Dotted,};
+use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
+use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{
     BKG_EXAMPLE, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
     Separator, Shape, ShapeHandle, Space, Text,
@@ -25,12 +25,13 @@ use crate::world::{Signal, TheWorld, ThingState};
 /// A container for rendering and managing graphical shapes
 /// and interactive widgets.
 /// - Manages a collection of shapes using the `Shape` trait.
-/// - Supports dynamic updates of shape properties.
+/// - Supports dynamic drawing of shapes.
+/// - Supports updates of shape properties.
 /// - Manages a collection of widgets using the `Widget` trait.
 /// - Integrates with the `gui_lib` library for rendering.
 #[derive(Debug)]
 pub(crate) struct TheCanvas {
-    // BasicCanvas provides underlying structure and functionality for any canvas.
+    // BasicCanvas provides underlying structure and functionality for any user canvas.
     // Shapes are stored in BasicCanvas::Vec<ShapeHandle>
     // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
     pub(crate) canvas: BasicCanvas,
@@ -48,7 +49,7 @@ pub(crate) struct TheCanvas {
 impl TheCanvas {
     //! Constructor for TheCanvas.
     //!
-    //! This is where Shapes and Widgets are added to create the original graphical display
+    //! This is where Shapes and Widgets are added to create the initial graphical display
     pub(crate) fn new() -> Self {
         // New empty BasicCanvas
         // --- Other possibilities:
@@ -56,18 +57,19 @@ impl TheCanvas {
         //let mut canvas = BasicCanvas::new(NoPanel, BKG_EXAMPLE);
         let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
 
-        // Add shapes as ShapeHandle's to BasicCanvas::Vec<ShapeHandle>)
-        // ------------
+        // ---- Create shapes as Rc<RefCell<T>> and push clone into BasicCanvas::Vec<ShapeHandle>
+
         // Add a Rectangle to the canvas
-        // rect is a Rc<RefCell<T>> to a concrete struct (in this case, a Rectangle)
+        // rect is a Rc<RefCell<T>> pointing to a concrete struct (in this case, a Rectangle)
         let rect: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
             eframe::egui::Pos2::new(400.0, 200.0),
             eframe::egui::Vec2::new(150.0, 100.0),
         )));
         rect.borrow_mut().set_fill_color(Color32::LIGHT_GRAY); // using RefCell interior mutability
-        // cloning increases the ref count of the Rc<T>
-        let rect_cln: ShapeHandle = rect.clone(); //coerced to ShapeHandle. Allows dynamic dispatch.
-        canvas.add_shape(rect_cln); // pushed into BasicCanvas::Vec<ShapeHandle>
+        // cloning increases the ref count of the Rc
+        // coercion to ShapeHandle happens automatically
+        // pushed into BasicCanvas::Vec<ShapeHandle>
+        canvas.add_shape(rect.clone());
 
         // Add a series of Polylines to the canvas
         let mut y = 75.0;
@@ -103,6 +105,7 @@ impl TheCanvas {
             10.0,
         )));
         tl_circle2.borrow_mut().set_fill_color(Color32::RED);
+        // Will be drawn on top of tl_circle1 because of z-order
         canvas.add_shape(tl_circle2.clone()); // coercion happens automatically
 
         // Add a dotted polyline to the canvas
@@ -147,20 +150,19 @@ impl TheCanvas {
         let stxt = Rc::new(RefCell::new(Text::new(egui::Pos2::new(345.0, 175.0), "")));
         canvas.add_shape(stxt.clone()); // coercion happens automatically
 
+        // Add text to display name.
         let stxtname: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(325.0, 60.0),
-            //egui::Pos2::new(300.0, 75.0),
             "Name: Steve",
         )));
-        let stxtname_cln: ShapeHandle = stxtname.clone();
-        canvas.add_shape(stxtname_cln as ShapeHandle);
+        canvas.add_shape(stxtname.clone()); // coercion happens automatically
 
+        // Add text to display value.
         let stxtval: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             eframe::egui::Pos2::new(325.0, 100.0),
             format!("{}{:.2}", "Value: ", 0.0),
         )));
-        let stxtval_cln: ShapeHandle = stxtval.clone();
-        canvas.add_shape(stxtval_cln as ShapeHandle);
+        canvas.add_shape(stxtval.clone()); // coercion happens automatically
 
         // ---- Create and add widgets as Box<dyn Widget>
         canvas.add_widget(Box::new(Space::new(15.0)));
