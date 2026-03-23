@@ -1,5 +1,5 @@
 //! ## module Canvas. Contains TheCanvas struct.
-//! Declation for struct TheCanvas:
+//! Declaration for struct [`TheCanvas`]:
 //! A container for rendering and managing graphical shapes
 //! and interactive widgets.
 
@@ -28,7 +28,7 @@ use crate::world::{Signal, TheWorld, ThingState};
 /// - Supports dynamic drawing of shapes.
 /// - Supports updates of shape properties.
 /// - Manages a collection of widgets using the `Widget` trait.
-/// - Integrates with the `gui_lib` library for rendering.
+/// - Integrates with the `gui_lib` library.
 #[derive(Debug)]
 pub(crate) struct TheCanvas {
     // BasicCanvas provides underlying structure and functionality for any user canvas.
@@ -47,9 +47,11 @@ pub(crate) struct TheCanvas {
 }
 
 impl TheCanvas {
-    //! Constructor for TheCanvas.
-    //!
-    //! This is where Shapes and Widgets are added to create the initial graphical display
+    /// Constructor for TheCanvas.
+    ///
+    /// This is where Shapes and Widgets are added to create the initial graphical display.
+    ///
+    /// Set layout and background color in [`BasicCanvas`] constructor.
     pub(crate) fn new() -> Self {
         // New empty BasicCanvas
         // --- Other possibilities:
@@ -205,7 +207,7 @@ impl TheCanvas {
         Self {
             // BasicCanvas
             canvas,
-            // Shapes as unique handle to a concrete struct (e.g. Rc<RefCell<Circle>>)
+            // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
             tl_circle2,
             rect,
             arrow_head,
@@ -215,7 +217,7 @@ impl TheCanvas {
         }
     }
 
-    //TDJ: not used. Wat is fn for?
+    //TDJ: not used. Should it be??
     pub(crate) fn canvas(&self) -> &BasicCanvas {
         &self.canvas
     }
@@ -225,10 +227,12 @@ impl TheCanvas {
     }
 
     /// Update the state of the canvas based on the current world state.
-    /// This method is called by the `TheApp` to update the canvas with the latest world state.
+    /// This method is called by the [`TheApp`] to update the canvas with the latest world state.
     /// Note that this method does not modify the world state.
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
+    /// Smaller programs may nat have a world object, in which case this update function will
+    /// take a parameter [`TheApp`] instead of TheWorld.
     pub(crate) fn update(&mut self, world: &TheWorld) {
         // Get state of traffic light and set appropriate color
         let tlc = if world.tl.state == Signal::Stop {

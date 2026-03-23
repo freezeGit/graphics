@@ -24,30 +24,28 @@ use crate::world::{TheWorld, ThingState};
 ///
 /// Represents the root of the application and contains
 /// the main canvas with all UI components
-/// and if used, a World or Model struct containing program data and logic.
+/// and if used, a world or model struct containing program data and logic.
 #[derive(Debug)]
 pub struct TheApp {
     world: Box<TheWorld>,
     canvas: TheCanvas,
     msgs: Vec<WidgetMsg>,
-    //dialog: ActiveDialog,
     timer: Timer,
 }
 
 impl TheApp {
-    /// Creates a new instance of the application
-    /// intended to demonstrate usage of gui_lib.
+    /// Creates a new instance of the application.
+    /// It is intended to demonstrate usage of gui_lib.
     ///
     /// # Returns
-    /// A new `TheApp` instance initialized with a canvas and wold
-    /// as well as a vec of messages, an active dialog, and a timer.
+    /// A new `TheApp` instance initialized with a canvas and world
+    /// as well as a vector for messages, and a timer.
 
     pub fn new() -> Self {
         Self {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
-            //dialog: ActiveDialog::None,
             timer: Timer::new(0.5),
         }
     }
@@ -56,7 +54,7 @@ impl TheApp {
 
     /// What to do with [`WidgetMsg`] messages from widgets and dialogs.
     /// This is the only communication between the GUI and the program code.
-    /// In this demo app program data and logic are encapsulated in struct TheWorld.
+    /// In this demo app program data and logic are encapsulated in struct [`TheWorld`].
     fn handle_msg(&mut self, msg: WidgetMsg) {
         match msg {
             WidgetMsg::ButtonClicked(id) => {
@@ -75,6 +73,7 @@ impl TheApp {
         }
     }
 
+    /// Handle button messages
     fn handle_button(&mut self, id: ButtonId) {
         match id {
             BTN_ABOUT => {
@@ -121,6 +120,7 @@ impl TheApp {
         }
     }
 
+    /// Handle drag float messages
     fn handle_drag_float(&mut self, id: DragFloatId, value: f32) {
         match id {
             DRAGFLOAT_GAUGE => {
@@ -130,6 +130,7 @@ impl TheApp {
         }
     }
 
+    /// Handle text entry messages
     fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
         match id {
             DLG_ENTER_NAME => {
@@ -139,6 +140,7 @@ impl TheApp {
         }
     }
 
+    /// Handle drag float dialog messages
     fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
         match id {
             DLG_ENTER_VALUE => {
@@ -149,13 +151,12 @@ impl TheApp {
     }
     //}
 
-    /// Calls [`Dialog::invoke_modal`] to invoke a modal dialog.
-    /// # Parameters
-    /// - `ctx`: A reference to the [`Context`] object, which provides the necessary
-    ///   environment for rendering and interaction with the modal dialog.
-    /// # Returns
-    /// - `bool`: Returns `true` if the dialog is closed by the user,
-    ///   or `false` if the dialog is still open.
+    /// Calls [`Dialog::invoke_modal`] to draw and get a message from a modal dialog.
+    ///
+    /// Parameter `ctx`: A reference to the [`Context`] object.
+    ///
+    /// Returns `true` if the user has closed the dialog,
+    /// or `false` if the dialog is still open.
     fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool {
         self.canvas
             .canvas
@@ -163,18 +164,16 @@ impl TheApp {
             .invoke_modal(ctx, &mut self.msgs)
     }
 
-    /// Executes the simulation logic during each cycle.
-    ///
+    /// Executes the simulation logic.
     /// This method is not required for many programs. It is only needed
     /// in case a simulation is run.
     ///
     /// This method checks if the simulation timer indicates that it's time
     /// to run the next simulation step. If so, it advances the state of the
-    /// simulation's world model by one step by calling [`TheWorld::advance`] and updates
-    /// the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
+    /// simulation's world model by one step by calling [`TheWorld::advance`] and then
+    /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
     ///
-    /// # Parameters
-    /// - `ctx`: A reference to the [`Context`] object.
+    /// Parameter `ctx`: A reference to the [`Context`] object.
     fn run_simulation(&mut self, ctx: &Context) {
         if self.timer.is_time(ctx) {
             self.world.advance(); // advance world one tick
@@ -185,12 +184,11 @@ impl TheApp {
 
 // eframe::App trait -------------------------------
 
-/// The eframe::App trait is the bridge between your custom application logic
+/// The eframe::App trait is the bridge between the user's custom application logic
 /// and the eframe framework that handles all the platform-specific details
 /// of creating a window and running an event loop.
 ///
-/// Function update is called each time the UI needs repainting
-///
+/// Function `update` is called each time the UI needs repainting:
 /// [fn update](https://docs.rs/eframe/latest/eframe/trait.App.html#tymethod.update)
 ///
 /// If there are background processes or animation:
@@ -201,23 +199,24 @@ impl TheApp {
 /// slower than the frame rate of the event loop. This allows better control of
 /// running a simulation. For a simpler simulation the world might just advance
 /// with the frame rate.
-/// The frame rate should be set for smooth widget interaction. Typically 60 FPS,
+/// The frame rate should be set for smooth interaction. Typically 60 FPS,
 /// (16 millisecond interval) but can be faster if the simulation is fast enough.
 ///
-/// If there is no simulation there is no need to call world.advance.
+/// If there is no simulation there is no need to call or define [`TheWorld::advance`].
 /// By default (if [`Context::request_repaint()`] or [`Context::request_repaint_after()`] is not called)
 /// egui is reactive, meaning it only repaints when there's an input event
 /// (like mouse movement or a key press).
+/// See: <https://docs.rs/egui/latest/egui/struct.Context.html#method.request_repaint_after>
 ///
 /// For a basic program there is no need for a world object. All state and logic
 /// can live directly in the TheApp.
-/// ///
+///
 /// # Parameters
-/// - `ctx`: A reference to the [`Context`] object, which provides the necessary
-///   environment for rendering and interaction with the modal dialog.
-/// - `frame`: A reference to the [`Frame`] object. Not used in this demo.
-
+/// - `ctx`: A reference to the [`Context`] object, which provides the necessary environment.
+/// - `frame`: A reference to the [`eframe::Frame`] object. Not used in this demo.
 impl eframe::App for TheApp {
+    /// Called each time the UI needs repainting.
+    /// Often 60 FPS, set by calling [`Context::request_repaint_after()`].
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         // ----------- Establish event loop
         self.msgs.clear(); // establish invariant: Belt and suspenders
@@ -244,10 +243,12 @@ impl eframe::App for TheApp {
             }
             // Put the buffer back (empty, but keeps its capacity).
             self.msgs = msgs;
-            // Update canvas once after all state changes:
+            // Update canvas once to reflect all state changes:
             self.canvas.update(&self.world);
         }
-        // Redraw after 16 milliseconds (60 FPS)
+        // Redraw after 16 milliseconds (60 FPS). Useful for animation.
+        // If there is no animation, you can skip this line.
+        // See the comment in the update function above.
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 }
