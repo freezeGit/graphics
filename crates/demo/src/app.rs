@@ -9,7 +9,7 @@
 use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
-    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, SliderId,
+    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, NilDlg, SliderId,
     TextEntryDlg, TextEntryDlgId, Timer, WidgetMsg,
 };
 
@@ -147,7 +147,41 @@ impl TheApp {
             _ => {}
         }
     }
-}
+    //}
+
+    /// Calls [`Dialog::invoke_modal`] to invoke a modal dialog.
+    /// # Parameters
+    /// - `ctx`: A reference to the [`Context`] object, which provides the necessary
+    ///   environment for rendering and interaction with the modal dialog.
+    /// # Returns
+    /// - `bool`: Returns `true` if the dialog is closed by the user,
+    ///   or `false` if the dialog is still open.
+    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool {
+        self.canvas
+            .canvas
+            .get_mut_dialog()
+            .invoke_modal(ctx, &mut self.msgs)
+    }
+
+    /// Executes the simulation logic during each cycle.
+    ///
+    /// This method is not required for many programs. It is only needed
+    /// in case a simulation is run.
+    ///
+    /// This method checks if the simulation timer indicates that it's time
+    /// to run the next simulation step. If so, it advances the state of the
+    /// simulation's world model by one step by calling [`TheWorld::advance`] and updates
+    /// the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
+    ///
+    /// # Parameters
+    /// - `ctx`: A reference to the [`Context`] object.
+    fn run_simulation(&mut self, ctx: &Context) {
+        if self.timer.is_time(ctx) {
+            self.world.advance(); // advance world one tick
+            self.canvas.update(&self.world); // update canvas
+        }
+    }
+} // end impl TheApp
 
 // eframe::App trait -------------------------------
 
@@ -171,24 +205,33 @@ impl TheApp {
 /// (16 millisecond interval) but can be faster if the simulation is fast enough.
 ///
 /// If there is no simulation there is no need to call world.advance.
-/// By default (if ctx.request_repaint() or ctx.request_repaint_after() is not called)
+/// By default (if [`Context::request_repaint()`] or [`Context::request_repaint_after()`] is not called)
 /// egui is reactive, meaning it only repaints when there's an input event
 /// (like mouse movement or a key press).
 ///
 /// For a basic program there is no need for a world object. All state and logic
 /// can live directly in the TheApp.
+/// ///
+/// # Parameters
+/// - `ctx`: A reference to the [`Context`] object, which provides the necessary
+///   environment for rendering and interaction with the modal dialog.
+/// - `frame`: A reference to the [`Frame`] object. Not used in this demo.
+
 impl eframe::App for TheApp {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-        // ----Simulation/animation. Not needed for all programs.
-        if self.timer.is_time(ctx) {
-            self.world.advance(); // advance world one tick
-            self.canvas.update(&self.world); // update canvas
-        }
-
-        // -----Establish event loop
+        // ----------- Establish event loop
         self.msgs.clear(); // establish invariant: Belt and suspenders
-        // Draw shapes and widgets on the canvas,
-        // and collect all messages from widgets (pushes into self.msgs)
+        // Draw active dialog over the canvas.
+        // When the dialog is closed push its message into self.msgs.
+        // Pause simulation while dialog is open.
+        if self.invoked_dialog_closed(ctx) {
+            // If the active dialog has been closed, set the dialog to nil
+            self.canvas.canvas.set_dialog(Box::new(NilDlg));
+            // Simulation/animation. Not needed for many programs.
+            self.run_simulation(ctx);
+        }
+        // Draw shapes and widgets on the canvas.
+        // Collect all messages from widgets into self.msgs.
         self.canvas.canvas.render(ctx, &mut self.msgs);
 
         // ------------ Handle messages if any exist
@@ -199,16 +242,12 @@ impl eframe::App for TheApp {
             for msg in msgs.drain(..) {
                 self.handle_msg(msg);
             }
-            // --------- Put the buffer back (empty, but keeps its capacity).
+            // Put the buffer back (empty, but keeps its capacity).
             self.msgs = msgs;
-
-            // ----- Update canvas once after all state changes:
+            // Update canvas once after all state changes:
             self.canvas.update(&self.world);
         }
         // Redraw after 16 milliseconds (60 FPS)
-        // See documentation for other options:
-        // https://docs.rs/eframe/0.16.0/eframe/struct.Context.html#method.request_repaint_after
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 }
-

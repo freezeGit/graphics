@@ -40,7 +40,7 @@ pub struct BasicCanvas {
     background_color: Color32,
     shapes: Vec<ShapeHandle>, // Vec<Rc<RefCell<dyn Shape>>>
     widgets: Vec<Box<dyn Widget>>,
-    dialog: Box<dyn Dialog>,
+    pub dialog: Box<dyn Dialog>,
 }
 
 /// BasicCanvas provides underlying structure and functionality for any user canvas.
@@ -177,27 +177,29 @@ impl BasicCanvas {
 
     // Dialog in canvas --------------------------------------------------
     /// Set the ative [`Dialog`] in the canvas.
-    pub fn set_dialog(&mut self, d: Box<dyn Dialog>) {
-        self.dialog = d;
+    pub fn set_dialog(&mut self, dlg: Box<dyn Dialog>) {
+        self.dialog = dlg;
+    }
+
+    pub fn get_dialog(&self) -> &dyn Dialog {
+        self.dialog.as_ref()
+    }
+
+    pub fn get_mut_dialog(&mut self) -> &mut dyn Dialog {
+        self.dialog.as_mut()
     }
 
     // Rendering canvas ---------------------------------------------
 
-    /// Renders all widgets and shapes, and the dialog.
+    /// Renders all widgets and shapes.
     ///
     /// Modifies the vector `out`
     /// to hold a sequence of tagged messages of type [`WidgetMsg`].
-    /// If the dialog is closed after bring invoked, sets the dialog to [`NilDlg`].
     pub fn render(&mut self, ctx: &Context, out: &mut Vec<WidgetMsg>) {
         match self.layout {
             LayoutStyle::TopPanel => self.render_with_top_panel(ctx, out),
             LayoutStyle::SidePanel => self.render_with_side_panel(ctx, out),
             LayoutStyle::NoPanel => self.render_with_no_panel(ctx, out),
-        }
-        // The dialog is rendered last, so it will be on top of everything else.
-        // LayoutStyle is not relevant here because a different context is used.
-        if self.dialog.invoke_modal(ctx, out) {
-            self.set_dialog(Box::new(NilDlg));
         }
     }
 

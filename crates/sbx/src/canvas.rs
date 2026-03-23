@@ -162,7 +162,8 @@ impl TheCanvas {
             eframe::egui::Pos2::new(325.0, 100.0),
             format!("{}{:.2}", "Value: ", 0.0),
         )));
-        
+        canvas.add_shape(stxtval.clone()); // coercion happens automatically
+
         let line_test: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
             Pos2::new(100.0, 600.0),
             Vec2::new(200.0, -100.0),

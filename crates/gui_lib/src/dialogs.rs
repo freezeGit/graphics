@@ -19,9 +19,8 @@ pub trait Dialog: std::fmt::Debug {
 pub struct NilDlg;
 
 impl Dialog for NilDlg {
-    /// Does nothing. Returns false because there is nothing to close.
-    fn invoke_modal(&mut self, ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
-        false
+    fn invoke_modal(&mut self, _ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
+        true  // Nothing to close
     }
 }
 
