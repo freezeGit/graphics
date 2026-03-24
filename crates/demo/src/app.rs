@@ -149,7 +149,52 @@ impl TheApp {
             _ => {}
         }
     }
-    //}
+
+    // Helper functions for App::update() --------------------------
+
+    /// Establish event loop.
+    ///
+    /// Invoke active dialog and collect emitted message in [`Self::msgs`].
+    ///
+    /// Run simulation logic (if program includes a simulation).
+    ///
+    /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
+    fn event_loop(&mut self, ctx: &Context) {
+        self.msgs.clear(); // establish invariant: Belt and suspenders
+        // Draw active dialog.
+        // When the dialog is closed push its message into self.msgs.
+        // Pause simulation while dialog is open.
+        if self.invoked_dialog_closed(ctx) {
+            // If the active dialog has been closed, set the dialog to nil
+            self.canvas.canvas.set_dialog(Box::new(NilDlg));
+            // Simulation/animation. Not needed for many programs.
+            self.run_simulation(ctx);  // Skip this line if there is no simulation.
+        }
+        // Draw shapes and widgets on the canvas.
+        // Collect all messages from widgets into self.msgs.
+        self.canvas.canvas.render(ctx, &mut self.msgs);
+    }
+
+
+    /// Handle messages if any exist
+    /// # Related Methods
+    /// - [`handle_msg`]: Called for each individual message in the `msgs` buffer.
+    /// - [`canvas.update`]: Updates the canvas to reflect changes in the `world`.
+    fn handle_emitted_messages(&mut self) {
+        // Handle messages if any exist
+        if !self.msgs.is_empty() {
+            // Move msgs out of self so we can mutably borrow self inside the loop.
+            let mut msgs = std::mem::take(&mut self.msgs);
+            // Handle messages
+            for msg in msgs.drain(..) {
+                self.handle_msg(msg);
+            }
+            // Put the buffer back (empty, but keeps its capacity).
+            self.msgs = msgs;
+            // Update canvas once to reflect all state changes:
+            self.canvas.update(&self.world);
+        }
+    }
 
     /// Calls [`Dialog::invoke_modal`] to draw and get a message from a modal dialog.
     ///
@@ -218,37 +263,13 @@ impl eframe::App for TheApp {
     /// Called each time the UI needs repainting.
     /// Often 60 FPS, set by calling [`Context::request_repaint_after()`].
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-        // ----------- Establish event loop
-        self.msgs.clear(); // establish invariant: Belt and suspenders
-        // Draw active dialog over the canvas.
-        // When the dialog is closed push its message into self.msgs.
-        // Pause simulation while dialog is open.
-        if self.invoked_dialog_closed(ctx) {
-            // If the active dialog has been closed, set the dialog to nil
-            self.canvas.canvas.set_dialog(Box::new(NilDlg));
-            // Simulation/animation. Not needed for many programs.
-            self.run_simulation(ctx);
-        }
-        // Draw shapes and widgets on the canvas.
-        // Collect all messages from widgets into self.msgs.
-        self.canvas.canvas.render(ctx, &mut self.msgs);
-
-        // ------------ Handle messages if any exist
-        if !self.msgs.is_empty() {
-            // Move msgs out of self so we can mutably borrow self inside the loop.
-            let mut msgs = std::mem::take(&mut self.msgs);
-            // Handle messages
-            for msg in msgs.drain(..) {
-                self.handle_msg(msg);
-            }
-            // Put the buffer back (empty, but keeps its capacity).
-            self.msgs = msgs;
-            // Update canvas once to reflect all state changes:
-            self.canvas.update(&self.world);
-        }
+        // Establish event loop
+        self.event_loop(ctx);
+        // Handle messages if any exist
+        self.handle_emitted_messages();
         // Redraw after 16 milliseconds (60 FPS). Useful for animation.
         // If there is no animation, you can skip this line.
-        // See the comment in the update function above.
+        // See the comment in the App trait above.
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 }

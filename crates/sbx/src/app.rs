@@ -157,86 +157,38 @@ impl TheApp {
         }
     }
 
-    /// Calls [`Dialog::invoke_modal`] to invoke a modal dialog.
-    /// # Parameters
-    /// - `ctx`: A reference to the [`Context`] object, which provides the necessary
-    ///   environment for rendering and interaction with the modal dialog.
-    /// # Returns
-    /// - `bool`: Returns `true` if the dialog is closed by the user,
-    ///   or `false` if the dialog is still open.
-    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool {
-        self.canvas
-            .canvas
-            .get_mut_dialog()
-            .invoke_modal(ctx, &mut self.msgs)
-    }
+    // Helper functions for App::update() --------------------------
 
-    /// Executes the simulation logic during each cycle.
+    /// Establish event loop.
     ///
-    /// This method is not required for many programs. It is only needed
-    /// in case a simulation is run.
+    /// Invoke active dialog and collect emitted message in [`Self::msgs`].
     ///
-    /// This method checks if the simulation timer indicates that it's time
-    /// to run the next simulation step. If so, it advances the state of the
-    /// simulation's world model by one step by calling [`TheWorld::advance`] and updates
-    /// the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
+    /// Run simulation logic (if program includes a simulation).
     ///
-    /// # Parameters
-    /// - `ctx`: A reference to the [`Context`] object.
-    fn run_simulation(&mut self, ctx: &Context) {
-        if self.timer.is_time(ctx) {
-            self.world.advance(); // advance world one tick
-            self.canvas.update(&self.world); // update canvas
-        }
-    }
-} // end impl TheApp
-
-/// The eframe::App trait is the bridge between your custom application logic
-/// and the eframe framework that handles all the platform-specific details
-/// of creating a window and running an event loop.
-/// It is called each time the UI needs repainting
-///
-/// If there are background processes or animation:
-/// you can schedule the next frame redraw after 16 milliseconds (60 FPS)
-/// for smooth responsiveness.
-///
-/// In this demonstration app a timer loop is used to advance the world at a rate
-/// slower than the frame rate of the event loop. This allows better control of
-/// running a simulation. For a simpler simulation the world might just advance
-/// with the frame rate.
-/// The frame rate should be set for smooth widget interaction. Typically 60 FPS,
-/// (16 millisecond interval) but can be faster if the simulation is fast enough.
-///
-/// If there is no simulation there is no need to call world.advance.
-/// By default (if ctx.request_repaint() or ctx.request_repaint_after() is not called)
-/// egui is reactive, meaning it only repaints when there's an input event
-/// (like mouse movement or a key press).
-///
-/// For a basic program there is no need for a world object. All state and logic
-/// can live directly in the TheApp.
-///
-/// # Parameters
-/// - `ctx`: A reference to the [`Context`] object, which provides the necessary
-///   environment for rendering and interaction with the modal dialog.
-/// - `frame`: A reference to the [`Frame`] object. Not used in this demo.
-impl eframe::App for TheApp {
-    fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-        // ----------- Establish event loop
+    /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
+    fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
-        // Draw active dialog over the canvas.
+        // Draw active dialog.
         // When the dialog is closed push its message into self.msgs.
         // Pause simulation while dialog is open.
         if self.invoked_dialog_closed(ctx) {
             // If the active dialog has been closed, set the dialog to nil
             self.canvas.canvas.set_dialog(Box::new(NilDlg));
             // Simulation/animation. Not needed for many programs.
-            self.run_simulation(ctx);
+            self.run_simulation(ctx);  // Skip this line if there is no simulation.
         }
         // Draw shapes and widgets on the canvas.
         // Collect all messages from widgets into self.msgs.
         self.canvas.canvas.render(ctx, &mut self.msgs);
+    }
 
-        // ------------ Handle messages if any exist
+
+    /// Handle messages if any exist
+    /// # Related Methods
+    /// - [`handle_msg`]: Called for each individual message in the `msgs` buffer.
+    /// - [`canvas.update`]: Updates the canvas to reflect changes in the `world`.
+    fn handle_emitted_messages(&mut self) {
+        // Handle messages if any exist
         if !self.msgs.is_empty() {
             // Move msgs out of self so we can mutably borrow self inside the loop.
             let mut msgs = std::mem::take(&mut self.msgs);
@@ -246,10 +198,85 @@ impl eframe::App for TheApp {
             }
             // Put the buffer back (empty, but keeps its capacity).
             self.msgs = msgs;
-            // Update canvas once after all state changes:
+            // Update canvas once to reflect all state changes:
             self.canvas.update(&self.world);
         }
-        // Redraw after 16 milliseconds (60 FPS)
+    }
+
+    /// Calls [`Dialog::invoke_modal`] to draw and get a message from a modal dialog.
+    ///
+    /// Parameter `ctx`: A reference to the [`Context`] object.
+    ///
+    /// Returns `true` if the user has closed the dialog,
+    /// or `false` if the dialog is still open.
+    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool {
+        self.canvas
+            .canvas
+            .get_mut_dialog()
+            .invoke_modal(ctx, &mut self.msgs)
+    }
+
+    /// Executes the simulation logic.
+    /// This method is not required for many programs. It is only needed
+    /// in case a simulation is run.
+    ///
+    /// This method checks if the simulation timer indicates that it's time
+    /// to run the next simulation step. If so, it advances the state of the
+    /// simulation's world model by one step by calling [`TheWorld::advance`] and then
+    /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
+    ///
+    /// Parameter `ctx`: A reference to the [`Context`] object.
+    fn run_simulation(&mut self, ctx: &Context) {
+        if self.timer.is_time(ctx) {
+            self.world.advance(); // advance world one tick
+            self.canvas.update(&self.world); // update canvas
+        }
+    }
+} // end impl TheApp
+
+// eframe::App trait -------------------------------
+
+/// The eframe::App trait is the bridge between the user's custom application logic
+/// and the eframe framework that handles all the platform-specific details
+/// of creating a window and running an event loop.
+///
+/// Function `update` is called each time the UI needs repainting:
+/// [fn update](https://docs.rs/eframe/latest/eframe/trait.App.html#tymethod.update)
+///
+/// If there are background processes or animation:
+/// you can schedule the next frame redraw after 16 milliseconds (60 FPS)
+/// for smooth responsiveness.
+///
+/// In this demonstration app a timer loop is used to advance the world at a rate
+/// slower than the frame rate of the event loop. This allows better control of
+/// running a simulation. For a simpler simulation the world might just advance
+/// with the frame rate.
+/// The frame rate should be set for smooth interaction. Typically 60 FPS,
+/// (16 millisecond interval) but can be faster if the simulation is fast enough.
+///
+/// If there is no simulation there is no need to call or define [`TheWorld::advance`].
+/// By default (if [`Context::request_repaint()`] or [`Context::request_repaint_after()`] is not called)
+/// egui is reactive, meaning it only repaints when there's an input event
+/// (like mouse movement or a key press).
+/// See: <https://docs.rs/egui/latest/egui/struct.Context.html#method.request_repaint_after>
+///
+/// For a basic program there is no need for a world object. All state and logic
+/// can live directly in the TheApp.
+///
+/// # Parameters
+/// - `ctx`: A reference to the [`Context`] object, which provides the necessary environment.
+/// - `frame`: A reference to the [`eframe::Frame`] object. Not used in this demo.
+impl eframe::App for TheApp {
+    /// Called each time the UI needs repainting.
+    /// Often 60 FPS, set by calling [`Context::request_repaint_after()`].
+    fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+        // Establish event loop
+        self.event_loop(ctx);
+        // Handle messages if any exist
+        self.handle_emitted_messages();
+        // Redraw after 16 milliseconds (60 FPS). Useful for animation.
+        // If there is no animation, you can skip this line.
+        // See the comment in the App trait above.
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 }

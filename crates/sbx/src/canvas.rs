@@ -317,7 +317,8 @@ impl TheCanvas {
                 self.stxt.borrow_mut().set_horizontal();
                 self.stxt.borrow_mut().set_size(48.0);
                 self.line_test.borrow_mut().set_length(100.0);
-                self.line_test.borrow_mut().set_angle(-1.5);
+                let angle_rad = -90.0f32.to_radians();
+                self.line_test.borrow_mut().set_angle(angle_rad);
                 //self.rect.borrow_mut().move_to( Pos2::new(400.0, 500.0) );
             }
             _ => {}
