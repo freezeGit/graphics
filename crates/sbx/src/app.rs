@@ -95,7 +95,7 @@ impl TheApp {
                 let mut dlg = DragFloatDlg::new(
                     DLG_ENTER_VALUE,
                     "Enter value",
-                    "Value:",
+                    //"Value:",
                     self.world.value as f32,
                 );
                 dlg.set_speed(1.0);

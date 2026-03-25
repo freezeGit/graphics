@@ -37,8 +37,8 @@ pub struct MessageBoxDlg {
 }
 
 impl MessageBoxDlg {
-    pub const DEFAULT_TITLE_SIZE: f32 = 22.0; // 20.0
-    pub const DEFAULT_FONT_SIZE: f32 = 18.0; // 16.0
+    const DEFAULT_TITLE_SIZE: f32 = 22.0; // 20.0
+    const DEFAULT_FONT_SIZE: f32 = 18.0; // 16.0
 
     pub fn new(id: MessageBoxDlgId, title: impl Into<String>, text: impl Into<String>) -> Self {
         Self::new_sized(
@@ -69,9 +69,13 @@ impl MessageBoxDlg {
 
 impl Dialog for MessageBoxDlg {
     fn invoke_modal(&mut self, ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
+        const DEFAULT_MN_WIDTH: f32 = 320.0; // Default minimum width for message box
+
         let mut close = false;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
+            ui.set_min_width(DEFAULT_MN_WIDTH);
+
             ui.heading(egui::RichText::new(&self.title).size(self.title_size));
             ui.separator();
 
@@ -100,7 +104,6 @@ pub struct TextEntryDlg {
     title: String,
     prompt: String,
     text: String,
-    //font_size: f32,
 }
 
 impl TextEntryDlg {
@@ -124,16 +127,25 @@ impl TextEntryDlg {
 
 impl Dialog for TextEntryDlg {
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
-        pub const DEFAULT_TED_SIZE: f32 = 20.0;  // 16.0
+        const DEFAULT_TED_SIZE: f32 = 20.0; // Default font size for text entry dialog
+        const DEFAULT_TE_WIDTH: f32 = 320.0; // Default minimum width for text entry dialog
+
         let mut close = false;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
+            ui.set_min_width(DEFAULT_TE_WIDTH);
+
             ui.heading(egui::RichText::new(&self.title).size(DEFAULT_TED_SIZE));
-                ui.separator();
+            ui.separator();
 
             ui.horizontal(|ui| {
-                ui.label(egui::RichText::new(&self.prompt).size(DEFAULT_TED_SIZE));
+                ui.label(egui::RichText::new(format!("{}:", self.prompt)).size(DEFAULT_TED_SIZE));
                 ui.add(egui::TextEdit::singleline(&mut self.text).font(egui::TextStyle::Heading));
+                // ui.add_sized(
+                //     [200.0, 0.0],
+                //     egui::TextEdit::singleline(&mut self.text)
+                //         .font(egui::TextStyle::Heading),
+                // ); TDJ: May need to control the size of the text edit box
             });
 
             ui.add_space(15.0);
@@ -147,12 +159,13 @@ impl Dialog for TextEntryDlg {
                 }
             });
         });
+
         close
     }
 }
 
 // ------------------------------------------
-/// Displays a dialog with a title, prompt, and floating point value entry field.
+/// Displays a dialog with a title and floating point value entry field.
 /// Outputs the value entered by the user.
 /// Emits WidgetMsg::DialogAcceptedDragFloat(self.id, self.value).
 #[derive(Debug)]
@@ -160,7 +173,7 @@ pub struct DragFloatDlg {
     egui_id: egui::Id,
     id: DragFloatDlgId,
     title: String,
-    prompt: String,
+    //prompt: String,
     value: f32,
     decimal: usize,
     speed: f64,
@@ -170,14 +183,14 @@ impl DragFloatDlg {
     pub fn new(
         id: DragFloatDlgId,
         title: impl Into<String>,
-        prompt: impl Into<String>,
+        //prompt: impl Into<String>,
         value: f32,
     ) -> Self {
         Self {
             egui_id: egui::Id::new(("text_entry_dialog", id)),
             id,
             title: title.into(),
-            prompt: prompt.into(),
+            //prompt: prompt.into(),
             value,
             decimal: 0,
             speed: 1.0,
@@ -194,12 +207,17 @@ impl DragFloatDlg {
 
 impl Dialog for DragFloatDlg {
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+        const DEFAULT_DF_SIZE: f32 = 20.0; // Default font size for drag float dialog
+        const DEFAULT_DF_WIDTH: f32 = 320.0; // Default minimum width for drag float dialog
+
         let mut close = false;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
-            ui.heading(&self.title);
+            ui.set_min_width(DEFAULT_DF_WIDTH);
+
+            ui.heading(egui::RichText::new(&self.title).size(DEFAULT_DF_SIZE));
             ui.separator();
-            ui.label(&self.prompt);
+            ui.add_space(10.0);
             ui.add(
                 egui::DragValue::new(&mut self.value)
                     .fixed_decimals(self.decimal)
@@ -221,5 +239,3 @@ impl Dialog for DragFloatDlg {
         close
     }
 }
-
-// ------------------------------------------------
