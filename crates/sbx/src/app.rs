@@ -81,6 +81,7 @@ impl TheApp {
                     "gui_lib demo v0.1\nWritten in Rust + egui",
                 )));
             }
+
             BTN_ENTER_NAME => {
                 self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
                     DLG_ENTER_NAME,
@@ -89,6 +90,7 @@ impl TheApp {
                     self.world.name.clone(),
                 )));
             }
+
             BTN_ENTER_VALUE => {
                 let mut dlg = DragFloatDlg::new(
                     DLG_ENTER_VALUE,
@@ -100,6 +102,7 @@ impl TheApp {
                 dlg.set_decimal(1);
                 self.canvas.canvas.set_dialog(Box::new(dlg));
             }
+
             BTN_RUN_PAUSE => {
                 if self.timer.is_running() {
                     self.timer.pause();
@@ -107,9 +110,11 @@ impl TheApp {
                     self.timer.run();
                 }
             }
+
             BTN_STATE_A => {
                 self.world.thing.state = ThingState::StateA;
             }
+
             BTN_STATE_B => {
                 self.world.thing.state = ThingState::StateB;
             }
@@ -123,9 +128,11 @@ impl TheApp {
             SLIDER_GAUGE => {
                 self.world.gauge.set_pointer(value.into());
             }
+
             SLIDER_ANOTHER => {
                 //Do something else
             }
+
             _ => {}
         }
     }
@@ -135,6 +142,7 @@ impl TheApp {
             DRAGFLOAT_GAUGE => {
                 self.world.gauge.set_pointer(value.into());
             }
+
             _ => {}
         }
     }
@@ -144,6 +152,7 @@ impl TheApp {
             DLG_ENTER_NAME => {
                 self.world.name = text.clone();
             }
+
             _ => {}
         }
     }
@@ -153,6 +162,7 @@ impl TheApp {
             DLG_ENTER_VALUE => {
                 self.world.value = val as f64;
             }
+
             _ => {}
         }
     }
@@ -168,6 +178,7 @@ impl TheApp {
     /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
     fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
+
         // Draw active dialog.
         // When the dialog is closed push its message into self.msgs.
         // Pause simulation while dialog is open.
@@ -175,13 +186,13 @@ impl TheApp {
             // If the active dialog has been closed, set the dialog to nil
             self.canvas.canvas.set_dialog(Box::new(NilDlg));
             // Simulation/animation. Not needed for many programs.
-            self.run_simulation(ctx);  // Skip this line if there is no simulation.
+            self.run_simulation(ctx); // Skip this line if there is no simulation.
         }
+
         // Draw shapes and widgets on the canvas.
         // Collect all messages from widgets into self.msgs.
         self.canvas.canvas.render(ctx, &mut self.msgs);
     }
-
 
     /// Handle messages if any exist
     /// # Related Methods
@@ -192,13 +203,14 @@ impl TheApp {
         if !self.msgs.is_empty() {
             // Move msgs out of self so we can mutably borrow self inside the loop.
             let mut msgs = std::mem::take(&mut self.msgs);
-            // Handle messages
+            // Handle messages and drain the buffer.
             for msg in msgs.drain(..) {
                 self.handle_msg(msg);
             }
             // Put the buffer back (empty, but keeps its capacity).
             self.msgs = msgs;
-            // Update canvas once to reflect all state changes:
+
+            // Update canvas to reflect all state changes:
             self.canvas.update(&self.world);
         }
     }
@@ -272,8 +284,10 @@ impl eframe::App for TheApp {
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         // Establish event loop
         self.event_loop(ctx);
+
         // Handle messages if any exist
         self.handle_emitted_messages();
+
         // Redraw after 16 milliseconds (60 FPS). Useful for animation.
         // If there is no animation, you can skip this line.
         // See the comment in the App trait above.

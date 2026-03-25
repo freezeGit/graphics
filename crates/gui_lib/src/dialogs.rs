@@ -14,13 +14,14 @@ pub trait Dialog: std::fmt::Debug {
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
 }
 // -----------------------------
+
 /// Does nothing.
 #[derive(Debug)]
 pub struct NilDlg;
 
 impl Dialog for NilDlg {
     fn invoke_modal(&mut self, _ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
-        true  // Nothing to close
+        true // Nothing to close
     }
 }
 
@@ -30,19 +31,38 @@ impl Dialog for NilDlg {
 pub struct MessageBoxDlg {
     egui_id: egui::Id,
     title: String,
+    title_size: f32,
     text: String,
+    font_size: f32,
 }
 
 impl MessageBoxDlg {
-    pub fn new(
-        id: MessageBoxDlgId, // TDJ id is used to create unique egui::Id. Is this necessary?
+    pub const DEFAULT_TITLE_SIZE: f32 = 22.0; // 20.0
+    pub const DEFAULT_FONT_SIZE: f32 = 18.0; // 16.0
+
+    pub fn new(id: MessageBoxDlgId, title: impl Into<String>, text: impl Into<String>) -> Self {
+        Self::new_sized(
+            id,
+            title,
+            Self::DEFAULT_TITLE_SIZE,
+            text,
+            Self::DEFAULT_FONT_SIZE,
+        )
+    }
+
+    pub fn new_sized(
+        id: MessageBoxDlgId,
         title: impl Into<String>,
+        title_size: f32,
         text: impl Into<String>,
+        font_size: f32,
     ) -> Self {
         Self {
             egui_id: egui::Id::new(("message_box_dialog", id)),
             title: title.into(),
+            title_size,
             text: text.into(),
+            font_size,
         }
     }
 }
@@ -52,12 +72,12 @@ impl Dialog for MessageBoxDlg {
         let mut close = false;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
-            ui.heading(&self.title);
+            ui.heading(egui::RichText::new(&self.title).size(self.title_size));
             ui.separator();
 
-            ui.label(&self.text);
-
+            ui.label(egui::RichText::new(&self.text).size(self.font_size));
             ui.add_space(10.0);
+
             ui.horizontal(|ui| {
                 if ui.button("OK").clicked() {
                     close = true;
@@ -80,6 +100,7 @@ pub struct TextEntryDlg {
     title: String,
     prompt: String,
     text: String,
+    //font_size: f32,
 }
 
 impl TextEntryDlg {
@@ -88,6 +109,7 @@ impl TextEntryDlg {
         title: impl Into<String>,
         prompt: impl Into<String>,
         text: impl Into<String>,
+        //font_size: f32,
     ) -> Self {
         Self {
             egui_id: egui::Id::new(("text_entry_dialog", id)),
@@ -95,25 +117,28 @@ impl TextEntryDlg {
             title: title.into(),
             prompt: prompt.into(),
             text: text.into(),
+            //font_size,
         }
     }
 }
 
 impl Dialog for TextEntryDlg {
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+        pub const DEFAULT_TED_SIZE: f32 = 20.0;  // 16.0
         let mut close = false;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
-            ui.heading(&self.title);
-            ui.separator();
+            ui.heading(egui::RichText::new(&self.title).size(DEFAULT_TED_SIZE));
+                ui.separator();
 
-            ui.label(&self.prompt);
-            ui.text_edit_singleline(&mut self.text);
+            ui.horizontal(|ui| {
+                ui.label(egui::RichText::new(&self.prompt).size(DEFAULT_TED_SIZE));
+                ui.add(egui::TextEdit::singleline(&mut self.text).font(egui::TextStyle::Heading));
+            });
 
-            ui.add_space(10.0);
+            ui.add_space(15.0);
             ui.horizontal(|ui| {
                 if ui.button("OK").clicked() {
-                    //out.push(WidgetMsg::DialogAcceptedText(self.id, self.text.clone()));
                     out.push(WidgetMsg::DialogAcceptedText(self.id, self.text.clone()));
                     close = true;
                 }
@@ -122,7 +147,6 @@ impl Dialog for TextEntryDlg {
                 }
             });
         });
-
         close
     }
 }
@@ -181,6 +205,7 @@ impl Dialog for DragFloatDlg {
                     .fixed_decimals(self.decimal)
                     .speed(self.speed),
             );
+
             ui.add_space(10.0);
             ui.horizontal(|ui| {
                 if ui.button("OK").clicked() {
