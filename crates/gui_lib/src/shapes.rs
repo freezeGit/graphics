@@ -8,6 +8,7 @@ pub mod lines;
 pub mod rectangle;
 pub mod circle;
 pub mod polyline;
+pub mod closed_polyline;
 pub mod text;
 
 pub use base::{LineStyle, Shape, ShapeBase};
@@ -15,6 +16,7 @@ pub use line::Line;
 pub use lines::Lines;
 pub use circle::Circle;
 pub use polyline::Polyline;
+pub use closed_polyline::ClosedPolyline;
 pub use rectangle::Rectangle;
 pub use text::{Text, TextFont};
 

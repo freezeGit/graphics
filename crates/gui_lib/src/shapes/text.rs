@@ -1,4 +1,4 @@
-//! ## module Text
+//! ## module text
 //! Declation for struct Text:
 //! A text with a specified location, size, and font.
 //!

@@ -1,12 +1,13 @@
-//! ## module polyline
-//! Contains customizable Polyline component.
+//! ## module closed_olyline
+//! Contains a customizable Polyline component.
 //!
 // polyline.rs
 
-use crate::egui::{self, Color32, Pos2, Vec2, Stroke};
+use crate::egui::epaint::PathShape;
+use crate::egui::{self, Color32, Pos2, Stroke, Vec2};
 use crate::shapes::base::{LineStyle, Shape, ShapeBase};
 
-/// A customizable Polyline component.
+/// A customizable ClosedPolyline component.
 ///
 /// # Fields
 /// * base: ShapeBase - The base properties of the shape.
@@ -14,12 +15,12 @@ use crate::shapes::base::{LineStyle, Shape, ShapeBase};
 /// All points will be plotted relative to 'location'.
 /// Any point Pos2::ZERO will be plotted at 'location'.
 #[derive(Debug, Default)]
-pub struct Polyline {
+pub struct ClosedPolyline {
     base: ShapeBase,
     points: Vec<Pos2>,
 }
 
-impl Polyline {
+impl ClosedPolyline {
     pub fn new(location: Pos2, points: impl IntoIterator<Item = Pos2>) -> Self {
         Self {
             base: ShapeBase {
@@ -29,12 +30,27 @@ impl Polyline {
             points: points.into_iter().collect(),
         }
     }
-}
+
+    // --------- Private functions ---------
+    fn close_last_point(pts: &mut Vec<Pos2>) {
+        pts.push(pts[0]);
+    }
+
+    fn draw_fill(&self, painter: &egui::Painter, pts: &Vec<Pos2>) {
+        let closed_path = PathShape {
+            points: pts.clone(),
+            closed: true,
+            fill: self.base.fill_color(),
+            stroke: Stroke::NONE.into(),
+        };
+        painter.add(egui::Shape::Path(closed_path));
+    }
+} // end of impl ClosedPolyline
 
 /// Implement trait Shape for Polyline.
 ///
 /// Make trait [`Shape`] methods available.
-impl Shape for Polyline {
+impl Shape for ClosedPolyline {
     fn base(&self) -> &ShapeBase {
         &self.base
     }
@@ -48,14 +64,25 @@ impl Shape for Polyline {
         }
 
         let translation = self.base.location().to_vec2() + canvas_offset;
-        let points_trans: Vec<egui::Pos2> = self.points.iter().map(|p| *p + translation).collect();
-        let stroke = Stroke::new(self.base.line_width(), self.base.color());
+        let mut points_trans: Vec<egui::Pos2> =
+            self.points.iter().map(|p| *p + translation).collect();
+        let stroke = egui::Stroke::new(self.base.line_width(), self.base.color());
 
         match self.base.line_style() {
             LineStyle::Solid => {
-                painter.line(points_trans, stroke);
+                let closed_path = PathShape {
+                    points: points_trans,
+                    closed: true,
+                    fill: self.base.fill_color(),
+                    stroke: stroke.into(),
+                };
+                painter.add(egui::Shape::Path(closed_path));
             }
+
             LineStyle::Dashed => {
+                self.draw_fill(painter, &points_trans);
+                ClosedPolyline::close_last_point(&mut points_trans);
+
                 let shapes = egui::Shape::dashed_line(
                     &points_trans,
                     stroke,
@@ -64,7 +91,11 @@ impl Shape for Polyline {
                 );
                 painter.extend(shapes);
             }
+
             LineStyle::Dotted => {
+                self.draw_fill(painter, &points_trans);
+                ClosedPolyline::close_last_point(&mut points_trans);
+
                 let shapes = egui::Shape::dotted_line(
                     &points_trans,
                     self.base.color(),
@@ -75,4 +106,4 @@ impl Shape for Polyline {
             }
         }
     }
-}
+} // end of impl Shape for Polyline

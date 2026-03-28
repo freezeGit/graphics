@@ -1,5 +1,5 @@
-//! ## module Circle
-//! A customizable Circle component.
+//! ## module circle
+//! Contains a  customizable Circle component.
 
 // circle.rs
 

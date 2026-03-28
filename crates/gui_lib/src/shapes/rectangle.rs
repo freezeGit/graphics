@@ -1,4 +1,4 @@
-//! ## module Rectangle
+//! ## module rectangle
 //! Declation for struct Rectangle:
 //! A rectangle with a specified size and location.
 //!

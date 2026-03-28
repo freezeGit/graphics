@@ -11,7 +11,7 @@ use std::rc::Rc;
 use gui_lib::LayoutStyle::TopPanel;
 use gui_lib::{
     BKG_EXAMPLE, BKG_WINDOWS, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Lines,
-    Polyline, Rectangle, Separator, Shape, ShapeHandle, Space, Text,
+    Polyline, ClosedPolyline, Rectangle, Separator, Shape, ShapeHandle, Space, Text,
 };
 use gui_lib::{LineStyle::Dashed, LineStyle::Dotted, LineStyle::Solid};
 use gui_lib::{Pos2, Vec2};
@@ -110,15 +110,15 @@ impl TheCanvas {
 
         // Add a dotted polyline to the canvas
         let poly: ShapeHandle = Rc::new(RefCell::new(Polyline::new(
-            eframe::egui::Pos2::new(550.0, 200.0),
+            Pos2::new(550.0, 200.0),
             [
-                eframe::egui::Pos2::new(0.0, 0.0),
-                eframe::egui::Pos2::new(25.0, 50.0),
-                eframe::egui::Pos2::new(75.0, -50.0),
-                eframe::egui::Pos2::new(125.0, 50.0),
-                eframe::egui::Pos2::new(175.0, -50.0),
-                eframe::egui::Pos2::new(225.0, 50.0),
-                eframe::egui::Pos2::new(250.0, 0.0),
+                Pos2::new(0.0, 0.0),
+                Pos2::new(25.0, 50.0),
+                Pos2::new(75.0, -50.0),
+                Pos2::new(125.0, 50.0),
+                Pos2::new(175.0, -50.0),
+                Pos2::new(225.0, 50.0),
+                Pos2::new(250.0, 0.0),
             ],
         )));
         poly.borrow_mut().set_color(Color32::RED);
@@ -126,6 +126,25 @@ impl TheCanvas {
         poly.borrow_mut().set_line_width(4.0);
         poly.borrow_mut().set_line_style(Dotted);
         canvas.add_shape(poly); // coercion happens automatically
+
+        // Add a ClosedPolyline to the canvas
+        let closed_poly: ShapeHandle = Rc::new(RefCell::new(ClosedPolyline::new(
+            Pos2::new(850.0, 200.0),
+            [
+                Pos2::new(0.0, 0.0),
+                Pos2::new(80.0, 40.0),
+                Pos2::new(160.0, -70.0),
+                Pos2::new(50.0, -120.0),
+                Pos2::new(-20.0, -60.0),
+            ],
+        )));
+        closed_poly.borrow_mut().set_color(Color32::BLUE);
+        closed_poly.borrow_mut().set_fill_color(Color32::LIGHT_RED);
+        closed_poly.borrow_mut().set_line_width(2.0);
+        closed_poly.borrow_mut().set_line_width(4.0);
+        //closed_poly.borrow_mut().set_line_style(Dashed);
+        closed_poly.borrow_mut().set_line_style(Dotted);
+        canvas.add_shape(closed_poly); // coercion happens automatically
 
         // Add gauge rectangle
         let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
@@ -157,7 +176,7 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxtname.clone()); // coercion happens automatically
 
-        // Add text to display value.
+        // Add text to display value
         let stxtval: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             eframe::egui::Pos2::new(325.0, 100.0),
             format!("{}{:.2}", "Value: ", 0.0),
@@ -214,7 +233,7 @@ impl TheCanvas {
         let lines_test_cln: ShapeHandle = lines_test.clone();
         canvas.add_shape(lines_test_cln as ShapeHandle);
 
-        // ---- Create and add widgets as Box<dyn Widget>
+        // ---- Create and add widgets as Box<dyn Widget> ---------
         canvas.add_widget(Box::new(Space::new(15.0)));
 
         let label1 = Label::new("Sandbox", Color32::BLUE, 20.0);
@@ -223,7 +242,6 @@ impl TheCanvas {
         canvas.add_widget(Box::new(Space::new(15.0)));
 
         let wb_run = Button::new(BTN_RUN_PAUSE, "Run/Pause", 120.0, 40.0);
-        //let wb_run = Button::new(BTN_RUN_PAUSE,None, 0.0, 0.0);
         canvas.add_widget(Box::new(wb_run));
 
         let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);

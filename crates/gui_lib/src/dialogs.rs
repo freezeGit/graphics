@@ -112,7 +112,6 @@ impl TextEntryDlg {
         title: impl Into<String>,
         prompt: impl Into<String>,
         text: impl Into<String>,
-        //font_size: f32,
     ) -> Self {
         Self {
             egui_id: egui::Id::new(("text_entry_dialog", id)),
@@ -120,7 +119,6 @@ impl TextEntryDlg {
             title: title.into(),
             prompt: prompt.into(),
             text: text.into(),
-            //font_size,
         }
     }
 }
