@@ -3,7 +3,7 @@
 //!
 // polyline.rs
 
-use crate::egui::{self, Color32, Pos2, Vec2, Stroke};
+use crate::egui::{self, Painter, Color32, Pos2, Vec2, Stroke};
 use crate::shapes::base::{LineStyle, Shape, ShapeBase};
 
 /// A customizable Polyline component.
@@ -29,7 +29,7 @@ impl Polyline {
             points: points.into_iter().collect(),
         }
     }
-}
+} // impl Polyline
 
 /// Implement trait Shape for Polyline.
 ///
@@ -42,13 +42,13 @@ impl Shape for Polyline {
         &mut self.base
     }
 
-    fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+    fn draw_at(&self, painter: &Painter, canvas_offset: egui::Vec2) {
         if self.points.len() < 2 {
             return;
         }
 
         let translation = self.base.location().to_vec2() + canvas_offset;
-        let points_trans: Vec<egui::Pos2> = self.points.iter().map(|p| *p + translation).collect();
+        let points_trans: Vec<Pos2> = self.points.iter().map(|p| *p + translation).collect();
         let stroke = Stroke::new(self.base.line_width(), self.base.color());
 
         match self.base.line_style() {
@@ -75,4 +75,4 @@ impl Shape for Polyline {
             }
         }
     }
-}
+} // impl Shape for Polyline

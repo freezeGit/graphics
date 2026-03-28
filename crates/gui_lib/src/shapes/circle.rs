@@ -109,4 +109,4 @@ impl Shape for Circle {
             self.draw_broken_circle(painter, canvas_offset);
         }
     }
-} // impl Shape
+} // impl tait Shape

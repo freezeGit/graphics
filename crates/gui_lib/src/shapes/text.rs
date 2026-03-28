@@ -4,7 +4,7 @@
 //!
 // text.rs
 
-use crate::egui::{self, Color32, Pos2, TextStyle};
+use crate::egui::{self, Color32, Pos2, TextStyle, FontId,};
 use crate::shapes::base::{Shape, ShapeBase};
 use std::f32::consts::FRAC_PI_2;
 
@@ -110,8 +110,8 @@ impl Shape for Text {
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
         let tl = self.base.location() + canvas_offset;
         let font_id = match self.font {
-            TextFont::Proportional => egui::FontId::proportional(self.size),
-            TextFont::Monospace => egui::FontId::monospace(self.size),
+            TextFont::Proportional => FontId::proportional(self.size),
+            TextFont::Monospace => FontId::monospace(self.size),
         };
 
         if self.angle != 0.0 {
@@ -137,4 +137,4 @@ impl Shape for Text {
             );
         }
     }
-}
+} // impl Shape for Text

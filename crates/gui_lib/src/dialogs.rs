@@ -13,7 +13,7 @@ pub trait Dialog: std::fmt::Debug {
     /// Returns true when the dialog is closed.
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
 }
-// -----------------------------
+// ---------- NilDlg -----------------
 
 /// Does nothing.
 #[derive(Debug)]
@@ -25,7 +25,7 @@ impl Dialog for NilDlg {
     }
 }
 
-// -----------------------------
+// ----------- MessageBoxDlg ------------------
 /// Displays a message box with a title and text.
 #[derive(Debug)]
 pub struct MessageBoxDlg {
@@ -65,7 +65,7 @@ impl MessageBoxDlg {
             font_size,
         }
     }
-}
+} // end of MessageBoxDlg
 
 impl Dialog for MessageBoxDlg {
     fn invoke_modal(&mut self, ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
@@ -91,9 +91,9 @@ impl Dialog for MessageBoxDlg {
 
         close
     }
-}
+} // end of impl Dialog for MessageBoxDlg
 
-// --------------------------------------
+// ---------------- TextEntryDlg ----------------------
 /// Displays a dialog with a title, prompt, and text entry field.
 /// Outputs the text entered by the user.
 /// Emits WidgetMsg::DialogAcceptedText(self.id, self.text.clone()).
@@ -121,7 +121,7 @@ impl TextEntryDlg {
             text: text.into(),
         }
     }
-}
+} // end of TextEntryDlg
 
 impl Dialog for TextEntryDlg {
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
@@ -139,11 +139,6 @@ impl Dialog for TextEntryDlg {
             ui.horizontal(|ui| {
                 ui.label(egui::RichText::new(format!("{}:", self.prompt)).size(DEFAULT_TED_SIZE));
                 ui.add(egui::TextEdit::singleline(&mut self.text).font(egui::TextStyle::Heading));
-                // ui.add_sized(
-                //     [200.0, 0.0],
-                //     egui::TextEdit::singleline(&mut self.text)
-                //         .font(egui::TextStyle::Heading),
-                // ); TDJ: May need to control the size of the text edit box
             });
 
             ui.add_space(15.0);
@@ -160,9 +155,9 @@ impl Dialog for TextEntryDlg {
 
         close
     }
-}
+} // end of impl Dialog for TextEntryDlg
 
-// ------------------------------------------
+// ------------ DragFloatDlg ------------------------------
 /// Displays a dialog with a title and floating point value entry field.
 /// Outputs the value entered by the user.
 /// Emits WidgetMsg::DialogAcceptedDragFloat(self.id, self.value).
@@ -181,14 +176,12 @@ impl DragFloatDlg {
     pub fn new(
         id: DragFloatDlgId,
         title: impl Into<String>,
-        //prompt: impl Into<String>,
         value: f32,
     ) -> Self {
         Self {
             egui_id: egui::Id::new(("text_entry_dialog", id)),
             id,
             title: title.into(),
-            //prompt: prompt.into(),
             value,
             decimal: 0,
             speed: 1.0,
@@ -201,7 +194,7 @@ impl DragFloatDlg {
     pub fn set_speed(&mut self, speed: f64) {
         self.speed = speed;
     }
-}
+} // end of DragFloatDlg
 
 impl Dialog for DragFloatDlg {
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
@@ -233,6 +226,92 @@ impl Dialog for DragFloatDlg {
                 }
             });
         });
+
+        close
+    }
+} // end of impl Dialog for DragFloatDlg
+
+// ------------ MultiTextEntryDlg ------------------------------
+#[derive(Debug, Clone)]
+pub struct TextEntryStruct {
+    pub prompt: String,
+    pub text: String,
+}
+
+impl TextEntryStruct {
+    pub fn new(prompt: impl Into<String>, text: impl Into<String>) -> Self {
+        Self {
+            prompt: prompt.into(),
+            text: text.into(),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct MultiTextEntryDlg {
+    pub egui_id: egui::Id,
+    pub id:TextEntryDlgId,
+    pub title: String,
+    pub entry_structs: Vec<TextEntryStruct>,
+}
+
+impl MultiTextEntryDlg {
+    pub fn new(
+        egui_id: egui::Id,
+        id: TextEntryDlgId,
+        title: impl Into<String>,
+        entry_structs: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
+    ) -> Self {
+        Self {
+            id,
+            egui_id,
+            title: title.into(),
+            entry_structs: entry_structs
+                .into_iter()
+                .map(|(prompt, text)| TextEntryStruct::new(prompt, text))
+                .collect(),
+        }
+    }
+} // end of MultiTextEntryDlg
+
+impl Dialog for MultiTextEntryDlg {
+    fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+        let mut close = false;
+        const DEFAULT_SIZE: f32 = 20.0;
+
+        egui::Modal::new(self.egui_id).show(ctx, |ui| {
+            ui.set_min_width(350.0);
+
+            ui.heading(egui::RichText::new(&self.title).size(DEFAULT_SIZE));
+            ui.separator();
+
+            for txtes in &mut self.entry_structs {
+                ui.horizontal(|ui| {
+                    ui.label(
+                        egui::RichText::new(format!("{}:", txtes.prompt))
+                            .size(DEFAULT_SIZE),
+                    );
+                    ui.add(
+                        egui::TextEdit::singleline(&mut txtes.text)
+                            .font(egui::TextStyle::Heading),
+                    );
+                });
+            }
+
+            ui.add_space(15.0);
+            ui.horizontal(|ui| {
+                if ui.button("OK").clicked() {
+                    close = true;
+                }
+                if ui.button("Cancel").clicked() {
+                    close = true;
+                }
+            });
+        });
+
+        if close {
+            // later you can push a message containing all the field values
+        }
 
         close
     }

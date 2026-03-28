@@ -67,7 +67,7 @@ impl Line {
     pub fn set_angle(&mut self, angle: f32) {
         self.vctr = Vec2::angled(angle) * self.vctr.length();
     }
-}
+} // end of impl Line
 
 /// Implement trait Shape for Line.
 ///

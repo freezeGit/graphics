@@ -4,7 +4,7 @@
 // polyline.rs
 
 use crate::egui::epaint::PathShape;
-use crate::egui::{self, Color32, Pos2, Stroke, Vec2};
+use crate::egui::{self, Painter, Pos2, Stroke,};
 use crate::shapes::base::{LineStyle, Shape, ShapeBase};
 
 /// A customizable ClosedPolyline component.
@@ -36,7 +36,7 @@ impl ClosedPolyline {
         pts.push(pts[0]);
     }
 
-    fn draw_fill(&self, painter: &egui::Painter, pts: &Vec<Pos2>) {
+    fn draw_fill(&self, painter: &Painter, pts: &Vec<Pos2>) {
         let closed_path = PathShape {
             points: pts.clone(),
             closed: true,
@@ -58,15 +58,15 @@ impl Shape for ClosedPolyline {
         &mut self.base
     }
 
-    fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+    fn draw_at(&self, painter: &Painter, canvas_offset: egui::Vec2) {
         if self.points.len() < 2 {
             return;
         }
 
         let translation = self.base.location().to_vec2() + canvas_offset;
-        let mut points_trans: Vec<egui::Pos2> =
+        let mut points_trans: Vec<Pos2> =
             self.points.iter().map(|p| *p + translation).collect();
-        let stroke = egui::Stroke::new(self.base.line_width(), self.base.color());
+        let stroke = Stroke::new(self.base.line_width(), self.base.color());
 
         match self.base.line_style() {
             LineStyle::Solid => {

@@ -32,15 +32,13 @@ use crate::world::{Signal, TheWorld, ThingState};
 #[derive(Debug)]
 pub(crate) struct TheCanvas {
     pub(crate) canvas: BasicCanvas,
-    //tl_circle1: Rc<RefCell<Circle>>,
+
     tl_circle2: Rc<RefCell<Circle>>,
     rect: Rc<RefCell<Rectangle>>,
-    //poly: Rc<RefCell<Polyline>>,
     arrow_head: Rc<RefCell<Polyline>>,
     stxt: Rc<RefCell<Text>>,
     stxtname: Rc<RefCell<Text>>,
     stxtval: Rc<RefCell<Text>>,
-    //pub(crate) line_test: Rc<RefCell<Line>>,
     line_test: Rc<RefCell<Line>>,
     lines_test: Rc<RefCell<Lines>>,
 }

@@ -40,7 +40,7 @@ pub struct BasicCanvas {
     background_color: Color32,
     shapes: Vec<ShapeHandle>, // Vec<Rc<RefCell<dyn Shape>>>
     widgets: Vec<Box<dyn Widget>>,
-    pub dialog: Box<dyn Dialog>,
+    pub active_dialog: Box<dyn Dialog>,
 }
 
 /// BasicCanvas provides underlying structure and functionality for any user canvas.
@@ -54,7 +54,7 @@ impl BasicCanvas {
             background_color: bkg,
             shapes: Vec::new(),
             widgets: Vec::new(),
-            dialog: Box::new(NilDlg),
+            active_dialog: Box::new(NilDlg),
         }
     }
 
@@ -178,15 +178,15 @@ impl BasicCanvas {
     // Dialog in canvas --------------------------------------------------
     /// Set the ative [`Dialog`] in the canvas.
     pub fn set_dialog(&mut self, dlg: Box<dyn Dialog>) {
-        self.dialog = dlg;
+        self.active_dialog = dlg;
     }
 
     pub fn get_dialog(&self) -> &dyn Dialog {
-        self.dialog.as_ref()
+        self.active_dialog.as_ref()
     }
 
     pub fn get_mut_dialog(&mut self) -> &mut dyn Dialog {
-        self.dialog.as_mut()
+        self.active_dialog.as_mut()
     }
 
     // Rendering canvas ---------------------------------------------

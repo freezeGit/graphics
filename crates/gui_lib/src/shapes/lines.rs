@@ -47,9 +47,3 @@ impl Shape for Lines {
     }
 }
 // impl Shape for Lines
-
-//let points = vec![p1, p2, p3, p4];
-
-// for pair in points.windows(2) {
-// draw_line(pair[0], pair[1]);
-// }

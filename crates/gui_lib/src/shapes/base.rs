@@ -23,23 +23,6 @@ pub struct ShapeBase {
     pub(crate) line_style: LineStyle,
 }
 
-impl Default for ShapeBase {
-    fn default() -> Self {
-        Self {
-            location: Pos2::default(),
-            //points: Vec::new(),
-            color: Color32::BLACK,
-            fill_color: Color32::TRANSPARENT,
-            line_width: 2.0,
-            line_style: LineStyle::Solid,
-            //line_style: LineStyle::Dashed { dash: 8.0, gap: 4.0 },
-            //line_style: LineStyle::Dashed,
-            //line_style: LineStyle::Dotted { spacing: 8.0, radius: 2.0 },
-            //line_style: LineStyle::Dotted,
-        }
-    }
-}
-
 impl ShapeBase {
     // /// Create a new, empty ShapeBase with default values.
     // pub fn new() -> Self {
@@ -91,7 +74,23 @@ impl ShapeBase {
     pub(crate) fn dot_spacing(&self) -> f32 {
         1.0 + (2.5 * self.line_width)
     }
-}
+} // end of impl ShapeBase
+
+impl Default for ShapeBase {
+    fn default() -> Self {
+        Self {
+            location: Pos2::default(),
+            color: Color32::BLACK,
+            fill_color: Color32::TRANSPARENT,
+            line_width: 2.0,
+            line_style: LineStyle::Solid,
+            //line_style: LineStyle::Dashed { dash: 8.0, gap: 4.0 },
+            //line_style: LineStyle::Dashed,
+            //line_style: LineStyle::Dotted { spacing: 8.0, radius: 2.0 },
+            //line_style: LineStyle::Dotted,
+        }
+    }
+} // end of impl Default for ShapeBase
 
 /// trait Shape is implemented by all shapes.
 ///
@@ -163,4 +162,4 @@ pub trait Shape: std::fmt::Debug {
     fn set_line_style(&mut self, ls: LineStyle) {
         self.base_mut().set_line_style(ls)
     }
-}
+} // end of trait Shape

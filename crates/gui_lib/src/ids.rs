@@ -2,10 +2,11 @@
 //! ## and enum WidgetMsg for emitted mesages
 // src/gui_lib/ids.rs
 
+// ------------ Widget IDs -------------------
 // WidgetId - unique ID for each widget.
 pub type WidgetId = u32;
 
-// Widget IDs -------------------
+// ---------------------------
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct ButtonId(pub WidgetId);
 
@@ -15,10 +16,10 @@ pub struct SliderId(pub WidgetId);
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DragFloatId(pub WidgetId);
 
+//---------------- Dialog IDs ------------------
 // DialogId - unique ID for each dialog.
 pub type DialogId = u32;
-
-// Dialog IDs ------------------
+// --------------------------------------
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct MessageBoxDlgId(pub DialogId);
@@ -28,6 +29,10 @@ pub struct TextEntryDlgId(pub DialogId);
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct DragFloatDlgId(pub DialogId);
+
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct MultiTextEntryDlg(pub DialogId);
+
 
 // ----------------------------------
 /// WidgetMsg - enum for all messages emitted from widgets and dialogs.
