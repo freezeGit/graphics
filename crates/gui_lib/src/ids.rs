@@ -2,6 +2,8 @@
 //! ## and enum WidgetMsg for emitted mesages
 // src/gui_lib/ids.rs
 
+use crate::dialogs::TextEntryResult;
+
 // ------------ Widget IDs -------------------
 // WidgetId - unique ID for each widget.
 pub type WidgetId = u32;
@@ -31,7 +33,7 @@ pub struct TextEntryDlgId(pub DialogId);
 pub struct DragFloatDlgId(pub DialogId);
 
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct MultiTextEntryDlg(pub DialogId);
+pub struct MultiTextEntryDlgId(pub DialogId);
 
 
 // ----------------------------------
@@ -46,4 +48,5 @@ pub enum WidgetMsg {
     // Dialog outcomes:
     DialogAcceptedText(TextEntryDlgId, String),
     DialogAcceptedDragFloat(DragFloatDlgId, f32),
+    DialogAcceptedMultiTextEntry(MultiTextEntryDlgId, Vec<TextEntryResult>),
 }

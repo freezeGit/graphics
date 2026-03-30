@@ -3,7 +3,7 @@
 // dialogs.rs
 
 use crate::egui;
-use crate::ids::{DragFloatDlgId, MessageBoxDlgId, TextEntryDlgId, WidgetMsg};
+use crate::ids::{DragFloatDlgId, MessageBoxDlgId, TextEntryDlgId, MultiTextEntryDlgId, WidgetMsg};
 
 // -----------------------------
 /// Trait for all dialogs.
@@ -13,8 +13,8 @@ pub trait Dialog: std::fmt::Debug {
     /// Returns true when the dialog is closed.
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool;
 }
-// ---------- NilDlg -----------------
 
+// ---------- NilDlg -----------------
 /// Does nothing.
 #[derive(Debug)]
 pub struct NilDlg;
@@ -232,15 +232,36 @@ impl Dialog for DragFloatDlg {
 } // end of impl Dialog for DragFloatDlg
 
 // ------------ MultiTextEntryDlg ------------------------------
+// #[derive(Debug, Clone)]
+// pub struct TextEntryField {
+//     pub prompt: String,
+//     pub text: String,
+// }
+//
+// impl TextEntryField {
+//     pub fn new(prompt: impl Into<String>, text: impl Into<String>) -> Self {
+//         Self {
+//             prompt: prompt.into(),
+//             text: text.into(),
+//         }
+//     }
+// }
+
 #[derive(Debug, Clone)]
-pub struct TextEntryStruct {
+pub struct TextEntryField {
+    pub id: String,
     pub prompt: String,
     pub text: String,
 }
 
-impl TextEntryStruct {
-    pub fn new(prompt: impl Into<String>, text: impl Into<String>) -> Self {
+impl TextEntryField {
+    pub fn new(
+        id: impl Into<String>,
+        prompt: impl Into<String>,
+        text: impl Into<String>,
+    ) -> Self {
         Self {
+            id: id.into(),
             prompt: prompt.into(),
             text: text.into(),
         }
@@ -249,29 +270,36 @@ impl TextEntryStruct {
 
 #[derive(Debug)]
 pub struct MultiTextEntryDlg {
+    pub id: MultiTextEntryDlgId,
     pub egui_id: egui::Id,
-    pub id:TextEntryDlgId,
     pub title: String,
-    pub entry_structs: Vec<TextEntryStruct>,
+    pub fields: Vec<TextEntryField>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TextEntryResult {
+    pub id: String,
+    pub text: String,
 }
 
 impl MultiTextEntryDlg {
-    pub fn new(
+    pub fn new<I>(
+        id: MultiTextEntryDlgId,
         egui_id: egui::Id,
-        id: TextEntryDlgId,
         title: impl Into<String>,
-        entry_structs: impl IntoIterator<Item = (impl Into<String>, impl Into<String>)>,
-    ) -> Self {
+        fields: I,
+    ) -> Self
+    where
+        I: IntoIterator<Item = TextEntryField>,
+    {
         Self {
             id,
             egui_id,
             title: title.into(),
-            entry_structs: entry_structs
-                .into_iter()
-                .map(|(prompt, text)| TextEntryStruct::new(prompt, text))
-                .collect(),
+            fields: fields.into_iter().collect(),
         }
     }
+
 } // end of MultiTextEntryDlg
 
 impl Dialog for MultiTextEntryDlg {
@@ -285,7 +313,7 @@ impl Dialog for MultiTextEntryDlg {
             ui.heading(egui::RichText::new(&self.title).size(DEFAULT_SIZE));
             ui.separator();
 
-            for txtes in &mut self.entry_structs {
+            for txtes in &mut self.fields {
                 ui.horizontal(|ui| {
                     ui.label(
                         egui::RichText::new(format!("{}:", txtes.prompt))
@@ -301,18 +329,22 @@ impl Dialog for MultiTextEntryDlg {
             ui.add_space(15.0);
             ui.horizontal(|ui| {
                 if ui.button("OK").clicked() {
+                    // later you can push a message containing all the field values
                     close = true;
                 }
+                // if ui.button("OK").clicked() {
+                //     out.push(WidgetMsg::DialogAcceptedText(self.id, self.text.clone()));
+                //     close = true;
                 if ui.button("Cancel").clicked() {
                     close = true;
                 }
             });
         });
 
-        if close {
-            // later you can push a message containing all the field values
-        }
+        // if close {
+        //     // later you can push a message containing all the field values
+        // }
 
         close
     }
-}
+} // end of impl Dialog for MultiTextEntryDlg
