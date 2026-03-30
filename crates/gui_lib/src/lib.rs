@@ -27,13 +27,14 @@ pub mod widgets;
 
 // Public API re-exports (nice for both demo apps AND your internal modules)
 // IDs and message types
-pub use ids::{
-    ButtonId, DialogId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, SliderId, TextEntryDlgId,
-};
+// pub use ids::{
+//     ButtonId, DialogId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, SliderId, TextEntryDlgId, MultiTextEntryDlgId
+// };
 pub use messages::WidgetMsg;
 
 pub use canvas::*;
 pub use dialogs::*;
+pub use ids::*;
 pub use shapes::base::{Shape, ShapeBase}; // because Shape + ShapeBase live in shapes/base.rs
 pub use shapes::*; // re-export Circle/Rectangle/etc
 pub use timer::*;

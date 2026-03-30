@@ -10,15 +10,15 @@ use std::rc::Rc;
 
 use gui_lib::LayoutStyle::TopPanel;
 use gui_lib::{
-    BKG_EXAMPLE, BKG_WINDOWS, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Lines,
-    Polyline, ClosedPolyline, Rectangle, Separator, Shape, ShapeHandle, Space, Text,
+    BKG_EXAMPLE, BKG_WINDOWS, BasicCanvas, Button, Circle, ClosedPolyline, Color32, DragFloat,
+    Label, Line, Lines, Polyline, Rectangle, Separator, Shape, ShapeHandle, Space, Text,
 };
 use gui_lib::{LineStyle::Dashed, LineStyle::Dotted, LineStyle::Solid};
 use gui_lib::{Pos2, Vec2};
 
 use crate::ids::{
-    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_TEXT, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B,
-    DRAGFLOAT_GAUGE,
+    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_MULT_TEXT, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A,
+    BTN_STATE_B, DRAGFLOAT_GAUGE,
 };
 use crate::world::{Signal, TheWorld, ThingState};
 
@@ -261,8 +261,8 @@ impl TheCanvas {
         let wb_enter_name = Button::new(BTN_ENTER_NAME, "Enter Name", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_enter_name));
 
-        let wb_enter_text = Button::new(BTN_ENTER_TEXT, "Enter Text", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_enter_text));
+        let wb_enter_mult_text = Button::new(BTN_ENTER_MULT_TEXT, "Enter Text", 120.0, 40.0);
+        canvas.add_widget(Box::new(wb_enter_mult_text));
 
         let wb_enter_value = Button::new(BTN_ENTER_VALUE, "Enter Value", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_enter_value));

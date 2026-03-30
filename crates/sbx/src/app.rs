@@ -9,14 +9,16 @@
 use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
-    ButtonId, Color32, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, NilDlg,
-    SliderId, TextEntryDlg, TextEntryDlgId, Timer, WidgetMsg,
+    ButtonId, Color32, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
+    MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId,
+    TextEntryField, Timer, WidgetMsg,
 };
-
+//use crate::ids::DLG_ENTER_MULTI_TEXT;
 use crate::canvas::TheCanvas;
 use crate::ids::{
     BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
-    DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
+    DLG_ENTER_MULTI_TEXT, DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER,
+    SLIDER_GAUGE,
 };
 use crate::world::{TheWorld, ThingState};
 
@@ -65,6 +67,9 @@ impl TheApp {
             WidgetMsg::DialogAcceptedText(id, text) => {
                 self.handle_text_entry(id, text);
             }
+            WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
+                self.handle_mult_text_entry(id, values);
+            }
             WidgetMsg::DialogAcceptedDragFloat(id, val) => {
                 self.handle_drag_float_dlg(id, val);
             }
@@ -89,6 +94,22 @@ impl TheApp {
                     "Name:",
                     self.world.name.clone(),
                 )));
+            }
+
+            BTN_ENTER_MULT_TEXT => {
+                self.canvas
+                    .canvas
+                    .set_dialog(Box::new(MultiTextEntryDlg::new(
+                        DLG_ENTER_MULTI_TEXT,
+                        egui::Id::new("person_dlg"),
+                        "Enter person data",
+                        [
+                            //TextEntryField::new("name", "Name", ""),
+                            TextEntryField::new("name", "Name", self.world.name.clone()),
+                            TextEntryField::new("city", "City", ""),
+                            TextEntryField::new("phone", "Phone", ""),
+                        ],
+                    )));
             }
 
             BTN_ENTER_VALUE => {
@@ -151,6 +172,16 @@ impl TheApp {
         match id {
             DLG_ENTER_NAME => {
                 self.world.name = text.clone();
+            }
+
+            _ => {}
+        }
+    }
+
+    fn handle_mult_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+        match id {
+            BTN_ENTER_MULT_TEXT => {
+                self.world.name = values[0].1.clone();
             }
 
             _ => {}
