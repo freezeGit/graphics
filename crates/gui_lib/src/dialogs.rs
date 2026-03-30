@@ -3,7 +3,8 @@
 // dialogs.rs
 
 use crate::egui;
-use crate::ids::{DragFloatDlgId, MessageBoxDlgId, TextEntryDlgId, MultiTextEntryDlgId, WidgetMsg};
+use crate::ids::{DragFloatDlgId, MessageBoxDlgId, TextEntryDlgId, MultiTextEntryDlgId};
+use crate::messages::WidgetMsg;
 
 // -----------------------------
 /// Trait for all dialogs.
@@ -232,21 +233,6 @@ impl Dialog for DragFloatDlg {
 } // end of impl Dialog for DragFloatDlg
 
 // ------------ MultiTextEntryDlg ------------------------------
-// #[derive(Debug, Clone)]
-// pub struct TextEntryField {
-//     pub prompt: String,
-//     pub text: String,
-// }
-//
-// impl TextEntryField {
-//     pub fn new(prompt: impl Into<String>, text: impl Into<String>) -> Self {
-//         Self {
-//             prompt: prompt.into(),
-//             text: text.into(),
-//         }
-//     }
-// }
-
 #[derive(Debug, Clone)]
 pub struct TextEntryField {
     pub id: String,
@@ -276,11 +262,11 @@ pub struct MultiTextEntryDlg {
     pub fields: Vec<TextEntryField>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct TextEntryResult {
-    pub id: String,
-    pub text: String,
-}
+// #[derive(Debug, Clone, PartialEq)]
+// pub struct TextEntryResult {
+//     pub id: String,
+//     pub text: String,
+// }
 
 impl MultiTextEntryDlg {
     pub fn new<I>(
@@ -313,14 +299,14 @@ impl Dialog for MultiTextEntryDlg {
             ui.heading(egui::RichText::new(&self.title).size(DEFAULT_SIZE));
             ui.separator();
 
-            for txtes in &mut self.fields {
+            for f in &mut self.fields {
                 ui.horizontal(|ui| {
                     ui.label(
-                        egui::RichText::new(format!("{}:", txtes.prompt))
+                        egui::RichText::new(format!("{}:", f.prompt))
                             .size(DEFAULT_SIZE),
                     );
                     ui.add(
-                        egui::TextEdit::singleline(&mut txtes.text)
+                        egui::TextEdit::singleline(&mut f.text)
                             .font(egui::TextStyle::Heading),
                     );
                 });
@@ -329,22 +315,21 @@ impl Dialog for MultiTextEntryDlg {
             ui.add_space(15.0);
             ui.horizontal(|ui| {
                 if ui.button("OK").clicked() {
-                    // later you can push a message containing all the field values
+                    let values = self.fields
+                        .iter()
+                        //.map(|f| (f.prompt.clone(), f.text.clone()))
+                        .map(|f| (f.id.clone(), f.text.clone()))
+                        .collect();
+
+                    out.push(WidgetMsg::DialogAcceptedMultiTextEntry(self.id, values));
                     close = true;
                 }
-                // if ui.button("OK").clicked() {
-                //     out.push(WidgetMsg::DialogAcceptedText(self.id, self.text.clone()));
-                //     close = true;
-                if ui.button("Cancel").clicked() {
+                 if ui.button("Cancel").clicked() {
                     close = true;
                 }
             });
         });
 
-        // if close {
-        //     // later you can push a message containing all the field values
-        // }
-
-        close
+       close
     }
 } // end of impl Dialog for MultiTextEntryDlg

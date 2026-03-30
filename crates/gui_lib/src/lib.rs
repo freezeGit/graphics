@@ -19,6 +19,7 @@
 pub mod canvas;
 pub mod dialogs;
 pub mod ids;
+pub mod messages;
 pub mod shapes;
 pub mod timer;
 pub mod widgets;
@@ -28,12 +29,11 @@ pub mod widgets;
 // IDs and message types
 pub use ids::{
     ButtonId, DialogId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, SliderId, TextEntryDlgId,
-    WidgetMsg,
 };
+pub use messages::WidgetMsg;
 
 pub use canvas::*;
 pub use dialogs::*;
-//pub use ids::WidgetMsg;          // WidgetMsg lives in ids.rs
 pub use shapes::base::{Shape, ShapeBase}; // because Shape + ShapeBase live in shapes/base.rs
 pub use shapes::*; // re-export Circle/Rectangle/etc
 pub use timer::*;
