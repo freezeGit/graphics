@@ -14,12 +14,8 @@ use gui_lib::{
     TextEntryField, Timer, WidgetMsg,
 };
 //use crate::ids::DLG_ENTER_MULTI_TEXT;
+use crate::ids::*;
 use crate::canvas::TheCanvas;
-use crate::ids::{
-    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_MULTI_TEXT, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
-    DLG_ENTER_MULTI_TEXT, DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER,
-    SLIDER_GAUGE,
-};
 use crate::world::{TheWorld, ThingState};
 
 /// Main application structure.
@@ -87,20 +83,20 @@ impl TheApp {
                 )));
             }
 
-            BTN_ENTER_NAME => {
-                self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
-                    DLG_ENTER_NAME,
-                    "Enter name",
-                    "Name:",
-                    self.world.name.clone(),
-                )));
-            }
+            // BTN_ENTER_NAME => {
+            //     self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
+            //         DLG_ENTER_NAME,
+            //         "Enter name",
+            //         "Name:",
+            //         self.world.name.clone(),
+            //     )));
+            // }
 
-            BTN_ENTER_MULTI_TEXT => {
+            BTN_PERSON => {
                 self.canvas
                     .canvas
                     .set_dialog(Box::new(MultiTextEntryDlg::new(
-                        DLG_ENTER_MULTI_TEXT,
+                        DLG_ENTER_PERSON,
                         egui::Id::new("person_dlg"),
                         "Enter person data",
                         [
@@ -119,7 +115,6 @@ impl TheApp {
                 let mut dlg = DragFloatDlg::new(
                     DLG_ENTER_VALUE,
                     "Enter value",
-                    //"Value:",
                     self.world.value as f32,
                 );
                 dlg.set_speed(1.0);
@@ -184,7 +179,7 @@ impl TheApp {
 
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
-            DLG_ENTER_MULTI_TEXT => {
+            DLG_ENTER_PERSON => {
                 for item in values {
                     let (item_id, text) = item;
                     match item_id.as_str() {
