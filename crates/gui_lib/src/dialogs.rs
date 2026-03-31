@@ -262,12 +262,6 @@ pub struct MultiTextEntryDlg {
     pub fields: Vec<TextEntryField>,
 }
 
-// #[derive(Debug, Clone, PartialEq)]
-// pub struct TextEntryResult {
-//     pub id: String,
-//     pub text: String,
-// }
-
 impl MultiTextEntryDlg {
     pub fn new<I>(
         id: MultiTextEntryDlgId,
@@ -317,7 +311,6 @@ impl Dialog for MultiTextEntryDlg {
                 if ui.button("OK").clicked() {
                     let values = self.fields
                         .iter()
-                        //.map(|f| (f.prompt.clone(), f.text.clone()))
                         .map(|f| (f.id.clone(), f.text.clone()))
                         .collect();
 

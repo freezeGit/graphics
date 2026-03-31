@@ -14,7 +14,7 @@ pub(crate) const BTN_STATE_B: ButtonId = ButtonId(2);
 pub(crate) const BTN_RUN_PAUSE: ButtonId = ButtonId(3);
 pub(crate) const BTN_ABOUT: ButtonId = ButtonId(4);
 pub(crate) const BTN_ENTER_NAME: ButtonId = ButtonId(5);
-pub(crate) const BTN_ENTER_MULT_TEXT: ButtonId = ButtonId(6);
+pub(crate) const BTN_ENTER_MULTI_TEXT: ButtonId = ButtonId(6);
 pub(crate) const BTN_ENTER_VALUE: ButtonId = ButtonId(7);
 
 // ---------- Dialog ids

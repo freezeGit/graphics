@@ -45,6 +45,14 @@ pub(crate) struct Thing {
     pub(crate) state: ThingState,
 }
 
+#[derive(Debug)]
+pub(crate) struct Person {
+    pub(crate) name: String,
+    pub(crate) city: String,
+    pub(crate) address: String,
+}
+
+
 /// Encapsulates program data and logic.
 /// No dependence on gui_lb
 /// No dependence on the app struct or the canvas struct.
@@ -54,13 +62,13 @@ pub(crate) struct TheWorld {
     pub(crate) thing: Thing,
     pub(crate) gauge: Gauge,
     pub(crate) name: String,
+    pub(crate) person: Person,
     pub(crate) value: f64,
 }
 
 impl TheWorld {
     pub(crate) fn new() -> Self {
         Self {
-            //state: 0,
             tl: TrafficLight {
                 state: Signal::Stop,
             },
@@ -69,6 +77,11 @@ impl TheWorld {
             },
             gauge: Gauge::new(),
             name: "Steve".to_string(),
+             person: Person {
+                name: String::from("Bill"),
+                city: String::from("Birtle"),
+                address: String::from("123 Main St"),
+            },
             value: 0.0,
         }
     }

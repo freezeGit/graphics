@@ -16,7 +16,7 @@ use gui_lib::{
 //use crate::ids::DLG_ENTER_MULTI_TEXT;
 use crate::canvas::TheCanvas;
 use crate::ids::{
-    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
+    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_MULTI_TEXT, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
     DLG_ENTER_MULTI_TEXT, DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER,
     SLIDER_GAUGE,
 };
@@ -68,7 +68,7 @@ impl TheApp {
                 self.handle_text_entry(id, text);
             }
             WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
-                self.handle_mult_text_entry(id, values);
+                self.handle_multi_text_entry(id, values);
             }
             WidgetMsg::DialogAcceptedDragFloat(id, val) => {
                 self.handle_drag_float_dlg(id, val);
@@ -96,7 +96,7 @@ impl TheApp {
                 )));
             }
 
-            BTN_ENTER_MULT_TEXT => {
+            BTN_ENTER_MULTI_TEXT => {
                 self.canvas
                     .canvas
                     .set_dialog(Box::new(MultiTextEntryDlg::new(
@@ -104,10 +104,13 @@ impl TheApp {
                         egui::Id::new("person_dlg"),
                         "Enter person data",
                         [
-                            //TextEntryField::new("name", "Name", ""),
-                            TextEntryField::new("name", "Name", self.world.name.clone()),
-                            TextEntryField::new("city", "City", ""),
-                            TextEntryField::new("phone", "Phone", ""),
+                            TextEntryField::new("name", "Name", self.world.person.name.clone()),
+                            TextEntryField::new("city", "City", self.world.person.city.clone()),
+                            TextEntryField::new(
+                                "address",
+                                "Address",
+                                self.world.person.address.clone(),
+                            ),
                         ],
                     )));
             }
@@ -171,17 +174,33 @@ impl TheApp {
     fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
         match id {
             DLG_ENTER_NAME => {
-                self.world.name = text.clone();
+                //self.world.name = text.clone();
+                self.world.name = text;
             }
 
             _ => {}
         }
     }
 
-    fn handle_mult_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+    fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
-            BTN_ENTER_MULT_TEXT => {
-                self.world.name = values[0].1.clone();
+            DLG_ENTER_MULTI_TEXT => {
+                for item in values {
+                    let (item_id, text) = item;
+                    match item_id.as_str() {
+                        "name" => {
+                            self.world.person.name = text;
+                            //println!("{}", self.world.person.name);
+                        }
+                         "city" => {
+                            self.world.person.city = text;
+                        }
+                        "address" => {
+                            self.world.person.address = text;
+                        }
+                        _ => {}
+                    }
+                }
             }
 
             _ => {}

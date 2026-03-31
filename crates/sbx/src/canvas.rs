@@ -17,7 +17,7 @@ use gui_lib::{LineStyle::Dashed, LineStyle::Dotted, LineStyle::Solid};
 use gui_lib::{Pos2, Vec2};
 
 use crate::ids::{
-    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_MULT_TEXT, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A,
+    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_MULTI_TEXT, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A,
     BTN_STATE_B, DRAGFLOAT_GAUGE,
 };
 use crate::world::{Signal, TheWorld, ThingState};
@@ -38,6 +38,8 @@ pub(crate) struct TheCanvas {
     arrow_head: Rc<RefCell<Polyline>>,
     stxt: Rc<RefCell<Text>>,
     stxtname: Rc<RefCell<Text>>,
+    stxtcity: Rc<RefCell<Text>>,
+    stxtaddress: Rc<RefCell<Text>>,
     stxtval: Rc<RefCell<Text>>,
     line_test: Rc<RefCell<Line>>,
     lines_test: Rc<RefCell<Lines>>,
@@ -169,14 +171,26 @@ impl TheCanvas {
 
         // Add text to display name.
         let stxtname: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(325.0, 60.0),
+            egui::Pos2::new(325.0, 33.0),
             "Name: Steve",
         )));
         canvas.add_shape(stxtname.clone()); // coercion happens automatically
 
+        let stxtcity: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(325.0, 65.0),
+            "City: Birtle",
+        )));
+        canvas.add_shape(stxtcity.clone()); // coercion happens automatically
+
+        let stxtaddress: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(325.0, 97.0),
+            "Address: 123 Main St",
+        )));
+        canvas.add_shape(stxtaddress.clone()); // coercion happens automatically
+
         // Add text to display value
         let stxtval: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            eframe::egui::Pos2::new(325.0, 100.0),
+            eframe::egui::Pos2::new(650.0, 33.0),
             format!("{}{:.2}", "Value: ", 0.0),
         )));
         canvas.add_shape(stxtval.clone()); // coercion happens automatically
@@ -258,10 +272,10 @@ impl TheCanvas {
         let sep = Separator::new(); // sep consumed, so can be reused
         canvas.add_widget(Box::new(sep));
 
-        let wb_enter_name = Button::new(BTN_ENTER_NAME, "Enter Name", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_enter_name));
+        // let wb_enter_name = Button::new(BTN_ENTER_NAME, "Enter Name", 120.0, 40.0);
+        // canvas.add_widget(Box::new(wb_enter_name));
 
-        let wb_enter_mult_text = Button::new(BTN_ENTER_MULT_TEXT, "Enter Text", 120.0, 40.0);
+        let wb_enter_mult_text = Button::new(BTN_ENTER_MULTI_TEXT, "Enter Person", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_enter_mult_text));
 
         let wb_enter_value = Button::new(BTN_ENTER_VALUE, "Enter Value", 120.0, 40.0);
@@ -280,6 +294,8 @@ impl TheCanvas {
             arrow_head,
             stxt,
             stxtname,
+            stxtcity,
+            stxtaddress,
             stxtval,
             line_test,
             lines_test,
@@ -344,8 +360,16 @@ impl TheCanvas {
         }
 
         //Update name
-        let name: String = "Name: ".to_owned() + &world.name.clone();
-        self.stxtname.borrow_mut().set_text(name);
+
+        //let person_name: String = "Name: ".to_owned() + &world.person.name.clone();
+        let person_name: String = "Name: ".to_owned() + &world.person.name;
+        self.stxtname.borrow_mut().set_text(person_name);
+
+        let person_city: String = "City: ".to_owned() + &world.person.city;
+        self.stxtcity.borrow_mut().set_text(person_city);
+
+        let person_address: String = "Address: ".to_owned() + &world.person.address;
+        self.stxtaddress.borrow_mut().set_text(person_address);
 
         //Update val_string
         let val = world.value;

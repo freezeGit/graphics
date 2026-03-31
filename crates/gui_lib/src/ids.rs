@@ -1,5 +1,5 @@
 //! ## Module ids contains IDs for all the widgets and dialogs
-//! ## and enum WidgetMsg for emitted mesages
+
 // src/gui_lib/ids.rs
 
 //use crate::dialogs::TextEntryResult;
