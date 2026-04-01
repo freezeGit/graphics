@@ -14,8 +14,8 @@ use gui_lib::{
     TextEntryField, Timer, WidgetMsg,
 };
 //use crate::ids::DLG_ENTER_MULTI_TEXT;
-use crate::ids::*;
 use crate::canvas::TheCanvas;
+use crate::ids::*;
 use crate::world::{TheWorld, ThingState};
 
 /// Main application structure.
@@ -79,25 +79,16 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "gui_lib demo v0.1\nWritten in Rust + egui",
+                    //"gui_lib demo v0.1\nWritten in Rust + egui",
+                    "Sandbox app for working with gui_lib \nWritten in Rust + egui",
                 )));
             }
-
-            // BTN_ENTER_NAME => {
-            //     self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
-            //         DLG_ENTER_NAME,
-            //         "Enter name",
-            //         "Name:",
-            //         self.world.name.clone(),
-            //     )));
-            // }
 
             BTN_PERSON => {
                 self.canvas
                     .canvas
                     .set_dialog(Box::new(MultiTextEntryDlg::new(
                         DLG_ENTER_PERSON,
-                        egui::Id::new("person_dlg"),
                         "Enter person data",
                         [
                             TextEntryField::new("name", "Name", self.world.person.name.clone()),
@@ -112,11 +103,8 @@ impl TheApp {
             }
 
             BTN_ENTER_VALUE => {
-                let mut dlg = DragFloatDlg::new(
-                    DLG_ENTER_VALUE,
-                    "Enter value",
-                    self.world.value as f32,
-                );
+                let mut dlg =
+                    DragFloatDlg::new(DLG_ENTER_VALUE, "Enter value", self.world.value as f32);
                 dlg.set_speed(1.0);
                 dlg.set_decimal(1);
                 self.canvas.canvas.set_dialog(Box::new(dlg));
@@ -187,7 +175,7 @@ impl TheApp {
                             self.world.person.name = text;
                             //println!("{}", self.world.person.name);
                         }
-                         "city" => {
+                        "city" => {
                             self.world.person.city = text;
                         }
                         "address" => {

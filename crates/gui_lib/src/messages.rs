@@ -2,11 +2,15 @@
 
 // messages.rs
 
-use crate::ids::{
-    ButtonId, DragFloatDlgId, DragFloatId, MultiTextEntryDlgId, SliderId, TextEntryDlgId,
-};
-
+use crate::*;
 /// WidgetMsg - enum for all messages emitted from widgets and dialogs.
+///
+/// Each WidgetMsg variant carries associated data:
+///
+/// The Id identifies the type of widget or dialog, and also the specific instantiation.
+///
+/// In addition, messages other than `ButtonClicked` carry additional data that is specific
+/// to the particular widget or dialog.
 #[derive(Debug, Clone, PartialEq)]
 pub enum WidgetMsg {
     // Widget outcomes:

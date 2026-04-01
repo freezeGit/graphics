@@ -1,8 +1,10 @@
 //! ## Module ids contains IDs for all the widgets and dialogs
+//!
+//! Each Id struct identifies a type of widget or dialog, and a specific instantiation.
+//! For example ButtonId(pub WidgetId) identifies a widget of type button, and the specific
+//! button is labeled by the WidgetId.
 
 // src/gui_lib/ids.rs
-
-//use crate::dialogs::TextEntryResult;
 
 // ------------ Widget IDs -------------------
 // WidgetId - unique ID for each widget.

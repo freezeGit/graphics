@@ -9,15 +9,17 @@
 use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
-    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, NilDlg, SliderId,
-    TextEntryDlg, TextEntryDlgId, Timer, WidgetMsg,
+    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
+    MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer,
+    WidgetMsg,
 };
 
 use crate::canvas::TheCanvas;
-use crate::ids::{
-    BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
-    DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
-};
+// use crate::ids::{
+//     BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
+//     DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
+// };
+use crate::ids::*;
 use crate::world::{TheWorld, ThingState};
 
 /// Main application structure.
@@ -66,6 +68,9 @@ impl TheApp {
             WidgetMsg::DialogAcceptedText(id, text) => {
                 self.handle_text_entry(id, text);
             }
+            WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
+                self.handle_multi_text_entry(id, values);
+            }
             WidgetMsg::DialogAcceptedDragFloat(id, val) => {
                 self.handle_drag_float_dlg(id, val);
             }
@@ -80,8 +85,28 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "gui_lib demo v0.1\nWritten in Rust + egui",
+                    "Demonstration app.\n\
+                    Can be used as a template to get started with gui_lib.\n\
+                    Written in Rust + egui.",
                 )));
+            }
+
+            BTN_PERSON => {
+                self.canvas
+                    .canvas
+                    .set_dialog(Box::new(MultiTextEntryDlg::new(
+                        DLG_ENTER_PERSON,
+                        "Enter person data",
+                        [
+                            TextEntryField::new("name", "Name", self.world.person.name.clone()),
+                            TextEntryField::new("city", "City", self.world.person.city.clone()),
+                            TextEntryField::new(
+                                "address",
+                                "Address",
+                                self.world.person.address.clone(),
+                            ),
+                        ],
+                    )));
             }
 
             BTN_ENTER_NAME => {
@@ -147,6 +172,31 @@ impl TheApp {
         }
     }
 
+    fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+        match id {
+            DLG_ENTER_PERSON => {
+                for item in values {
+                    let (item_id, text) = item;
+                    match item_id.as_str() {
+                        "name" => {
+                            self.world.person.name = text;
+                            //println!("{}", self.world.person.name);
+                        }
+                        "city" => {
+                            self.world.person.city = text;
+                        }
+                        "address" => {
+                            self.world.person.address = text;
+                        }
+                        _ => {}
+                    }
+                }
+            }
+
+            _ => {}
+        }
+    }
+
     /// Handle drag float dialog messages
     fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
         match id {
@@ -177,14 +227,13 @@ impl TheApp {
             // If the active dialog has been closed, set the dialog to nil
             self.canvas.canvas.set_dialog(Box::new(NilDlg));
             // Simulation/animation. Not needed for many programs.
-            self.run_simulation(ctx);  // Skip this line if there is no simulation.
+            self.run_simulation(ctx); // Skip this line if there is no simulation.
         }
 
         // Draw shapes and widgets on the canvas.
         // Collect all messages from widgets into self.msgs.
         self.canvas.canvas.render(ctx, &mut self.msgs);
     }
-
 
     /// Handle messages if any exist
     /// # Related Methods

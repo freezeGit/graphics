@@ -352,9 +352,7 @@ impl TheCanvas {
             }
             _ => {}
         }
-
-        //Update name
-
+        
         //let person_name: String = "Name: ".to_owned() + &world.person.name.clone();
         let person_name: String = "Name: ".to_owned() + &world.person.name;
         self.stxtname.borrow_mut().set_text(person_name);

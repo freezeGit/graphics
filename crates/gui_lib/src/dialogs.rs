@@ -3,7 +3,7 @@
 // dialogs.rs
 
 use crate::egui;
-use crate::ids::{DragFloatDlgId, MessageBoxDlgId, TextEntryDlgId, MultiTextEntryDlgId};
+use crate::ids::{DragFloatDlgId, MessageBoxDlgId, MultiTextEntryDlgId, TextEntryDlgId};
 use crate::messages::WidgetMsg;
 
 // -----------------------------
@@ -28,6 +28,7 @@ impl Dialog for NilDlg {
 
 // ----------- MessageBoxDlg ------------------
 /// Displays a message box with a title and text.
+/// Does not emit a message.
 #[derive(Debug)]
 pub struct MessageBoxDlg {
     egui_id: egui::Id,
@@ -96,8 +97,8 @@ impl Dialog for MessageBoxDlg {
 
 // ---------------- TextEntryDlg ----------------------
 /// Displays a dialog with a title, prompt, and text entry field.
-/// Outputs the text entered by the user.
-/// Emits WidgetMsg::DialogAcceptedText(self.id, self.text.clone()).
+/// Outputs the text entered by the user as a String associated with the emitted message.
+/// Emits WidgetMsg::DialogAcceptedText(TextEntryDlgId, String).
 #[derive(Debug)]
 pub struct TextEntryDlg {
     egui_id: egui::Id,
@@ -161,7 +162,7 @@ impl Dialog for TextEntryDlg {
 // ------------ DragFloatDlg ------------------------------
 /// Displays a dialog with a title and floating point value entry field.
 /// Outputs the value entered by the user.
-/// Emits WidgetMsg::DialogAcceptedDragFloat(self.id, self.value).
+/// Emits WidgetMsg::DialogAcceptedDragFloat(DragFloatId, f32).
 #[derive(Debug)]
 pub struct DragFloatDlg {
     egui_id: egui::Id,
@@ -174,11 +175,7 @@ pub struct DragFloatDlg {
 }
 
 impl DragFloatDlg {
-    pub fn new(
-        id: DragFloatDlgId,
-        title: impl Into<String>,
-        value: f32,
-    ) -> Self {
+    pub fn new(id: DragFloatDlgId, title: impl Into<String>, value: f32) -> Self {
         Self {
             egui_id: egui::Id::new(("text_entry_dialog", id)),
             id,
@@ -233,6 +230,7 @@ impl Dialog for DragFloatDlg {
 } // end of impl Dialog for DragFloatDlg
 
 // ------------ MultiTextEntryDlg ------------------------------
+/// An array of TextEntryField's is used to construct a MultiTextEntryDlg.
 #[derive(Debug, Clone)]
 pub struct TextEntryField {
     pub id: String,
@@ -241,11 +239,7 @@ pub struct TextEntryField {
 }
 
 impl TextEntryField {
-    pub fn new(
-        id: impl Into<String>,
-        prompt: impl Into<String>,
-        text: impl Into<String>,
-    ) -> Self {
+    pub fn new(id: impl Into<String>, prompt: impl Into<String>, text: impl Into<String>) -> Self {
         Self {
             id: id.into(),
             prompt: prompt.into(),
@@ -254,6 +248,12 @@ impl TextEntryField {
     }
 }
 
+/// Displays a dialog with a title,
+/// and a number of prompt, text entry fields.
+/// Outputs the texts entered by the user as a Vec<(String, String)
+/// (associated with the emitted message).
+/// The first value in the tuple is the id of the field, and the second is the text entered.
+/// Emits WidgetMsg::DialogAcceptedText(MultiTextEntryDlgId, Vec<(String, String)>).
 #[derive(Debug)]
 pub struct MultiTextEntryDlg {
     pub id: MultiTextEntryDlgId,
@@ -263,23 +263,17 @@ pub struct MultiTextEntryDlg {
 }
 
 impl MultiTextEntryDlg {
-    pub fn new<I>(
-        id: MultiTextEntryDlgId,
-        egui_id: egui::Id,
-        title: impl Into<String>,
-        fields: I,
-    ) -> Self
+    pub fn new<I>(id: MultiTextEntryDlgId, title: impl Into<String>, fields: I) -> Self
     where
         I: IntoIterator<Item = TextEntryField>,
     {
         Self {
             id,
-            egui_id,
+            egui_id: egui::Id::new(("person_dlg", id)),
             title: title.into(),
             fields: fields.into_iter().collect(),
         }
     }
-
 } // end of MultiTextEntryDlg
 
 impl Dialog for MultiTextEntryDlg {
@@ -295,21 +289,16 @@ impl Dialog for MultiTextEntryDlg {
 
             for f in &mut self.fields {
                 ui.horizontal(|ui| {
-                    ui.label(
-                        egui::RichText::new(format!("{}:", f.prompt))
-                            .size(DEFAULT_SIZE),
-                    );
-                    ui.add(
-                        egui::TextEdit::singleline(&mut f.text)
-                            .font(egui::TextStyle::Heading),
-                    );
+                    ui.label(egui::RichText::new(format!("{}:", f.prompt)).size(DEFAULT_SIZE));
+                    ui.add(egui::TextEdit::singleline(&mut f.text).font(egui::TextStyle::Heading));
                 });
             }
 
             ui.add_space(15.0);
             ui.horizontal(|ui| {
                 if ui.button("OK").clicked() {
-                    let values = self.fields
+                    let values = self
+                        .fields
                         .iter()
                         .map(|f| (f.id.clone(), f.text.clone()))
                         .collect();
@@ -317,12 +306,12 @@ impl Dialog for MultiTextEntryDlg {
                     out.push(WidgetMsg::DialogAcceptedMultiTextEntry(self.id, values));
                     close = true;
                 }
-                 if ui.button("Cancel").clicked() {
+                if ui.button("Cancel").clicked() {
                     close = true;
                 }
             });
         });
 
-       close
+        close
     }
 } // end of impl Dialog for MultiTextEntryDlg
