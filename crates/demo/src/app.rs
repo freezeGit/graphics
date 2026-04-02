@@ -333,6 +333,7 @@ impl eframe::App for TheApp {
         // Redraw after 16 milliseconds (60 FPS). Useful for animation.
         // If there is no animation, you can skip this line.
         // See the comment in the App trait above.
-        ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        //ctx.request_repaint_after(std::time::Duration::from_millis(500));
+        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 }

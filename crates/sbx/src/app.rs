@@ -212,6 +212,10 @@ impl TheApp {
     fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
 
+        // Draw shapes and widgets on the canvas.
+        // Collect all messages from widgets into self.msgs.
+        self.canvas.canvas.render(ctx, &mut self.msgs);
+
         // Draw active dialog.
         // When the dialog is closed push its message into self.msgs.
         // Pause simulation while dialog is open.
@@ -221,10 +225,6 @@ impl TheApp {
             // Simulation/animation. Not needed for many programs.
             self.run_simulation(ctx); // Skip this line if there is no simulation.
         }
-
-        // Draw shapes and widgets on the canvas.
-        // Collect all messages from widgets into self.msgs.
-        self.canvas.canvas.render(ctx, &mut self.msgs);
     }
 
     /// Handle messages if any exist
@@ -324,6 +324,7 @@ impl eframe::App for TheApp {
         // Redraw after 16 milliseconds (60 FPS). Useful for animation.
         // If there is no animation, you can skip this line.
         // See the comment in the App trait above.
+        //ctx.request_repaint_after(std::time::Duration::from_millis(1000));
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 }
