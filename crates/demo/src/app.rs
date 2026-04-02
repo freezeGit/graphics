@@ -217,8 +217,13 @@ impl TheApp {
     /// Run simulation logic when dialog is not open (if program includes a simulation).
     ///
     /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
+
     fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
+
+        // Draw shapes and widgets on the canvas.
+        // Collect all messages from widgets into self.msgs.
+        self.canvas.canvas.render(ctx, &mut self.msgs);
 
         // Draw active dialog.
         // When the dialog is closed push its message into self.msgs.
@@ -229,10 +234,6 @@ impl TheApp {
             // Simulation/animation. Not needed for many programs.
             self.run_simulation(ctx); // Skip this line if there is no simulation.
         }
-
-        // Draw shapes and widgets on the canvas.
-        // Collect all messages from widgets into self.msgs.
-        self.canvas.canvas.render(ctx, &mut self.msgs);
     }
 
     /// Handle messages if any exist
