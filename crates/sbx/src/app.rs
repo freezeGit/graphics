@@ -1,7 +1,7 @@
 //! ## Application. struct TheApp is the main structure and entry point of the application.
 //! - Contains a `Canvas` for holding a collection of shapes.
 //! - Provides methods for creating and updating the UI.
-//! - May contain a 'World" (or 'Model' or 'Document')
+//! - Cntains a `World` struct
 //!   which contains all  non-gui program data and logic
 
 // app.rs
@@ -304,9 +304,6 @@ impl TheApp {
 /// egui is reactive, meaning it only repaints when there's an input event
 /// (like mouse movement or a key press).
 /// See: <https://docs.rs/egui/latest/egui/struct.Context.html#method.request_repaint_after>
-///
-/// For a basic program there is no need for a world object. All state and logic
-/// can live directly in the TheApp.
 ///
 /// # Parameters
 /// - `ctx`: A reference to the [`Context`] object, which provides the necessary environment.
