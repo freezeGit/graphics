@@ -48,7 +48,7 @@ impl TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
-            timer: Timer::new(0.5),
+            timer: Timer::new(0.5), // TDJ: use constant instead of 0.5?
         }
     }
 
@@ -56,8 +56,8 @@ impl TheApp {
 
     /// What to do with [`WidgetMsg`] messages from widgets and dialogs.
     /// This is the only communication between the GUI and the program code.
-    /// In this demo app program data and logic are encapsulated in struct [`TheWorld`].
-    fn handle_msg(&mut self, msg: WidgetMsg) {
+    /// Program data and logic are encapsulated in struct [`TheWorld`].
+    fn handle_msg(&mut self, msg: WidgetMsg) {  // TDJ: Could be in trait TheApp.?
         match msg {
             WidgetMsg::ButtonClicked(id) => {
                 self.handle_button(id);
@@ -218,7 +218,7 @@ impl TheApp {
     ///
     /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
 
-    fn event_loop(&mut self, ctx: &Context) {
+    fn event_loop(&mut self, ctx: &Context) {  // TDJ: Could be in trait TheApp.?
         self.msgs.clear(); // establish invariant: Belt and suspenders
 
         // Draw shapes and widgets on the canvas.
@@ -240,7 +240,7 @@ impl TheApp {
     /// # Related Methods
     /// - [`handle_msg`]: Called for each individual message in the `msgs` buffer.
     /// - [`canvas.update`]: Updates the canvas to reflect changes in the `world`.
-    fn handle_emitted_messages(&mut self) {
+    fn handle_emitted_messages(&mut self) {  // TDJ: Could be in trait TheApp.?
         // Handle messages if any exist
         if !self.msgs.is_empty() {
             // Move msgs out of self so we can mutably borrow self inside the loop.
@@ -263,7 +263,7 @@ impl TheApp {
     ///
     /// Returns `true` if the user has closed the dialog,
     /// or `false` if the dialog is still open.
-    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool {
+    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool { // TDJ: Could be in trait TheApp.?
         self.canvas
             .canvas
             .get_mut_dialog()
@@ -280,7 +280,7 @@ impl TheApp {
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
     ///
     /// Parameter `ctx`: A reference to the [`Context`] object.
-    fn run_simulation(&mut self, ctx: &Context) {
+    fn run_simulation(&mut self, ctx: &Context) { // TDJ: Could be in trait TheApp.??
         if self.timer.is_time(ctx) {
             self.world.advance(); // advance world one tick
             self.canvas.update(&self.world); // update canvas
@@ -334,6 +334,6 @@ impl eframe::App for TheApp {
         // If there is no animation, you can skip this line.
         // See the comment in the App trait above.
         //ctx.request_repaint_after(std::time::Duration::from_millis(500));
-        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 }

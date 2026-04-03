@@ -43,7 +43,6 @@ pub(crate) struct TheCanvas {
     rect: Rc<RefCell<Rectangle>>,
     arrow_head: Rc<RefCell<Polyline>>,
     stxt: Rc<RefCell<Text>>,
-    //txtname: Rc<RefCell<Text>>,
     stxtname: Rc<RefCell<Text>>,
     stxtcity: Rc<RefCell<Text>>,
     stxtaddress: Rc<RefCell<Text>>,
@@ -64,6 +63,7 @@ impl TheCanvas {
         let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
 
         // ---- Create shapes as Rc<RefCell<T>> and push clone into BasicCanvas::Vec<ShapeHandle>
+        // TDJ: Maybe define a type alias for Rc<RefCell<T>?
 
         // Add a Rectangle to the canvas
         // rect is a Rc<RefCell<T>> pointing to a concrete struct (in this case, a Rectangle)
@@ -157,13 +157,6 @@ impl TheCanvas {
         canvas.add_shape(stxt.clone()); // coercion happens automatically
 
         // Add text to display name.
-        // let stxtname: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     egui::Pos2::new(325.0, 60.0),
-        //     "Name: Steve",
-        // )));
-        // canvas.add_shape(stxtname.clone()); // coercion happens automatically
-
-        // Add text to display name.
         let stxtname: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(325.0, 33.0),
             "Name: Steve",
@@ -246,14 +239,14 @@ impl TheCanvas {
         }
     }
 
-    //TDJ: not used. Should it be??
-    pub(crate) fn canvas(&self) -> &BasicCanvas {
-        &self.canvas
-    }
-    //TDJ: not used. What is fn for?
-    pub(crate) fn canvas_mut(&mut self) -> &mut BasicCanvas {
-        &mut self.canvas
-    }
+    //TDJ: not used. Should it be?
+    // pub(crate) fn canvas(&self) -> &BasicCanvas {
+    //     &self.canvas
+    // }
+    //TDJ: not used.  Should it be?
+    // pub(crate) fn canvas_mut(&mut self) -> &mut BasicCanvas {
+    //     &mut self.canvas
+    // }
 
     /// Update the state of the canvas based on the current world state.
     /// This method is called by the [`TheApp`] to update the canvas with the latest world state.

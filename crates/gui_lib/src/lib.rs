@@ -16,6 +16,8 @@
 //! will implement the eframe::App trait update() method.
 // lib.rs
 
+pub mod run;
+
 pub mod ids;
 pub mod messages;
 
@@ -27,6 +29,8 @@ pub mod timer;
 
 
 // Public API re-exports (nice for both demo apps AND your internal modules)
+pub use run::*;
+
 pub use ids::*;
 pub use messages::WidgetMsg;
 

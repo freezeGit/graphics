@@ -84,44 +84,54 @@ mod world;
 // ============================================================
 // Function main() starts the application.
 // ============================================================
-fn main() -> Result<(), eframe::Error> {
-    run_the_app()
-}
+// fn main() -> Result<(), eframe::Error> {
+//     run_the_app()
+// }
 
 // -----------------------------------------------------------
 const APP_NAME: &str = "gui_lib sandbox app";
 const XWVP: f32 = 1200.0; // Width of viewport in pixels.
 const YHVP: f32 = 800.0; // Height of viewport in pixels.
 
-/// Function run_the_app() starts a native (desktop) app.
-///
-/// Calls eframe::run_native() to create TheApp.
-/// Change constant APP_NAME to change the name of the app.
-/// Change constants XWVP and YHVP to adjust the width and height of the viewport.
-/// This function can be modified to change the theme.
-fn run_the_app() -> Result<(), eframe::Error> {
-    let native_options = custom_native_options(XWVP, YHVP);
-    eframe::run_native(
-        APP_NAME,
-        native_options, // or eframe::NativeOptions::default()
-        Box::new(|cc| {
-            cc.egui_ctx.set_visuals(egui::Visuals::light()); //light theme
-            let app = Box::new(app::TheApp::new());
-            Ok(app)
-        }),
-    )
+fn main() -> Result<(), eframe::Error> {
+    gui_lib::run_app(APP_NAME, XWVP, YHVP, |cc| {
+        cc.egui_ctx.set_visuals(egui::Visuals::light());
+        //cc.egui_ctx.set_visuals(egui::Visuals::dark());
+        app::TheApp::new()
+    })
 }
 
-/// Creates and returns an instance of `eframe::NativeOptions` with a custom viewport size.
-///
-/// # Arguments
-/// * `xv` - A `f32` representing the horizontal size (width) of the viewport.
-/// * `yv` - A `f32` representing the vertical size (height) of the viewport.
-///
-/// This function can be customized to change
-/// options controlling the behavior of a native window.
-fn custom_native_options(xv: f32, yv: f32) -> eframe::NativeOptions {
-    let mut native_options = eframe::NativeOptions::default();
-    native_options.viewport = native_options.viewport.with_inner_size(egui::vec2(xv, yv));
-    native_options
-}
+
+
+// /// Function run_the_app() starts a native (desktop) app.
+// ///
+// /// Calls eframe::run_native() to create TheApp.
+// /// Change constant APP_NAME to change the name of the app.
+// /// Change constants XWVP and YHVP to adjust the width and height of the viewport.
+// /// This function can be modified to change the theme.
+// fn run_the_app() -> Result<(), eframe::Error> {
+//     let native_options = custom_native_options(XWVP, YHVP);
+//     eframe::run_native(
+//         APP_NAME,
+//         native_options, // or eframe::NativeOptions::default()
+//         Box::new(|cc| {
+//             cc.egui_ctx.set_visuals(egui::Visuals::light()); //light theme
+//             let app = Box::new(app::TheApp::new());
+//             Ok(app)
+//         }),
+//     )
+// }
+//
+// /// Creates and returns an instance of `eframe::NativeOptions` with a custom viewport size.
+// ///
+// /// # Arguments
+// /// * `xv` - A `f32` representing the horizontal size (width) of the viewport.
+// /// * `yv` - A `f32` representing the vertical size (height) of the viewport.
+// ///
+// /// This function can be customized to change
+// /// options controlling the behavior of a native window.
+// fn custom_native_options(xv: f32, yv: f32) -> eframe::NativeOptions {
+//     let mut native_options = eframe::NativeOptions::default();
+//     native_options.viewport = native_options.viewport.with_inner_size(egui::vec2(xv, yv));
+//     native_options
+// }

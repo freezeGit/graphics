@@ -107,6 +107,7 @@ fn run_the_app() -> Result<(), eframe::Error> {
         native_options, // or eframe::NativeOptions::default()
         Box::new(|cc| {
             cc.egui_ctx.set_visuals(egui::Visuals::light()); //light theme
+            //cc.egui_ctx.set_visuals(egui::Visuals::dark()); //dark theme
             let app = Box::new(app::TheApp::new());
             Ok(app)
         }),
