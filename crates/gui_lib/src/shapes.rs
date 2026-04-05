@@ -1,5 +1,5 @@
 //! ## Module shapes contains module [`base`] and various shapes modules.
-//!!    
+//!
 // src/gui_lib/shapes.rs
 
 pub mod base;

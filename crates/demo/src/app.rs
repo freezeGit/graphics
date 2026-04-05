@@ -8,11 +8,7 @@
 
 use ::gui_lib as gl;
 use egui::Context;
-use gui_lib::{
-    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
-    MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer,
-    WidgetMsg,
-};
+use gui_lib::{run, ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer, WidgetMsg};
 
 use crate::canvas::TheCanvas;
 // use crate::ids::{
@@ -85,7 +81,7 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "Demonstration app.\n\
+                    "Demonstration app using the gui_lib library.\n\
                     Can be used as a template to get started with gui_lib.\n\
                     Written in Rust + egui.",
                 )));
@@ -335,5 +331,24 @@ impl eframe::App for TheApp {
         // See the comment in the App trait above.
         //ctx.request_repaint_after(std::time::Duration::from_millis(500));
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
+    }
+}
+
+/// A trait representing a user-defined application that extends the functionality
+/// of the `eframe::App` framework.
+///
+/// This trait is designed to provide a flexible and standardized way for users to define
+/// and initialize their custom applications when using the `eframe` framework.
+/// The `new()` function must have an empty parameter list. This guarantees that
+/// the application `new()` constructor will have the correct signature to be called by the
+/// `run_the_app()` function.
+impl run::UserApp for TheApp {
+    fn new() -> Self {
+        Self {
+            world: Box::new(TheWorld::new()),
+            canvas: TheCanvas::new(),
+            msgs: Vec::new(),
+            timer: Timer::new(0.5),
+        }
     }
 }

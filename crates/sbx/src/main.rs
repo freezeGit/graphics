@@ -61,6 +61,7 @@
 //!
 //! # Errors
 //! This application returns an `eframe::Error` if initialization or event handling fails.
+
 // main.rs
 
 mod app;
@@ -73,29 +74,17 @@ mod world;
 const APP_NAME: &str = "gui_lib sandbox app";
 const XWVP: f32 = 1200.0; // Width of viewport in pixels.
 const YHVP: f32 = 800.0; // Height of viewport in pixels.
-const THEME: gui_lib::Theme = gui_lib::Theme::Light;
 
-/// Initializes and creates an instance of the application.
-///
-/// ## Usage
-/// This function is used to create an instance of the `app::TheApp` struct.
-/// It is passed as an argument to the `gui_lib::run_app` function
-fn create_app(cc: &eframe::CreationContext<'_>) -> app::TheApp {
-    gui_lib::set_theme(cc, THEME);
-    app::TheApp::new()
-}
 /// ## Running the Application
 ///
-/// Function main() starts the application.
-/// It calls the `run_app()` function,
+/// Function `main()` starts the application.
+/// It calls the `run_the_app()` function,
 /// which initializes an `eframe` native window
-/// with a custom viewport size (`xv` and `yv`) 
+/// with a custom viewport size (`width` and `height`)
 /// and sets up the layout and visuals.
 // ============================================================
 // Function main() starts the application.
 // ============================================================
 fn main() -> Result<(), eframe::Error> {
-    gui_lib::run_app(APP_NAME, XWVP, YHVP, create_app)
+    gui_lib::run_the_app::<app::TheApp>(APP_NAME, XWVP, YHVP)
 }
-
-// ----------------------------------------------------------

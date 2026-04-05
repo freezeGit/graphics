@@ -17,6 +17,7 @@ use gui_lib::{
 use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::world::{TheWorld, ThingState};
+use gui_lib::run;
 
 /// Main application structure.
 ///
@@ -38,15 +39,6 @@ impl TheApp {
     /// Returns
     /// A new `TheApp` instance initialized with a canvas and wold
     /// as well as a vec of messages, an active dialog, and a timer.
-
-    pub fn new() -> Self {
-        Self {
-            world: Box::new(TheWorld::new()),
-            canvas: TheCanvas::new(),
-            msgs: Vec::new(),
-            timer: Timer::new(0.5),
-        }
-    }
 
     /// What to do with messages from widgets and dialogs.
     fn handle_msg(&mut self, msg: WidgetMsg) {
@@ -325,3 +317,22 @@ impl eframe::App for TheApp {
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
 }
+
+/// A trait representing a user-defined application that extends the functionality
+/// of the `eframe::App` framework.
+///
+/// This trait is designed to provide a flexible and standardized way for users to define
+/// and initialize their custom applications when using the `eframe` framework. It guarantees that
+/// the application `new()` constructor will have the correct signature to be called by the
+/// `run_the_app()` function.
+impl run::UserApp for TheApp {
+    fn new() -> Self {
+        Self {
+            world: Box::new(TheWorld::new()),
+            canvas: TheCanvas::new(),
+            msgs: Vec::new(),
+            timer: Timer::new(0.5),
+        }
+    }
+}
+
