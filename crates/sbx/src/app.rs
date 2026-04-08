@@ -1,7 +1,7 @@
 //! ## Application. struct TheApp is the main structure and entry point of the application.
 //! - Contains a `Canvas` for holding a collection of shapes.
 //! - Provides methods for creating and updating the UI.
-//! - Cntains a `World` struct
+//! - May contain a 'World" (or 'Model' or 'Document')
 //!   which contains all  non-gui program data and logic
 
 // app.rs
@@ -9,21 +9,20 @@
 use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
-    ButtonId, Color32, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
-    MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId,
-    TextEntryField, Timer, WidgetMsg,
+    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
+    MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer,
+    WidgetMsg, run,
 };
-//use crate::ids::DLG_ENTER_MULTI_TEXT;
+
 use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::world::{TheWorld, ThingState};
-use gui_lib::run;
 
 /// Main application structure.
 ///
 /// Represents the root of the application and contains
-/// the canvas with all UI components
-/// and if used, a World or Model struct containing program data and logic.
+/// the main canvas with all UI components
+/// and if used, a world or model struct containing program data and logic.
 #[derive(Debug)]
 pub struct TheApp {
     world: Box<TheWorld>,
@@ -33,21 +32,17 @@ pub struct TheApp {
 }
 
 impl TheApp {
-    /// # Creates a new instance of the application
-    /// intended to demonstrate usage of gui_lib.
-    ///
-    /// Returns
-    /// A new `TheApp` instance initialized with a canvas and wold
-    /// as well as a vec of messages, an active dialog, and a timer.
+    // pub fn new(): implemented in trait run::UserApp
 
-    /// What to do with messages from widgets and dialogs.
+    // Handle messages --------------------------
+
+    /// What to do with [`WidgetMsg`] messages from widgets and dialogs.
+    /// This is the only communication between the GUI and the program code.
+    /// Program data and logic are encapsulated in struct [`TheWorld`].
     fn handle_msg(&mut self, msg: WidgetMsg) {
         match msg {
             WidgetMsg::ButtonClicked(id) => {
                 self.handle_button(id);
-            }
-            WidgetMsg::SliderChanged(id, value) => {
-                self.handle_slider(id, value);
             }
             WidgetMsg::DragFloatChanged(id, value) => {
                 self.handle_drag_float(id, value);
@@ -65,14 +60,16 @@ impl TheApp {
         }
     }
 
+    /// Handle button messages
     fn handle_button(&mut self, id: ButtonId) {
         match id {
             BTN_ABOUT => {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    //"gui_lib demo v0.1\nWritten in Rust + egui",
-                    "Sandbox app for working with gui_lib \nWritten in Rust + egui",
+                    "Demonstration app using the gui_lib library.\n\
+                    Can be used as a template to get started with gui_lib.\n\
+                    Written in Rust + egui.",
                 )));
             }
 
@@ -94,9 +91,22 @@ impl TheApp {
                     )));
             }
 
+            BTN_ENTER_NAME => {
+                self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
+                    DLG_ENTER_NAME,
+                    "Enter name",
+                    "Name:",
+                    self.world.name.clone(),
+                )));
+            }
+
             BTN_ENTER_VALUE => {
-                let mut dlg =
-                    DragFloatDlg::new(DLG_ENTER_VALUE, "Enter value", self.world.value as f32);
+                let mut dlg = DragFloatDlg::new(
+                    DLG_ENTER_VALUE,
+                    "Enter value",
+                    //"Value:",
+                    self.world.value as f32,
+                );
                 dlg.set_speed(1.0);
                 dlg.set_decimal(1);
                 self.canvas.canvas.set_dialog(Box::new(dlg));
@@ -122,20 +132,7 @@ impl TheApp {
         }
     }
 
-    fn handle_slider(&mut self, id: SliderId, value: f32) {
-        match id {
-            SLIDER_GAUGE => {
-                self.world.gauge.set_pointer(value.into());
-            }
-
-            SLIDER_ANOTHER => {
-                //Do something else
-            }
-
-            _ => {}
-        }
-    }
-
+    /// Handle drag float messages
     fn handle_drag_float(&mut self, id: DragFloatId, value: f32) {
         match id {
             DRAGFLOAT_GAUGE => {
@@ -146,11 +143,11 @@ impl TheApp {
         }
     }
 
+    /// Handle text entry messages
     fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
         match id {
             DLG_ENTER_NAME => {
-                //self.world.name = text.clone();
-                self.world.name = text;
+                self.world.name = text.clone();
             }
 
             _ => {}
@@ -165,7 +162,6 @@ impl TheApp {
                     match item_id.as_str() {
                         "name" => {
                             self.world.person.name = text;
-                            //println!("{}", self.world.person.name);
                         }
                         "city" => {
                             self.world.person.city = text;
@@ -182,6 +178,7 @@ impl TheApp {
         }
     }
 
+    /// Handle drag float dialog messages
     fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
         match id {
             DLG_ENTER_VALUE => {
@@ -198,9 +195,10 @@ impl TheApp {
     ///
     /// Invoke active dialog and collect emitted message in [`Self::msgs`].
     ///
-    /// Run simulation logic (if program includes a simulation).
+    /// Run simulation logic when dialog is not open (if program includes a simulation).
     ///
     /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
+
     fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
 
@@ -216,27 +214,6 @@ impl TheApp {
             self.canvas.canvas.set_dialog(Box::new(NilDlg));
             // Simulation/animation. Not needed for many programs.
             self.run_simulation(ctx); // Skip this line if there is no simulation.
-        }
-    }
-
-    /// Handle messages if any exist
-    /// # Related Methods
-    /// - [`handle_msg`]: Called for each individual message in the `msgs` buffer.
-    /// - [`canvas.update`]: Updates the canvas to reflect changes in the `world`.
-    fn handle_emitted_messages(&mut self) {
-        // Handle messages if any exist
-        if !self.msgs.is_empty() {
-            // Move msgs out of self so we can mutably borrow self inside the loop.
-            let mut msgs = std::mem::take(&mut self.msgs);
-            // Handle messages and drain the buffer.
-            for msg in msgs.drain(..) {
-                self.handle_msg(msg);
-            }
-            // Put the buffer back (empty, but keeps its capacity).
-            self.msgs = msgs;
-
-            // Update canvas to reflect all state changes:
-            self.canvas.update(&self.world);
         }
     }
 
@@ -263,10 +240,39 @@ impl TheApp {
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
     ///
     /// Parameter `ctx`: A reference to the [`Context`] object.
+    // fn run_simulation(&mut self, ctx: &Context) {
+    //     if self.timer.is_time(ctx) {
+    //         self.world.advance(); // advance world one tick
+    //         self.canvas.update(&self.world); // update canvas
+    //     }
+    // }
     fn run_simulation(&mut self, ctx: &Context) {
         if self.timer.is_time(ctx) {
+            //println!("Time: {}", ctx.input(|i| i.time));  // TDJ: debug
             self.world.advance(); // advance world one tick
             self.canvas.update(&self.world); // update canvas
+        }
+    }
+    // ------------------------------------------------
+
+    /// Handle messages if any exist
+    /// # Related Methods
+    /// - [`handle_msg`]: Called for each individual message in the `msgs` buffer.
+    /// - [`canvas.update`]: Updates the canvas to reflect changes in the `world`.
+    fn handle_emitted_messages(&mut self) {
+        // Handle messages if any exist
+        if !self.msgs.is_empty() {
+            // Move msgs out of self so we can mutably borrow self inside the loop.
+            let mut msgs = std::mem::take(&mut self.msgs);
+            // Handle messages and drain the buffer.
+            for msg in msgs.drain(..) {
+                self.handle_msg(msg);
+            }
+            // Put the buffer back (empty, but keeps its capacity).
+            self.msgs = msgs;
+
+            // Update canvas to reflect all state changes:
+            self.canvas.update(&self.world);
         }
     }
 } // end impl TheApp
@@ -297,6 +303,9 @@ impl TheApp {
 /// (like mouse movement or a key press).
 /// See: <https://docs.rs/egui/latest/egui/struct.Context.html#method.request_repaint_after>
 ///
+/// For a basic program there is no need for a world object. All state and logic
+/// can live directly in the TheApp.
+///
 /// # Parameters
 /// - `ctx`: A reference to the [`Context`] object, which provides the necessary environment.
 /// - `frame`: A reference to the [`eframe::Frame`] object. Not used in this demo.
@@ -304,6 +313,7 @@ impl eframe::App for TheApp {
     /// Called each time the UI needs repainting.
     /// Often 60 FPS, set by calling [`Context::request_repaint_after()`].
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+        //println!("Update: {}", ctx.input(|i| i.time));  // TDJ: debug
         // Establish event loop
         self.event_loop(ctx);
 
@@ -313,26 +323,52 @@ impl eframe::App for TheApp {
         // Redraw after 16 milliseconds (60 FPS). Useful for animation.
         // If there is no animation, you can skip this line.
         // See the comment in the App trait above.
+        // TDJ: How to request repaint
         //ctx.request_repaint_after(std::time::Duration::from_millis(1000));
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        //ctx.request_repaint();
     }
-}
+} // end impl eframe::App
+
+// use std::time::Duration;
+// impl eframe::App for TheApp {
+//     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+//         let now = std::time::Instant::now();
+//
+//         // Use your own timing, not ctx.input().time
+//         if let Some(last) = self.last_update {
+//             let delta = now - last;
+//             println!("Delta since last update: {:?}", delta);
+//         }
+//         self.last_update = Some(now);
+//
+//         // Request repaint exactly 1 second from NOW
+//         ctx.request_repaint_after(Duration::from_secs(1));
+//     }
+// }
 
 /// A trait representing a user-defined application that extends the functionality
 /// of the `eframe::App` framework.
 ///
 /// This trait is designed to provide a flexible and standardized way for users to define
-/// and initialize their custom applications when using the `eframe` framework. It guarantees that
+/// and initialize their custom applications when using the `eframe` framework.
+/// The `new()` function must have an empty parameter list. This guarantees that
 /// the application `new()` constructor will have the correct signature to be called by the
 /// `run_the_app()` function.
 impl run::UserApp for TheApp {
+    /// Creates a new instance of TheApp application.
+    /// It is intended to demonstrate usage of gui_lib.
+    ///
+    /// # Returns
+    /// A new `TheApp` instance initialized with a canvas and world
+    /// as well as a vector for messages, and a timer.
     fn new() -> Self {
         Self {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
+            // TDJ: use constant instead of 0.5?
             timer: Timer::new(0.5),
         }
     }
-}
-
+} // end impl run::UserApp

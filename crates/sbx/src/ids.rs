@@ -19,6 +19,6 @@ pub(crate) const BTN_ENTER_VALUE: ButtonId = ButtonId(7);
 
 // ---------- Dialog ids
 pub(crate) const DLG_ABOUT: MessageBoxDlgId = MessageBoxDlgId(1);
-//pub(crate) const DLG_ENTER_NAME: TextEntryDlgId = TextEntryDlgId(1);
+pub(crate) const DLG_ENTER_NAME: TextEntryDlgId = TextEntryDlgId(1);
 pub(crate) const DLG_ENTER_PERSON: MultiTextEntryDlgId = MultiTextEntryDlgId(1);
 pub(crate) const DLG_ENTER_VALUE: DragFloatDlgId = DragFloatDlgId(1);

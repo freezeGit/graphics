@@ -36,21 +36,7 @@ pub struct TheApp {
 }
 
 impl TheApp {
-    /// Creates a new instance of the application.
-    /// It is intended to demonstrate usage of gui_lib.
-    ///
-    /// # Returns
-    /// A new `TheApp` instance initialized with a canvas and world
-    /// as well as a vector for messages, and a timer.
-
-    pub fn new() -> Self {
-        Self {
-            world: Box::new(TheWorld::new()),
-            canvas: TheCanvas::new(),
-            msgs: Vec::new(),
-            timer: Timer::new(0.5), // TDJ: use constant instead of 0.5?
-        }
-    }
+    // pub fn new(): implemented in trait run::UserApp
 
     // Handle messages --------------------------
 
@@ -180,7 +166,6 @@ impl TheApp {
                     match item_id.as_str() {
                         "name" => {
                             self.world.person.name = text;
-                            //println!("{}", self.world.person.name);
                         }
                         "city" => {
                             self.world.person.city = text;
@@ -259,8 +244,15 @@ impl TheApp {
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
     ///
     /// Parameter `ctx`: A reference to the [`Context`] object.
+    // fn run_simulation(&mut self, ctx: &Context) {
+    //     if self.timer.is_time(ctx) {
+    //         self.world.advance(); // advance world one tick
+    //         self.canvas.update(&self.world); // update canvas
+    //     }
+    // }
     fn run_simulation(&mut self, ctx: &Context) {
         if self.timer.is_time(ctx) {
+            //println!("Time: {}", ctx.input(|i| i.time));  // TDJ: debug
             self.world.advance(); // advance world one tick
             self.canvas.update(&self.world); // update canvas
         }
@@ -325,6 +317,7 @@ impl eframe::App for TheApp {
     /// Called each time the UI needs repainting.
     /// Often 60 FPS, set by calling [`Context::request_repaint_after()`].
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+        //println!("Update: {}", ctx.input(|i| i.time));  // TDJ: debug
         // Establish event loop
         self.event_loop(ctx);
 
@@ -334,12 +327,29 @@ impl eframe::App for TheApp {
         // Redraw after 16 milliseconds (60 FPS). Useful for animation.
         // If there is no animation, you can skip this line.
         // See the comment in the App trait above.
-        // TDJ: Is it best to use 16 milliseconds or timer advance rate?
-        //ctx.request_repaint_after(std::time::Duration::from_millis(500));
+        // TDJ: How to request repaint
+        //ctx.request_repaint_after(std::time::Duration::from_millis(1000));
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
         //ctx.request_repaint();
     }
-}
+} // end impl eframe::App
+
+// use std::time::Duration;
+// impl eframe::App for TheApp {
+//     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+//         let now = std::time::Instant::now();
+//
+//         // Use your own timing, not ctx.input().time
+//         if let Some(last) = self.last_update {
+//             let delta = now - last;
+//             println!("Delta since last update: {:?}", delta);
+//         }
+//         self.last_update = Some(now);
+//
+//         // Request repaint exactly 1 second from NOW
+//         ctx.request_repaint_after(Duration::from_secs(1));
+//     }
+// }
 
 /// A trait representing a user-defined application that extends the functionality
 /// of the `eframe::App` framework.
@@ -350,12 +360,19 @@ impl eframe::App for TheApp {
 /// the application `new()` constructor will have the correct signature to be called by the
 /// `run_the_app()` function.
 impl run::UserApp for TheApp {
+    /// Creates a new instance of TheApp application.
+    /// It is intended to demonstrate usage of gui_lib.
+    ///
+    /// # Returns
+    /// A new `TheApp` instance initialized with a canvas and world
+    /// as well as a vector for messages, and a timer.
     fn new() -> Self {
         Self {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
+            // TDJ: use constant instead of 0.5?
             timer: Timer::new(0.5),
         }
     }
-}
+} // end impl run::UserApp
