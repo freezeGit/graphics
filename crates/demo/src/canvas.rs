@@ -8,19 +8,14 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use crate::ids::*;
+use crate::world::{Signal, TheWorld, ThingState};
 use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{
     BKG_EXAMPLE, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
-    Separator, Shape, ShapeHandle, Space, Text,
+    Separator, Shape, Space, Text,
 };
-
-// use crate::ids::{
-//     BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B,
-//     DRAGFLOAT_GAUGE,
-// };
-use crate ::ids::*;
-use crate::world::{Signal, TheWorld, ThingState};
 
 /// ## struct Canvas
 /// A container for rendering and managing graphical shapes
@@ -33,14 +28,16 @@ use crate::world::{Signal, TheWorld, ThingState};
 #[derive(Debug)]
 pub(crate) struct TheCanvas {
     // BasicCanvas provides underlying structure and functionality for any user canvas.
-    // Shapes are stored in BasicCanvas::Vec<ShapeHandle>
+    // Shapes are stored in BasicCanvas::shapes: Vec<ShapeHandle>
     // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
-    pub(crate) canvas: BasicCanvas,
+    pub(crate) canvas: BasicCanvas, // From gui_lib
 
-    // Shapes that require a unique handle to a concrete struct (e.g. Circle)
+    // Concrete shapes   (e.g. Circle)
     // are stored in TheCanvas as fields of type Rc<RefCell<T>>
     tl_circle2: Rc<RefCell<Circle>>,
+    //tl_circle2: SharedMut<Circle>,
     rect: Rc<RefCell<Rectangle>>,
+    //rect: SharedMut<Rectangle>,
     arrow_head: Rc<RefCell<Polyline>>,
     stxt: Rc<RefCell<Text>>,
     stxtname: Rc<RefCell<Text>>,
@@ -57,14 +54,21 @@ impl TheCanvas {
     /// Set layout and background color in [`BasicCanvas`] constructor.
     pub(crate) fn new() -> Self {
         // New empty BasicCanvas
-        // --- Other possibilities:
+        // --- Other possibilities: //TDJ: maybe use costant for layout style
+        // and background color?
         //let mut canvas = BasicCanvas::new(SidePanel, BKG_EXAMPLE);
         //let mut canvas = BasicCanvas::new(NoPanel, BKG_EXAMPLE);
         let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
 
-        // ---- Create shapes as Rc<RefCell<T>> and push clone into BasicCanvas::Vec<ShapeHandle>
-        // TDJ: Maybe define a type alias for Rc<RefCell<T>?
-
+        // ---- Create shapes as Rc<RefCell<T>> and push clone into BasicCanvas::shapes: Vec<ShapeHandle>
+        // Note: Rc<RefCell<T>> is a smart pointer that can be cloned.
+        //       - The RefCell interior mutability allows interior mutability.
+        //       - This is useful for updating properties of shapes.
+        // Shapes are stored in BasicCanvas::shapes: Vec<ShapeHandle
+        // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
+        // Rc<RefCell<T>> coercion to ShapeHandle happens automatically
+        // ----
+        
         // Add a Rectangle to the canvas
         // rect is a Rc<RefCell<T>> pointing to a concrete struct (in this case, a Rectangle)
         let rect: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
@@ -74,7 +78,7 @@ impl TheCanvas {
         rect.borrow_mut().set_fill_color(Color32::LIGHT_GRAY); // using RefCell interior mutability
         // cloning increases the ref count of the Rc
         // coercion to ShapeHandle happens automatically
-        // pushed into BasicCanvas::Vec<ShapeHandle>
+        // pushed into BasicCanvas::shapes: Vec<ShapeHandle>
         canvas.add_shape(rect.clone());
 
         // Add a series of Polylines to the canvas
@@ -89,7 +93,7 @@ impl TheCanvas {
                     eframe::egui::Pos2::new(20.0, 0.0),
                 ],
             )));
-            // Push each polyline sequentially into BasicCanvas::Vec<ShapeHandle>
+            // Push each polyline sequentially into BasicCanvas::shapes: Vec<ShapeHandle>
             canvas.add_shape(vee.clone()); // coercion happens automatically
             y += 10.0;
         }
@@ -115,7 +119,9 @@ impl TheCanvas {
         canvas.add_shape(tl_circle2.clone()); // coercion happens automatically
 
         // Add a dotted polyline to the canvas
-        let poly: ShapeHandle = Rc::new(RefCell::new(Polyline::new(
+        //let poly: ShapeHandle = Rc::new(RefCell::new(Polyline::new(
+        //let poly: Rc<RefCell<dyn Shape>> = Rc::new(RefCell::new(Polyline::new(
+        let poly: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
             eframe::egui::Pos2::new(550.0, 200.0),
             [
                 eframe::egui::Pos2::new(0.0, 0.0),

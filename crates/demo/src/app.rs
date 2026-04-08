@@ -8,7 +8,11 @@
 
 use ::gui_lib as gl;
 use egui::Context;
-use gui_lib::{run, ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer, WidgetMsg};
+use gui_lib::{
+    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
+    MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer,
+    WidgetMsg, run,
+};
 
 use crate::canvas::TheCanvas;
 // use crate::ids::{
@@ -53,7 +57,7 @@ impl TheApp {
     /// What to do with [`WidgetMsg`] messages from widgets and dialogs.
     /// This is the only communication between the GUI and the program code.
     /// Program data and logic are encapsulated in struct [`TheWorld`].
-    fn handle_msg(&mut self, msg: WidgetMsg) {  // TDJ: Could be in trait TheApp.?
+    fn handle_msg(&mut self, msg: WidgetMsg) {
         match msg {
             WidgetMsg::ButtonClicked(id) => {
                 self.handle_button(id);
@@ -214,7 +218,7 @@ impl TheApp {
     ///
     /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
 
-    fn event_loop(&mut self, ctx: &Context) {  // TDJ: Could be in trait TheApp.?
+    fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
 
         // Draw shapes and widgets on the canvas.
@@ -232,34 +236,13 @@ impl TheApp {
         }
     }
 
-    /// Handle messages if any exist
-    /// # Related Methods
-    /// - [`handle_msg`]: Called for each individual message in the `msgs` buffer.
-    /// - [`canvas.update`]: Updates the canvas to reflect changes in the `world`.
-    fn handle_emitted_messages(&mut self) {  // TDJ: Could be in trait TheApp.?
-        // Handle messages if any exist
-        if !self.msgs.is_empty() {
-            // Move msgs out of self so we can mutably borrow self inside the loop.
-            let mut msgs = std::mem::take(&mut self.msgs);
-            // Handle messages and drain the buffer.
-            for msg in msgs.drain(..) {
-                self.handle_msg(msg);
-            }
-            // Put the buffer back (empty, but keeps its capacity).
-            self.msgs = msgs;
-
-            // Update canvas to reflect all state changes:
-            self.canvas.update(&self.world);
-        }
-    }
-
     /// Calls [`Dialog::invoke_modal`] to draw and get a message from a modal dialog.
     ///
     /// Parameter `ctx`: A reference to the [`Context`] object.
     ///
     /// Returns `true` if the user has closed the dialog,
     /// or `false` if the dialog is still open.
-    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool { // TDJ: Could be in trait TheApp.?
+    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool {
         self.canvas
             .canvas
             .get_mut_dialog()
@@ -276,10 +259,32 @@ impl TheApp {
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
     ///
     /// Parameter `ctx`: A reference to the [`Context`] object.
-    fn run_simulation(&mut self, ctx: &Context) { // TDJ: Could be in trait TheApp.??
+    fn run_simulation(&mut self, ctx: &Context) {
         if self.timer.is_time(ctx) {
             self.world.advance(); // advance world one tick
             self.canvas.update(&self.world); // update canvas
+        }
+    }
+    // ------------------------------------------------
+
+    /// Handle messages if any exist
+    /// # Related Methods
+    /// - [`handle_msg`]: Called for each individual message in the `msgs` buffer.
+    /// - [`canvas.update`]: Updates the canvas to reflect changes in the `world`.
+    fn handle_emitted_messages(&mut self) {
+        // Handle messages if any exist
+        if !self.msgs.is_empty() {
+            // Move msgs out of self so we can mutably borrow self inside the loop.
+            let mut msgs = std::mem::take(&mut self.msgs);
+            // Handle messages and drain the buffer.
+            for msg in msgs.drain(..) {
+                self.handle_msg(msg);
+            }
+            // Put the buffer back (empty, but keeps its capacity).
+            self.msgs = msgs;
+
+            // Update canvas to reflect all state changes:
+            self.canvas.update(&self.world);
         }
     }
 } // end impl TheApp
@@ -329,8 +334,10 @@ impl eframe::App for TheApp {
         // Redraw after 16 milliseconds (60 FPS). Useful for animation.
         // If there is no animation, you can skip this line.
         // See the comment in the App trait above.
+        // TDJ: Is it best to use 16 milliseconds or timer advance rate?
         //ctx.request_repaint_after(std::time::Duration::from_millis(500));
         ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        //ctx.request_repaint();
     }
 }
 

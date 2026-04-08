@@ -11,12 +11,14 @@ use eframe::egui::{CentralPanel, Context, RichText};
 
 use crate::{Color32, Dialog, NilDlg, Shape, Widget, WidgetMsg};
 
-/// Handle for Shapes in BasicCanvas::Vec<ShapeHandle>
+/// Handle for Shapes in BasicCanvas::shapes: Vec<ShapeHandle>
 ///
 /// [`ShapeHandle`] = Rc<RefCell<dyn Shape>>
+/// ShapeHandle is a smart pointer that can be cloned.
+/// The RefCell interior mutability allows interior mutability.
 pub type ShapeHandle = Rc<RefCell<dyn Shape>>;
 
-// enum for canvas layoutstyles
+/// enum for canvas layout styles
 #[derive(Debug)]
 pub enum LayoutStyle {
     TopPanel,
@@ -44,7 +46,7 @@ pub struct BasicCanvas {
 }
 
 /// BasicCanvas provides underlying structure and functionality for any user canvas.
-/// Shapes are stored in BasicCanvas::Vec<ShapeHandle> (type ShapeHandle = Rc<RefCell<dyn Shape>>)
+/// Shapes are stored in BasicCanvas::shapes: Vec<ShapeHandle> (type ShapeHandle = Rc<RefCell<dyn Shape>>)
 /// and are drawn dynamically by iterating through the vector
 
 impl BasicCanvas {

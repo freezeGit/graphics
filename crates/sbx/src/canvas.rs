@@ -54,7 +54,7 @@ impl TheCanvas {
         //let mut canvas = BasicCanvas::new(NoPanel, BKG_EXAMPLE);
         let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
 
-        // ---- Create shapes as Rc<RefCell<T>> and push clone into BasicCanvas::Vec<ShapeHandle>
+        // ---- Create shapes as Rc<RefCell<T>> and push clone into BasicCanvas::shapes: Vec<ShapeHandle>
 
         // Add a Rectangle to the canvas
         // rect is a Rc<RefCell<T>> pointing to a concrete struct (in this case, a Rectangle)
@@ -65,7 +65,7 @@ impl TheCanvas {
         rect.borrow_mut().set_fill_color(Color32::LIGHT_GRAY); // using RefCell interior mutability
         // cloning increases the ref count of the Rc
         // coercion to ShapeHandle happens automatically
-        // pushed into BasicCanvas::Vec<ShapeHandle>
+        // pushed into BasicCanvas::shapes: Vec<ShapeHandle>
         canvas.add_shape(rect.clone());
 
         // Add a series of Polylines to the canvas
