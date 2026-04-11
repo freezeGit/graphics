@@ -205,12 +205,11 @@ impl TheApp {
 
     /// Establish event loop.
     ///
+    /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
+    ///
     /// Invoke active dialog and collect emitted message in [`Self::msgs`].
     ///
-    /// Run simulation logic when dialog is not open (if program includes a simulation).
-    ///
-    /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
-
+    /// Run simulation logic only when dialog is not open (if program includes a simulation).
     fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
 
@@ -221,12 +220,11 @@ impl TheApp {
         // Draw active dialog.
         // When the dialog is closed push its message into self.msgs.
         // Pause simulation while dialog is open.
-        if self.invoked_dialog_closed(ctx) {
+        if self.active_dialog_invoked_and_closed(ctx) {
             // If the active dialog has been closed, set the dialog to nil
             self.canvas.canvas.set_dialog(Box::new(NilDlg));
-            // Simulation/animation. Not needed for many programs.
-            self.run_simulation(ctx); // Skip this line if there is no simulation.
-           // ctx.request_repaint();
+            // Only run simulation (if one exists) if the dialog is not open.
+            self.run_simulation(ctx);
         }
     }
 
@@ -236,7 +234,7 @@ impl TheApp {
     ///
     /// Returns `true` if the user has closed the dialog,
     /// or `false` if the dialog is still open.
-    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool {
+    fn active_dialog_invoked_and_closed(&mut self, ctx: &Context) -> bool {
         self.canvas
             .canvas
             .get_mut_dialog()
@@ -253,15 +251,6 @@ impl TheApp {
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
     ///
     /// Parameter `ctx`: A reference to the [`Context`] object.
-    // fn run_simulation(&mut self, ctx: &Context) {
-    //     if self.timer.is_time(ctx) {
-    //         //println!("Time: {}", ctx.input(|i| i.time));  // TDJ: debug
-    //         self.world.advance(); // advance world one tick
-    //         self.canvas.update(&self.world); // update canvas
-    //         //ctx.request_repaint();
-    //     }
-    // }
-
     pub fn run_simulation(&mut self, ctx: &egui::Context) {
         if !self.sim_timer.is_running() {
             return;

@@ -22,7 +22,7 @@ pub struct NilDlg;
 
 impl Dialog for NilDlg {
     fn invoke_modal(&mut self, _ctx: &egui::Context, _out: &mut Vec<WidgetMsg>) -> bool {
-        true // Nothing to close
+        true // Nothing to open so already closed
     }
 }
 
