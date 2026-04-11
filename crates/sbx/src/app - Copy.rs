@@ -8,38 +8,27 @@
 
 use ::gui_lib as gl;
 use egui::Context;
-use std::time::{Duration, Instant};
 use gui_lib::{
     ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
     MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer,
-    WidgetMsg, run, World,
+    WidgetMsg, run,
 };
+
 use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::world::{TheWorld, ThingState};
-//use gui_lib::World;
 
 /// Main application structure.
 ///
 /// Represents the root of the application and contains
 /// the main canvas with all UI components
 /// and if used, a world or model struct containing program data and logic.
-// #[derive(Debug)]
-// pub struct TheApp {
-//     world: Box<TheWorld>,
-//     canvas: TheCanvas,
-//     msgs: Vec<WidgetMsg>,
-//     //sim_last_called: Instant,
-//     timer: Timer,
-// }
-
 #[derive(Debug)]
 pub struct TheApp {
     world: Box<TheWorld>,
     canvas: TheCanvas,
     msgs: Vec<WidgetMsg>,
-    sim_timer: Timer,
-    //fast_forward: bool, TDJ: debug
+    timer: Timer,
 }
 
 impl TheApp {
@@ -124,11 +113,10 @@ impl TheApp {
             }
 
             BTN_RUN_PAUSE => {
-                //if self.timer.is_running() {
-                if self.sim_timer.is_running() {
-                    self.sim_timer.pause();
+                if self.timer.is_running() {
+                    self.timer.pause();
                 } else {
-                    self.sim_timer.run();
+                    self.timer.run();
                 }
             }
 
@@ -226,7 +214,6 @@ impl TheApp {
             self.canvas.canvas.set_dialog(Box::new(NilDlg));
             // Simulation/animation. Not needed for many programs.
             self.run_simulation(ctx); // Skip this line if there is no simulation.
-           // ctx.request_repaint();
         }
     }
 
@@ -255,42 +242,17 @@ impl TheApp {
     /// Parameter `ctx`: A reference to the [`Context`] object.
     // fn run_simulation(&mut self, ctx: &Context) {
     //     if self.timer.is_time(ctx) {
-    //         //println!("Time: {}", ctx.input(|i| i.time));  // TDJ: debug
     //         self.world.advance(); // advance world one tick
     //         self.canvas.update(&self.world); // update canvas
-    //         //ctx.request_repaint();
     //     }
     // }
-
-    pub fn run_simulation(&mut self, ctx: &egui::Context) {
-        if !self.sim_timer.is_running() {
-            return;
+    fn run_simulation(&mut self, ctx: &Context) {
+        if self.timer.is_time(ctx) {
+            //println!("Time: {}", ctx.input(|i| i.time));  // TDJ: debug
+            self.world.advance(); // advance world one tick
+            self.canvas.update(&self.world); // update canvas
         }
-
-        // if !self.simulation_allowed() { // TDJ: debug
-        //     return;
-        // }
-
-        // if self.fast_forward { //
-        //     self.run_fast_forward_batch();
-        //     self.canvas.update(&self.world);
-        //     ctx.request_repaint();
-        //     return;
-        // }
-
-        let steps = self.sim_timer.ready_count().min(4);
-
-        for _ in 0..steps {
-            self.world.advance();
-        }
-
-        if steps > 0 {
-            self.canvas.update(&self.world);
-        }
-
-        ctx.request_repaint_after(self.sim_timer.remaining());
     }
-
     // ------------------------------------------------
 
     /// Handle messages if any exist
@@ -393,7 +355,7 @@ impl eframe::App for TheApp {
 /// The `new()` function must have an empty parameter list. This guarantees that
 /// the application `new()` constructor will have the correct signature to be called by the
 /// `run_the_app()` function.
-impl gui_lib::UserApp for TheApp {
+impl run::UserApp for TheApp {
     /// Creates a new instance of TheApp application.
     /// It is intended to demonstrate usage of gui_lib.
     ///
@@ -405,10 +367,8 @@ impl gui_lib::UserApp for TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
-            //sim_last_called: Instant::now(),
             // TDJ: use constant instead of 0.5?
-            //sim_timer: Timer::new(0.5),
-            sim_timer: Timer::new(Duration::from_millis(500)),
+            timer: Timer::new(0.5),
         }
     }
 } // end impl run::UserApp

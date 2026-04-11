@@ -5,6 +5,9 @@
 
 // world.rs
 
+//use crate::app::TheApp;
+use gui_lib::World;
+
 #[derive(Debug)]
 pub(crate) struct Gauge {
     pointer: f64,
@@ -86,10 +89,10 @@ impl TheWorld {
         }
     }
 
-    pub(crate) fn advance(&mut self) {
-        //self.state += 1;
-        self.toggle_light();
-    }
+    // pub(crate) fn advance(&mut self) {
+    //     //self.state += 1;
+    //     self.toggle_light();
+    // }
 
     fn toggle_light(&mut self) {
         self.tl.state = match self.tl.state {
@@ -97,4 +100,13 @@ impl TheWorld {
             Signal::Go => Signal::Stop,
         };
     }
-}
+} // end of impl TheWorld
+
+// ---------- World trait --------------------------
+impl World for TheWorld {
+    fn advance(&mut self) {
+        //self.state += 1;
+        self.toggle_light();
+    }
+} // end impl World
+
