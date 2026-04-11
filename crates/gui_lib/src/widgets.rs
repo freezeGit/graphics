@@ -5,7 +5,7 @@
 use crate::Color32;
 use crate::egui::RichText;
 //use crate::ids::{ButtonId, DragFloatId, SliderId, WidgetMsg};
-use crate::ids::{ButtonId, DragFloatId, SliderId};
+use crate::ids_gl::{ButtonId, DragFloatId, SliderId};
 use crate::WidgetMsg;
 
 /// Trait for invoking any widget in the UI.

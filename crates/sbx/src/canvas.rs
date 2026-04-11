@@ -3,7 +3,7 @@
 //! A container for rendering and managing graphical shapes
 //! and interactive widgets.
 
-// canvas.rs
+// canvas_gl
 
 use std::cell::RefCell;
 use std::rc::Rc;

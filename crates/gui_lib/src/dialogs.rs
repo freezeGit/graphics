@@ -3,8 +3,8 @@
 // dialogs.rs
 
 use crate::egui;
-use crate::ids::{DragFloatDlgId, MessageBoxDlgId, MultiTextEntryDlgId, TextEntryDlgId};
-use crate::messages::WidgetMsg;
+use crate::ids_gl::{DragFloatDlgId, MessageBoxDlgId, MultiTextEntryDlgId, TextEntryDlgId};
+use crate::messages_gl::WidgetMsg;
 
 // -----------------------------
 /// Trait for all dialogs.

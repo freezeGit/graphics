@@ -16,25 +16,26 @@
 //! will implement the eframe::App trait update() method.
 // lib.rs
 
-pub mod run;
-
-pub mod ids;
-pub mod messages;
-
-pub mod canvas;
+pub mod app_gl;
+pub mod world_gl;
+pub mod canvas_gl;
 pub mod shapes;
 pub mod widgets;
 pub mod dialogs;
+pub mod ids_gl;
+pub mod messages_gl;
 pub mod timer;
 
 
 // Public API re-exports (nice for both demo apps AND your internal modules)
-pub use run::*;
+// TDJ: tidy this section up
+pub use app_gl::*;
+pub use world_gl::*;
 
-pub use ids::*;
-pub use messages::WidgetMsg;
+pub use ids_gl::*;
+pub use messages_gl::WidgetMsg;
 
-pub use canvas::*;
+pub use canvas_gl::*;
 pub use shapes::base::{Shape, ShapeBase}; // because Shape + ShapeBase live in shapes/base.rs
 pub use shapes::*; // re-export Circle/Rectangle/etc
 pub use widgets::{Widget, *}; // Widget trait lives in widgets.rs (and any other widget types)

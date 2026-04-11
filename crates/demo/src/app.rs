@@ -11,7 +11,7 @@ use egui::Context;
 use gui_lib::{
     ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
     MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer,
-    WidgetMsg, run,
+    WidgetMsg, app_gl,
 };
 
 use crate::canvas::TheCanvas;
@@ -359,7 +359,7 @@ impl eframe::App for TheApp {
 /// The `new()` function must have an empty parameter list. This guarantees that
 /// the application `new()` constructor will have the correct signature to be called by the
 /// `run_the_app()` function.
-impl run::UserApp for TheApp {
+impl app_gl::UserApp for TheApp {
     /// Creates a new instance of TheApp application.
     /// It is intended to demonstrate usage of gui_lib.
     ///

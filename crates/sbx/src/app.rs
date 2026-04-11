@@ -12,7 +12,7 @@ use std::time::{Duration, Instant};
 use gui_lib::{
     ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
     MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer,
-    WidgetMsg, run, World,
+    WidgetMsg, app_gl, World,
 };
 use crate::canvas::TheCanvas;
 use crate::ids::*;
@@ -352,27 +352,10 @@ impl eframe::App for TheApp {
         // See the comment in the App trait above.
         // TDJ: How to request repaint
         //ctx.request_repaint_after(std::time::Duration::from_millis(1000));
-        ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
         //ctx.request_repaint();
     }
 } // end impl eframe::App
-
-// use std::time::Duration;
-// impl eframe::App for TheApp {
-//     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-//         let now = std::time::Instant::now();
-//
-//         // Use your own timing, not ctx.input().time
-//         if let Some(last) = self.last_update {
-//             let delta = now - last;
-//             println!("Delta since last update: {:?}", delta);
-//         }
-//         self.last_update = Some(now);
-//
-//         // Request repaint exactly 1 second from NOW
-//         ctx.request_repaint_after(Duration::from_secs(1));
-//     }
-// }
 
 /// A trait representing a user-defined application that extends the functionality
 /// of the `eframe::App` framework.
@@ -394,9 +377,7 @@ impl gui_lib::UserApp for TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
-            //sim_last_called: Instant::now(),
-            // TDJ: use constant instead of 0.5?
-            //sim_timer: Timer::new(0.5),
+             // TDJ: use constant instead of 500?
             sim_timer: Timer::new(Duration::from_millis(500)),
         }
     }

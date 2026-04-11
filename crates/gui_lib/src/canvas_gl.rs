@@ -1,7 +1,7 @@
 //! ## Module canvas contains the BasicCanvas struct.
 //!
 //! This struct is intended to be contained (by composition) in any application canvas.
-// canvas.rs
+// canvas_gl
 
 use std::cell::RefCell;
 use std::rc::Rc;

@@ -1,6 +1,6 @@
 //! ## Module messages contains enum WidgetMsg for emitted mesages
 
-// messages.rs
+// messages_gl
 
 use crate::*;
 /// WidgetMsg - enum for all messages emitted from widgets and dialogs.
