@@ -358,7 +358,7 @@ impl eframe::App for TheApp {
         // See the comment in the App trait above.
         // TDJ: How to request repaint
         //ctx.request_repaint_after(std::time::Duration::from_millis(1000));
-        ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
         //ctx.request_repaint();
     }
 } // end impl eframe::App

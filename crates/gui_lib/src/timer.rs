@@ -30,12 +30,6 @@ impl Timer {
         self.interval = interval;
     }
 
-    //pub fn start(&mut self) {
-    // pub fn run(&mut self) {
-    //     self.running = true;
-    //     self.last_tick = Instant::now();
-    // }
-
     pub fn run(&mut self) {
         if !self.running {
             self.running = true;
