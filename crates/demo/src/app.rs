@@ -6,6 +6,7 @@
 
 // app.rs
 
+use std::time::Duration;
 use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
@@ -32,7 +33,7 @@ pub struct TheApp {
     world: Box<TheWorld>,
     canvas: TheCanvas,
     msgs: Vec<WidgetMsg>,
-    timer: Timer,
+    sim_timer: Timer,
 }
 
 impl TheApp {
@@ -117,10 +118,10 @@ impl TheApp {
             }
 
             BTN_RUN_PAUSE => {
-                if self.timer.is_running() {
-                    self.timer.pause();
+                if self.sim_timer.is_running() {
+                    self.sim_timer.pause();
                 } else {
-                    self.timer.run();
+                    self.sim_timer.run();
                 }
             }
 
@@ -250,13 +251,41 @@ impl TheApp {
     //         self.canvas.update(&self.world); // update canvas
     //     }
     // }
-    fn run_simulation(&mut self, ctx: &Context) {
-        if self.timer.is_time(ctx) {
-            //println!("Time: {}", ctx.input(|i| i.time));  // TDJ: debug
-            self.world.advance(); // advance world one tick
-            self.canvas.update(&self.world); // update canvas
+    pub fn run_simulation(&mut self, ctx: &egui::Context) {
+        if !self.sim_timer.is_running() {
+            return;
         }
+
+        // if !self.simulation_allowed() { // TDJ: debug
+        //     return;
+        // }
+
+        // if self.fast_forward { //
+        //     self.run_fast_forward_batch();
+        //     self.canvas.update(&self.world);
+        //     ctx.request_repaint();
+        //     return;
+        // }
+
+        let steps = self.sim_timer.ready_count().min(4);
+
+        for _ in 0..steps {
+            self.world.advance();
+        }
+
+        if steps > 0 {
+            self.canvas.update(&self.world);
+        }
+
+        ctx.request_repaint_after(self.sim_timer.remaining());
     }
+    // fn run_simulation(&mut self, ctx: &Context) {
+    //     if self.timer.is_time(ctx) {
+    //         //println!("Time: {}", ctx.input(|i| i.time));  // TDJ: debug
+    //         self.world.advance(); // advance world one tick
+    //         self.canvas.update(&self.world); // update canvas
+    //     }
+    // }
     // ------------------------------------------------
 
     /// Handle messages if any exist
@@ -371,8 +400,8 @@ impl app_gl::UserApp for TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
-            // TDJ: use constant instead of 0.5?
-            timer: Timer::new(0.5),
+            // TDJ: use constant instead of 500?
+            sim_timer: Timer::new(Duration::from_millis(500)),
         }
     }
 } // end impl run::UserApp
