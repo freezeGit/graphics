@@ -1,7 +1,7 @@
 //! ## Application. struct TheApp is the main structure and entry point of the application.
 //! - Contains a `Canvas` for holding a collection of shapes.
 //! - Provides methods for creating and updating the UI.
-//! - May contain a 'World" (or 'Model' or 'Document')
+//! - Contains a 'World"
 //!   which contains all  non-gui program data and logic
 
 // app.rs
@@ -27,7 +27,7 @@ use crate::world::{TheWorld, ThingState};
 ///
 /// Represents the root of the application and contains
 /// the main canvas with all UI components
-/// and if used, a world or model struct containing program data and logic.
+/// and a world struct containing program data and logic.
 #[derive(Debug)]
 pub struct TheApp {
     world: Box<TheWorld>,
