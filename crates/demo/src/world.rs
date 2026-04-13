@@ -58,6 +58,7 @@ pub(crate) struct Person {
 /// No dependence on the app struct or the canvas struct.
 #[derive(Debug)]
 pub(crate) struct TheWorld {
+    pub(crate) frame_number: u32,
     pub(crate) tl: TrafficLight,
     pub(crate) thing: Thing,
     pub(crate) gauge: Gauge,
@@ -69,7 +70,7 @@ pub(crate) struct TheWorld {
 impl TheWorld {
     pub(crate) fn new() -> Self {
         Self {
-            //state: 0,
+            frame_number: 0,
             tl: TrafficLight {
                 state: Signal::Stop,
             },
@@ -88,7 +89,7 @@ impl TheWorld {
     }
 
     pub(crate) fn advance(&mut self) {
-        //self.state += 1;
+        self.frame_number += 1;
         self.toggle_light();
     }
 

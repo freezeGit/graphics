@@ -217,8 +217,8 @@ impl TheApp {
         if self.invoked_dialog_closed(ctx) {
             // If the active dialog has been closed, set the dialog to nil
             self.canvas.canvas.set_dialog(Box::new(NilDlg));
-            // Simulation/animation. Not needed for many programs.
-            self.run_simulation(ctx); // Skip this line if there is no simulation.
+            // Only run simulation (if one exists) if the dialog is not open.
+            self.run_simulation(ctx);
         }
     }
 
@@ -245,20 +245,10 @@ impl TheApp {
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
     ///
     /// Parameter `ctx`: A reference to the [`Context`] object.
-    // fn run_simulation(&mut self, ctx: &Context) {
-    //     if self.timer.is_time(ctx) {
-    //         self.world.advance(); // advance world one tick
-    //         self.canvas.update(&self.world); // update canvas
-    //     }
-    // }
     pub fn run_simulation(&mut self, ctx: &egui::Context) {
         if !self.sim_timer.is_running() {
             return;
         }
-
-        // if !self.simulation_allowed() { // TDJ: debug
-        //     return;
-        // }
 
         // if self.fast_forward { //
         //     self.run_fast_forward_batch();
@@ -268,24 +258,15 @@ impl TheApp {
         // }
 
         let steps = self.sim_timer.ready_count().min(4);
-
         for _ in 0..steps {
             self.world.advance();
         }
-
         if steps > 0 {
             self.canvas.update(&self.world);
         }
 
         ctx.request_repaint_after(self.sim_timer.remaining());
     }
-    // fn run_simulation(&mut self, ctx: &Context) {
-    //     if self.timer.is_time(ctx) {
-    //         //println!("Time: {}", ctx.input(|i| i.time));  // TDJ: debug
-    //         self.world.advance(); // advance world one tick
-    //         self.canvas.update(&self.world); // update canvas
-    //     }
-    // }
     // ------------------------------------------------
 
     /// Handle messages if any exist
@@ -316,35 +297,18 @@ impl TheApp {
 /// and the eframe framework that handles all the platform-specific details
 /// of creating a window and running an event loop.
 ///
-/// Function `update` is called each time the UI needs repainting:
-/// [fn update](https://docs.rs/eframe/latest/eframe/trait.App.html#tymethod.update)
-///
-/// If there are background processes or animation:
-/// you can schedule the next frame redraw after 16 milliseconds (60 FPS)
-/// for smooth responsiveness.
-///
-/// In this demonstration app a timer loop is used to advance the world at a rate
-/// slower than the frame rate of the event loop. This allows better control of
-/// running a simulation. For a simpler simulation the world might just advance
-/// with the frame rate.
-/// The frame rate should be set for smooth interaction. Typically 60 FPS,
-/// (16 millisecond interval) but can be faster if the simulation is fast enough.
-///
-/// If there is no simulation there is no need to call or define [`TheWorld::advance`].
-/// By default (if [`Context::request_repaint()`] or [`Context::request_repaint_after()`] is not called)
-/// egui is reactive, meaning it only repaints when there's an input event
-/// (like mouse movement or a key press).
-/// See: <https://docs.rs/egui/latest/egui/struct.Context.html#method.request_repaint_after>
-///
-/// For a basic program there is no need for a world object. All state and logic
-/// can live directly in the TheApp.
+/// Function [`update`] is called each time the UI needs repainting: see:
+/// [fn update](https://docs.rs/eframe/latest/eframe/trait.App.html#tymethod.update).
+/// In this demonstration app a timer loop is used to advance a simulation by asking for repaints.
+/// See: [repaint methods](<https://docs.rs/egui/latest/egui/struct.Context.html#method.request_repaint_after>).
+/// In the absense of repaint requests, egui is reactive, meaning it
+/// repaints when there's an input event (like mouse movement or a key press).
 ///
 /// # Parameters
 /// - `ctx`: A reference to the [`Context`] object, which provides the necessary environment.
 /// - `frame`: A reference to the [`eframe::Frame`] object. Not used in this demo.
 impl eframe::App for TheApp {
     /// Called each time the UI needs repainting.
-    /// Often 60 FPS, set by calling [`Context::request_repaint_after()`].
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
         //println!("Update: {}", ctx.input(|i| i.time));  // TDJ: debug
         // Establish event loop
@@ -352,33 +316,8 @@ impl eframe::App for TheApp {
 
         // Handle messages if any exist
         self.handle_emitted_messages();
-
-        // Redraw after 16 milliseconds (60 FPS). Useful for animation.
-        // If there is no animation, you can skip this line.
-        // See the comment in the App trait above.
-        // TDJ: How to request repaint
-        //ctx.request_repaint_after(std::time::Duration::from_millis(1000));
-        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
-        //ctx.request_repaint();
     }
 } // end impl eframe::App
-
-// use std::time::Duration;
-// impl eframe::App for TheApp {
-//     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-//         let now = std::time::Instant::now();
-//
-//         // Use your own timing, not ctx.input().time
-//         if let Some(last) = self.last_update {
-//             let delta = now - last;
-//             println!("Delta since last update: {:?}", delta);
-//         }
-//         self.last_update = Some(now);
-//
-//         // Request repaint exactly 1 second from NOW
-//         ctx.request_repaint_after(Duration::from_secs(1));
-//     }
-// }
 
 /// A trait representing a user-defined application that extends the functionality
 /// of the `eframe::App` framework.
@@ -390,7 +329,7 @@ impl eframe::App for TheApp {
 /// `run_the_app()` function.
 impl app_gl::UserApp for TheApp {
     /// Creates a new instance of TheApp application.
-    /// It is intended to demonstrate usage of gui_lib.
+    /// This demo app is intended to demonstrate usage of gui_lib.
     ///
     /// # Returns
     /// A new `TheApp` instance initialized with a canvas and world
@@ -400,8 +339,10 @@ impl app_gl::UserApp for TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(),
-            // TDJ: use constant instead of 500?
+            // TDJ: use constant for simulation speed?
+            //sim_timer: Timer::new(Duration::from_millis(1000)),
             sim_timer: Timer::new(Duration::from_millis(500)),
+            //sim_timer: Timer::new(Duration::from_millis(200)),
         }
     }
 } // end impl run::UserApp

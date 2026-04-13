@@ -35,9 +35,8 @@ pub(crate) struct TheCanvas {
     // Concrete shapes   (e.g. Circle)
     // are stored in TheCanvas as fields of type Rc<RefCell<T>>
     tl_circle2: Rc<RefCell<Circle>>,
-    //tl_circle2: SharedMut<Circle>,
+    stxt_frame: Rc<RefCell<Text>>,
     rect: Rc<RefCell<Rectangle>>,
-    //rect: SharedMut<Rectangle>,
     arrow_head: Rc<RefCell<Polyline>>,
     stxt: Rc<RefCell<Text>>,
     stxtname: Rc<RefCell<Text>>,
@@ -68,7 +67,7 @@ impl TheCanvas {
         // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
         // Rc<RefCell<T>> coercion to ShapeHandle happens automatically
         // ----
-        
+
         // Add a Rectangle to the canvas
         // rect is a Rc<RefCell<T>> pointing to a concrete struct (in this case, a Rectangle)
         let rect: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
@@ -117,6 +116,15 @@ impl TheCanvas {
         tl_circle2.borrow_mut().set_fill_color(Color32::RED);
         // Will be drawn on top of tl_circle1 because of z-order
         canvas.add_shape(tl_circle2.clone()); // coercion happens automatically
+
+        // Add text to frame number.
+        let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            eframe::egui::Pos2::new(250.0, 270.0),
+            format!("{}", 0),
+        )));
+        stxt_frame.borrow_mut().set_size(36.0);
+        stxt_frame.borrow_mut().set_color(Color32::BLUE);
+        canvas.add_shape(stxt_frame.clone()); // coercion happens automatically
 
         // Add a dotted polyline to the canvas
         //let poly: ShapeHandle = Rc::new(RefCell::new(Polyline::new(
@@ -183,7 +191,6 @@ impl TheCanvas {
 
         // Add text to display value.
         let stxtval: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //eframe::egui::Pos2::new(325.0, 100.0),
             eframe::egui::Pos2::new(650.0, 33.0),
             format!("{}{:.2}", "Value: ", 0.0),
         )));
@@ -235,6 +242,7 @@ impl TheCanvas {
             canvas,
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
             tl_circle2,
+            stxt_frame,
             rect,
             arrow_head,
             stxt,
@@ -262,6 +270,10 @@ impl TheCanvas {
     /// Smaller programs may nat have a world object, in which case this update function will
     /// take a parameter [`TheApp`] instead of TheWorld.
     pub(crate) fn update(&mut self, world: &TheWorld) {
+        // Set stxt_frame to display frame number
+        self.stxt_frame
+            .borrow_mut()
+            .set_text(format!("{}", world.frame_number));
         // Get state of traffic light and set appropriate color
         let tlc = if world.tl.state == Signal::Stop {
             Color32::RED
@@ -303,9 +315,7 @@ impl TheCanvas {
         self.stxtaddress.borrow_mut().set_text(person_address);
 
         //Update val_string
-        //let val = 42.3;
         let val = world.value;
-        //let val_string: String = format!("{}{}", "Value: ", val);
         let val_string: String = format!("{}{:.2}", "Value: ", val);
         self.stxtval.borrow_mut().set_text(val_string);
     }
