@@ -88,8 +88,13 @@ impl TheWorld {
         }
     }
 
+
+    // Advance simulation by one step.
+    // TDJ: Use trait?
     pub(crate) fn advance(&mut self) {
+        // Increment frame number each simulation step.
         self.frame_number += 1;
+        // Traffic light alternates between Go and Stop while simulation is running.
         self.toggle_light();
     }
 

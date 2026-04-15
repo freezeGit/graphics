@@ -6,6 +6,8 @@
 
 // app.rs
 
+mod app_internal;
+
 use std::time::Duration;
 use ::gui_lib as gl;
 use egui::Context;
@@ -329,7 +331,7 @@ impl eframe::App for TheApp {
 /// `run_the_app()` function.
 impl app_gl::UserApp for TheApp {
     /// Creates a new instance of TheApp application.
-    /// This demo app is intended to demonstrate usage of gui_lib.
+    /// This demo app intended to demonstrate usage of gui_lib, and for use as a template.
     ///
     /// # Returns
     /// A new `TheApp` instance initialized with a canvas and world
