@@ -1,8 +1,9 @@
 //! ## Application. struct TheApp is the main structure and entry point of the application.
 //! - Contains a `Canvas` for holding a collection of shapes.
 //! - Provides methods for creating and updating the UI.
-//! - Contains a 'World"
-//!   which contains all  non-gui program data and logic
+//! - Contains a 'World" which contains all  non-gui program data and logic.
+//!
+//! This demo app is intended to demonstrate usage of gui_lib, and for use as a template.
 
 // app.rs
 
@@ -30,6 +31,7 @@ use crate::world::{TheWorld, ThingState};
 /// Represents the root of the application and contains
 /// the main canvas with all UI components
 /// and a world struct containing program data and logic.
+
 #[derive(Debug)]
 pub struct TheApp {
     world: Box<TheWorld>,
@@ -41,15 +43,7 @@ pub struct TheApp {
 // eframe::App trait -------------------------------
 
 /// The eframe::App trait is the bridge between the user's custom application logic
-/// and the eframe framework that handles all the platform-specific details
-/// of creating a window and running an event loop.
-///
-/// Function [`update`] is called each time the UI needs repainting: see:
-/// [fn update](https://docs.rs/eframe/latest/eframe/trait.App.html#tymethod.update).
-/// In this demonstration app a timer loop is used to advance a simulation by asking for repaints.
-/// See: [repaint methods](<https://docs.rs/egui/latest/egui/struct.Context.html#method.request_repaint_after>).
-/// In the absense of repaint requests, egui is reactive, meaning it
-/// repaints when there's an input event (like mouse movement or a key press).
+/// and the eframe framework.
 ///
 /// # Parameters
 /// - `ctx`: A reference to the [`Context`] object, which provides the necessary environment.
@@ -57,35 +51,29 @@ pub struct TheApp {
 impl eframe::App for TheApp {
     /// Called each time the UI needs repainting.
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-        //println!("Update: {}", ctx.input(|i| i.time));  // TDJ: debug
         // Establish event loop
         self.event_loop(ctx);
-
         // Handle messages if any exist
         self.handle_emitted_messages();
     }
 } // end impl eframe::App
 
-/// A trait representing a user-defined application that extends the functionality
-/// of the `eframe::App` framework.
+/// A trait representing a user-defined application.
 ///
-/// This trait is designed to provide a flexible and standardized way for users to define
-/// and initialize their custom applications when using the `eframe` framework.
 /// The `new()` function must have an empty parameter list. This guarantees that
 /// the application `new()` constructor will have the correct signature to be called by the
 /// `run_the_app()` function.
 impl app_gl::UserApp for TheApp {
     /// Creates a new instance of TheApp application.
-    /// This demo app intended to demonstrate usage of gui_lib, and for use as a template.
+
     ///
     /// # Returns
-    /// A new `TheApp` instance initialized with a canvas and world
-    /// as well as a vector for messages, and a timer.
+    /// A new `TheApp` instance
     fn new() -> Self {
         Self {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
-            msgs: Vec::new(),
+            msgs: Vec::new(), // Vec<WidgetMsg>
             // TDJ: use constant for simulation speed?
             //sim_timer: Timer::new(Duration::from_millis(1000)),
             sim_timer: Timer::new(Duration::from_millis(500)),
@@ -96,7 +84,7 @@ impl app_gl::UserApp for TheApp {
 
 impl TheApp {
     // -------- User customization below --------
-    // All method handing methods in this module need application specific customizations.
+    //! All method handing methods in this module need application specific customizations.
 
     /// Handle button messages
     ///

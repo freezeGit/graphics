@@ -5,14 +5,14 @@ use super::*;
 
 // --------- Helper functions for App::update() --------------------------
 
-/// Establish event loop.
-///
-/// Invoke active dialog and collect emitted message in [`Self::msgs`].
-///
-/// Run simulation logic when dialog is not open (if program includes a simulation).
-///
-/// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
 impl TheApp {
+    /// Establish event loop.
+    ///
+    /// Invoke active dialog and collect emitted message in [`Self::msgs`].
+    ///
+    /// Run simulation logic when dialog is not open (if program includes a simulation).
+    ///
+    /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
     pub(super) fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
 
