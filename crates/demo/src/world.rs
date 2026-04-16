@@ -1,61 +1,21 @@
 //! Program state and simulation logic.
 //!
-//! This module defines `TheWorld` and related types.
+//! This module defines `TheWorld`.
 //! It deliberately has no dependency on gui_lib or egui.
 
-// world.rs
+// src/demo/world.rs
 
-#[derive(Debug)]
-pub(crate) struct Gauge {
-    pointer: f64,
-}
+// Sub modules under mod world.
+// Many applications will have multiple sub modules.
+pub(crate) mod world_demo; // demo program data and logic
+// ---------------------------------------------------
 
-impl Gauge {
-    fn new() -> Self {
-        Self { pointer: 0.0 }
-    }
+use gui_lib::World;
+use crate::world::world_demo::{Gauge, ThingState, Thing, Signal, TrafficLight, Person};
 
-    pub(crate) fn pointer(&self) -> f64 {
-        self.pointer
-    }
-
-    pub(crate) fn set_pointer(&mut self, pointer: f64) {
-        self.pointer = pointer;
-    }
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub(crate) enum Signal {
-    Stop,
-    Go,
-}
-#[derive(Debug)]
-pub(crate) struct TrafficLight {
-    pub(crate) state: Signal,
-}
-
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
-pub(crate) enum ThingState {
-    StateA,
-    StateB,
-    StateC,
-}
-#[derive(Debug)]
-pub(crate) struct Thing {
-    pub(crate) state: ThingState,
-}
-
-#[derive(Debug)]
-pub(crate) struct Person {
-    pub(crate) name: String,
-    pub(crate) city: String,
-    pub(crate) address: String,
-}
-
-
-/// Encapsulates program data and logic.
-/// No dependence on gui_lb
-/// No dependence on the app struct or the canvas struct.
+/// TheWorld struct encapsulates application data and logic.
+/// It has no dependence on gui_lib and no dependence on egui.
+/// It has no dependence on the app struct or the canvas struct.
 #[derive(Debug)]
 pub(crate) struct TheWorld {
     pub(crate) frame_number: u32,
@@ -65,6 +25,19 @@ pub(crate) struct TheWorld {
     pub(crate) name: String,
     pub(crate) person: Person,
     pub(crate) value: f64,
+}
+
+impl World for TheWorld {
+    /// Advance simulation by one step.
+    /// If the application does not include a simulation,
+    /// this method can be left undefined:
+    /// it will be automatically implemented as an empty function.
+    fn advance(&mut self) {
+        // Increment frame number each simulation step.
+        self.frame_number += 1;
+        // Traffic light alternates between Go and Stop while simulation is running.
+        self.toggle_light();
+    }
 }
 
 impl TheWorld {
@@ -91,12 +64,12 @@ impl TheWorld {
 
     // Advance simulation by one step.
     // TDJ: Use trait?
-    pub(crate) fn advance(&mut self) {
-        // Increment frame number each simulation step.
-        self.frame_number += 1;
-        // Traffic light alternates between Go and Stop while simulation is running.
-        self.toggle_light();
-    }
+    // pub(crate) fn advance(&mut self) {
+    //     // Increment frame number each simulation step.
+    //     self.frame_number += 1;
+    //     // Traffic light alternates between Go and Stop while simulation is running.
+    //     self.toggle_light();
+    // }
 
     fn toggle_light(&mut self) {
         self.tl.state = match self.tl.state {

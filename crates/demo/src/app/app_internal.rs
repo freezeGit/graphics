@@ -1,6 +1,7 @@
 // app_internal.rs
 
 use super::*;
+use gui_lib::World;
 //use egui::Context;
 
 // --------- Helper functions for App::update() --------------------------

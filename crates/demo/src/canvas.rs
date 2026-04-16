@@ -9,7 +9,9 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::ids::*;
-use crate::world::{Signal, TheWorld, ThingState};
+use crate::world::TheWorld;
+//use crate::world::{Signal, TheWorld, ThingState};
+use crate::world::world_demo::{Signal, ThingState};
 use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{

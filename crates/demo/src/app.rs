@@ -24,7 +24,8 @@ use crate::canvas::TheCanvas;
 //     DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
 // };
 use crate::ids::*;
-use crate::world::{TheWorld, ThingState};
+use crate::world::{TheWorld};
+use crate::world::world_demo::ThingState;
 
 /// Main application structure.
 ///
@@ -64,9 +65,6 @@ impl eframe::App for TheApp {
 /// the application `new()` constructor will have the correct signature to be called by the
 /// `run_the_app()` function.
 impl app_gl::UserApp for TheApp {
-    /// Creates a new instance of TheApp application.
-
-    ///
     /// # Returns
     /// A new `TheApp` instance
     fn new() -> Self {
