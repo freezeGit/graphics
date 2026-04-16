@@ -6,9 +6,8 @@
 
 // app.rs
 
-mod app_internal;
+mod app_internal; // internal functions that do not rquire application specific customizations
 
-use std::time::Duration;
 use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
@@ -16,6 +15,7 @@ use gui_lib::{
     MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer,
     WidgetMsg, app_gl,
 };
+use std::time::Duration;
 
 use crate::canvas::TheCanvas;
 // use crate::ids::{
@@ -38,36 +38,69 @@ pub struct TheApp {
     sim_timer: Timer,
 }
 
-impl TheApp {
-    // pub fn new(): implemented in trait run::UserApp
+// eframe::App trait -------------------------------
 
-    // Handle messages --------------------------
+/// The eframe::App trait is the bridge between the user's custom application logic
+/// and the eframe framework that handles all the platform-specific details
+/// of creating a window and running an event loop.
+///
+/// Function [`update`] is called each time the UI needs repainting: see:
+/// [fn update](https://docs.rs/eframe/latest/eframe/trait.App.html#tymethod.update).
+/// In this demonstration app a timer loop is used to advance a simulation by asking for repaints.
+/// See: [repaint methods](<https://docs.rs/egui/latest/egui/struct.Context.html#method.request_repaint_after>).
+/// In the absense of repaint requests, egui is reactive, meaning it
+/// repaints when there's an input event (like mouse movement or a key press).
+///
+/// # Parameters
+/// - `ctx`: A reference to the [`Context`] object, which provides the necessary environment.
+/// - `frame`: A reference to the [`eframe::Frame`] object. Not used in this demo.
+impl eframe::App for TheApp {
+    /// Called each time the UI needs repainting.
+    fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+        //println!("Update: {}", ctx.input(|i| i.time));  // TDJ: debug
+        // Establish event loop
+        self.event_loop(ctx);
 
-    /// What to do with [`WidgetMsg`] messages from widgets and dialogs.
-    /// This is the only communication between the GUI and the program code.
-    /// Program data and logic are encapsulated in struct [`TheWorld`].
-    fn handle_msg(&mut self, msg: WidgetMsg) {
-        match msg {
-            WidgetMsg::ButtonClicked(id) => {
-                self.handle_button(id);
-            }
-            WidgetMsg::DragFloatChanged(id, value) => {
-                self.handle_drag_float(id, value);
-            }
-            WidgetMsg::DialogAcceptedText(id, text) => {
-                self.handle_text_entry(id, text);
-            }
-            WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
-                self.handle_multi_text_entry(id, values);
-            }
-            WidgetMsg::DialogAcceptedDragFloat(id, val) => {
-                self.handle_drag_float_dlg(id, val);
-            }
-            _ => {}
+        // Handle messages if any exist
+        self.handle_emitted_messages();
+    }
+} // end impl eframe::App
+
+/// A trait representing a user-defined application that extends the functionality
+/// of the `eframe::App` framework.
+///
+/// This trait is designed to provide a flexible and standardized way for users to define
+/// and initialize their custom applications when using the `eframe` framework.
+/// The `new()` function must have an empty parameter list. This guarantees that
+/// the application `new()` constructor will have the correct signature to be called by the
+/// `run_the_app()` function.
+impl app_gl::UserApp for TheApp {
+    /// Creates a new instance of TheApp application.
+    /// This demo app intended to demonstrate usage of gui_lib, and for use as a template.
+    ///
+    /// # Returns
+    /// A new `TheApp` instance initialized with a canvas and world
+    /// as well as a vector for messages, and a timer.
+    fn new() -> Self {
+        Self {
+            world: Box::new(TheWorld::new()),
+            canvas: TheCanvas::new(),
+            msgs: Vec::new(),
+            // TDJ: use constant for simulation speed?
+            //sim_timer: Timer::new(Duration::from_millis(1000)),
+            sim_timer: Timer::new(Duration::from_millis(500)),
+            //sim_timer: Timer::new(Duration::from_millis(200)),
         }
     }
+} // end impl run::UserApp
+
+impl TheApp {
+    // -------- User customization below --------
+    // All method handing methods in this module need application specific customizations.
 
     /// Handle button messages
+    ///
+    /// Requires application specific customization.
     fn handle_button(&mut self, id: ButtonId) {
         match id {
             BTN_ABOUT => {
@@ -140,6 +173,8 @@ impl TheApp {
     }
 
     /// Handle drag float messages
+    ///
+    /// Requires application specific customization.
     fn handle_drag_float(&mut self, id: DragFloatId, value: f32) {
         match id {
             DRAGFLOAT_GAUGE => {
@@ -151,6 +186,8 @@ impl TheApp {
     }
 
     /// Handle text entry messages
+    ///
+    /// Requires application specific customization.
     fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
         match id {
             DLG_ENTER_NAME => {
@@ -186,6 +223,8 @@ impl TheApp {
     }
 
     /// Handle drag float dialog messages
+    ///
+    /// Requires application specific customization.
     fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
         match id {
             DLG_ENTER_VALUE => {
@@ -195,156 +234,4 @@ impl TheApp {
             _ => {}
         }
     }
-
-    // Helper functions for App::update() --------------------------
-
-    /// Establish event loop.
-    ///
-    /// Invoke active dialog and collect emitted message in [`Self::msgs`].
-    ///
-    /// Run simulation logic when dialog is not open (if program includes a simulation).
-    ///
-    /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
-
-    fn event_loop(&mut self, ctx: &Context) {
-        self.msgs.clear(); // establish invariant: Belt and suspenders
-
-        // Draw shapes and widgets on the canvas.
-        // Collect all messages from widgets into self.msgs.
-        self.canvas.canvas.render(ctx, &mut self.msgs);
-
-        // Draw active dialog.
-        // When the dialog is closed push its message into self.msgs.
-        // Pause simulation while dialog is open.
-        if self.invoked_dialog_closed(ctx) {
-            // If the active dialog has been closed, set the dialog to nil
-            self.canvas.canvas.set_dialog(Box::new(NilDlg));
-            // Only run simulation (if one exists) if the dialog is not open.
-            self.run_simulation(ctx);
-        }
-    }
-
-    /// Calls [`Dialog::invoke_modal`] to draw and get a message from a modal dialog.
-    ///
-    /// Parameter `ctx`: A reference to the [`Context`] object.
-    ///
-    /// Returns `true` if the user has closed the dialog,
-    /// or `false` if the dialog is still open.
-    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool {
-        self.canvas
-            .canvas
-            .get_mut_dialog()
-            .invoke_modal(ctx, &mut self.msgs)
-    }
-
-    /// Executes the simulation logic.
-    /// This method is not required for many programs. It is only needed
-    /// in case a simulation is run.
-    ///
-    /// This method checks if the simulation timer indicates that it's time
-    /// to run the next simulation step. If so, it advances the state of the
-    /// simulation's world model by one step by calling [`TheWorld::advance`] and then
-    /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
-    ///
-    /// Parameter `ctx`: A reference to the [`Context`] object.
-    pub fn run_simulation(&mut self, ctx: &egui::Context) {
-        if !self.sim_timer.is_running() {
-            return;
-        }
-
-        // if self.fast_forward { //
-        //     self.run_fast_forward_batch();
-        //     self.canvas.update(&self.world);
-        //     ctx.request_repaint();
-        //     return;
-        // }
-
-        let steps = self.sim_timer.ready_count().min(4);
-        for _ in 0..steps {
-            self.world.advance();
-        }
-        if steps > 0 {
-            self.canvas.update(&self.world);
-        }
-
-        ctx.request_repaint_after(self.sim_timer.remaining());
-    }
-    // ------------------------------------------------
-
-    /// Handle messages if any exist
-    /// # Related Methods
-    /// - [`handle_msg`]: Called for each individual message in the `msgs` buffer.
-    /// - [`canvas.update`]: Updates the canvas to reflect changes in the `world`.
-    fn handle_emitted_messages(&mut self) {
-        // Handle messages if any exist
-        if !self.msgs.is_empty() {
-            // Move msgs out of self so we can mutably borrow self inside the loop.
-            let mut msgs = std::mem::take(&mut self.msgs);
-            // Handle messages and drain the buffer.
-            for msg in msgs.drain(..) {
-                self.handle_msg(msg);
-            }
-            // Put the buffer back (empty, but keeps its capacity).
-            self.msgs = msgs;
-
-            // Update canvas to reflect all state changes:
-            self.canvas.update(&self.world);
-        }
-    }
 } // end impl TheApp
-
-// eframe::App trait -------------------------------
-
-/// The eframe::App trait is the bridge between the user's custom application logic
-/// and the eframe framework that handles all the platform-specific details
-/// of creating a window and running an event loop.
-///
-/// Function [`update`] is called each time the UI needs repainting: see:
-/// [fn update](https://docs.rs/eframe/latest/eframe/trait.App.html#tymethod.update).
-/// In this demonstration app a timer loop is used to advance a simulation by asking for repaints.
-/// See: [repaint methods](<https://docs.rs/egui/latest/egui/struct.Context.html#method.request_repaint_after>).
-/// In the absense of repaint requests, egui is reactive, meaning it
-/// repaints when there's an input event (like mouse movement or a key press).
-///
-/// # Parameters
-/// - `ctx`: A reference to the [`Context`] object, which provides the necessary environment.
-/// - `frame`: A reference to the [`eframe::Frame`] object. Not used in this demo.
-impl eframe::App for TheApp {
-    /// Called each time the UI needs repainting.
-    fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
-        //println!("Update: {}", ctx.input(|i| i.time));  // TDJ: debug
-        // Establish event loop
-        self.event_loop(ctx);
-
-        // Handle messages if any exist
-        self.handle_emitted_messages();
-    }
-} // end impl eframe::App
-
-/// A trait representing a user-defined application that extends the functionality
-/// of the `eframe::App` framework.
-///
-/// This trait is designed to provide a flexible and standardized way for users to define
-/// and initialize their custom applications when using the `eframe` framework.
-/// The `new()` function must have an empty parameter list. This guarantees that
-/// the application `new()` constructor will have the correct signature to be called by the
-/// `run_the_app()` function.
-impl app_gl::UserApp for TheApp {
-    /// Creates a new instance of TheApp application.
-    /// This demo app intended to demonstrate usage of gui_lib, and for use as a template.
-    ///
-    /// # Returns
-    /// A new `TheApp` instance initialized with a canvas and world
-    /// as well as a vector for messages, and a timer.
-    fn new() -> Self {
-        Self {
-            world: Box::new(TheWorld::new()),
-            canvas: TheCanvas::new(),
-            msgs: Vec::new(),
-            // TDJ: use constant for simulation speed?
-            //sim_timer: Timer::new(Duration::from_millis(1000)),
-            sim_timer: Timer::new(Duration::from_millis(500)),
-            //sim_timer: Timer::new(Duration::from_millis(200)),
-        }
-    }
-} // end impl run::UserApp
