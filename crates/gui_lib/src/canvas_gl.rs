@@ -39,7 +39,7 @@ pub const BKG_WINDOWS: Color32 = Color32::from_rgb(240, 240, 240);
 #[derive(Debug)]
 pub struct BasicCanvas {
     layout: LayoutStyle,
-    background_color: Color32,
+    pub background_color: Color32,
     shapes: Vec<ShapeHandle>, // Vec<Rc<RefCell<dyn Shape>>>
     widgets: Vec<Box<dyn Widget>>,
     pub active_dialog: Box<dyn Dialog>,
