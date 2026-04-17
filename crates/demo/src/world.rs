@@ -22,7 +22,7 @@ pub(crate) struct TheWorld {
     pub(crate) tl: TrafficLight,
     pub(crate) thing: Thing,
     pub(crate) gauge: Gauge,
-    pub(crate) name: String,
+    //pub(crate) name: String,
     pub(crate) person: Person,
     pub(crate) value: f64,
 }
@@ -51,7 +51,7 @@ impl TheWorld {
                 state: ThingState::StateC,
             },
             gauge: Gauge::new(),
-            name: "Steve".to_string(),
+            //name: "Steve".to_string(),
             person: Person {
                 name: String::from("Bill"),
                 city: String::from("Birtle"),

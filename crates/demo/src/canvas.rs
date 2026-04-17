@@ -265,7 +265,7 @@ impl TheCanvas {
     // }
 
     /// Update the state of the canvas based on the current world state.
-    /// This method is called by the [`TheApp`] to update the canvas with the latest world state.
+    /// 
     /// Note that this method does not modify the world state.
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
@@ -283,9 +283,11 @@ impl TheCanvas {
         self.tl_circle2.borrow_mut().set_fill_color(tlc);
 
         // Update gauge pointer
-        let mut ah_pos = self.arrow_head.borrow_mut().location();
-        ah_pos.x = 100.0 + 8.0 * (world.gauge.pointer() as f32);
-        self.arrow_head.borrow_mut().move_to(ah_pos);
+        let mut arrow_head = self.arrow_head.borrow_mut();
+        let mut ah_pos = arrow_head.location();
+        let pointer = world.gauge.pointer() as f32;
+        ah_pos.x = 100.0 + 8.0 * pointer;
+        arrow_head.move_to(ah_pos);
 
         // Update thing state, color coded
         match world.thing.state {
@@ -301,23 +303,22 @@ impl TheCanvas {
         }
 
         //Update name
-        let name: String = "Name: ".to_owned() + &world.name.clone();
-        self.stxtname.borrow_mut().set_text(name);
+        // let name = format!("Name: {}", world.name);
+        // self.stxtname.borrow_mut().set_text(name);
 
         // Update person
-        //let person_name: String = "Name: ".to_owned() + &world.person.name.clone();
-        let person_name: String = "Name: ".to_owned() + &world.person.name;
+        let person_name = format!("Name: {}", world.person.name);
         self.stxtname.borrow_mut().set_text(person_name);
 
-        let person_city: String = "City: ".to_owned() + &world.person.city;
+        let person_city = format!("City: {}", world.person.city);
         self.stxtcity.borrow_mut().set_text(person_city);
 
-        let person_address: String = "Address: ".to_owned() + &world.person.address;
+        let person_address = format!("Name: {}", world.person.address);;
         self.stxtaddress.borrow_mut().set_text(person_address);
 
         //Update val_string
         let val = world.value;
-        let val_string: String = format!("{}{:.2}", "Value: ", val);
+        let val_string = format!("Value: {:.2}", val);
         self.stxtval.borrow_mut().set_text(val_string);
     }
 } // end of impl TheCanvas

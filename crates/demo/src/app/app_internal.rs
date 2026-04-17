@@ -113,9 +113,9 @@ impl TheApp {
             WidgetMsg::DragFloatChanged(id, value) => {
                 self.handle_drag_float(id, value);
             }
-            WidgetMsg::DialogAcceptedText(id, text) => {
-                self.handle_text_entry(id, text);
-            }
+            // WidgetMsg::DialogAcceptedText(id, text) => {
+            //     self.handle_text_entry(id, text);
+            // }
             WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
                 self.handle_multi_text_entry(id, values);
             }

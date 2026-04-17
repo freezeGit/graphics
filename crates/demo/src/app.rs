@@ -117,14 +117,14 @@ impl TheApp {
                     )));
             }
 
-            BTN_ENTER_NAME => {
-                self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
-                    DLG_ENTER_NAME,
-                    "Enter name",
-                    "Name:",
-                    self.world.name.clone(),
-                )));
-            }
+            // BTN_ENTER_NAME => {
+            //     self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
+            //         DLG_ENTER_NAME,
+            //         "Enter name",
+            //         "Name:",
+            //         self.world.name.clone(),
+            //     )));
+            // }
 
             BTN_ENTER_VALUE => {
                 let mut dlg = DragFloatDlg::new(
@@ -174,15 +174,15 @@ impl TheApp {
     /// Handle text entry messages
     ///
     /// Requires application specific customization.
-    fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
-        match id {
-            DLG_ENTER_NAME => {
-                self.world.name = text.clone();
-            }
-
-            _ => {}
-        }
-    }
+    // fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
+    //     match id {
+    //         DLG_ENTER_NAME => {
+    //             self.world.name = text.clone();
+    //         }
+    //
+    //         _ => {}
+    //     }
+    // }
 
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
