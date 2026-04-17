@@ -75,6 +75,8 @@ impl TheApp {
             self.canvas.update(&self.world);
         }
 
+        // TDJ:
+        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
         ctx.request_repaint_after(self.sim_timer.remaining());
     }
     //  --------- Handle messages if any exist---------------------

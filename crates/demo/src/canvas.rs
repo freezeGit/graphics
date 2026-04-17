@@ -269,8 +269,6 @@ impl TheCanvas {
     /// Note that this method does not modify the world state.
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
-    /// Smaller programs may nat have a world object, in which case this update function will
-    /// take a parameter [`TheApp`] instead of TheWorld.
     pub(crate) fn update(&mut self, world: &TheWorld) {
         // Set stxt_frame to display frame number
         self.stxt_frame
@@ -306,6 +304,7 @@ impl TheCanvas {
         let name: String = "Name: ".to_owned() + &world.name.clone();
         self.stxtname.borrow_mut().set_text(name);
 
+        // Update person
         //let person_name: String = "Name: ".to_owned() + &world.person.name.clone();
         let person_name: String = "Name: ".to_owned() + &world.person.name;
         self.stxtname.borrow_mut().set_text(person_name);
