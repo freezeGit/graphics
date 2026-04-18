@@ -53,7 +53,8 @@ impl TheWorld {
             gauge: Gauge::new(),
             //name: "Steve".to_string(),
             person: Person {
-                name: String::from("Bill"),
+                //name: String::from("Bill"),
+                name: String::from("Steve"),
                 city: String::from("Birtle"),
                 address: String::from("123 Main St"),
             },
