@@ -4,7 +4,7 @@
 // line.rs
 
 use crate::egui::{self, Pos2, Vec2,};
-use crate::shapes::base::{Shape, ShapeBase,};
+use crate::shapes_gl::base::{Shape, ShapeBase,};
 use crate::{LineStyle};
 
 /// Struct Line

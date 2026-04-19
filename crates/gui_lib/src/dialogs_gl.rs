@@ -1,6 +1,6 @@
 //! ## Module dialogs contains the Dialog trait and the various dialog types.
 //!
-// dialogs.rs
+// dialogs_gl
 
 use crate::egui;
 use crate::ids_gl::{DragFloatDlgId, MessageBoxDlgId, MultiTextEntryDlgId, TextEntryDlgId};

@@ -15,7 +15,7 @@ use crate::world::world_demo::{Signal, ThingState};
 use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{
-    BKG_EXAMPLE, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
+    BKG_DEFAULT, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
     Separator, Shape, Space, Text,
 };
 
@@ -32,6 +32,11 @@ struct ViewHandles {
     stxtval: Rc<RefCell<Text>>,
 }
 
+// TopPanel, SidePanel, NoPanel
+const LAYOUT_STYLE: gui_lib::LayoutStyle = TopPanel;
+// BKG_DEFAULT, BKG_WINDOWS, any Color32
+const BACKGROUND_COLOR: Color32 = gui_lib::BKG_DEFAULT;
+
 /// ## struct Canvas
 /// A container for rendering and managing graphical shapes
 /// and interactive widgets.
@@ -45,8 +50,8 @@ pub(crate) struct TheCanvas {
     // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
     // Widgets are stored in  BasicCanvas::Vec<Box<dyn Widget>>
     pub(crate) canvas: BasicCanvas, // From gui_lib
-    // ViewHandles fields are concrete shapes as unique handles Rc<RefCell<T>>
-    vh: ViewHandles,
+    // ViewHandles fields are concrete shapes as unique handles of type Rc<RefCell<T>>
+    view_handles: ViewHandles,
 }
 
 impl TheCanvas {
@@ -55,16 +60,11 @@ impl TheCanvas {
     /// Creates and initializes a BasicCanvas
     /// Creates and initializes all shapes and widgets
     pub(crate) fn new() -> Self {
-        // New empty BasicCanvas
-        // --- Other possibilities: //TDJ:  use constant for layout style
-        // and background color?
-        //let mut canvas = BasicCanvas::new(SidePanel, BKG_EXAMPLE);
-        //let mut canvas = BasicCanvas::new(NoPanel, BKG_EXAMPLE);
-        let mut canvas = BasicCanvas::new(TopPanel, BKG_EXAMPLE);
+        let mut canvas = BasicCanvas::new(LAYOUT_STYLE, BACKGROUND_COLOR);
         Self::init_widgets(&mut canvas);
-        let vh = Self::init_shapes(&mut canvas);
+        let view_handles = Self::init_shapes(&mut canvas);
 
-        Self { canvas, vh }
+        Self { canvas, view_handles }
     }
 
     fn init_shapes(canvas: &mut BasicCanvas) -> ViewHandles {
@@ -277,7 +277,7 @@ impl TheCanvas {
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
     pub(crate) fn update(&mut self, world: &TheWorld) {
         // Set stxt_frame to display frame number
-        self.vh
+        self.view_handles
             .stxt_frame
             .borrow_mut()
             .set_text(format!("{}", world.frame_number));
@@ -287,10 +287,10 @@ impl TheCanvas {
         } else {
             Color32::GREEN
         };
-        self.vh.tl_circle2.borrow_mut().set_fill_color(tlc);
+        self.view_handles.tl_circle2.borrow_mut().set_fill_color(tlc);
 
         // Update gauge pointer
-        let mut arrow_head = self.vh.arrow_head.borrow_mut();
+        let mut arrow_head = self.view_handles.arrow_head.borrow_mut();
         let mut ah_pos = arrow_head.location();
         let pointer = world.gauge.pointer() as f32;
         ah_pos.x = 100.0 + 8.0 * pointer;
@@ -299,12 +299,12 @@ impl TheCanvas {
         // Update thing state, color coded
         match world.thing.state {
             ThingState::StateA => {
-                self.vh.rect.borrow_mut().set_fill_color(Color32::GOLD);
-                self.vh.stxt.borrow_mut().set_text("State A");
+                self.view_handles.rect.borrow_mut().set_fill_color(Color32::GOLD);
+                self.view_handles.stxt.borrow_mut().set_text("State A");
             }
             ThingState::StateB => {
-                self.vh.rect.borrow_mut().set_fill_color(Color32::CYAN);
-                self.vh.stxt.borrow_mut().set_text("State B");
+                self.view_handles.rect.borrow_mut().set_fill_color(Color32::CYAN);
+                self.view_handles.stxt.borrow_mut().set_text("State B");
             }
             _ => {}
         }
@@ -315,17 +315,17 @@ impl TheCanvas {
 
         // Update person
         let person_name = format!("Name: {}", world.person.name);
-        self.vh.stxtname.borrow_mut().set_text(person_name);
+        self.view_handles.stxtname.borrow_mut().set_text(person_name);
 
         let person_city = format!("City: {}", world.person.city);
-        self.vh.stxtcity.borrow_mut().set_text(person_city);
+        self.view_handles.stxtcity.borrow_mut().set_text(person_city);
 
         let person_address = format!("Address: {}", world.person.address);
-        self.vh.stxtaddress.borrow_mut().set_text(person_address);
+        self.view_handles.stxtaddress.borrow_mut().set_text(person_address);
 
         //Update val_string
         let val = world.value;
         let val_string = format!("Value: {:.2}", val);
-        self.vh.stxtval.borrow_mut().set_text(val_string);
+        self.view_handles.stxtval.borrow_mut().set_text(val_string);
     }
 } // end of impl TheCanvas

@@ -5,7 +5,7 @@
 
 use crate::egui::epaint::PathShape;
 use crate::egui::{self, Painter, Pos2, Stroke,};
-use crate::shapes::base::{LineStyle, Shape, ShapeBase};
+use crate::shapes_gl::base::{LineStyle, Shape, ShapeBase};
 
 /// A customizable ClosedPolyline component.
 ///

@@ -5,7 +5,7 @@
 // text.rs
 
 use crate::egui::{self, Color32, Pos2, TextStyle, FontId,};
-use crate::shapes::base::{Shape, ShapeBase};
+use crate::shapes_gl::base::{Shape, ShapeBase};
 use std::f32::consts::FRAC_PI_2;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

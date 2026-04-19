@@ -1,6 +1,6 @@
 //! ## Module widgets contains the [`Widget`] trait and various widgets.
 //!
-// src/gui_lib/widgets.rs
+// src/gui_lib/widgets_gl.rs
 
 use crate::Color32;
 use crate::egui::RichText;

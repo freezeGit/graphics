@@ -27,7 +27,7 @@ pub enum LayoutStyle {
 }
 
 // Examples of background colors. Any Color32 will do.
-pub const BKG_EXAMPLE: Color32 = Color32::from_rgb(200, 200, 210);
+pub const BKG_DEFAULT: Color32 = Color32::from_rgb(200, 200, 210);
 pub const BKG_WINDOWS: Color32 = Color32::from_rgb(240, 240, 240);
 
 //------------------------------------------------

@@ -4,7 +4,7 @@
 // circle.rs
 
 use crate::egui::{self, Pos2};
-use crate::shapes::base::{Shape, ShapeBase};
+use crate::shapes_gl::base::{Shape, ShapeBase};
 use crate::{Color32, LineStyle};
 use std::f32::consts::TAU;
 
