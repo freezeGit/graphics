@@ -20,6 +20,7 @@ impl TheApp {
         // Draw shapes and widgets on the canvas.
         // Collect all messages from widgets into self.msgs.
         self.canvas.canvas.render(ctx, &mut self.msgs);
+        self.canvas.update(&self.world); // DDJ:
 
         // Draw active dialog.
         // When the dialog is closed push its message into self.msgs.
@@ -30,6 +31,9 @@ impl TheApp {
             // Only run simulation (if one exists) if the dialog is not open.
             self.run_simulation(ctx);
         }
+        //ctx.request_repaint_after(std::time::Duration::from_millis(450));
+        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        //ctx.request_repaint_after(self.sim_timer.remaining());
     }
 
     /// Calls [`Dialog::invoke_modal`] to draw and get a message from a modal dialog.
@@ -55,29 +59,66 @@ impl TheApp {
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
     ///
     /// Parameter `ctx`: A reference to the [`Context`] object.
+    // fn run_simulation(&mut self, ctx: &egui::Context) {
+    //     if !self.sim_timer.is_running() {
+    //         return;
+    //     }
+    //
+    //     // if self.fast_forward { //
+    //     //     self.run_fast_forward_batch();
+    //     //     self.canvas.update(&self.world);
+    //     //     ctx.request_repaint();
+    //     //     return;
+    //     // }
+    //
+    //     let steps = self.sim_timer.ready_count().min(4);
+    //     for _ in 0..steps {
+    //         self.world.advance();
+    //     }
+    //     if steps > 0 {
+    //         self.canvas.update(&self.world);
+    //     }
+    //
+    //     // TDJ:
+    //     //ctx.request_repaint_after(std::time::Duration::from_millis(16));
+    //     ctx.request_repaint_after(self.sim_timer.remaining());
+    // }
+
+    // fn run_simulation(&mut self, ctx: &egui::Context) {
+    //     if !self.sim_timer.is_running() {
+    //         return;
+    //     }
+    //
+    //     if self.sim_timer.is_time(ctx) {
+    //         self.world.advance();
+    //         self.canvas.update(&self.world);
+    //     }
+    //
+    //     //self.canvas.update(&self.world);
+    //
+    //     // TDJ:
+    //     //ctx.request_repaint_after(std::time::Duration::from_millis(450));
+    //     ctx.request_repaint_after(std::time::Duration::from_millis(16));
+    //     //ctx.request_repaint_after(self.sim_timer.remaining());
+    // }
+
     fn run_simulation(&mut self, ctx: &egui::Context) {
         if !self.sim_timer.is_running() {
             return;
         }
 
-        // if self.fast_forward { //
-        //     self.run_fast_forward_batch();
-        //     self.canvas.update(&self.world);
-        //     ctx.request_repaint();
-        //     return;
-        // }
-
-        let steps = self.sim_timer.ready_count().min(4);
-        for _ in 0..steps {
+        if self.sim_timer.is_time(ctx) {
             self.world.advance();
-        }
-        if steps > 0 {
             self.canvas.update(&self.world);
+            //self.canvas.canvas.render(ctx, &mut self.msgs); //TDJ
         }
+
+        //self.canvas.update(&self.world);
 
         // TDJ:
-        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
-        ctx.request_repaint_after(self.sim_timer.remaining());
+        // //ctx.request_repaint_after(std::time::Duration::from_millis(450));
+        // ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        // //ctx.request_repaint_after(self.sim_timer.remaining());
     }
     //  --------- Handle messages if any exist---------------------
 

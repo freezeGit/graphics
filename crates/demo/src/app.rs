@@ -73,9 +73,9 @@ impl app_gl::UserApp for TheApp {
             canvas: TheCanvas::new(),
             msgs: Vec::new(), // Vec<WidgetMsg>
             // TDJ: use constant for simulation speed?
-            //sim_timer: Timer::new(Duration::from_millis(1000)),
-            sim_timer: Timer::new(Duration::from_millis(500)),
+            // sim_timer: Timer::new(Duration::from_millis(500)),
             //sim_timer: Timer::new(Duration::from_millis(200)),
+            sim_timer: Timer::new(0.5), //TDJ:
         }
     }
 } // end impl run::UserApp
