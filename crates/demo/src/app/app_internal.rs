@@ -9,32 +9,37 @@ use gui_lib::World;
 impl TheApp {
     /// Establish event loop.
     ///
-    /// Invoke active dialog and collect emitted message in [`Self::msgs`].
-    ///
-    /// Run simulation logic when dialog is not open (if program includes a simulation).
-    ///
     /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
+    /// Invoke active dialog and collect emitted message in [`Self::msgs`].
+    /// Run simulation logic if dialog is not open (if program includes a simulation)
     pub(super) fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
 
         // Draw shapes and widgets on the canvas.
         // Collect all messages from widgets into self.msgs.
         self.canvas.canvas.render(ctx, &mut self.msgs);
-        self.canvas.update(&self.world); // DDJ:
+        // self.canvas.update(&self.world); // DDJ:
 
-        // Draw active dialog.
-        // When the dialog is closed push its message into self.msgs.
-        // Pause simulation while dialog is open.
-        if self.invoked_dialog_closed(ctx) {
-            // If the active dialog has been closed, set the dialog to nil
+        if self.dialog_invoked_and_closed(ctx) {
             self.canvas.canvas.set_dialog(Box::new(NilDlg));
-            // Only run simulation (if one exists) if the dialog is not open.
             self.run_simulation(ctx);
+        } else {
+            self.sim_timer.resync();
         }
-        //ctx.request_repaint_after(std::time::Duration::from_millis(450));
-        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
-        //ctx.request_repaint_after(self.sim_timer.remaining());
+
+        // // Invoke active dialog.
+        // // When the dialog is closed push its message into self.msgs.
+        // // Pause simulation while dialog is open.
+        // if self.dialog_invoked_and_closed(ctx) {
+        //     // If the active dialog has been closed, set the dialog to nil
+        //     self.canvas.canvas.set_dialog(Box::new(NilDlg));
+        //     // // Only run simulation (if one exists) if the dialog is not open.
+        //     self.run_simulation(ctx);
+        // }
+
+        //self.canvas.update(&self.world); // DDJ:xxx
     }
+
 
     /// Calls [`Dialog::invoke_modal`] to draw and get a message from a modal dialog.
     ///
@@ -42,7 +47,7 @@ impl TheApp {
     ///
     /// Returns `true` if the user has closed the dialog,
     /// or `false` if the dialog is still open.
-    fn invoked_dialog_closed(&mut self, ctx: &Context) -> bool {
+    fn dialog_invoked_and_closed(&mut self, ctx: &Context) -> bool {
         self.canvas
             .canvas
             .get_mut_dialog()
@@ -59,67 +64,25 @@ impl TheApp {
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
     ///
     /// Parameter `ctx`: A reference to the [`Context`] object.
-    // fn run_simulation(&mut self, ctx: &egui::Context) {
-    //     if !self.sim_timer.is_running() {
-    //         return;
-    //     }
-    //
-    //     // if self.fast_forward { //
-    //     //     self.run_fast_forward_batch();
-    //     //     self.canvas.update(&self.world);
-    //     //     ctx.request_repaint();
-    //     //     return;
-    //     // }
-    //
-    //     let steps = self.sim_timer.ready_count().min(4);
-    //     for _ in 0..steps {
-    //         self.world.advance();
-    //     }
-    //     if steps > 0 {
-    //         self.canvas.update(&self.world);
-    //     }
-    //
-    //     // TDJ:
-    //     //ctx.request_repaint_after(std::time::Duration::from_millis(16));
-    //     ctx.request_repaint_after(self.sim_timer.remaining());
-    // }
-
-    // fn run_simulation(&mut self, ctx: &egui::Context) {
-    //     if !self.sim_timer.is_running() {
-    //         return;
-    //     }
-    //
-    //     if self.sim_timer.is_time(ctx) {
-    //         self.world.advance();
-    //         self.canvas.update(&self.world);
-    //     }
-    //
-    //     //self.canvas.update(&self.world);
-    //
-    //     // TDJ:
-    //     //ctx.request_repaint_after(std::time::Duration::from_millis(450));
-    //     ctx.request_repaint_after(std::time::Duration::from_millis(16));
-    //     //ctx.request_repaint_after(self.sim_timer.remaining());
-    // }
-
     fn run_simulation(&mut self, ctx: &egui::Context) {
         if !self.sim_timer.is_running() {
             return;
         }
 
-        if self.sim_timer.is_time(ctx) {
+        let now = ctx.input(|i| i.time);
+
+        if self.sim_timer.ready(now) {
             self.world.advance();
             self.canvas.update(&self.world);
-            //self.canvas.canvas.render(ctx, &mut self.msgs); //TDJ
         }
 
-        //self.canvas.update(&self.world);
+        ctx.request_repaint_after(std::time::Duration::from_secs_f64(
+            self.sim_timer.remaining(now),
+        ));
 
-        // TDJ:
-        // //ctx.request_repaint_after(std::time::Duration::from_millis(450));
-        // ctx.request_repaint_after(std::time::Duration::from_millis(16));
-        // //ctx.request_repaint_after(self.sim_timer.remaining());
+        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
     }
+
     //  --------- Handle messages if any exist---------------------
 
     /// Handle messages if any exist
