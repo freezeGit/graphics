@@ -20,8 +20,10 @@ impl TheApp {
         self.canvas.canvas.render(ctx, &mut self.msgs);
         // self.canvas.update(&self.world); // DDJ:
 
-        if self.dialog_invoked_and_closed(ctx) {
+        if self.active_dialog_closed(ctx) {
+            // NilDlg is always closed.
             self.canvas.canvas.set_dialog(Box::new(NilDlg));
+            // Simulation is only run if the dialog is not open.
             self.run_simulation(ctx);
         } else {
             self.sim_timer.resync();
@@ -47,7 +49,7 @@ impl TheApp {
     ///
     /// Returns `true` if the user has closed the dialog,
     /// or `false` if the dialog is still open.
-    fn dialog_invoked_and_closed(&mut self, ctx: &Context) -> bool {
+    fn active_dialog_closed(&mut self, ctx: &Context) -> bool {
         self.canvas
             .canvas
             .get_mut_dialog()

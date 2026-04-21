@@ -8,9 +8,9 @@ use std::time::{Duration, Instant};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum TimerState {
-    Stopped,
-    WaitingForSync,
-    Running,
+    Stopped, // Call to ready() returns false
+    WaitingForSync, // flast_time
+    Running, // Call to ready() returns true if interval has elapsed since last call
 }
 
 #[derive(Debug)]
@@ -75,9 +75,7 @@ impl Timer {
         match self.state {
             TimerState::Stopped | TimerState::WaitingForSync => self.interval,
 
-            TimerState::Running => {
-                (self.interval - (now - self.last_time)).max(0.0)
-            }
+            TimerState::Running => (self.interval - (now - self.last_time)).max(0.0),
         }
     }
 }
@@ -88,7 +86,7 @@ impl Timer {
 //     last_tick: Instant,
 //     running: bool,
 // }
-// 
+//
 // impl Timer {
 //     pub fn new(interval: Duration) -> Self {
 //         Self {
@@ -97,57 +95,57 @@ impl Timer {
 //             running: false,
 //         }
 //     }
-// 
+//
 //     pub fn interval(&self) -> Duration {
 //         self.interval
 //     }
-// 
+//
 //     pub fn set_interval(&mut self, interval: Duration) {
 //         self.interval = interval;
 //     }
-// 
+//
 //     pub fn run(&mut self) {
 //         if !self.running {
 //             self.running = true;
 //             self.last_tick = Instant::now();
 //         }
 //     }
-// 
+//
 //     //pub fn stop(&mut self) {
 //     pub fn pause(&mut self) {
 //         self.running = false;
 //     }
-// 
+//
 //     pub fn reset(&mut self) {
 //         self.last_tick = Instant::now();
 //     }
-// 
+//
 //     pub fn is_running(&self) -> bool {
 //         self.running
 //     }
-// 
+//
 //     pub fn ready_count(&mut self) -> u32 {
 //         if !self.running || self.interval.is_zero() {
 //             return 0;
 //         }
-// 
+//
 //         let now = Instant::now();
 //         let elapsed = now.saturating_duration_since(self.last_tick);
-// 
+//
 //         let count = (elapsed.as_nanos() / self.interval.as_nanos()) as u32;
-// 
+//
 //         if count > 0 {
 //             self.last_tick += self.interval * count;
 //         }
-// 
+//
 //         count
 //     }
-// 
+//
 //     pub fn remaining(&self) -> Duration {
 //         if !self.running {
 //             return self.interval;
 //         }
-// 
+//
 //         let now = Instant::now();
 //         self.interval
 //             .saturating_sub(now.saturating_duration_since(self.last_tick))
