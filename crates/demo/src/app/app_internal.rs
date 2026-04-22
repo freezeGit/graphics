@@ -18,30 +18,16 @@ impl TheApp {
         // Draw shapes and widgets on the canvas.
         // Collect all messages from widgets into self.msgs.
         self.canvas.canvas.render(ctx, &mut self.msgs);
-        // self.canvas.update(&self.world); // DDJ:
 
+        // If no dialog is open set active dialog to nil and run simulation.
         if self.active_dialog_closed(ctx) {
-            // NilDlg is always closed.
-            self.canvas.canvas.set_dialog(Box::new(NilDlg));
-            // Simulation is only run if the dialog is not open.
+            self.canvas.canvas.set_dialog(Box::new(NilDlg));  // NilDlg is always closed.
             self.run_simulation(ctx);
         } else {
+            // Continue timer from current time when the dialog is closed.
             self.sim_timer.resync();
         }
-
-        // // Invoke active dialog.
-        // // When the dialog is closed push its message into self.msgs.
-        // // Pause simulation while dialog is open.
-        // if self.dialog_invoked_and_closed(ctx) {
-        //     // If the active dialog has been closed, set the dialog to nil
-        //     self.canvas.canvas.set_dialog(Box::new(NilDlg));
-        //     // // Only run simulation (if one exists) if the dialog is not open.
-        //     self.run_simulation(ctx);
-        // }
-
-        //self.canvas.update(&self.world); // DDJ:xxx
     }
-
 
     /// Calls [`Dialog::invoke_modal`] to draw and get a message from a modal dialog.
     ///
