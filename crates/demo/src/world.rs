@@ -18,7 +18,7 @@ use crate::world::world_demo::{Gauge, ThingState, Thing, Signal, TrafficLight, P
 /// It has no dependence on the app struct or the canvas struct.
 #[derive(Debug)]
 pub(crate) struct TheWorld {
-    pub(crate) frame_number: u32,
+    pub(crate) frame_number: u64, // TDJ: for batching
     pub(crate) tl: TrafficLight,
     pub(crate) thing: Thing,
     pub(crate) gauge: Gauge,

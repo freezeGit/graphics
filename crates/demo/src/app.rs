@@ -94,7 +94,7 @@ impl TheApp {
                     DLG_ABOUT,
                     "About",
                     "Demonstration app using the gui_lib library.\n\
-                    Can be used as a template to get started with gui_lib.\n\
+                    Intended to be used as a template to get started.\n\
                     Written in Rust + egui.",
                 )));
             }

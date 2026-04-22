@@ -11,7 +11,7 @@ impl TheApp {
     ///
     /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
     /// Invoke active dialog and collect emitted message in [`Self::msgs`].
-    /// Run simulation logic if dialog is not open (if program includes a simulation)
+    /// Run simulation logic if dialog is not open.
     pub(super) fn event_loop(&mut self, ctx: &Context) {
         self.msgs.clear(); // establish invariant: Belt and suspenders
 
@@ -19,27 +19,21 @@ impl TheApp {
         // Collect all messages from widgets into self.msgs.
         self.canvas.canvas.render(ctx, &mut self.msgs);
 
-        // If no dialog is open set active dialog to nil and run simulation.
-        if self.active_dialog_closed(ctx) {
-            self.canvas.canvas.set_dialog(Box::new(NilDlg));  // NilDlg is always closed.
+        // If an open dialog has just been closed or is already NilDlg
+        // set or reset the active dialog to NilDlg and run simulation.
+        if self
+            .canvas
+            .canvas
+            .get_mut_dialog()
+            // Open active dialog and return true when it is closed.
+            .invoke_modal(ctx, &mut self.msgs)
+        {
+            self.canvas.canvas.set_dialog(Box::new(NilDlg)); // NilDlg is always closed.
             self.run_simulation(ctx);
         } else {
             // Continue timer from current time when the dialog is closed.
             self.sim_timer.resync();
         }
-    }
-
-    /// Calls [`Dialog::invoke_modal`] to draw and get a message from a modal dialog.
-    ///
-    /// Parameter `ctx`: A reference to the [`Context`] object.
-    ///
-    /// Returns `true` if the user has closed the dialog,
-    /// or `false` if the dialog is still open.
-    fn active_dialog_closed(&mut self, ctx: &Context) -> bool {
-        self.canvas
-            .canvas
-            .get_mut_dialog()
-            .invoke_modal(ctx, &mut self.msgs)
     }
 
     /// Executes the simulation logic.
@@ -68,7 +62,40 @@ impl TheApp {
             self.sim_timer.remaining(now),
         ));
 
-        //ctx.request_repaint_after(std::time::Duration::from_millis(16));
+        //ctx.request_repaint_after(std::time::Duration::from_millis(16)); // TDJ:
+    }
+
+    // // TDJ: Run simulation wth batch
+    // fn run_simulation(&mut self, ctx: &egui::Context) {
+    //     if !self.sim_timer.is_running() {
+    //         return;
+    //     }
+    //
+    //     let now = ctx.input(|i| i.time);
+    //
+    //     // if self.sim_timer.ready(now) {
+    //     //     //self.world.advance();
+    //     //     self.batch_world_advances();
+    //     //     self.canvas.update(&self.world);
+    //     // }
+    //
+    //     self.batch_world_advances();
+    //     self.canvas.update(&self.world);
+    //
+    //     ctx.request_repaint();
+    //
+    //     // ctx.request_repaint_after(std::time::Duration::from_secs_f64(
+    //     //     self.sim_timer.remaining(now),
+    //     // ));
+    //
+    //     //ctx.request_repaint_after(std::time::Duration::from_millis(16)); // TDJ:
+    // }
+
+    // TDJ: // batch_world_advances
+    fn batch_world_advances(&mut self) {
+        for i in 0..10_000_000 {
+            self.world.advance();
+        }
     }
 
     //  --------- Handle messages if any exist---------------------
