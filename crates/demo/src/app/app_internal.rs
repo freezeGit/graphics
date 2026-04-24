@@ -7,6 +7,11 @@ use gui_lib::World;
 // --------- Helper functions for App::update() --------------------------
 
 impl TheApp {
+    /// Get current time in seconds from start of app.
+    pub fn time_now(&self, ctx: &Context) -> f64 {
+        ctx.input(|i| i.time)
+    }
+
     /// Establish event loop.
     ///
     /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
@@ -44,68 +49,17 @@ impl TheApp {
     /// to run the next simulation step. If so, it advances the state of the
     /// simulation's world model by one step by calling [`TheWorld::advance`] and then
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
-    ///
-    /// Parameter `ctx`: A reference to the [`Context`] object.
-    // fn run_simulation(&mut self, ctx: &egui::Context) {
-    //     if !self.sim_timer.is_running() {
-    //         return;
-    //     }
-    //
-    //     let now = ctx.input(|i| i.time);
-    //
-    //     if self.sim_timer.ready(now) {
-    //         self.world.advance();
-    //         self.canvas.update(&self.world);
-    //     }
-    //
-    //     ctx.request_repaint_after(std::time::Duration::from_secs_f64(
-    //         self.sim_timer.remaining(now),
-    //     ));
-    //
-    //     //ctx.request_repaint_after(std::time::Duration::from_millis(16)); // TDJ:
-    // }
-
-    // TDJ: Run simulation wth batch
-    // fn run_simulation(&mut self, ctx: &egui::Context) {
-    //     if !self.sim_timer.is_running() {
-    //         return;
-    //     }
-    //
-    //     if self.sim_timer.fast_forward() {
-    //         for i in 0..10_000_001 {
-    //             self.world.advance();
-    //         }
-    //         self.canvas.update(&self.world);
-    //         ctx.request_repaint();
-    //     } else {
-    //         let now = ctx.input(|i| i.time);
-    //         if self.sim_timer.ready(now) {
-    //             self.world.advance();
-    //             self.canvas.update(&self.world);
-    //         }
-    //         //self.step_when_ready(ctx);
-    //         ctx.request_repaint_after(std::time::Duration::from_secs_f64(
-    //             self.sim_timer.remaining(now),
-    //         ));
-    //         //ctx.request_repaint_after(std::time::Duration::from_millis(16)); // TDJ:
-    //     }
-    // }
-
     fn run_simulation(&mut self, ctx: &egui::Context) {
         if !self.sim_timer.is_running() {
             return;
         }
 
         if self.sim_timer.fast_forward() {
-            // for i in 0..10_000_001 {
-            //     self.world.advance();
-            // }
-            // self.canvas.update(&self.world);
             self.batch_step();
             ctx.request_repaint();
         } else {
-            let now = ctx.input(|i| i.time);
-            self.if_ready_step(ctx, now);
+            let now = self.time_now(ctx);
+            self.step_when_ready(ctx, now);
             ctx.request_repaint_after(std::time::Duration::from_secs_f64(
                 self.sim_timer.remaining(now),
             ));
@@ -114,13 +68,13 @@ impl TheApp {
     }
 
     fn batch_step(&mut self) {
-        for i in 0..10_000_001 {
+        for i in 0..self.sim_timer.batch_size() {
             self.world.advance();
         }
         self.canvas.update(&self.world);
     }
 
-    fn if_ready_step(&mut self, ctx: &egui::Context, now: f64) {
+    fn step_when_ready(&mut self, ctx: &egui::Context, now: f64) {
         if self.sim_timer.ready(now) {
             self.world.advance();
             self.canvas.update(&self.world);

@@ -2,6 +2,8 @@
 //!
 // timer_gl
 
+const BATCH_SIZE: u32  = 1000;
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum TimerState {
     Stopped,        // Call to ready() returns false (Timer not active)
@@ -14,6 +16,7 @@ pub struct SimTimer {
     interval: f64,
     last_time: f64,
     fast: bool,
+    batch_size: u32,
     state: TimerState,
 }
 
@@ -22,7 +25,9 @@ impl SimTimer {
         Self {
             interval,
             last_time: 0.0,
-            fast: false,
+            //fast: false,
+            fast: true,
+            batch_size: BATCH_SIZE,
             state: TimerState::Stopped,
         }
     }
@@ -45,6 +50,14 @@ impl SimTimer {
 
     pub fn is_running(&self) -> bool {
         self.state != TimerState::Stopped
+    }
+
+    pub fn set_interval(&mut self, interval: f64) {
+        self.interval = interval;
+    }
+
+    pub fn interval(&self) -> f64 {
+        self.interval
     }
 
     pub fn ready(&mut self, now: f64) -> bool {
@@ -84,4 +97,12 @@ impl SimTimer {
     pub fn fast_forward(&self) -> bool {
         self.fast
     }
+    pub fn set_batch_size(&mut self, batch_size: u32) {
+        self.batch_size = batch_size;
+    }
+    pub fn batch_size(&self) -> u32 {
+        self.batch_size
+    }
+
+
 } // SimTimer
