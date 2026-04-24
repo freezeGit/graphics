@@ -13,7 +13,7 @@ use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
     ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
-    MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, Timer,
+    MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, SimTimer,
     WidgetMsg, app_gl,
 };
 use std::time::Duration;
@@ -38,7 +38,7 @@ pub struct TheApp {
     world: Box<TheWorld>,
     canvas: TheCanvas,
     msgs: Vec<WidgetMsg>,
-    sim_timer: Timer,
+    sim_timer: SimTimer,
 }
 
 // eframe::App trait -------------------------------
@@ -75,7 +75,7 @@ impl app_gl::UserApp for TheApp {
             // TDJ: use constant for simulation speed?
             // sim_timer: Timer::new(Duration::from_millis(500)),
             //sim_timer: Timer::new(Duration::from_millis(200)),
-            sim_timer: Timer::new(0.5), //TDJ:
+            sim_timer: SimTimer::new(0.5), //TDJ:
         }
     }
 } // end impl run::UserApp

@@ -4,23 +4,25 @@
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum TimerState {
-    Stopped, // Call to ready() returns false (Timer not active)
+    Stopped,        // Call to ready() returns false (Timer not active)
     WaitingForSync, // Call to ready(): sync to current time
-    Running, // Call to ready() returns true if interval has elapsed since last call
+    Running,        // Call to ready() returns true if interval has elapsed since last call
 }
 
 #[derive(Debug)]
-pub struct Timer {
+pub struct SimTimer {
     interval: f64,
     last_time: f64,
+    fast: bool,
     state: TimerState,
 }
 
-impl Timer {
+impl SimTimer {
     pub fn new(interval: f64) -> Self {
         Self {
             interval,
             last_time: 0.0,
+            fast: false,
             state: TimerState::Stopped,
         }
     }
@@ -74,4 +76,12 @@ impl Timer {
             TimerState::Running => (self.interval - (now - self.last_time)).max(0.0),
         }
     }
-}
+
+    pub fn set_fast_forward(&mut self, ff: bool) {
+        self.fast = ff;
+    }
+
+    pub fn fast_forward(&self) -> bool {
+        self.fast
+    }
+} // SimTimer
