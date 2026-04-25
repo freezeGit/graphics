@@ -34,7 +34,7 @@ impl TheApp {
             .invoke_modal(ctx, &mut self.msgs)
         {
             self.canvas.canvas.set_dialog(Box::new(NilDlg)); // NilDlg is always closed.
-            self.run_simulation(ctx);
+            self.step_simulation(ctx);
         } else {
             // Continue timer from current time when the dialog is closed.
             self.sim_timer.resync();
@@ -49,7 +49,26 @@ impl TheApp {
     /// to run the next simulation step. If so, it advances the state of the
     /// simulation's world model by one step by calling [`TheWorld::advance`] and then
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
-    fn run_simulation(&mut self, ctx: &egui::Context) {
+    // fn step_simulation(&mut self, ctx: &egui::Context) {
+    //     if !self.sim_timer.is_running() {
+    //         return;
+    //     }
+    //
+    //     if self.sim_timer.fast_forward() {
+    //         self.batch_step();
+    //         ctx.request_repaint();
+    //     } else {
+    //         let now = self.time_now(ctx);
+    //         self.step_when_ready(ctx, now);
+    //
+    //         ctx.request_repaint_after(std::time::Duration::from_secs_f64(
+    //             self.sim_timer.remaining(now),
+    //         ));
+    //         //ctx.request_repaint_after(std::time::Duration::from_millis(16)); // TDJ:
+    //     }
+    // }
+
+    fn step_simulation(&mut self, ctx: &egui::Context) {
         if !self.sim_timer.is_running() {
             return;
         }
@@ -60,10 +79,7 @@ impl TheApp {
         } else {
             let now = self.time_now(ctx);
             self.step_when_ready(ctx, now);
-            ctx.request_repaint_after(std::time::Duration::from_secs_f64(
-                self.sim_timer.remaining(now),
-            ));
-            //ctx.request_repaint_after(std::time::Duration::from_millis(16)); // TDJ:
+            ctx.request_repaint_after(self.conditional_duration(SIM_REPAINT_16MS, now));
         }
     }
 
@@ -78,6 +94,14 @@ impl TheApp {
         if self.sim_timer.ready(now) {
             self.world.advance();
             self.canvas.update(&self.world);
+        }
+    }
+
+    fn conditional_duration(&self, condition: bool, now: f64) -> std::time::Duration {
+        if condition {
+            std::time::Duration::from_millis(16)
+        } else {
+            std::time::Duration::from_secs_f64(self.sim_timer.remaining(now))
         }
     }
 

@@ -2,7 +2,7 @@
 //!
 // timer_gl
 
-const BATCH_SIZE: u32  = 1000;
+// const BATCH_SIZE: u32  = 1000;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum TimerState {
@@ -21,13 +21,13 @@ pub struct SimTimer {
 }
 
 impl SimTimer {
-    pub fn new(interval: f64) -> Self {
+    pub fn new(interval: f64, batch_size: u32) -> Self {
         Self {
             interval,
             last_time: 0.0,
-            //fast: false,
-            fast: true,
-            batch_size: BATCH_SIZE,
+            fast: false,
+            //fast: true,
+            batch_size,
             state: TimerState::Stopped,
         }
     }

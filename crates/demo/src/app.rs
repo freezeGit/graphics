@@ -7,7 +7,7 @@
 
 // app.rs
 
-mod app_internal; // internal functions that do not rquire application specific customizations
+mod app_internal; // internal functions that do not require application specific customizations
 
 use ::gui_lib as gl;
 use egui::Context;
@@ -27,12 +27,17 @@ use crate::ids::*;
 use crate::world::{TheWorld};
 use crate::world::world_demo::ThingState;
 
+const INTERVAL: f64 = 0.5;
+const BATCH_SIZE: u32  = 1000;
+//const SIM_REPAINT_16MS: bool = false;
+const SIM_REPAINT_16MS: bool = true;
+
+
 /// Main application structure.
 ///
 /// Represents the root of the application and contains
 /// the main canvas with all UI components
 /// and a world struct containing program data and logic.
-
 #[derive(Debug)]
 pub struct TheApp {
     world: Box<TheWorld>,
@@ -72,10 +77,7 @@ impl app_gl::UserApp for TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(), // Vec<WidgetMsg>
-            // TDJ: use constant for simulation speed?
-            // sim_timer: Timer::new(Duration::from_millis(500)),
-            //sim_timer: Timer::new(Duration::from_millis(200)),
-            sim_timer: SimTimer::new(0.5), //TDJ:
+            sim_timer: SimTimer::new(INTERVAL, BATCH_SIZE),
         }
     }
 } // end impl run::UserApp
