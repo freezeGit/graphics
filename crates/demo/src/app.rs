@@ -1,7 +1,8 @@
 //! ## Application. struct TheApp is the main structure and entry point of the application.
 //! - Contains a `Canvas` for holding a collection of shapes.
 //! - Provides methods for creating and updating the UI.
-//! - Contains a 'World" which contains all  non-gui program data and logic.
+//! - All method handing methods in this module need application specific customizations.
+//! - Contains a 'World" which contains all non-gui program data and logic.
 //!
 //! This demo app is intended to demonstrate usage of gui_lib, and for use as a template.
 
@@ -27,11 +28,21 @@ use crate::ids::*;
 use crate::world::{TheWorld};
 use crate::world::world_demo::ThingState;
 
-const INTERVAL: f64 = 0.5;
-const BATCH_SIZE: u32  = 1000;
-//const SIM_REPAINT_16MS: bool = false;
-const SIM_REPAINT_16MS: bool = true;
+// --------- User customized application specific constants.  ----------------
+/// User customized simulation parameters
 
+// `INTERVAL`: Time between simulation steps in seconds
+const INTERVAL: f64 = 0.5;
+
+// `BATCH_SIZE`: Number of world advances to perform in a single simulation step
+// during fast-forward of the simulation.
+const BATCH_SIZE: u32  = 1000;
+
+// `SIM_REPAINT_16MS`: If true, the simulation will request repaint at 16ms intervals.
+// This may result in a smoother animation, but may also cause performance issues
+// because of extra refresh requests. If false, the simulation will request repaint
+// at intervals determined by INTERVAL.
+const SIM_REPAINT_16MS: bool = false;
 
 /// Main application structure.
 ///
@@ -64,6 +75,8 @@ impl eframe::App for TheApp {
     }
 } // end impl eframe::App
 
+// app_gl::UserApp trait -------------------------------
+
 /// A trait representing a user-defined application.
 ///
 /// The `new()` function must have an empty parameter list. This guarantees that
@@ -80,11 +93,33 @@ impl app_gl::UserApp for TheApp {
             sim_timer: SimTimer::new(INTERVAL, BATCH_SIZE),
         }
     }
-} // end impl run::UserApp
+} // end impl app_gl::UserApp
 
 impl TheApp {
     // -------- User customization below --------
-    //! All method handing methods in this module need application specific customizations.
+
+    /// What to do with [`WidgetMsg`] messages from widgets and dialogs.
+    /// All method handing methods in this module need application specific customizations.
+    fn handle_msg(&mut self, msg: WidgetMsg) {
+        match msg {
+            WidgetMsg::ButtonClicked(id) => {
+                self.handle_button(id);
+            }
+            WidgetMsg::DragFloatChanged(id, value) => {
+                self.handle_drag_float(id, value);
+            }
+            // WidgetMsg::DialogAcceptedText(id, text) => {
+            //     self.handle_text_entry(id, text);
+            // }
+            WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
+                self.handle_multi_text_entry(id, values);
+            }
+            WidgetMsg::DialogAcceptedDragFloat(id, val) => {
+                self.handle_drag_float_dlg(id, val);
+            }
+            _ => {} // Other messages may not be handled in this app                                                                                                                                other
+        }
+    }
 
     /// Handle button messages
     ///
@@ -173,9 +208,9 @@ impl TheApp {
         }
     }
 
-    /// Handle text entry messages
-    ///
-    /// Requires application specific customization.
+    // /// Handle text entry messages
+    // ///
+    // /// Requires application specific customization.
     // fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
     //     match id {
     //         DLG_ENTER_NAME => {
@@ -186,6 +221,9 @@ impl TheApp {
     //     }
     // }
 
+    /// Handle handle_multi_text_entry messages
+    ///
+    /// Requires application specific customization.
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
             DLG_ENTER_PERSON => {

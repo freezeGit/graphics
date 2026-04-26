@@ -1,3 +1,5 @@
+//! Internal functions that do not require application specific customizations.
+
 // app_internal.rs
 
 use super::*;
@@ -7,11 +9,6 @@ use gui_lib::World;
 // --------- Helper functions for App::update() --------------------------
 
 impl TheApp {
-    /// Get current time in seconds from start of app.
-    pub fn time_now(&self, ctx: &Context) -> f64 {
-        ctx.input(|i| i.time)
-    }
-
     /// Establish event loop.
     ///
     /// Render canvas and collect any emitted widgets messages in [`Self::msgs`].
@@ -24,7 +21,7 @@ impl TheApp {
         // Collect all messages from widgets into self.msgs.
         self.canvas.canvas.render(ctx, &mut self.msgs);
 
-        // If an open dialog has just been closed or is already NilDlg
+        // If an open dialog has just been closed or is already NilDlg,
         // set or reset the active dialog to NilDlg and run simulation.
         if self
             .canvas
@@ -49,24 +46,6 @@ impl TheApp {
     /// to run the next simulation step. If so, it advances the state of the
     /// simulation's world model by one step by calling [`TheWorld::advance`] and then
     /// updates the canvas to reflect the world’s new state by calling [`TheCanvas::update`].
-    // fn step_simulation(&mut self, ctx: &egui::Context) {
-    //     if !self.sim_timer.is_running() {
-    //         return;
-    //     }
-    //
-    //     if self.sim_timer.fast_forward() {
-    //         self.batch_step();
-    //         ctx.request_repaint();
-    //     } else {
-    //         let now = self.time_now(ctx);
-    //         self.step_when_ready(ctx, now);
-    //
-    //         ctx.request_repaint_after(std::time::Duration::from_secs_f64(
-    //             self.sim_timer.remaining(now),
-    //         ));
-    //         //ctx.request_repaint_after(std::time::Duration::from_millis(16)); // TDJ:
-    //     }
-    // }
 
     fn step_simulation(&mut self, ctx: &egui::Context) {
         if !self.sim_timer.is_running() {
@@ -81,6 +60,11 @@ impl TheApp {
             self.step_when_ready(ctx, now);
             ctx.request_repaint_after(self.conditional_duration(SIM_REPAINT_16MS, now));
         }
+    }
+
+    /// Get current time in seconds from start of app.
+    pub fn time_now(&self, ctx: &Context) -> f64 {
+        ctx.input(|i| i.time)
     }
 
     fn batch_step(&mut self) {
@@ -125,30 +109,6 @@ impl TheApp {
 
             // Update canvas to reflect all state changes:
             self.canvas.update(&self.world);
-        }
-    }
-
-    /// What to do with [`WidgetMsg`] messages from widgets and dialogs.
-    /// This is the only communication between the GUI and the program code.
-    /// Program data and logic are encapsulated in struct [`TheWorld`].
-    fn handle_msg(&mut self, msg: WidgetMsg) {
-        match msg {
-            WidgetMsg::ButtonClicked(id) => {
-                self.handle_button(id);
-            }
-            WidgetMsg::DragFloatChanged(id, value) => {
-                self.handle_drag_float(id, value);
-            }
-            // WidgetMsg::DialogAcceptedText(id, text) => {
-            //     self.handle_text_entry(id, text);
-            // }
-            WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
-                self.handle_multi_text_entry(id, values);
-            }
-            WidgetMsg::DialogAcceptedDragFloat(id, val) => {
-                self.handle_drag_float_dlg(id, val);
-            }
-            _ => {}
         }
     }
 } // end impl TheApp
