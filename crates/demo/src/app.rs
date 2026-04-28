@@ -183,6 +183,15 @@ impl TheApp {
                 }
             }
 
+            BTN_SLOW_FAST => {
+                if self.sim_timer.fast_forward() {
+                    //self.sim_timer.set_normal_speed();
+                    self.sim_timer.exit_fast_forward();
+                } else {
+                    self.sim_timer.set_fast_forward();
+                }
+            }
+
             BTN_STATE_A => {
                 self.world.thing.state = ThingState::StateA;
             }

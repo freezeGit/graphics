@@ -33,7 +33,8 @@ impl TheApp {
             self.canvas.canvas.set_dialog(Box::new(NilDlg)); // NilDlg is always closed.
             self.step_simulation(ctx);
         } else {
-            // Continue timer from current time when the dialog is closed.
+            // Keep simulation timer synchronized while dialog is open,
+            // so simulation does not jump ahead when the dialog closes.
             self.sim_timer.resync();
         }
     }

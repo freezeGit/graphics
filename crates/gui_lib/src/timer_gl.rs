@@ -2,8 +2,6 @@
 //!
 // timer_gl
 
-// const BATCH_SIZE: u32  = 1000;
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum TimerState {
     Stopped,        // Call to ready() returns false (Timer not active)
@@ -26,7 +24,6 @@ impl SimTimer {
             interval,
             last_time: 0.0,
             fast: false,
-            //fast: true,
             batch_size,
             state: TimerState::Stopped,
         }
@@ -89,13 +86,20 @@ impl SimTimer {
             TimerState::Running => (self.interval - (now - self.last_time)).max(0.0),
         }
     }
-
-    pub fn set_fast_forward(&mut self, ff: bool) {
-        self.fast = ff;
+    // pub fn set_normal_speed(&mut self) {
+    //     self.fast = false;
+    // }
+    pub fn set_fast_forward(&mut self) {
+        self.fast = true;
     }
-
     pub fn fast_forward(&self) -> bool {
         self.fast
+    }
+    pub fn exit_fast_forward(&mut self) {
+        if self.fast {
+            self.fast = false;
+            self.resync();
+        }
     }
     pub fn set_batch_size(&mut self, batch_size: u32) {
         self.batch_size = batch_size;
