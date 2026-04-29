@@ -1,7 +1,10 @@
 [workspace]
 members = [
     "crates/gui_lib",
-    "crates/demo"
+    "crates/demo",
+    "crates/sbx"
 ]
+
+default-members = ["crates/gui_lib"]
 
 resolver = "2"

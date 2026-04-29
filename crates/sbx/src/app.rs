@@ -130,8 +130,9 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "Demonstration app using the gui_lib library.\n\
-                    Intended to be used as a template to get started.\n\
+                    "Sandbox app using the gui_lib library.\n\
+                    Intended to be used as a sandbox\n\
+                    to experiment with gui_lib.\n\
                     Written in Rust + egui.",
                 )));
             }

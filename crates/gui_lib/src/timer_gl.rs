@@ -4,9 +4,9 @@
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum TimerState {
-    Stopped,        // Call to ready() returns false (Timer not active)
-    WaitingForSync, // Call to ready(): sync to current time
-    Running,        // Call to ready() returns true if interval has elapsed since last call
+    Stopped,        // Call to ready(): returns false (Timer not active).
+    WaitingForSync, // Call to ready(): sync to current time and return false.
+    Running,        // Call to ready(): returns true if interval has elapsed since last call.
 }
 
 #[derive(Debug)]
