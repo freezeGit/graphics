@@ -1,8 +1,8 @@
 //! ids used to identify widgets and dialogs
 
 use ::gui_lib as gl;
-use gl::{ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, SliderId, TextEntryDlgId};
-use gui_lib::MultiTextEntryDlgId;
+use gl::{ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId, SliderId, TextEntryDlgId, MultiTextEntryDlgId, RadioBoxesDlgId};
+//use gui_lib::{MultiTextEntryDlgId, RadioBoxesDlgId};
 
 // ---------- Widget ids
 pub(crate) const SLIDER_GAUGE: SliderId = SliderId(1);
@@ -19,10 +19,11 @@ pub(crate) const BTN_PERSON: ButtonId = ButtonId(6);
 //pub(crate) const BTN_PERSON: ButtonId = ButtonId(9);
 pub(crate) const BTN_ENTER_VALUE: ButtonId = ButtonId(7);
 pub(crate) const BTN_SLOW_FAST: ButtonId = ButtonId(8);
+pub(crate) const BTN_SIM: ButtonId = ButtonId(9);
 
 // ---------- Dialog ids
 pub(crate) const DLG_ABOUT: MessageBoxDlgId = MessageBoxDlgId(1);
 pub(crate) const DLG_ENTER_NAME: TextEntryDlgId = TextEntryDlgId(1);
-//pub(crate) const DLG_ENTER_PERSON: TextEntryDlgId = TextEntryDlgId(1);
 pub(crate) const DLG_ENTER_PERSON: MultiTextEntryDlgId = MultiTextEntryDlgId(1);
 pub(crate) const DLG_ENTER_VALUE: DragFloatDlgId = DragFloatDlgId(1);
+pub(crate) const DLG_SIM_STATE: RadioBoxesDlgId = RadioBoxesDlgId(1);

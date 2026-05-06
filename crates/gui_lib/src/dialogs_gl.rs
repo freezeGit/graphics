@@ -3,7 +3,9 @@
 // dialogs_gl
 
 use crate::egui;
-use crate::ids_gl::{DragFloatDlgId, MessageBoxDlgId, MultiTextEntryDlgId, TextEntryDlgId};
+use crate::ids_gl::{
+    DragFloatDlgId, MessageBoxDlgId, MultiTextEntryDlgId, TextEntryDlgId, RadioBoxesDlgId,
+};
 use crate::messages_gl::WidgetMsg;
 
 // -----------------------------
@@ -269,7 +271,8 @@ impl MultiTextEntryDlg {
     {
         Self {
             id,
-            egui_id: egui::Id::new(("person_dlg", id)),
+            //egui_id: egui::Id::new(("person_dlg", id)),
+            egui_id: egui::Id::new(("multi_text_entry_dlg", id)),
             title: title.into(),
             fields: fields.into_iter().collect(),
         }
@@ -315,3 +318,136 @@ impl Dialog for MultiTextEntryDlg {
         close
     }
 } // end of impl Dialog for MultiTextEntryDlg
+
+// ---------------------------------------------------
+
+// ------------ RadioBoxesDlg ------------------------------
+/// An array of TextEntryField's is used to construct a MultiTextEntryDlg.
+#[derive(Debug, Clone)]
+pub struct RadioBoxesField {
+    //pub id: String,
+    pub selected: String,
+    pub alternative: String,
+    pub label: String,
+}
+
+impl RadioBoxesField {
+    pub fn new(selected: impl Into<String>, alternative: impl Into<String>, label: impl Into<String>) -> Self {
+        Self {
+            selected: selected.into(),
+            alternative: alternative.into(),
+            label: label.into(),
+        }
+    }
+}
+
+// /// Displays a dialog with a title,
+// /// and a number of prompt, text entry fields.
+// /// Outputs the texts entered by the user as a Vec<(String, String)
+// /// (associated with the emitted message).
+// /// The first value in the tuple is the id of the field, and the second is the text entered.
+// /// Emits WidgetMsg::DialogAcceptedText(MultiTextEntryDlgId, Vec<(String, String)>).
+#[derive(Debug)]
+pub struct RadioBoxesDlg {
+    pub id: RadioBoxesDlgId,
+    pub egui_id: egui::Id,
+    pub title: String,
+    pub fields: Vec<RadioBoxesField>,
+}
+
+impl RadioBoxesDlg {
+    pub fn new<I>(id: RadioBoxesDlgId, title: impl Into<String>, fields: I) -> Self
+    where
+        I: IntoIterator<Item = RadioBoxesField>,
+    {
+        Self {
+            id,
+            egui_id: egui::Id::new(("radio_boxes_dlg", id)),
+            title: title.into(),
+            fields: fields.into_iter().collect(),
+        }
+    }
+} // end of RadioBoxesDlg
+
+impl Dialog for RadioBoxesDlg {
+    fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+        let mut close = false;
+        const DEFAULT_SIZE: f32 = 20.0;
+
+        egui::Modal::new(self.egui_id).show(ctx, |ui| {
+            ui.set_min_width(350.0);
+
+            ui.heading(egui::RichText::new(&self.title).size(DEFAULT_SIZE));
+            ui.separator();
+
+            // for f in &mut self.fields {
+            //     ui.horizontal(|ui| {
+            //         ui.label(egui::RichText::new(format!("{}:", f.prompt)).size(DEFAULT_SIZE));
+            //         ui.add(egui::TextEdit::singleline(&mut f.text).font(egui::TextStyle::Heading));
+            //     });
+            // }
+
+            ui.add_space(15.0);
+            ui.horizontal(|ui| {
+                if ui.button("OK").clicked() {
+                    // let values = self
+                    //     .fields
+                    //     .iter()
+                    //     .map(|f| (f.id.clone(), f.text.clone()))
+                    //     .collect();
+                    //
+                    // out.push(WidgetMsg::DialogAcceptedMultiTextEntry(self.id, values));
+                    out.push(WidgetMsg::DialogAcceptedRadioBoxes(self.id, "Output".to_string()));
+                    close = true;
+                }
+                if ui.button("Cancel").clicked() {
+                    close = true;
+                }
+            });
+        });
+
+        close
+    }
+} // end of impl Dialog for MultiTextEntryDlg
+
+// impl Dialog for MultiTextEntryDlg {
+//     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
+//         let mut close = false;
+//         const DEFAULT_SIZE: f32 = 20.0;
+//
+//         egui::Modal::new(self.egui_id).show(ctx, |ui| {
+//             ui.set_min_width(350.0);
+//
+//             ui.heading(egui::RichText::new(&self.title).size(DEFAULT_SIZE));
+//             ui.separator();
+//
+//             for f in &mut self.fields {
+//                 ui.horizontal(|ui| {
+//                     ui.label(egui::RichText::new(format!("{}:", f.prompt)).size(DEFAULT_SIZE));
+//                     ui.add(egui::TextEdit::singleline(&mut f.text).font(egui::TextStyle::Heading));
+//                 });
+//             }
+//
+//             ui.add_space(15.0);
+//             ui.horizontal(|ui| {
+//                 if ui.button("OK").clicked() {
+//                     let values = self
+//                         .fields
+//                         .iter()
+//                         .map(|f| (f.id.clone(), f.text.clone()))
+//                         .collect();
+//
+//                     out.push(WidgetMsg::DialogAcceptedMultiTextEntry(self.id, values));
+//                     close = true;
+//                 }
+//                 if ui.button("Cancel").clicked() {
+//                     close = true;
+//                 }
+//             });
+//         });
+//
+//         close
+//     }
+// } // end of impl Dialog for MultiTextEntryDlg
+
+

@@ -37,3 +37,6 @@ pub struct DragFloatDlgId(pub DialogId);
 #[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct MultiTextEntryDlgId(pub DialogId);
 
+#[derive(Default, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct RadioBoxesDlgId(pub DialogId);
+

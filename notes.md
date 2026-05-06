@@ -1,4 +1,7 @@
-    pub fn run_demo() -> Result<(), eframe::Error> {
+
+
+----------------------------------------------------------------------
+pub fn run_demo() -> Result<(), eframe::Error> {
         //let mut app = Box::new(DemoApp::new());
         // let mut native_options = eframe::NativeOptions::default();
         // native_options.viewport = native_options.viewport.with_inner_size(vec2(1200.0, 800.0));

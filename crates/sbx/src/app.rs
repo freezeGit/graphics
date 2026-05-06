@@ -14,7 +14,8 @@ use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
     ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
-    MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, SimTimer,
+    MultiTextEntryDlgId, NilDlg, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField,
+    RadioBoxesDlg, RadioBoxesField,
     WidgetMsg, app_gl,
 };
 use std::time::Duration;
@@ -25,7 +26,7 @@ use crate::canvas::TheCanvas;
 //     DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
 // };
 use crate::ids::*;
-use crate::world::{TheWorld};
+use crate::world::TheWorld;
 use crate::world::world_demo::ThingState;
 
 // --------- User customized application specific constants.  ----------------
@@ -36,7 +37,7 @@ const INTERVAL: f64 = 0.5;
 
 // `BATCH_SIZE`: Number of world advances to perform in a single simulation step
 // during fast-forward of the simulation.
-const BATCH_SIZE: u32  = 1001;
+const BATCH_SIZE: u32 = 1001;
 
 // `SIM_REPAINT_16MS`: If true, the simulation will request repaint at 16ms intervals.
 // This may result in a smoother animation, but may also cause performance issues
@@ -155,6 +156,34 @@ impl TheApp {
                     )));
             }
 
+            BTN_SIM => {
+                self.canvas
+                    .canvas
+                    .set_dialog(Box::new(RadioBoxesDlg::new(
+                        DLG_SIM_STATE,
+                        "Sim state",
+                        [
+                            RadioBoxesField::new("name", "Name", "lab"),
+                            RadioBoxesField::new("city", "City", "lab"),
+                            RadioBoxesField::new(
+                                "address",
+                                "Address",
+                                //self.world.person.address.clone(),
+                               "lab",
+                            ),
+                        ],
+                        // [
+                        //     RadioBoxesField::new("name", "Name", self.world.person.name.clone()),
+                        //     RadioBoxesField::new("city", "City", self.world.person.city.clone()),
+                        //     RadioBoxesField::new(
+                        //         "address",
+                        //         "Address",
+                        //         self.world.person.address.clone(),
+                        //     ),
+                        // ],
+                    )));
+            }
+
             // BTN_ENTER_NAME => {
             //     self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
             //         DLG_ENTER_NAME,
@@ -163,7 +192,6 @@ impl TheApp {
             //         self.world.name.clone(),
             //     )));
             // }
-
             BTN_ENTER_VALUE => {
                 let mut dlg = DragFloatDlg::new(
                     DLG_ENTER_VALUE,
