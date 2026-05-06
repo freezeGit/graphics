@@ -22,5 +22,5 @@ pub enum WidgetMsg {
     DialogAcceptedText(TextEntryDlgId, String),
     DialogAcceptedMultiTextEntry(MultiTextEntryDlgId, Vec<(String, String)>),
     DialogAcceptedDragFloat(DragFloatDlgId, f32),
-    DialogAcceptedRadioBoxes(RadioBoxesDlgId, String),
+    DialogAcceptedRadioBoxes(RadioBoxesDlgId, i32),
 }

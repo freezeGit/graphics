@@ -4,9 +4,9 @@
 //! - All method handing methods in this module need application specific customizations.
 //! - Contains a 'World" which contains all non-gui program data and logic.
 //!
-//! This demo app is intended to demonstrate usage of gui_lib, and for use as a template.
+//! This demo app1 is intended to demonstrate usage of gui_lib, and for use as a template.
 
-// app.rs
+// app1.rs
 
 mod app_internal; // internal functions that do not require application specific customizations
 
@@ -117,7 +117,7 @@ impl TheApp {
             WidgetMsg::DialogAcceptedDragFloat(id, val) => {
                 self.handle_drag_float_dlg(id, val);
             }
-            _ => {} // Other messages may not be handled in this app                                                                                                                                other
+            _ => {} // Other messages may not be handled in this app1                                                                                                                                other
         }
     }
 
@@ -130,7 +130,7 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "Demonstration app using the gui_lib library.\n\
+                    "Demonstration app1 using the gui_lib library.\n\
                     Intended to be used as a template to get started.\n\
                     Written in Rust + egui.",
                 )));

@@ -271,7 +271,6 @@ impl MultiTextEntryDlg {
     {
         Self {
             id,
-            //egui_id: egui::Id::new(("person_dlg", id)),
             egui_id: egui::Id::new(("multi_text_entry_dlg", id)),
             title: title.into(),
             fields: fields.into_iter().collect(),
@@ -282,17 +281,17 @@ impl MultiTextEntryDlg {
 impl Dialog for MultiTextEntryDlg {
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
         let mut close = false;
-        const DEFAULT_SIZE: f32 = 20.0;
+        const MT_DEFAULT_FONT_SIZE: f32 = 20.0;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
             ui.set_min_width(350.0);
 
-            ui.heading(egui::RichText::new(&self.title).size(DEFAULT_SIZE));
+            ui.heading(egui::RichText::new(&self.title).size(MT_DEFAULT_FONT_SIZE));
             ui.separator();
 
             for f in &mut self.fields {
                 ui.horizontal(|ui| {
-                    ui.label(egui::RichText::new(format!("{}:", f.prompt)).size(DEFAULT_SIZE));
+                    ui.label(egui::RichText::new(format!("{}:", f.prompt)).size(MT_DEFAULT_FONT_SIZE));
                     ui.add(egui::TextEdit::singleline(&mut f.text).font(egui::TextStyle::Heading));
                 });
             }
@@ -322,20 +321,21 @@ impl Dialog for MultiTextEntryDlg {
 // ---------------------------------------------------
 
 // ------------ RadioBoxesDlg ------------------------------
-/// An array of TextEntryField's is used to construct a MultiTextEntryDlg.
+/// An array of RadioBoxesField's is used to construct a MultiTextEntryDlg.
 #[derive(Debug, Clone)]
 pub struct RadioBoxesField {
     //pub id: String,
-    pub selected: String,
-    pub alternative: String,
+    //pub selected: i32,
+    pub choice: i32,
     pub label: String,
 }
 
 impl RadioBoxesField {
-    pub fn new(selected: impl Into<String>, alternative: impl Into<String>, label: impl Into<String>) -> Self {
+    //pub fn new(selected: impl Into<String>, alternative: impl Into<String>, label: impl Into<String>) -> Self {
+    pub fn new(choice: i32, label: impl Into<String>) -> Self {
         Self {
-            selected: selected.into(),
-            alternative: alternative.into(),
+            //selected,
+            choice,
             label: label.into(),
         }
     }
@@ -352,11 +352,12 @@ pub struct RadioBoxesDlg {
     pub id: RadioBoxesDlgId,
     pub egui_id: egui::Id,
     pub title: String,
+    pub selected: i32,
     pub fields: Vec<RadioBoxesField>,
 }
 
 impl RadioBoxesDlg {
-    pub fn new<I>(id: RadioBoxesDlgId, title: impl Into<String>, fields: I) -> Self
+    pub fn new<I>(id: RadioBoxesDlgId, title: impl Into<String>, selected: i32, fields: I) -> Self
     where
         I: IntoIterator<Item = RadioBoxesField>,
     {
@@ -364,6 +365,7 @@ impl RadioBoxesDlg {
             id,
             egui_id: egui::Id::new(("radio_boxes_dlg", id)),
             title: title.into(),
+            selected,
             fields: fields.into_iter().collect(),
         }
     }
@@ -372,32 +374,22 @@ impl RadioBoxesDlg {
 impl Dialog for RadioBoxesDlg {
     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
         let mut close = false;
-        const DEFAULT_SIZE: f32 = 20.0;
+        const RB_DEFAULT_FONT_SIZE: f32 = 20.0;
 
         egui::Modal::new(self.egui_id).show(ctx, |ui| {
             ui.set_min_width(350.0);
 
-            ui.heading(egui::RichText::new(&self.title).size(DEFAULT_SIZE));
+            ui.heading(egui::RichText::new(&self.title).size(RB_DEFAULT_FONT_SIZE));
             ui.separator();
 
-            // for f in &mut self.fields {
-            //     ui.horizontal(|ui| {
-            //         ui.label(egui::RichText::new(format!("{}:", f.prompt)).size(DEFAULT_SIZE));
-            //         ui.add(egui::TextEdit::singleline(&mut f.text).font(egui::TextStyle::Heading));
-            //     });
-            // }
+            for f in &mut self.fields {
+                ui.radio_value(&mut self.selected, f.choice, egui::RichText::new(&f.label).size(RB_DEFAULT_FONT_SIZE),);
+            }
 
             ui.add_space(15.0);
             ui.horizontal(|ui| {
                 if ui.button("OK").clicked() {
-                    // let values = self
-                    //     .fields
-                    //     .iter()
-                    //     .map(|f| (f.id.clone(), f.text.clone()))
-                    //     .collect();
-                    //
-                    // out.push(WidgetMsg::DialogAcceptedMultiTextEntry(self.id, values));
-                    out.push(WidgetMsg::DialogAcceptedRadioBoxes(self.id, "Output".to_string()));
+                    out.push(WidgetMsg::DialogAcceptedRadioBoxes(self.id, self.selected));
                     close = true;
                 }
                 if ui.button("Cancel").clicked() {

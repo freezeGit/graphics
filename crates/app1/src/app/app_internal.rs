@@ -63,7 +63,7 @@ impl TheApp {
         }
     }
 
-    /// Get current time in seconds from start of app.
+    /// Get current time in seconds from start of app1.
     pub fn time_now(&self, ctx: &Context) -> f64 {
         ctx.input(|i| i.time)
     }

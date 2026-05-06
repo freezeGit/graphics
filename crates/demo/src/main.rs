@@ -81,7 +81,7 @@ mod world;
 // -----------------------------------------------------------
 
 /// Constants for application configuration.
-const APP_NAME: &str = "Demo app for gui_lib";
+const APP_NAME: &str = "Demo app1 for gui_lib";
 const XWVP: f32 = 1200.0; // Width of viewport in pixels.
 const YHVP: f32 = 800.0; // Height of viewport in pixels.
 

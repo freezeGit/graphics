@@ -15,7 +15,7 @@ use crate::world::world_demo::{Gauge, ThingState, Thing, Signal, TrafficLight, P
 
 /// TheWorld struct encapsulates application data and logic.
 /// It has no dependence on gui_lib and no dependence on egui.
-/// It has no dependence on the app struct or the canvas struct.
+/// It has no dependence on the app1 struct or the canvas struct.
 #[derive(Debug)]
 pub(crate) struct TheWorld {
     pub(crate) frame_number: u64, // TDJ: for batching

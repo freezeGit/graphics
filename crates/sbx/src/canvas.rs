@@ -42,7 +42,7 @@ const BACKGROUND_COLOR: Color32 = gui_lib::BKG_DEFAULT;
 /// A container for rendering and managing graphical shapes
 /// and interactive widgets.
 ///
-/// Owns the app's BasicCanvas and selected concrete view handles.
+/// Owns the app1's BasicCanvas and selected concrete view handles.
 /// Builds the visual scene and updates selected elements from TheWorld.
 #[derive(Debug)]
 pub(crate) struct TheCanvas {

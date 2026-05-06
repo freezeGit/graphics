@@ -4,9 +4,9 @@
 //! - All method handing methods in this module need application specific customizations.
 //! - Contains a 'World" which contains all non-gui program data and logic.
 //!
-//! This demo app is intended to demonstrate usage of gui_lib, and for use as a template.
+//! This demo app1 is intended to demonstrate usage of gui_lib, and for use as a template.
 
-// app.rs
+// app1.rs
 
 mod app_internal; // internal functions that do not require application specific customizations
 
@@ -14,9 +14,8 @@ use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
     ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
-    MultiTextEntryDlgId, NilDlg, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField,
-    RadioBoxesDlg, RadioBoxesField,
-    WidgetMsg, app_gl,
+    MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesField, SimTimer, SliderId, TextEntryDlg,
+    TextEntryDlgId, TextEntryField, WidgetMsg, app_gl,
 };
 use std::time::Duration;
 
@@ -118,7 +117,7 @@ impl TheApp {
             WidgetMsg::DialogAcceptedDragFloat(id, val) => {
                 self.handle_drag_float_dlg(id, val);
             }
-            _ => {} // Other messages may not be handled in this app                                                                                                                                other
+            _ => {} // Other messages may not be handled in this app1                                                                                                                                other
         }
     }
 
@@ -131,7 +130,7 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "Sandbox app using the gui_lib library.\n\
+                    "Sandbox app1 using the gui_lib library.\n\
                     Intended to be used as a sandbox\n\
                     to experiment with gui_lib.\n\
                     Written in Rust + egui.",
@@ -157,31 +156,19 @@ impl TheApp {
             }
 
             BTN_SIM => {
-                self.canvas
-                    .canvas
-                    .set_dialog(Box::new(RadioBoxesDlg::new(
-                        DLG_SIM_STATE,
-                        "Sim state",
-                        [
-                            RadioBoxesField::new("name", "Name", "lab"),
-                            RadioBoxesField::new("city", "City", "lab"),
-                            RadioBoxesField::new(
-                                "address",
-                                "Address",
-                                //self.world.person.address.clone(),
-                               "lab",
-                            ),
-                        ],
-                        // [
-                        //     RadioBoxesField::new("name", "Name", self.world.person.name.clone()),
-                        //     RadioBoxesField::new("city", "City", self.world.person.city.clone()),
-                        //     RadioBoxesField::new(
-                        //         "address",
-                        //         "Address",
-                        //         self.world.person.address.clone(),
-                        //     ),
-                        // ],
-                    )));
+                const CHOICE_RUN: i32 = 1;
+                const CHOICE_PAUSE: i32 = 2;
+                const CHOICE_FAST: i32 = 3;
+                self.canvas.canvas.set_dialog(Box::new(RadioBoxesDlg::new(
+                    DLG_SIM_STATE,
+                    "Sim state",
+                    CHOICE_RUN,
+                    [
+                        RadioBoxesField::new(CHOICE_RUN, "Run"),
+                        RadioBoxesField::new(CHOICE_PAUSE, "Pause"),
+                        RadioBoxesField::new(CHOICE_FAST, "Fast-forward"),
+                    ],
+                )));
             }
 
             // BTN_ENTER_NAME => {
