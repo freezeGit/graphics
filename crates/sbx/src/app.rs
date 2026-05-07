@@ -12,11 +12,7 @@ mod app_internal; // internal functions that do not require application specific
 
 use ::gui_lib as gl;
 use egui::Context;
-use gui_lib::{
-    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
-    MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesField, SimTimer, SliderId, TextEntryDlg,
-    TextEntryDlgId, TextEntryField, WidgetMsg, app_gl,
-};
+use gui_lib::{ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg, app_gl, RadioBoxesDlgId, DialogId};
 use std::time::Duration;
 
 use crate::canvas::TheCanvas;
@@ -43,6 +39,12 @@ const BATCH_SIZE: u32 = 1001;
 // because of extra refresh requests. If false, the simulation will request repaint
 // at intervals determined by INTERVAL.
 const SIM_REPAINT_16MS: bool = false;
+
+const CHOICE_RUN: i32 = 1;
+const CHOICE_PAUSE: i32 = 2;
+const CHOICE_FAST: i32 = 3;
+//const CHOICE_RESET: i32 = 4;
+const CHOICE_OTHER: i32 = 100;
 
 /// Main application structure.
 ///
@@ -111,6 +113,9 @@ impl TheApp {
             // WidgetMsg::DialogAcceptedText(id, text) => {
             //     self.handle_text_entry(id, text);
             // }
+            WidgetMsg::DialogAcceptedRadioBoxes(id, value) => {
+                self.handle_radio_boxes(id, value);
+            }
             WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
                 self.handle_multi_text_entry(id, values);
             }
@@ -154,16 +159,11 @@ impl TheApp {
                         ],
                     )));
             }
-
+            //normal_speed
             BTN_SIM => {
-                const CHOICE_RUN: i32 = 1;
-                const CHOICE_PAUSE: i32 = 2;
-                const CHOICE_FAST: i32 = 3;
-                //const CHOICE_RESET: i32 = 4;
-                const CHOICE_OTHER: i32 = 3;
-
                 let current_choice =
-                    if self.sim_timer.is_running() && !self.sim_timer.fast_forward() {
+                    //if self.sim_timer.is_running() && !self.sim_timer.fast_forward() {
+                    if self.sim_timer.is_running() && self.sim_timer.normal_speed() {
                         CHOICE_RUN
                     } else if self.sim_timer.is_running() && self.sim_timer.fast_forward() {
                         CHOICE_FAST
@@ -260,7 +260,41 @@ impl TheApp {
     //     }
     // }
 
-    /// Handle handle_multi_text_entry messages
+
+
+
+    /// Handle DialogAcceptedRadioBoxes messages
+    ///
+    /// Requires application specific customization.
+    fn handle_radio_boxes(&mut self, id: RadioBoxesDlgId, value: i32) {
+        match id {
+            DLG_SIM_STATE => {
+                match value {
+                    // CHOICE_RUN => {
+                    //     self.sim_timer.set_normal_speed();
+                    //     self.sim_timer.run();
+                    // }
+                    CHOICE_RUN => {
+                        self.sim_timer.set_to_run_normal_speed();
+                    }
+                    CHOICE_PAUSE => {
+                        self.sim_timer.pause();
+                    }
+                    // CHOICE_FAST => {
+                    //     self.sim_timer.set_fast_forward();
+                    //     self.sim_timer.run();
+                    // }
+                    CHOICE_FAST => {
+                        self.sim_timer.set_to_run_fast_forward();
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        }
+    }
+
+    /// Handle DialogAcceptedMultiTextEntry messages
     ///
     /// Requires application specific customization.
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {

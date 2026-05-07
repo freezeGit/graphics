@@ -34,27 +34,16 @@ impl SimTimer {
             self.state = TimerState::WaitingForSync;
         }
     }
-
     pub fn pause(&mut self) {
         self.state = TimerState::Stopped;
     }
-
     pub fn resync(&mut self) {
         if self.state != TimerState::Stopped {
             self.state = TimerState::WaitingForSync;
         }
     }
-
     pub fn is_running(&self) -> bool {
         self.state != TimerState::Stopped
-    }
-
-    pub fn set_interval(&mut self, interval: f64) {
-        self.interval = interval;
-    }
-
-    pub fn interval(&self) -> f64 {
-        self.interval
     }
 
     pub fn ready(&mut self, now: f64) -> bool {
@@ -86,9 +75,13 @@ impl SimTimer {
             TimerState::Running => (self.interval - (now - self.last_time)).max(0.0),
         }
     }
-    // pub fn set_normal_speed(&mut self) {
-    //     self.fast = false;
-    // }
+
+    pub fn set_normal_speed(&mut self) {
+        self.fast = false;
+    }
+    pub fn normal_speed(&self) -> bool {
+        !self.fast
+    }
     pub fn set_fast_forward(&mut self) {
         self.fast = true;
     }
@@ -100,6 +93,22 @@ impl SimTimer {
             self.fast = false;
             self.resync();
         }
+    }
+
+    pub fn set_to_run_normal_speed(&mut self) {
+        self.exit_fast_forward();
+        self.run();
+    }
+    pub fn set_to_run_fast_forward(&mut self) {
+        self.set_fast_forward();
+        self.run();
+    }
+
+    pub fn set_interval(&mut self, interval: f64) {
+        self.interval = interval;
+    }
+    pub fn interval(&self) -> f64 {
+        self.interval
     }
     pub fn set_batch_size(&mut self, batch_size: u32) {
         self.batch_size = batch_size;
