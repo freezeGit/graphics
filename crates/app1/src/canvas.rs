@@ -65,7 +65,10 @@ impl TheCanvas {
         Self::init_widgets(&mut canvas);
         let view_handles = Self::init_shapes(&mut canvas);
 
-        Self { canvas, view_handles }
+        Self {
+            canvas,
+            view_handles,
+        }
     }
 
     fn init_shapes(canvas: &mut BasicCanvas) -> ViewHandles {
@@ -291,7 +294,10 @@ impl TheCanvas {
         } else {
             Color32::GREEN
         };
-        self.view_handles.tl_circle2.borrow_mut().set_fill_color(tlc);
+        self.view_handles
+            .tl_circle2
+            .borrow_mut()
+            .set_fill_color(tlc);
 
         // Update gauge pointer
         let mut arrow_head = self.view_handles.arrow_head.borrow_mut();
@@ -303,11 +309,17 @@ impl TheCanvas {
         // Update thing state, color coded
         match world.thing.state {
             ThingState::StateA => {
-                self.view_handles.rect.borrow_mut().set_fill_color(Color32::GOLD);
+                self.view_handles
+                    .rect
+                    .borrow_mut()
+                    .set_fill_color(Color32::GOLD);
                 self.view_handles.stxt.borrow_mut().set_text("State A");
             }
             ThingState::StateB => {
-                self.view_handles.rect.borrow_mut().set_fill_color(Color32::CYAN);
+                self.view_handles
+                    .rect
+                    .borrow_mut()
+                    .set_fill_color(Color32::CYAN);
                 self.view_handles.stxt.borrow_mut().set_text("State B");
             }
             _ => {}
@@ -319,13 +331,22 @@ impl TheCanvas {
 
         // Update person
         let person_name = format!("Name: {}", world.person.name);
-        self.view_handles.stxtname.borrow_mut().set_text(person_name);
+        self.view_handles
+            .stxtname
+            .borrow_mut()
+            .set_text(person_name);
 
         let person_city = format!("City: {}", world.person.city);
-        self.view_handles.stxtcity.borrow_mut().set_text(person_city);
+        self.view_handles
+            .stxtcity
+            .borrow_mut()
+            .set_text(person_city);
 
         let person_address = format!("Address: {}", world.person.address);
-        self.view_handles.stxtaddress.borrow_mut().set_text(person_address);
+        self.view_handles
+            .stxtaddress
+            .borrow_mut()
+            .set_text(person_address);
 
         //Update val_string
         let val = world.value;

@@ -5,8 +5,8 @@
 use crate::Color32;
 use crate::egui::RichText;
 //use crate::ids::{ButtonId, DragFloatId, SliderId, WidgetMsg};
-use crate::ids_gl::{ButtonId, DragFloatId, SliderId};
 use crate::WidgetMsg;
+use crate::ids_gl::{ButtonId, DragFloatId, SliderId};
 
 /// Trait for invoking any widget in the UI.
 /// Outputs a vector of [`WidgetMsg`]s.

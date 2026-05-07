@@ -14,7 +14,7 @@ use ::gui_lib as gl;
 use egui::Context;
 use gui_lib::{
     ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
-    MultiTextEntryDlgId, NilDlg, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, SimTimer,
+    MultiTextEntryDlgId, NilDlg, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField,
     WidgetMsg, app_gl,
 };
 use std::time::Duration;
@@ -25,7 +25,7 @@ use crate::canvas::TheCanvas;
 //     DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
 // };
 use crate::ids::*;
-use crate::world::{TheWorld};
+use crate::world::TheWorld;
 use crate::world::world_demo::ThingState;
 
 // --------- User customized application specific constants.  ----------------
@@ -36,7 +36,7 @@ const INTERVAL: f64 = 0.5;
 
 // `BATCH_SIZE`: Number of world advances to perform in a single simulation step
 // during fast-forward of the simulation.
-const BATCH_SIZE: u32  = 1001;
+const BATCH_SIZE: u32 = 1001;
 
 // `SIM_REPAINT_16MS`: If true, the simulation will request repaint at 16ms intervals.
 // This may result in a smoother animation, but may also cause performance issues
@@ -130,9 +130,8 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "Demonstration app1 using the gui_lib library.\n\
-                    Intended to be used as a template to get started.\n\
-                    Written in Rust + egui.",
+                    "App using the gui_lib library.\n\
+                     Written in Rust + egui.",
                 )));
             }
 
@@ -162,7 +161,6 @@ impl TheApp {
             //         self.world.name.clone(),
             //     )));
             // }
-
             BTN_ENTER_VALUE => {
                 let mut dlg = DragFloatDlg::new(
                     DLG_ENTER_VALUE,

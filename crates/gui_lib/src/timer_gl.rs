@@ -107,6 +107,4 @@ impl SimTimer {
     pub fn batch_size(&self) -> u32 {
         self.batch_size
     }
-
-
 } // SimTimer

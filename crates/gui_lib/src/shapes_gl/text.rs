@@ -4,7 +4,7 @@
 //!
 // text.rs
 
-use crate::egui::{self, Color32, Pos2, TextStyle, FontId,};
+use crate::egui::{self, Color32, FontId, Pos2, TextStyle};
 use crate::shapes_gl::base::{Shape, ShapeBase};
 use std::f32::consts::FRAC_PI_2;
 
@@ -116,11 +116,7 @@ impl Shape for Text {
 
         if self.angle != 0.0 {
             // rotate
-            let galley = painter.layout_no_wrap(
-                self.text.clone(),
-                font_id,
-                self.base.color(),
-            );
+            let galley = painter.layout_no_wrap(self.text.clone(), font_id, self.base.color());
             let mut shape = egui::Shape::galley(tl, galley, self.base.color);
             if let egui::Shape::Text(ref mut text_shape) = shape {
                 text_shape.angle = self.angle;
@@ -128,13 +124,7 @@ impl Shape for Text {
             painter.add(shape);
         } else {
             // do not rotate
-            painter.text(
-                tl,
-                self.place,
-                self.text.as_str(),
-                font_id,
-                self.base.color,
-            );
+            painter.text(tl, self.place, self.text.as_str(), font_id, self.base.color);
         }
     }
 } // impl Shape for Text

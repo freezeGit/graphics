@@ -76,7 +76,7 @@ impl Circle {
                     self.base.dash_gap(),
                 );
                 painter.extend(shapes);
-            },
+            }
             LineStyle::Dotted => {
                 let shapes = egui::Shape::dotted_line(
                     &pts_trans,
@@ -85,8 +85,8 @@ impl Circle {
                     self.base.dot_radius(),
                 );
                 painter.extend(shapes);
-            },
-            LineStyle::Solid => {},
+            }
+            LineStyle::Solid => {}
         }
     }
 } // impl Circle

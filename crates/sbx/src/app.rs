@@ -159,10 +159,24 @@ impl TheApp {
                 const CHOICE_RUN: i32 = 1;
                 const CHOICE_PAUSE: i32 = 2;
                 const CHOICE_FAST: i32 = 3;
+                //const CHOICE_RESET: i32 = 4;
+                const CHOICE_OTHER: i32 = 3;
+
+                let current_choice =
+                    if self.sim_timer.is_running() && !self.sim_timer.fast_forward() {
+                        CHOICE_RUN
+                    } else if self.sim_timer.is_running() && self.sim_timer.fast_forward() {
+                        CHOICE_FAST
+                    } else if !self.sim_timer.is_running() {
+                        CHOICE_PAUSE
+                    } else {
+                        CHOICE_OTHER
+                    };
+
                 self.canvas.canvas.set_dialog(Box::new(RadioBoxesDlg::new(
                     DLG_SIM_STATE,
                     "Sim state",
-                    CHOICE_RUN,
+                    current_choice,
                     [
                         RadioBoxesField::new(CHOICE_RUN, "Run"),
                         RadioBoxesField::new(CHOICE_PAUSE, "Pause"),
@@ -191,22 +205,22 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(dlg));
             }
 
-            BTN_RUN_PAUSE => {
-                if self.sim_timer.is_running() {
-                    self.sim_timer.pause();
-                } else {
-                    self.sim_timer.run();
-                }
-            }
+            // BTN_RUN_PAUSE => {
+            //     if self.sim_timer.is_running() {
+            //         self.sim_timer.pause();
+            //     } else {
+            //         self.sim_timer.run();
+            //     }
+            // }
 
-            BTN_SLOW_FAST => {
-                if self.sim_timer.fast_forward() {
-                    //self.sim_timer.set_normal_speed();
-                    self.sim_timer.exit_fast_forward();
-                } else {
-                    self.sim_timer.set_fast_forward();
-                }
-            }
+            // BTN_SLOW_FAST => {
+            //     if self.sim_timer.fast_forward() {
+            //         //self.sim_timer.set_normal_speed();
+            //         self.sim_timer.exit_fast_forward();
+            //     } else {
+            //         self.sim_timer.set_fast_forward();
+            //     }
+            // }
 
             BTN_STATE_A => {
                 self.world.thing.state = ThingState::StateA;

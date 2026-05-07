@@ -3,13 +3,13 @@
 
 // line.rs
 
-use crate::egui::{self, Pos2, Vec2,};
-use crate::shapes_gl::base::{Shape, ShapeBase,};
-use crate::{LineStyle};
+use crate::LineStyle;
+use crate::egui::{self, Pos2, Vec2};
+use crate::shapes_gl::base::{Shape, ShapeBase};
 
 /// Struct Line
 ///
-/// A line segment with a start point and a vector. 
+/// A line segment with a start point and a vector.
 #[derive(Debug, Default)]
 pub struct Line {
     base: ShapeBase,
@@ -88,7 +88,7 @@ impl Shape for Line {
         match self.base.line_style() {
             LineStyle::Solid => {
                 painter.line_segment([start, end], stroke);
-            },
+            }
             LineStyle::Dashed => {
                 let shapes = egui::Shape::dashed_line(
                     &[start, end],
@@ -97,7 +97,7 @@ impl Shape for Line {
                     self.base.dash_gap(),
                 );
                 painter.extend(shapes);
-            },
+            }
             LineStyle::Dotted => {
                 let shapes = egui::Shape::dotted_line(
                     &[start, end],
@@ -106,7 +106,7 @@ impl Shape for Line {
                     self.base.dot_radius(),
                 );
                 painter.extend(shapes);
-            },
+            }
         }
     }
 } // impl Shape for Line

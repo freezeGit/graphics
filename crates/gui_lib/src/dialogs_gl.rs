@@ -4,7 +4,7 @@
 
 use crate::egui;
 use crate::ids_gl::{
-    DragFloatDlgId, MessageBoxDlgId, MultiTextEntryDlgId, TextEntryDlgId, RadioBoxesDlgId,
+    DragFloatDlgId, MessageBoxDlgId, MultiTextEntryDlgId, RadioBoxesDlgId, TextEntryDlgId,
 };
 use crate::messages_gl::WidgetMsg;
 
@@ -291,7 +291,9 @@ impl Dialog for MultiTextEntryDlg {
 
             for f in &mut self.fields {
                 ui.horizontal(|ui| {
-                    ui.label(egui::RichText::new(format!("{}:", f.prompt)).size(MT_DEFAULT_FONT_SIZE));
+                    ui.label(
+                        egui::RichText::new(format!("{}:", f.prompt)).size(MT_DEFAULT_FONT_SIZE),
+                    );
                     ui.add(egui::TextEdit::singleline(&mut f.text).font(egui::TextStyle::Heading));
                 });
             }
@@ -318,35 +320,25 @@ impl Dialog for MultiTextEntryDlg {
     }
 } // end of impl Dialog for MultiTextEntryDlg
 
-// ---------------------------------------------------
-
 // ------------ RadioBoxesDlg ------------------------------
 /// An array of RadioBoxesField's is used to construct a MultiTextEntryDlg.
 #[derive(Debug, Clone)]
 pub struct RadioBoxesField {
-    //pub id: String,
-    //pub selected: i32,
     pub choice: i32,
     pub label: String,
 }
 
 impl RadioBoxesField {
-    //pub fn new(selected: impl Into<String>, alternative: impl Into<String>, label: impl Into<String>) -> Self {
     pub fn new(choice: i32, label: impl Into<String>) -> Self {
         Self {
-            //selected,
             choice,
             label: label.into(),
         }
     }
 }
 
-// /// Displays a dialog with a title,
-// /// and a number of prompt, text entry fields.
-// /// Outputs the texts entered by the user as a Vec<(String, String)
-// /// (associated with the emitted message).
-// /// The first value in the tuple is the id of the field, and the second is the text entered.
-// /// Emits WidgetMsg::DialogAcceptedText(MultiTextEntryDlgId, Vec<(String, String)>).
+/// Displays a radiobox group with a title
+/// Emits WidgetMsg::DialogAcceptedRadioBoxes(RadioBoxesDlgId, i32).
 #[derive(Debug)]
 pub struct RadioBoxesDlg {
     pub id: RadioBoxesDlgId,
@@ -383,7 +375,11 @@ impl Dialog for RadioBoxesDlg {
             ui.separator();
 
             for f in &mut self.fields {
-                ui.radio_value(&mut self.selected, f.choice, egui::RichText::new(&f.label).size(RB_DEFAULT_FONT_SIZE),);
+                ui.radio_value(
+                    &mut self.selected,
+                    f.choice,
+                    egui::RichText::new(&f.label).size(RB_DEFAULT_FONT_SIZE),
+                );
             }
 
             ui.add_space(15.0);
@@ -400,46 +396,4 @@ impl Dialog for RadioBoxesDlg {
 
         close
     }
-} // end of impl Dialog for MultiTextEntryDlg
-
-// impl Dialog for MultiTextEntryDlg {
-//     fn invoke_modal(&mut self, ctx: &egui::Context, out: &mut Vec<WidgetMsg>) -> bool {
-//         let mut close = false;
-//         const DEFAULT_SIZE: f32 = 20.0;
-//
-//         egui::Modal::new(self.egui_id).show(ctx, |ui| {
-//             ui.set_min_width(350.0);
-//
-//             ui.heading(egui::RichText::new(&self.title).size(DEFAULT_SIZE));
-//             ui.separator();
-//
-//             for f in &mut self.fields {
-//                 ui.horizontal(|ui| {
-//                     ui.label(egui::RichText::new(format!("{}:", f.prompt)).size(DEFAULT_SIZE));
-//                     ui.add(egui::TextEdit::singleline(&mut f.text).font(egui::TextStyle::Heading));
-//                 });
-//             }
-//
-//             ui.add_space(15.0);
-//             ui.horizontal(|ui| {
-//                 if ui.button("OK").clicked() {
-//                     let values = self
-//                         .fields
-//                         .iter()
-//                         .map(|f| (f.id.clone(), f.text.clone()))
-//                         .collect();
-//
-//                     out.push(WidgetMsg::DialogAcceptedMultiTextEntry(self.id, values));
-//                     close = true;
-//                 }
-//                 if ui.button("Cancel").clicked() {
-//                     close = true;
-//                 }
-//             });
-//         });
-//
-//         close
-//     }
-// } // end of impl Dialog for MultiTextEntryDlg
-
-
+} // end of impl Dialog for RadioBoxesDlg

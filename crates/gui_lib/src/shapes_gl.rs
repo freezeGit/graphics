@@ -3,20 +3,20 @@
 // src/gui_lib/shapes.rs
 
 pub mod base;
+pub mod circle;
+pub mod closed_polyline;
 pub mod line;
 pub mod lines;
-pub mod rectangle;
-pub mod circle;
 pub mod polyline;
-pub mod closed_polyline;
+pub mod rectangle;
 pub mod text;
 
 pub use base::{LineStyle, Shape, ShapeBase};
+pub use circle::Circle;
+pub use closed_polyline::ClosedPolyline;
 pub use line::Line;
 pub use lines::Lines;
-pub use circle::Circle;
 pub use polyline::Polyline;
-pub use closed_polyline::ClosedPolyline;
 pub use rectangle::Rectangle;
 pub use text::{Text, TextFont};
 

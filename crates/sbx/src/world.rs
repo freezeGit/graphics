@@ -10,8 +10,8 @@
 pub(crate) mod world_demo; // demo program data and logic
 // ---------------------------------------------------
 
+use crate::world::world_demo::{Gauge, Person, Signal, Thing, ThingState, TrafficLight};
 use gui_lib::World;
-use crate::world::world_demo::{Gauge, ThingState, Thing, Signal, TrafficLight, Person};
 
 /// TheWorld struct encapsulates application data and logic.
 /// It has no dependence on gui_lib and no dependence on egui.
