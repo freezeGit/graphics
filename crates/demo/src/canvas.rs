@@ -33,8 +33,8 @@ struct ViewHandles {
 }
 
 // Layout styles: TopPanel, SidePanel, NoPanel
-//const LAYOUT_STYLE: gui_lib::LayoutStyle = TopPanel;
-const LAYOUT_STYLE: gui_lib::LayoutStyle = SidePanel;
+const LAYOUT_STYLE: gui_lib::LayoutStyle = TopPanel;
+//const LAYOUT_STYLE: gui_lib::LayoutStyle = SidePanel;
 // Background colors: BKG_DEFAULT, BKG_WINDOWS, any Color32
 const BACKGROUND_COLOR: Color32 = gui_lib::BKG_DEFAULT;
 
@@ -232,11 +232,14 @@ impl TheCanvas {
 
         canvas.add_widget(Box::new(Space::new(15.0)));
 
-        let wb_run = Button::new(BTN_RUN_PAUSE, "Run/Pause", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_run));
+        let wb_sim = Button::new(BTN_SIM, "Sim", 120.0, 40.0);
+        canvas.add_widget(Box::new(wb_sim));
 
-        let wb_speed = Button::new(BTN_SLOW_FAST, "Slow/Fast", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_speed));
+        // let wb_run = Button::new(BTN_RUN_PAUSE, "Run/Pause", 120.0, 40.0);
+        // canvas.add_widget(Box::new(wb_run));
+        //
+        // let wb_speed = Button::new(BTN_SLOW_FAST, "Slow/Fast", 120.0, 40.0);
+        // canvas.add_widget(Box::new(wb_speed));
 
         let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_a));

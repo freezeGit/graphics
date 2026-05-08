@@ -12,7 +12,12 @@ mod app_internal; // internal functions that do not require application specific
 
 use ::gui_lib as gl;
 use egui::Context;
-use gui_lib::{ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg, app_gl, RadioBoxesDlgId, DialogId};
+use gui_lib::{
+    ButtonId, Dialog, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
+    MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesDlgId,
+    RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
+    app_gl,
+};
 use std::time::Duration;
 
 use crate::canvas::TheCanvas;
@@ -40,6 +45,7 @@ const BATCH_SIZE: u32 = 1001;
 // at intervals determined by INTERVAL.
 const SIM_REPAINT_16MS: bool = false;
 
+/// Constants for the simulation state radio boxes dialog
 const CHOICE_RUN: i32 = 1;
 const CHOICE_PAUSE: i32 = 2;
 const CHOICE_FAST: i32 = 3;
@@ -159,7 +165,7 @@ impl TheApp {
                         ],
                     )));
             }
-            //normal_speed
+
             BTN_SIM => {
                 let current_choice =
                     //if self.sim_timer.is_running() && !self.sim_timer.fast_forward() {
@@ -221,7 +227,6 @@ impl TheApp {
             //         self.sim_timer.set_fast_forward();
             //     }
             // }
-
             BTN_STATE_A => {
                 self.world.thing.state = ThingState::StateA;
             }
@@ -259,9 +264,6 @@ impl TheApp {
     //         _ => {}
     //     }
     // }
-
-
-
 
     /// Handle DialogAcceptedRadioBoxes messages
     ///

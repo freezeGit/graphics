@@ -12,10 +12,16 @@ mod app_internal; // internal functions that do not require application specific
 
 use ::gui_lib as gl;
 use egui::Context;
+// use gui_lib::{
+//     ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
+//     MultiTextEntryDlgId, NilDlg, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField,
+//     WidgetMsg, app_gl,
+// };
 use gui_lib::{
-    ButtonId, Dialog, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg, MultiTextEntryDlg,
-    MultiTextEntryDlgId, NilDlg, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField,
-    WidgetMsg, app_gl,
+    ButtonId, Dialog, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
+    MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesDlgId,
+    RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
+    app_gl,
 };
 use std::time::Duration;
 
@@ -43,6 +49,13 @@ const BATCH_SIZE: u32 = 1001;
 // because of extra refresh requests. If false, the simulation will request repaint
 // at intervals determined by INTERVAL.
 const SIM_REPAINT_16MS: bool = false;
+
+/// Constants for the simulation state radio boxes dialog
+const CHOICE_RUN: i32 = 1;
+const CHOICE_PAUSE: i32 = 2;
+const CHOICE_FAST: i32 = 3;
+//const CHOICE_RESET: i32 = 4;
+const CHOICE_OTHER: i32 = 100;
 
 /// Main application structure.
 ///
@@ -111,6 +124,9 @@ impl TheApp {
             // WidgetMsg::DialogAcceptedText(id, text) => {
             //     self.handle_text_entry(id, text);
             // }
+            WidgetMsg::DialogAcceptedRadioBoxes(id, value) => {
+                self.handle_radio_boxes(id, value);
+            }
             WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
                 self.handle_multi_text_entry(id, values);
             }
@@ -130,9 +146,34 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "Demonstration app1 using the gui_lib library.\n\
+                    "Demonstration app using the gui_lib library.\n\
                     Intended to be used as a template to get started.\n\
                     Written in Rust + egui.",
+                )));
+            }
+
+            BTN_SIM => {
+                let current_choice =
+                    //if self.sim_timer.is_running() && !self.sim_timer.fast_forward() {
+                    if self.sim_timer.is_running() && self.sim_timer.normal_speed() {
+                        CHOICE_RUN
+                    } else if self.sim_timer.is_running() && self.sim_timer.fast_forward() {
+                        CHOICE_FAST
+                    } else if !self.sim_timer.is_running() {
+                        CHOICE_PAUSE
+                    } else {
+                        CHOICE_OTHER
+                    };
+
+                self.canvas.canvas.set_dialog(Box::new(RadioBoxesDlg::new(
+                    DLG_SIM_STATE,
+                    "Sim state",
+                    current_choice,
+                    [
+                        RadioBoxesField::new(CHOICE_RUN, "Run"),
+                        RadioBoxesField::new(CHOICE_PAUSE, "Pause"),
+                        RadioBoxesField::new(CHOICE_FAST, "Fast-forward"),
+                    ],
                 )));
             }
 
@@ -174,22 +215,22 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(dlg));
             }
 
-            BTN_RUN_PAUSE => {
-                if self.sim_timer.is_running() {
-                    self.sim_timer.pause();
-                } else {
-                    self.sim_timer.run();
-                }
-            }
+            // BTN_RUN_PAUSE => {
+            //     if self.sim_timer.is_running() {
+            //         self.sim_timer.pause();
+            //     } else {
+            //         self.sim_timer.run();
+            //     }
+            // }
 
-            BTN_SLOW_FAST => {
-                if self.sim_timer.fast_forward() {
-                    //self.sim_timer.set_normal_speed();
-                    self.sim_timer.exit_fast_forward();
-                } else {
-                    self.sim_timer.set_fast_forward();
-                }
-            }
+            // BTN_SLOW_FAST => {
+            //     if self.sim_timer.fast_forward() {
+            //         //self.sim_timer.set_normal_speed();
+            //         self.sim_timer.exit_fast_forward();
+            //     } else {
+            //         self.sim_timer.set_fast_forward();
+            //     }
+            // }
 
             BTN_STATE_A => {
                 self.world.thing.state = ThingState::StateA;
@@ -228,6 +269,37 @@ impl TheApp {
     //         _ => {}
     //     }
     // }
+
+    /// Handle DialogAcceptedRadioBoxes messages
+    ///
+    /// Requires application specific customization.
+    fn handle_radio_boxes(&mut self, id: RadioBoxesDlgId, value: i32) {
+        match id {
+            DLG_SIM_STATE => {
+                match value {
+                    // CHOICE_RUN => {
+                    //     self.sim_timer.set_normal_speed();
+                    //     self.sim_timer.run();
+                    // }
+                    CHOICE_RUN => {
+                        self.sim_timer.set_to_run_normal_speed();
+                    }
+                    CHOICE_PAUSE => {
+                        self.sim_timer.pause();
+                    }
+                    // CHOICE_FAST => {
+                    //     self.sim_timer.set_fast_forward();
+                    //     self.sim_timer.run();
+                    // }
+                    CHOICE_FAST => {
+                        self.sim_timer.set_to_run_fast_forward();
+                    }
+                    _ => {}
+                }
+            }
+            _ => {}
+        }
+    }
 
     /// Handle handle_multi_text_entry messages
     ///

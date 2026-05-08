@@ -374,7 +374,8 @@ impl Dialog for RadioBoxesDlg {
             ui.heading(egui::RichText::new(&self.title).size(RB_DEFAULT_FONT_SIZE));
             ui.separator();
 
-            for f in &mut self.fields {
+            //for f in &mut self.fields {
+            for f in &self.fields {
                 ui.radio_value(
                     &mut self.selected,
                     f.choice,

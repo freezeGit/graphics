@@ -232,8 +232,8 @@ impl TheCanvas {
 
         canvas.add_widget(Box::new(Space::new(15.0)));
 
-        let wb_run = Button::new(BTN_SIM, "Sim", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_run));
+        let wb_sim = Button::new(BTN_SIM, "Sim", 120.0, 40.0);
+        canvas.add_widget(Box::new(wb_sim));
 
         // let wb_run = Button::new(BTN_RUN_PAUSE, "Run/Pause", 120.0, 40.0);
         // canvas.add_widget(Box::new(wb_run));
