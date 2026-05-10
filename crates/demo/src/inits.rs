@@ -1,6 +1,7 @@
 //! ## module app_inits. Contains constants and initialization values.
 
 use gui_lib::Color32;
+#[allow(unused_imports)]
 use gui_lib::LayoutStyle::{TopPanel, SidePanel, NoPanel};
 
 // ------ User customized gui_lib application specific initialization constants --------

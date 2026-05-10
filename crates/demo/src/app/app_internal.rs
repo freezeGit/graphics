@@ -58,8 +58,9 @@ impl TheApp {
             ctx.request_repaint();
         } else {
             let now = self.time_now(ctx);
-            self.step_when_ready(ctx, now);
-            ctx.request_repaint_after(self.conditional_duration(app_inits::SMOOTH_ANIMATION, now));
+            //self.step_when_ready(ctx, now);
+            self.step_when_ready(now);
+            ctx.request_repaint_after(self.sim_timer.conditional_duration(now));
         }
     }
 
@@ -69,26 +70,33 @@ impl TheApp {
     }
 
     fn batch_step(&mut self) {
-        for i in 0..self.sim_timer.batch_size() {
+        for _ in 0..self.sim_timer.batch_size() {
             self.world.advance();
         }
         self.canvas.update(&self.world);
     }
 
-    fn step_when_ready(&mut self, ctx: &egui::Context, now: f64) {
+    // fn step_when_ready(&mut self, ctx: &egui::Context, now: f64) {
+    //     if self.sim_timer.ready(now) {
+    //         self.world.advance();
+    //         self.canvas.update(&self.world);
+    //     }
+    // }
+
+    fn step_when_ready(&mut self, now: f64) {
         if self.sim_timer.ready(now) {
             self.world.advance();
             self.canvas.update(&self.world);
         }
     }
 
-    fn conditional_duration(&self, condition: bool, now: f64) -> std::time::Duration {
-        if condition {
-            std::time::Duration::from_millis(16)
-        } else {
-            std::time::Duration::from_secs_f64(self.sim_timer.remaining(now))
-        }
-    }
+    // fn conditional_duration(&self, condition: bool, now: f64) -> std::time::Duration {
+    //     if condition {
+    //         std::time::Duration::from_millis(16)
+    //     } else {
+    //         std::time::Duration::from_secs_f64(self.sim_timer.remaining(now))
+    //     }
+    // }
 
     //  --------- Handle messages if any exist---------------------
 

@@ -8,16 +8,17 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::app_inits;
+use crate::inits;
 use crate::ids::*;
 //use crate::app_inits::{LAYOUT_STYLE, BACKGROUND_COLOR};
 use crate::world::TheWorld;
 //use crate::world::{Signal, TheWorld, ThingState};
 use crate::world::world_demo::{Signal, ThingState};
-use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
+//use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
+#[allow(unused_imports)]
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{
-    BKG_DEFAULT, BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
+    BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
     Separator, Shape, Space, Text,
 };
 
@@ -34,12 +35,6 @@ struct ViewHandles {
     stxtval: Rc<RefCell<Text>>,
 }
 
-// Layout styles: TopPanel, SidePanel, NoPanel
-//const LAYOUT_STYLE: gui_lib::LayoutStyle = TopPanel;
-//const LAYOUT_STYLE: gui_lib::LayoutStyle = SidePanel;
-// Background colors: BKG_DEFAULT, BKG_WINDOWS, any Color32
-//const BACKGROUND_COLOR: Color32 = gui_lib::BKG_DEFAULT;
-
 /// ## struct Canvas
 /// A container for rendering and managing graphical shapes
 /// and interactive widgets.
@@ -53,6 +48,7 @@ pub(crate) struct TheCanvas {
     // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
     // Widgets are stored in  BasicCanvas::Vec<Box<dyn Widget>>
     pub(crate) canvas: BasicCanvas, // From gui_lib
+    
     // ViewHandles fields are concrete shapes as unique handles of type Rc<RefCell<T>>
     view_handles: ViewHandles,
 }
@@ -63,7 +59,7 @@ impl TheCanvas {
     /// Creates and initializes a BasicCanvas
     /// Creates and initializes all shapes and widgets
     pub(crate) fn new() -> Self {
-        let mut canvas = BasicCanvas::new(app_inits::LAYOUT_STYLE, app_inits::BACKGROUND_COLOR);
+        let mut canvas = BasicCanvas::new(inits::LAYOUT_STYLE, inits::BACKGROUND_COLOR);
         Self::init_widgets(&mut canvas);
         let view_handles = Self::init_shapes(&mut canvas);
 

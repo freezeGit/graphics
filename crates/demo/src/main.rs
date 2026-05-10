@@ -73,11 +73,9 @@
 //! # Errors
 //! This application returns an [`eframe::Error`] if initialization or event handling fails.
 
-//use crate::app_inits::{APP_NAME, XWVP, YHVP};
-
 // main.rs
 mod app;
-mod app_inits;
+mod inits;
 mod canvas;
 mod ids;
 mod world;
@@ -89,12 +87,12 @@ mod world;
 /// Function `main()` starts the application.
 /// It calls the `run_the_app()` function,
 /// which initializes an `eframe` native window
-/// with a custom viewport size (`width` and `height`)
+/// with a custom viewport size
 /// and sets up the layout and visuals.
 // ============================================================
 // Function main() starts the application.
 // ============================================================
 
 fn main() -> Result<(), eframe::Error> {
-    gui_lib::run_the_app::<app::TheApp>(app_inits::APP_NAME, app_inits::XWVP, app_inits::YHVP)
+    gui_lib::run_the_app::<app::TheApp>(inits::APP_NAME, inits::XWVP, inits::YHVP)
 }

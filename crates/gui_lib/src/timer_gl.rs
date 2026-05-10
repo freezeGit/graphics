@@ -14,16 +14,18 @@ pub struct SimTimer {
     interval: f64,
     last_time: f64,
     fast: bool,
+    smooth: bool,
     batch_size: u32,
     state: TimerState,
 }
 
 impl SimTimer {
-    pub fn new(interval: f64, batch_size: u32) -> Self {
+    pub fn new(interval: f64, smooth: bool,  batch_size: u32) -> Self {
         Self {
             interval,
             last_time: 0.0,
             fast: false,
+            smooth,
             batch_size,
             state: TimerState::Stopped,
         }
@@ -73,6 +75,14 @@ impl SimTimer {
             TimerState::Stopped | TimerState::WaitingForSync => self.interval,
 
             TimerState::Running => (self.interval - (now - self.last_time)).max(0.0),
+        }
+    }
+
+    pub fn conditional_duration(&self, now: f64) -> std::time::Duration {
+        if self.smooth {
+            std::time::Duration::from_millis(16)
+        } else {
+            std::time::Duration::from_secs_f64(self.remaining(now))
         }
     }
 

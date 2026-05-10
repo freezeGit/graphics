@@ -1,7 +1,7 @@
 //! ## Module base contains the [`ShapeBase`] struct and the [`Shape`] trait.
 // base.rs
 
-use crate::egui::{self, Color32, Pos2, Vec2};
+use crate::egui::{self, Color32, Pos2,};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum LineStyle {

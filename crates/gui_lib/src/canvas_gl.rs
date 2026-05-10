@@ -7,7 +7,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::egui;
-use eframe::egui::{CentralPanel, Context, RichText};
+use eframe::egui::{CentralPanel, Context,};
 
 use crate::{Color32, Dialog, NilDlg, Shape, Widget, WidgetMsg};
 

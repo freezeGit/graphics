@@ -5,7 +5,8 @@
 
 use crate::egui::{self, Pos2};
 use crate::shapes_gl::base::{Shape, ShapeBase};
-use crate::{Color32, LineStyle};
+//use crate::{Color32, LineStyle};
+use crate::LineStyle;
 use std::f32::consts::TAU;
 
 /// A customizable Circle component.

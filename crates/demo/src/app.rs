@@ -10,15 +10,22 @@
 
 mod app_internal; // internal functions that do not require application specific customizations
 
-use ::gui_lib as gl;
+//use ::gui_lib as gl;
 use egui::Context;
+// use gui_lib::{
+//     ButtonId, Dialog, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
+//     MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesDlgId,
+//     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
+//     app_gl,
+// };
+#[allow(unused_imports)]
 use gui_lib::{
-    ButtonId, Dialog, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
+    ButtonId, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
     MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesDlgId,
     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
     app_gl,
 };
-use crate::app_inits;
+use crate::inits;
 
 use crate::canvas::TheCanvas;
 use crate::ids::*;
@@ -77,7 +84,7 @@ impl app_gl::UserApp for TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(), // Vec<WidgetMsg>
-            sim_timer: SimTimer::new(app_inits::INTERVAL, app_inits::BATCH_SIZE),
+            sim_timer: SimTimer::new(inits::INTERVAL, inits::SMOOTH_ANIMATION, inits::BATCH_SIZE),
         }
     }
 } // end impl app_gl::UserApp
