@@ -59,7 +59,7 @@ impl TheApp {
         } else {
             let now = self.time_now(ctx);
             self.step_when_ready(ctx, now);
-            ctx.request_repaint_after(self.conditional_duration(SIM_REPAINT_16MS, now));
+            ctx.request_repaint_after(self.conditional_duration(app_inits::SMOOTH_ANIMATION, now));
         }
     }
 

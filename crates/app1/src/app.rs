@@ -34,6 +34,13 @@ use crate::ids::*;
 use crate::world::TheWorld;
 use crate::world::world_demo::ThingState;
 
+/// Constants for simulation state choice. 1 = Run, 2 = Pause, 3 = Fast-forward.
+const CHOICE_RUN: i32 = 1;
+const CHOICE_PAUSE: i32 = 2;
+const CHOICE_FAST: i32 = 3;
+//const CHOICE_RESET: i32 = 4;
+const CHOICE_OTHER: i32 = 100;
+
 // --------- User customized application specific constants.  ----------------
 /// User customized simulation parameters
 
@@ -49,13 +56,7 @@ const BATCH_SIZE: u32 = 1001;
 // because of extra refresh requests. If false, the simulation will request repaint
 // at intervals determined by INTERVAL.
 const SIM_REPAINT_16MS: bool = false;
-
-/// Constants for the simulation state radio boxes dialog
-const CHOICE_RUN: i32 = 1;
-const CHOICE_PAUSE: i32 = 2;
-const CHOICE_FAST: i32 = 3;
-//const CHOICE_RESET: i32 = 4;
-const CHOICE_OTHER: i32 = 100;
+// --------- End of user customized application specific constants.  ----------------
 
 /// Main application structure.
 ///

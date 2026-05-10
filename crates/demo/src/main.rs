@@ -72,18 +72,17 @@
 //!
 //! # Errors
 //! This application returns an [`eframe::Error`] if initialization or event handling fails.
+
+//use crate::app_inits::{APP_NAME, XWVP, YHVP};
+
 // main.rs
 mod app;
+mod app_inits;
 mod canvas;
 mod ids;
 mod world;
 
 // -----------------------------------------------------------
-
-/// Constants for application configuration.
-const APP_NAME: &str = "Demo app for gui_lib";
-const XWVP: f32 = 1200.0; // Width of viewport in pixels.
-const YHVP: f32 = 800.0; // Height of viewport in pixels.
 
 /// ## Running the Application
 ///
@@ -95,6 +94,7 @@ const YHVP: f32 = 800.0; // Height of viewport in pixels.
 // ============================================================
 // Function main() starts the application.
 // ============================================================
+
 fn main() -> Result<(), eframe::Error> {
-    gui_lib::run_the_app::<app::TheApp>(APP_NAME, XWVP, YHVP)
+    gui_lib::run_the_app::<app::TheApp>(app_inits::APP_NAME, app_inits::XWVP, app_inits::YHVP)
 }

@@ -8,7 +8,9 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use crate::app_inits;
 use crate::ids::*;
+//use crate::app_inits::{LAYOUT_STYLE, BACKGROUND_COLOR};
 use crate::world::TheWorld;
 //use crate::world::{Signal, TheWorld, ThingState};
 use crate::world::world_demo::{Signal, ThingState};
@@ -33,10 +35,10 @@ struct ViewHandles {
 }
 
 // Layout styles: TopPanel, SidePanel, NoPanel
-const LAYOUT_STYLE: gui_lib::LayoutStyle = TopPanel;
+//const LAYOUT_STYLE: gui_lib::LayoutStyle = TopPanel;
 //const LAYOUT_STYLE: gui_lib::LayoutStyle = SidePanel;
 // Background colors: BKG_DEFAULT, BKG_WINDOWS, any Color32
-const BACKGROUND_COLOR: Color32 = gui_lib::BKG_DEFAULT;
+//const BACKGROUND_COLOR: Color32 = gui_lib::BKG_DEFAULT;
 
 /// ## struct Canvas
 /// A container for rendering and managing graphical shapes
@@ -61,7 +63,7 @@ impl TheCanvas {
     /// Creates and initializes a BasicCanvas
     /// Creates and initializes all shapes and widgets
     pub(crate) fn new() -> Self {
-        let mut canvas = BasicCanvas::new(LAYOUT_STYLE, BACKGROUND_COLOR);
+        let mut canvas = BasicCanvas::new(app_inits::LAYOUT_STYLE, app_inits::BACKGROUND_COLOR);
         Self::init_widgets(&mut canvas);
         let view_handles = Self::init_shapes(&mut canvas);
 

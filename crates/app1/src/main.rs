@@ -96,5 +96,19 @@ const YHVP: f32 = 800.0; // Height of viewport in pixels.
 // Function main() starts the application.
 // ============================================================
 fn main() -> Result<(), eframe::Error> {
+    let mut a = 5;
+    println!("Hello, world! {}", a);
+
+    let ra = &mut a;
+    println!("Hello, world! {}", ra);
+
+    println!("Hello, world! {}", a);
+
+    //println!("Hello, world! {}", ra);
+
+
+
+
+    // ------------------------------------------------
     gui_lib::run_the_app::<app::TheApp>(APP_NAME, XWVP, YHVP)
 }
