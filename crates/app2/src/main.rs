@@ -1,9 +1,7 @@
-//! Demo crate for an application with a custom UI.
+//! Crate for an application with a custom UI.
 //!
-//! This crate showcases the implementation of a demo application using the `eframe`
+//! This crate implements of an application using the `eframe`
 //! framework and a custom `gui_lib` library to render various graphical components.
-//!
-//! It an be used as a template to get started with gui_lib.
 //!
 //! # Components
 //!
@@ -72,29 +70,27 @@
 //!
 //! # Errors
 //! This application returns an [`eframe::Error`] if initialization or event handling fails.
+
 // main.rs
 mod app;
+mod inits;
 mod canvas;
 mod ids;
 mod world;
 
 // -----------------------------------------------------------
 
-/// Constants for application configuration.
-const APP_NAME: &str = "Sand box app for gui_lib";
-const XWVP: f32 = 1200.0; // Width of viewport in pixels.
-const YHVP: f32 = 800.0; // Height of viewport in pixels.
-
 /// ## Running the Application
 ///
 /// Function `main()` starts the application.
 /// It calls the `run_the_app()` function,
 /// which initializes an `eframe` native window
-/// with a custom viewport size (`width` and `height`)
+/// with a custom viewport size
 /// and sets up the layout and visuals.
 // ============================================================
 // Function main() starts the application.
 // ============================================================
+
 fn main() -> Result<(), eframe::Error> {
-    gui_lib::run_the_app::<app::TheApp>(APP_NAME, XWVP, YHVP)
+    gui_lib::run_the_app::<app::TheApp>(inits::APP_NAME, inits::XWVP, inits::YHVP)
 }

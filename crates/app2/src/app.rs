@@ -2,29 +2,30 @@
 //! - Contains a `Canvas` for holding a collection of shapes.
 //! - Provides methods for creating and updating the UI.
 //! - All method handing methods in this module need application specific customizations.
-//! - Contains a 'World" which contains all non-gui program data and logic.
-//!
-//! This demo app1 is intended to demonstrate usage of gui_lib, and for use as a template.
+//! - Contains a 'World" which contains all non-gui program data and logic. .
 
 // app1.rs
 
 mod app_internal; // internal functions that do not require application specific customizations
 
-use ::gui_lib as gl;
+//use ::gui_lib as gl;
 use egui::Context;
+// use gui_lib::{
+//     ButtonId, Dialog, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
+//     MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesDlgId,
+//     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
+//     app_gl,
+// };
+use crate::inits;
+#[allow(unused_imports)]
 use gui_lib::{
-    ButtonId, Dialog, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
+    ButtonId, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
     MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesDlgId,
     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
     app_gl,
 };
-use std::time::Duration;
 
 use crate::canvas::TheCanvas;
-// use crate::ids::{
-//     BTN_ABOUT, BTN_ENTER_NAME, BTN_ENTER_VALUE, BTN_RUN_PAUSE, BTN_STATE_A, BTN_STATE_B, DLG_ABOUT,
-//     DLG_ENTER_NAME, DLG_ENTER_VALUE, DRAGFLOAT_GAUGE, SLIDER_ANOTHER, SLIDER_GAUGE,
-// };
 use crate::ids::*;
 use crate::world::TheWorld;
 use crate::world::world_demo::ThingState;
@@ -35,23 +36,7 @@ const CHOICE_PAUSE: i32 = 2;
 const CHOICE_FAST: i32 = 3;
 //const CHOICE_RESET: i32 = 4;
 const CHOICE_OTHER: i32 = 100;
-
-// --------- User customized application specific constants.  ----------------
-/// User customized simulation parameters
-
-// `INTERVAL`: Time between simulation steps in seconds
-const INTERVAL: f64 = 0.5;
-
-// `BATCH_SIZE`: Number of world advances to perform in a single simulation step
-// during fast-forward of the simulation.
-const BATCH_SIZE: u32 = 1001;
-
-// `SIM_REPAINT_16MS`: If true, the simulation will request repaint at 16ms intervals.
-// This may result in a smoother animation, but may also cause performance issues
-// because of extra refresh requests. If false, the simulation will request repaint
-// at intervals determined by INTERVAL.
-const SIM_REPAINT_16MS: bool = false;
-// --------- End of user customized application specific constants.  ----------------
+// ---------------------------
 
 /// Main application structure.
 ///
@@ -67,7 +52,6 @@ pub struct TheApp {
 }
 
 // eframe::App trait -------------------------------
-
 /// The eframe::App trait is the bridge between the user's custom application logic
 /// and the eframe framework.
 ///
@@ -85,7 +69,6 @@ impl eframe::App for TheApp {
 } // end impl eframe::App
 
 // app_gl::UserApp trait -------------------------------
-
 /// A trait representing a user-defined application.
 ///
 /// The `new()` function must have an empty parameter list. This guarantees that
@@ -99,7 +82,7 @@ impl app_gl::UserApp for TheApp {
             world: Box::new(TheWorld::new()),
             canvas: TheCanvas::new(),
             msgs: Vec::new(), // Vec<WidgetMsg>
-            sim_timer: SimTimer::new(INTERVAL, BATCH_SIZE),
+            sim_timer: SimTimer::new(inits::INTERVAL, inits::SMOOTH_ANIMATION, inits::BATCH_SIZE),
         }
     }
 } // end impl app_gl::UserApp
@@ -142,29 +125,9 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "Sandbox app1 using the gui_lib library.\n\
-                    Intended to be used as a sandbox\n\
-                    to experiment with gui_lib.\n\
-                    Written in Rust + egui.",
+                    "App using the gui_lib library.\n\
+                     Written in Rust + egui.",
                 )));
-            }
-
-            BTN_PERSON => {
-                self.canvas
-                    .canvas
-                    .set_dialog(Box::new(MultiTextEntryDlg::new(
-                        DLG_ENTER_PERSON,
-                        "Enter person data",
-                        [
-                            TextEntryField::new("name", "Name", self.world.person.name.clone()),
-                            TextEntryField::new("city", "City", self.world.person.city.clone()),
-                            TextEntryField::new(
-                                "address",
-                                "Address",
-                                self.world.person.address.clone(),
-                            ),
-                        ],
-                    )));
             }
 
             BTN_SIM => {
@@ -192,6 +155,24 @@ impl TheApp {
                 )));
             }
 
+            BTN_PERSON => {
+                self.canvas
+                    .canvas
+                    .set_dialog(Box::new(MultiTextEntryDlg::new(
+                        DLG_ENTER_PERSON,
+                        "Enter person data",
+                        [
+                            TextEntryField::new("name", "Name", self.world.person.name.clone()),
+                            TextEntryField::new("city", "City", self.world.person.city.clone()),
+                            TextEntryField::new(
+                                "address",
+                                "Address",
+                                self.world.person.address.clone(),
+                            ),
+                        ],
+                    )));
+            }
+
             // BTN_ENTER_NAME => {
             //     self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
             //         DLG_ENTER_NAME,
@@ -212,22 +193,6 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(dlg));
             }
 
-            // BTN_RUN_PAUSE => {
-            //     if self.sim_timer.is_running() {
-            //         self.sim_timer.pause();
-            //     } else {
-            //         self.sim_timer.run();
-            //     }
-            // }
-
-            // BTN_SLOW_FAST => {
-            //     if self.sim_timer.fast_forward() {
-            //         //self.sim_timer.set_normal_speed();
-            //         self.sim_timer.exit_fast_forward();
-            //     } else {
-            //         self.sim_timer.set_fast_forward();
-            //     }
-            // }
             BTN_STATE_A => {
                 self.world.thing.state = ThingState::StateA;
             }
@@ -297,7 +262,7 @@ impl TheApp {
         }
     }
 
-    /// Handle DialogAcceptedMultiTextEntry messages
+    /// Handle handle_multi_text_entry messages
     ///
     /// Requires application specific customization.
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {

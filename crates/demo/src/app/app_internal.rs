@@ -31,7 +31,7 @@ impl TheApp {
             .invoke_modal(ctx, &mut self.msgs)
         {
             self.canvas.canvas.set_dialog(Box::new(NilDlg)); // NilDlg is always closed.
-            self.step_simulation(ctx);
+            self.step_simulation(ctx); // TDJ: needs world and canvas
         } else {
             // Keep simulation timer synchronized while dialog is open,
             // so simulation does not jump ahead when the dialog closes.
@@ -54,12 +54,12 @@ impl TheApp {
         }
 
         if self.sim_timer.fast_forward() {
-            self.batch_step();
+            self.batch_step(); // TDJ: needs world and canvas
             ctx.request_repaint();
         } else {
             let now = self.time_now(ctx);
             //self.step_when_ready(ctx, now);
-            self.step_when_ready(now);
+            self.step_when_ready(now); // TDJ: needs world and canvas
             ctx.request_repaint_after(self.sim_timer.conditional_duration(now));
         }
     }
@@ -69,34 +69,19 @@ impl TheApp {
         ctx.input(|i| i.time)
     }
 
-    fn batch_step(&mut self) {
+    fn batch_step(&mut self) { // TDJ: needs world and canvas
         for _ in 0..self.sim_timer.batch_size() {
             self.world.advance();
         }
         self.canvas.update(&self.world);
     }
 
-    // fn step_when_ready(&mut self, ctx: &egui::Context, now: f64) {
-    //     if self.sim_timer.ready(now) {
-    //         self.world.advance();
-    //         self.canvas.update(&self.world);
-    //     }
-    // }
-
-    fn step_when_ready(&mut self, now: f64) {
+    fn step_when_ready(&mut self, now: f64) { // TDJ: needs world and canvas
         if self.sim_timer.ready(now) {
             self.world.advance();
             self.canvas.update(&self.world);
         }
     }
-
-    // fn conditional_duration(&self, condition: bool, now: f64) -> std::time::Duration {
-    //     if condition {
-    //         std::time::Duration::from_millis(16)
-    //     } else {
-    //         std::time::Duration::from_secs_f64(self.sim_timer.remaining(now))
-    //     }
-    // }
 
     //  --------- Handle messages if any exist---------------------
 
