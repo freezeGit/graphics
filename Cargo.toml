@@ -7,4 +7,4 @@ members = [
 
 default-members = ["crates/gui_lib"]
 
-resolver = "2"
+resolver = "3"

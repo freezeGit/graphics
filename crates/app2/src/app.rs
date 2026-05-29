@@ -126,7 +126,7 @@ impl TheApp {
                     DLG_ABOUT,
                     "About",
                     "App using the gui_lib library.\n\
-                     Written in Rust + egui.",
+                     Written in Rust + egui 0.33.3"
                 )));
             }
 

@@ -1,6 +1,7 @@
 //! gui_lib
 //!
 //! A small GUI library built on top of [`egui`] and [`eframe`].
+//! NB: depends on egui 0.33.3
 //!
 //! Provides:
 //! - simple canvas drawing (Circle, Line, Rectangle, Text, etc.)

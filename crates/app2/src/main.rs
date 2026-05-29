@@ -2,6 +2,7 @@
 //!
 //! This crate implements of an application using the `eframe`
 //! framework and a custom `gui_lib` library to render various graphical components.
+//! NB: depends on egui 0.33.3
 //!
 //! # Components
 //!
