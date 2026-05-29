@@ -129,7 +129,8 @@ impl TheApp {
                     "About",
                     "Demonstration app using the gui_lib library.\n\
                     Intended to be used as a template to get started.\n\
-                    Written in Rust + egui.",
+                    Written in Rust + egui.\n\
+                    Reverted to egui 0.33.3"
                 )));
             }
 
