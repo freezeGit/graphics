@@ -9,6 +9,7 @@
 // Many applications will have multiple sub modules.
 pub(crate) mod world_demo; // demo program data and logic
 pub(crate) mod body;
+pub(crate) mod emerge;
 // ---------------------------------------------------
 
 use crate::world::world_demo::{Gauge, Person, Signal, Thing, ThingState, TrafficLight};
