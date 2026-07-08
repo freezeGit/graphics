@@ -9,3 +9,4 @@ gui_lib = { path = "../gui_lib" }
 #egui = "0.32.0"
 eframe = "0.33.3"
 egui = "0.33.3"
+rand = "0.10.2"
