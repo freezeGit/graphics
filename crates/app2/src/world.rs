@@ -20,8 +20,9 @@ use gui_lib::World;
 /// TheWorld struct encapsulates application data and logic.
 /// It has no dependence on gui_lib and no dependence on egui.
 /// It has no dependence on the app1 struct or the canvas struct.
-#[derive(Debug)]
+//#[derive(Debug)] // TDJ: Debug is not needed
 pub(crate) struct TheWorld {
+    bits: BitArray,
     pub(crate) frame_number: u64, // TDJ: for batching
     pub(crate) tl: TrafficLight,
     pub(crate) thing: Thing,
@@ -77,6 +78,8 @@ impl World for TheWorld {
 impl TheWorld {
     pub(crate) fn new() -> Self {
         Self {
+            bits: BitArray::new(10),
+
             frame_number: 0,
             tl: TrafficLight {
                 state: Signal::Stop,

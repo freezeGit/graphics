@@ -43,7 +43,7 @@ const CHOICE_OTHER: i32 = 100;
 /// Represents the root of the application and contains
 /// the main canvas with all UI components
 /// and a world struct containing program data and logic.
-#[derive(Debug)]
+//#[derive(Debug)] // TDJ: Debug is not needed for this app
 pub struct TheApp {
     world: Box<TheWorld>,
     canvas: TheCanvas,
