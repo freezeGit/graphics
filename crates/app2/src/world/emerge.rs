@@ -22,14 +22,6 @@ impl BitArray {
         self.len
     }
 
-    // fn set(&mut self, index: usize, value: bool) {
-    //     self.words[index / 64] |= (value as u64) << (index % 64);
-    // }
-    //
-    // fn get(&self, index: usize) -> bool {
-    //     (self.words[index / 64] >> (index % 64)) & 1 == 1
-    // }
-
     pub(crate)fn get(&self, i: usize) -> bool {
         debug_assert!(i < self.len);
 
@@ -52,8 +44,27 @@ impl BitArray {
             self.words[word_index] &= !mask;
         }
     }
-}
+} // end of BitArray
 
+// --------------------------------------------
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bit_array_works() {
+        //  BitArray::new(10) sets all 10 elements to false
+        let mut array = BitArray::new(10);
+        assert_eq!(array.len(), 10);
+        assert!(!array.get(5));
+        // set element 5 to true
+        array.set(5, true);
+        assert!(array.get(5));
+        // set element 5 to false
+        array.set(5, false);
+        assert!(!array.get(5));
+    }
+} // end of tests
 
 
 
