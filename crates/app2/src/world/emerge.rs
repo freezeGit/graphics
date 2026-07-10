@@ -47,7 +47,7 @@ impl BitArray {
     }
 } // end of BitArray
 
-pub(crate) fn step_bits(bits: &mut BitArray, rng: &mut impl Rng) {
+pub(crate) fn step_bits_old(bits: &mut BitArray, rng: &mut impl Rng) {
     //let n = bits.len;
     let n = bits.len();
 
@@ -76,7 +76,7 @@ pub(crate) fn step_bits(bits: &mut BitArray, rng: &mut impl Rng) {
     bits.set(i, new_a);
     bits.set(j, new_b);
 }
-pub(crate) fn step_bits2(bits: &mut BitArray, rng: &mut impl Rng) {
+pub(crate) fn step_bits(bits: &mut BitArray, rng: &mut impl Rng) {
 //fn random_pair_step(world: &mut World) {
     let n = bits.len();
 
