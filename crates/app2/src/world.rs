@@ -5,16 +5,18 @@
 
 // src/demo/world.rs
 
-// Sub modules under mod world.
+// Submodules under mod world.
 // Many applications will have multiple sub modules.
 pub(crate) mod world_demo; // demo program data and logic
 pub(crate) mod emerge;
 // ---------------------------------------------------
 
-use crate::world::world_demo::{Gauge, Person, Signal, Thing, ThingState, TrafficLight};
-use crate::world::emerge::BitArray;
 //use rand::Rng;
+use crate::world::world_demo::{Gauge, Person, Signal, Thing, ThingState, TrafficLight};
+//use crate::world::emerge::BitArray;
+use crate::world::emerge::{BitArray, step_bits};
 use rand::{Rng, RngExt};
+use rand::rngs::ThreadRng;
 use gui_lib::World;
 
 /// TheWorld struct encapsulates application data and logic.
@@ -23,6 +25,7 @@ use gui_lib::World;
 //#[derive(Debug)] // TDJ: Debug is not needed
 pub(crate) struct TheWorld {
     bits: BitArray,
+    rng: ThreadRng,
     pub(crate) frame_number: u64, // TDJ: for batching
     pub(crate) tl: TrafficLight,
     pub(crate) thing: Thing,
@@ -30,36 +33,6 @@ pub(crate) struct TheWorld {
     //pub(crate) name: String,
     pub(crate) person: Person,
     pub(crate) value: f64,
-}
-
-fn step(bits: &mut BitArray, rng: &mut impl Rng) {
-    //let n = bits.len;
-    let n = bits.len();
-
-    assert!(
-        n >= 2,
-        "step requires at least 2 bits, got {n}"
-    );
-
-    let i = rng.random_range(0..n);
-
-    let mut j = rng.random_range(0..n - 1);
-    if j >= i {
-        j += 1;
-    }
-
-    let a = bits.get(i);
-    let b = bits.get(j);
-
-    let (new_a, new_b) = match (a, b) {
-        (false, false) => (false, true),
-        (false, true)  => (true, false),
-        (true, false)  => (true, true),
-        (true, true)   => (false, false),
-    };
-
-    bits.set(i, new_a);
-    bits.set(j, new_b);
 }
 
 impl World for TheWorld {
@@ -70,15 +43,20 @@ impl World for TheWorld {
     fn advance(&mut self) {
         // Increment frame number each simulation step.
         self.frame_number += 1;
+
+        step_bits(&mut self.bits, &mut self.rng);
+
         // Traffic light alternates between Go and Stop while simulation is running.
-        self.toggle_light();
+        //self.toggle_light();
     }
 }
 
 impl TheWorld {
     pub(crate) fn new() -> Self {
         Self {
-            bits: BitArray::new(10),
+            bits: BitArray::new(1000),
+
+            rng: rand::rng(),
 
             frame_number: 0,
             tl: TrafficLight {

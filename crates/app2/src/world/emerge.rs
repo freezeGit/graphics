@@ -1,3 +1,4 @@
+use rand::{Rng, RngExt};
 
 pub(crate) struct BitArray {
     words: Vec<u64>,
@@ -22,7 +23,7 @@ impl BitArray {
         self.len
     }
 
-    pub(crate)fn get(&self, i: usize) -> bool {
+    pub(crate) fn get(&self, i: usize) -> bool {
         debug_assert!(i < self.len);
 
         let word_index = i / 64;
@@ -31,7 +32,7 @@ impl BitArray {
         (self.words[word_index] & (1u64 << bit_index)) != 0
     }
 
-    pub(crate)fn set(&mut self, i: usize, value: bool) {
+    pub(crate) fn set(&mut self, i: usize, value: bool) {
         debug_assert!(i < self.len);
 
         let word_index = i / 64;
@@ -45,6 +46,43 @@ impl BitArray {
         }
     }
 } // end of BitArray
+
+pub(crate) fn step_bits(bits: &mut BitArray, rng: &mut impl Rng) {
+    //let n = bits.len;
+    let n = bits.len();
+
+    assert!(
+        n >= 2,
+        "step requires at least 2 bits, got {n}"
+    );
+
+    let i = rng.random_range(0..n);
+
+    // let mut j = rng.random_range(0..n - 1);
+    // if j >= i {
+    //     j += 1;
+    // }
+
+    let i = rng.random_range(0..n);
+    let j = rng.random_range(0..n);
+
+    if i == j {
+        return;
+    }
+
+    let a = bits.get(i);
+    let b = bits.get(j);
+
+    let (new_a, new_b) = match (a, b) {
+        (false, false) => (false, true),
+        (false, true)  => (true, false),
+        (true, false)  => (true, true),
+        (true, true)   => (false, false),
+    };
+
+    bits.set(i, new_a);
+    bits.set(j, new_b);
+}
 
 // --------------------------------------------
 #[cfg(test)]
