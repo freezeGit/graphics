@@ -57,13 +57,6 @@ pub(crate) fn step_bits(bits: &mut BitArray, rng: &mut impl Rng) {
     );
 
     let i = rng.random_range(0..n);
-
-    // let mut j = rng.random_range(0..n - 1);
-    // if j >= i {
-    //     j += 1;
-    // }
-
-    let i = rng.random_range(0..n);
     let j = rng.random_range(0..n);
 
     if i == j {
@@ -82,6 +75,47 @@ pub(crate) fn step_bits(bits: &mut BitArray, rng: &mut impl Rng) {
 
     bits.set(i, new_a);
     bits.set(j, new_b);
+}
+pub(crate) fn step_bits2(bits: &mut BitArray, rng: &mut impl Rng) {
+//fn random_pair_step(world: &mut World) {
+    let n = bits.len();
+
+    let i = rng.random_range(0..n);
+    let j = rng.random_range(0..n);
+
+    interact(bits, i, j);
+}
+
+fn interact(bits: &mut BitArray, i: usize, j: usize) {
+    if i == j {
+        return;
+    }
+
+    let a = bits.get(i);
+    let b = bits.get(j);
+
+    let (new_a, new_b) = apply_rule(a, b);
+
+    bits.set(i, new_a);
+    bits.set(j, new_b);
+}
+
+// fn apply_rule(a: bool, b: bool) -> (bool, bool) {
+//     match (a, b) {
+//         (false, false) => (false, true),
+//         (false, true)  => (true, false),
+//         (true, false)  => (true, true),
+//         (true, true)   => (false, false),
+//     }
+// }
+
+fn apply_rule(a: bool, b: bool) -> (bool, bool) {
+    // symmetrically reversible rule
+    (response(a, b), response(b, a))
+}
+
+fn response(this: bool, other: bool) -> bool {
+    this != other
 }
 
 // --------------------------------------------
