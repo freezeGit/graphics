@@ -47,35 +47,6 @@ impl BitArray {
     }
 } // end of BitArray
 
-pub(crate) fn step_bits_old(bits: &mut BitArray, rng: &mut impl Rng) {
-    //let n = bits.len;
-    let n = bits.len();
-
-    assert!(
-        n >= 2,
-        "step requires at least 2 bits, got {n}"
-    );
-
-    let i = rng.random_range(0..n);
-    let j = rng.random_range(0..n);
-
-    if i == j {
-        return;
-    }
-
-    let a = bits.get(i);
-    let b = bits.get(j);
-
-    let (new_a, new_b) = match (a, b) {
-        (false, false) => (false, true),
-        (false, true)  => (true, false),
-        (true, false)  => (true, true),
-        (true, true)   => (false, false),
-    };
-
-    bits.set(i, new_a);
-    bits.set(j, new_b);
-}
 pub(crate) fn step_bits(bits: &mut BitArray, rng: &mut impl Rng) {
 //fn random_pair_step(world: &mut World) {
     let n = bits.len();

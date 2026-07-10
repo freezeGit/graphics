@@ -155,23 +155,23 @@ impl TheApp {
                 )));
             }
 
-            BTN_PERSON => {
-                self.canvas
-                    .canvas
-                    .set_dialog(Box::new(MultiTextEntryDlg::new(
-                        DLG_ENTER_PERSON,
-                        "Enter person data",
-                        [
-                            TextEntryField::new("name", "Name", self.world.person.name.clone()),
-                            TextEntryField::new("city", "City", self.world.person.city.clone()),
-                            TextEntryField::new(
-                                "address",
-                                "Address",
-                                self.world.person.address.clone(),
-                            ),
-                        ],
-                    )));
-            }
+            // BTN_PERSON => {
+            //     self.canvas
+            //         .canvas
+            //         .set_dialog(Box::new(MultiTextEntryDlg::new(
+            //             DLG_ENTER_PERSON,
+            //             "Enter person data",
+            //             [
+            //                 TextEntryField::new("name", "Name", self.world.person.name.clone()),
+            //                 TextEntryField::new("city", "City", self.world.person.city.clone()),
+            //                 TextEntryField::new(
+            //                     "address",
+            //                     "Address",
+            //                     self.world.person.address.clone(),
+            //                 ),
+            //             ],
+            //         )));
+            // }
 
             // BTN_ENTER_NAME => {
             //     self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
@@ -181,59 +181,44 @@ impl TheApp {
             //         self.world.name.clone(),
             //     )));
             // }
-            BTN_ENTER_VALUE => {
-                let mut dlg = DragFloatDlg::new(
-                    DLG_ENTER_VALUE,
-                    "Enter value",
-                    //"Value:",
-                    self.world.value as f32,
-                );
-                dlg.set_speed(1.0);
-                dlg.set_decimal(1);
-                self.canvas.canvas.set_dialog(Box::new(dlg));
-            }
+            // BTN_ENTER_VALUE => {
+            //     let mut dlg = DragFloatDlg::new(
+            //         DLG_ENTER_VALUE,
+            //         "Enter value",
+            //         //"Value:",
+            //         self.world.value as f32,
+            //     );
+            //     dlg.set_speed(1.0);
+            //     dlg.set_decimal(1);
+            //     self.canvas.canvas.set_dialog(Box::new(dlg));
+            // }
 
-            BTN_STATE_A => {
-                self.world.thing.state = ThingState::StateA;
-            }
-
-            BTN_STATE_B => {
-                self.world.thing.state = ThingState::StateB;
-            }
+            // BTN_STATE_A => {
+            //     self.world.thing.state = ThingState::StateA;
+            // }
+            //
+            // BTN_STATE_B => {
+            //     self.world.thing.state = ThingState::StateB;
+            // }
 
             _ => {}
         }
     }
 
-    /// Handle drag float messages
-    ///
-    /// Requires application specific customization.
+
     fn handle_drag_float(&mut self, id: DragFloatId, value: f32) {
         match id {
-            DRAGFLOAT_GAUGE => {
-                self.world.gauge.set_pointer(value.into());
-            }
+            // DRAGFLOAT_GAUGE => {
+            //     self.world.gauge.set_pointer(value.into());
+            // }
 
             _ => {}
         }
     }
 
-    // /// Handle text entry messages
-    // ///
-    // /// Requires application specific customization.
-    // fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
-    //     match id {
-    //         DLG_ENTER_NAME => {
-    //             self.world.name = text.clone();
-    //         }
-    //
-    //         _ => {}
-    //     }
-    // }
 
-    /// Handle DialogAcceptedRadioBoxes messages
-    ///
-    /// Requires application specific customization.
+
+
     fn handle_radio_boxes(&mut self, id: RadioBoxesDlgId, value: i32) {
         match id {
             DLG_SIM_STATE => {
@@ -262,41 +247,39 @@ impl TheApp {
         }
     }
 
-    /// Handle handle_multi_text_entry messages
-    ///
-    /// Requires application specific customization.
+
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
-            DLG_ENTER_PERSON => {
-                for item in values {
-                    let (item_id, text) = item;
-                    match item_id.as_str() {
-                        "name" => {
-                            self.world.person.name = text;
-                        }
-                        "city" => {
-                            self.world.person.city = text;
-                        }
-                        "address" => {
-                            self.world.person.address = text;
-                        }
-                        _ => {}
-                    }
-                }
-            }
+            // DLG_ENTER_PERSON => {
+            //     for item in values {
+            //         let (item_id, text) = item;
+            //         match item_id.as_str() {
+            //             "name" => {
+            //                 self.world.person.name = text;
+            //             }
+            //             "city" => {
+            //                 self.world.person.city = text;
+            //             }
+            //             "address" => {
+            //                 self.world.person.address = text;
+            //             }
+            //             _ => {}
+            //         }
+            //     }
+            // }
 
             _ => {}
         }
     }
 
-    /// Handle drag float dialog messages
-    ///
-    /// Requires application specific customization.
+    //Handle drag float dialog messages
+
+    //Requires application specific customization.
     fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
         match id {
-            DLG_ENTER_VALUE => {
-                self.world.value = val as f64;
-            }
+            // DLG_ENTER_VALUE => {
+            //     self.world.value = val as f64;
+            // }
 
             _ => {}
         }
