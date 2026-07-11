@@ -8,18 +8,18 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::inits;
 use crate::ids::*;
+use crate::inits;
 //use crate::app_inits::{LAYOUT_STYLE, BACKGROUND_COLOR};
 use crate::world::TheWorld;
 //use crate::world::{Signal, TheWorld, ThingState};
-use crate::world::world_demo::{Signal, ThingState};
+//use crate::world::world_demo::{Signal, ThingState};
 //use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 #[allow(unused_imports)]
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{
-    BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
-    Separator, Shape, Space, Text,
+    BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator, Shape,
+    Space, Text,
 };
 
 #[derive(Debug)]
@@ -48,7 +48,7 @@ pub(crate) struct TheCanvas {
     // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
     // Widgets are stored in  BasicCanvas::Vec<Box<dyn Widget>>
     pub(crate) canvas: BasicCanvas, // From gui_lib
-    
+
     // ViewHandles fields are concrete shapes as unique handles of type Rc<RefCell<T>>
     view_handles: ViewHandles,
 }
@@ -78,14 +78,42 @@ impl TheCanvas {
         // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
         // Rc<RefCell<T>> coercion to ShapeHandle happens automatically
         // ----
+        const SIZE: usize = 6000;
+        const WIDTH: usize = 100;
 
-        // Add text to frame number.
+        // let x = index % width;
+        // let y = index / width;
+        //pub(crate) const SLIDER_GAUGE: SliderId = SliderId(1);
+
+        //const HEIGHT: usize = 100;
+
+        for y in 0..30 {
+            for x in 0..50 {
+                //let xpx = 75.0 + ((x % WIDTH) as f32) * 20.0;
+                let xpx = 75.0 + ((x % WIDTH) as f32) * 20.0;
+                let ypx = 75.0 + y as f32 * 20.0;
+                let bit_disp: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
+                    //eframe::egui::Pos2::new(50.0, 50.0),
+                    eframe::egui::Pos2::new(xpx, ypx),
+                    4.0,
+                )));
+                bit_disp.borrow_mut().set_line_width(0.0);
+                //bit_disp.borrow_mut().set_color(Color32::TRANSPARENT);
+                bit_disp.borrow_mut().set_fill_color(Color32::BLUE);
+                canvas.add_shape(bit_disp.clone());
+            }
+        }
+
+
+
+        // frame number.
         let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            eframe::egui::Pos2::new(250.0, 270.0),
-            format!("{}", 0),
+            //eframe::egui::Pos2::new(250.0, 270.0),
+            eframe::egui::Pos2::new(10.0, 10.0),
+            format!("Interactions: {}", 0),
         )));
-        stxt_frame.borrow_mut().set_size(36.0);
-        stxt_frame.borrow_mut().set_color(Color32::BLUE);
+        //stxt_frame.borrow_mut().set_size(36.0);
+        //stxt_frame.borrow_mut().set_color(Color32::BLUE);
         canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
 
         // // Add a Rectangle to the canvas
