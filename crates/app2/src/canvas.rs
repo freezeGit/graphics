@@ -21,18 +21,11 @@ use gui_lib::{
     BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator, Shape,
     Space, Text,
 };
+use crate::world::emerge::BitArray;
 
 #[derive(Debug)]
 struct ViewHandles {
-    //tl_circle2: Rc<RefCell<Circle>>,
     stxt_frame: Rc<RefCell<Text>>,
-    // rect: Rc<RefCell<Rectangle>>,
-    // arrow_head: Rc<RefCell<Polyline>>,
-    // stxt: Rc<RefCell<Text>>,
-    // stxtname: Rc<RefCell<Text>>,
-    // stxtcity: Rc<RefCell<Text>>,
-    // stxtaddress: Rc<RefCell<Text>>,
-    // stxtval: Rc<RefCell<Text>>,
 }
 
 /// ## struct Canvas
@@ -46,7 +39,7 @@ pub(crate) struct TheCanvas {
     // BasicCanvas provides underlying canvas structure and functionality.
     // Shapes are stored in BasicCanvas::shapes: Vec<ShapeHandle>
     // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
-    // Widgets are stored in  BasicCanvas::Vec<Box<dyn Widget>>
+    // Widgets are stored in BasicCanvas::Vec<Box<dyn Widget>>
     pub(crate) canvas: BasicCanvas, // From gui_lib
 
     // ViewHandles fields are concrete shapes as unique handles of type Rc<RefCell<T>>
@@ -78,183 +71,41 @@ impl TheCanvas {
         // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
         // Rc<RefCell<T>> coercion to ShapeHandle happens automatically
         // ----
-        const SIZE: usize = 6000;
+        //const SIZE: usize = 6000;
         const WIDTH: usize = 100;
 
-        // let x = index % width;
-        // let y = index / width;
-        //pub(crate) const SLIDER_GAUGE: SliderId = SliderId(1);
-
-        //const HEIGHT: usize = 100;
-
-        for y in 0..30 {
-            for x in 0..50 {
-                //let xpx = 75.0 + ((x % WIDTH) as f32) * 20.0;
-                let xpx = 75.0 + ((x % WIDTH) as f32) * 20.0;
-                let ypx = 75.0 + y as f32 * 20.0;
-                let bit_disp: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-                    //eframe::egui::Pos2::new(50.0, 50.0),
-                    eframe::egui::Pos2::new(xpx, ypx),
-                    4.0,
+        for y in 0..60 {
+            for x in 0..100 {
+                let xpx = 75.0 + ((x % WIDTH) as f32) * 10.0;
+                let ypx = 75.0 + y as f32 * 10.0;
+                let bit_disp: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+                    egui::Pos2::new(xpx, ypx),
+                    egui::Vec2::new(10.0, 10.0),
                 )));
-                bit_disp.borrow_mut().set_line_width(0.0);
-                //bit_disp.borrow_mut().set_color(Color32::TRANSPARENT);
-                bit_disp.borrow_mut().set_fill_color(Color32::BLUE);
+                //bit_disp.borrow_mut().set_line_width(0.0);
+                bit_disp.borrow_mut().set_color(Color32::GRAY);
+                //bit_disp.borrow_mut().set_fill_color(Color32::LIGHT_BLUE);
+                bit_disp.borrow_mut().set_fill_color(Color32::BLACK);
                 canvas.add_shape(bit_disp.clone());
             }
         }
 
-
-
         // frame number.
         let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             //eframe::egui::Pos2::new(250.0, 270.0),
-            eframe::egui::Pos2::new(10.0, 10.0),
+            egui::Pos2::new(10.0, 10.0),
             format!("Interactions: {}", 0),
         )));
         //stxt_frame.borrow_mut().set_size(36.0);
         //stxt_frame.borrow_mut().set_color(Color32::BLUE);
         canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
 
-        // // Add a Rectangle to the canvas
-        // // rect is a Rc<RefCell<T>> pointing to a concrete struct (in this case, a Rectangle)
-        // let rect: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
-        //     eframe::egui::Pos2::new(400.0, 200.0),
-        //     eframe::egui::Vec2::new(150.0, 100.0),
-        // )));
-        // rect.borrow_mut().set_fill_color(Color32::LIGHT_GRAY); // using RefCell interior mutability
-        // // cloning increases the ref count of the Rc
-        // // coercion to ShapeHandle happens automatically
-        // // pushed into BasicCanvas::shapes: Vec<ShapeHandle>
-        // canvas.add_shape(rect.clone()); // coercion to ShapeHandle happens automatically
 
-        // // Add a series of Polylines to the canvas
-        // let mut y = 75.0;
-        // for _ in 0..22 {
-        //     //note: vee will be lost. It will not be used to initialize a field in Self
-        //     let vee: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-        //         eframe::egui::Pos2::new(150.0, y),
-        //         [
-        //             eframe::egui::Pos2::new(0.0, 0.0),
-        //             eframe::egui::Pos2::new(10.0, 10.0),
-        //             eframe::egui::Pos2::new(20.0, 0.0),
-        //         ],
-        //     )));
-        //     // Push each polyline sequentially into BasicCanvas::shapes: Vec<ShapeHandle>
-        //     canvas.add_shape(vee.clone()); // coercion to ShapeHandle happens automatically
-        //     y += 10.0;
-        // }
-        //
-        // // Add the bottom traffic light circle to the canvas
-        // // tl_circle1 is not used to initialize a field in Self
-        // // and it will go out of scope and be dropped.
-        // let tl_circle1: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-        //     eframe::egui::Pos2::new(200.0, 200.0),
-        //     75.0,
-        // )));
-        // tl_circle1.borrow_mut().set_line_width(4.0);
-        // tl_circle1.borrow_mut().set_fill_color(Color32::GRAY);
-        // canvas.add_shape(tl_circle1.clone()); // coercion to ShapeHandle happens automatically
-        //
-        // // Add the top traffic light circle to the canvas
-        // let tl_circle2: Rc<RefCell<Circle>> = Rc::new(RefCell::new(Circle::new(
-        //     eframe::egui::Pos2::new(200.0, 200.0),
-        //     10.0,
-        // )));
-        // tl_circle2.borrow_mut().set_fill_color(Color32::RED);
-        // // Will be drawn on top of tl_circle1 because of z-order
-        // canvas.add_shape(tl_circle2.clone()); // coercion to ShapeHandlehappens automatically
-
-        // // Add text to frame number.
-        // let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     eframe::egui::Pos2::new(250.0, 270.0),
-        //     format!("{}", 0),
-        // )));
-        // stxt_frame.borrow_mut().set_size(36.0);
-        // stxt_frame.borrow_mut().set_color(Color32::BLUE);
-        // canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
-
-        // // Add a dotted polyline to the canvas
-        // //let poly: ShapeHandle = Rc::new(RefCell::new(Polyline::new(
-        // //let poly: Rc<RefCell<dyn Shape>> = Rc::new(RefCell::new(Polyline::new(
-        // let poly: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-        //     eframe::egui::Pos2::new(550.0, 200.0),
-        //     [
-        //         eframe::egui::Pos2::new(0.0, 0.0),
-        //         eframe::egui::Pos2::new(25.0, 50.0),
-        //         eframe::egui::Pos2::new(75.0, -50.0),
-        //         eframe::egui::Pos2::new(125.0, 50.0),
-        //         eframe::egui::Pos2::new(175.0, -50.0),
-        //         eframe::egui::Pos2::new(225.0, 50.0),
-        //         eframe::egui::Pos2::new(250.0, 0.0),
-        //     ],
-        // )));
-        // poly.borrow_mut().set_color(Color32::RED);
-        // poly.borrow_mut().set_line_width(4.0);
-        // poly.borrow_mut().set_line_style(Dotted);
-        // canvas.add_shape(poly); // coercion to ShapeHandle happens automatically
-        //
-        // // Add gauge rectangle
-        // let gauge: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new_from_center(
-        //     eframe::egui::Pos2::new(500.0, 350.0),
-        //     eframe::egui::Vec2::new(850.0, 50.0),
-        // )));
-        // gauge.borrow_mut().set_fill_color(Color32::LIGHT_GRAY);
-        // canvas.add_shape(gauge); // coercion to ShapeHandle happens automatically
-        //
-        // let arrow_head: Rc<RefCell<Polyline>> = Rc::new(RefCell::new(Polyline::new(
-        //     eframe::egui::Pos2::new(100.0, 369.0),
-        //     [
-        //         eframe::egui::Pos2::new(-4.0, 0.0),
-        //         eframe::egui::Pos2::new(0.0, -39.0),
-        //         eframe::egui::Pos2::new(4.0, 0.0),
-        //     ],
-        // )));
-        // arrow_head.borrow_mut().set_line_width(2.0);
-        // canvas.add_shape(arrow_head.clone()); // coercion to ShapeHandle happens automatically
-        //
-        // // Add text to describe the state of the thing
-        // let stxt = Rc::new(RefCell::new(Text::new(egui::Pos2::new(345.0, 175.0), "")));
-        // canvas.add_shape(stxt.clone()); // coercion to ShapeHandle happens automatically
-        //
-        // // Add text to display name.
-        // let stxtname: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     egui::Pos2::new(325.0, 33.0),
-        //     "Name: Steve",
-        // )));
-        // canvas.add_shape(stxtname.clone()); // coercion to ShapeHandle happens automatically
-        //
-        // let stxtcity: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     egui::Pos2::new(325.0, 65.0),
-        //     "City: Birtle",
-        // )));
-        // canvas.add_shape(stxtcity.clone()); // coercion to ShapeHandle happens automatically
-        //
-        // let stxtaddress: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     egui::Pos2::new(325.0, 97.0),
-        //     "Address: 123 Main St",
-        // )));
-        // canvas.add_shape(stxtaddress.clone()); // coercion to ShapeHandle happens automatically
-        //
-        // // Add text to display value.
-        // let stxtval: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     eframe::egui::Pos2::new(650.0, 33.0),
-        //     format!("{}{:.2}", "Value: ", 0.0),
-        // )));
-        // canvas.add_shape(stxtval.clone()); // coercion to ShapeHandle happens automatically
 
         ViewHandles {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
-            //tl_circle2,
             stxt_frame,
-            // rect,
-            // arrow_head,
-            // stxt,
-            // stxtname,
-            // stxtcity,
-            // stxtaddress,
-            // stxtval,
-        }
+         }
     }
 
     // Create and add widgets as Box<dyn Widget>
@@ -321,74 +172,18 @@ impl TheCanvas {
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
     pub(crate) fn update(&mut self, world: &TheWorld) {
+
+        for i in 0..world.bits.len() {
+            let bit = world.bits.get(i);
+            //let col = if bit { Color32::LIGHT_RED } else { Color32::LIGHT_BLUE };
+            let col = if bit { Color32::WHITE } else { Color32::BLACK };
+            self.canvas.shapes[i].borrow_mut().set_fill_color(col);
+        }
+
         // Set stxt_frame to display frame number
         self.view_handles
             .stxt_frame
             .borrow_mut()
-            .set_text(format!("{}", world.frame_number));
-        // Get state of traffic light and set appropriate color
-        // let tlc = if world.tl.state == Signal::Stop {
-        //     Color32::RED
-        // } else {
-        //     Color32::GREEN
-        // };
-        // self.view_handles
-        //     .tl_circle2
-        //     .borrow_mut()
-        //     .set_fill_color(tlc);
-
-        // Update gauge pointer
-        // let mut arrow_head = self.view_handles.arrow_head.borrow_mut();
-        // let mut ah_pos = arrow_head.location();
-        // let pointer = world.gauge.pointer() as f32;
-        // ah_pos.x = 100.0 + 8.0 * pointer;
-        // arrow_head.move_to(ah_pos);
-
-        // Update thing state, color coded
-        // match world.thing.state {
-        //     ThingState::StateA => {
-        //         self.view_handles
-        //             .rect
-        //             .borrow_mut()
-        //             .set_fill_color(Color32::GOLD);
-        //         self.view_handles.stxt.borrow_mut().set_text("State A");
-        //     }
-        //     ThingState::StateB => {
-        //         self.view_handles
-        //             .rect
-        //             .borrow_mut()
-        //             .set_fill_color(Color32::CYAN);
-        //         self.view_handles.stxt.borrow_mut().set_text("State B");
-        //     }
-        //     _ => {}
-        // }
-
-        //Update name
-        // let name = format!("Name: {}", world.name);
-        // self.stxtname.borrow_mut().set_text(name);
-
-        // Update person
-        // let person_name = format!("Name: {}", world.person.name);
-        // self.view_handles
-        //     .stxtname
-        //     .borrow_mut()
-        //     .set_text(person_name);
-        //
-        // let person_city = format!("City: {}", world.person.city);
-        // self.view_handles
-        //     .stxtcity
-        //     .borrow_mut()
-        //     .set_text(person_city);
-        //
-        // let person_address = format!("Address: {}", world.person.address);
-        // self.view_handles
-        //     .stxtaddress
-        //     .borrow_mut()
-        //     .set_text(person_address);
-
-        //Update val_string
-        // let val = world.value;
-        // let val_string = format!("Value: {:.2}", val);
-        // self.view_handles.stxtval.borrow_mut().set_text(val_string);
+            .set_text(format!("Interactions: {}", world.frame_number));
     }
 } // end of impl TheCanvas

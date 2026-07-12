@@ -24,16 +24,9 @@ use gui_lib::World;
 /// It has no dependence on the app1 struct or the canvas struct.
 //#[derive(Debug)] // TDJ: Debug is not needed
 pub(crate) struct TheWorld {
-    bits: BitArray,
     rng: ThreadRng,
+    pub bits: BitArray,
     pub(crate) frame_number: u64, // TDJ: for batching
-    //pub(crate) tl: TrafficLight,
-
-    // pub(crate) thing: Thing,
-    // pub(crate) gauge: Gauge,
-    // //pub(crate) name: String,
-    // pub(crate) person: Person,
-    // pub(crate) value: f64,
 }
 
 impl World for TheWorld {
@@ -55,35 +48,40 @@ impl World for TheWorld {
 
 impl TheWorld {
     pub(crate) fn new() -> Self {
+        let mut bits = BitArray::new(6000);
+
+        // Example: change some bits before storing the BitArray.
+        // Replace these with the actual BitArray methods from your emerge module.
+        bits.set(0, true);
+        bits.set(10, true);
+        bits.set(42, true);
+
         Self {
-            bits: BitArray::new(1000),
-
             rng: rand::rng(),
-
+            bits,
             frame_number: 0,
-
-            // tl: TrafficLight {
-            //     state: Signal::Stop,
-            // },
-            // thing: Thing {
-            //     state: ThingState::StateC,
-            // },
-            // gauge: Gauge::new(),
-            // //name: "Steve".to_string(),
-            // person: Person {
-            //     //name: String::from("Bill"),
-            //     name: String::from("Steve"),
-            //     city: String::from("Birtle"),
-            //     address: String::from("123 Main St"),
-            // },
-            // value: 0.0,
         }
     }
-
-    // fn toggle_light(&mut self) {
-    //     self.tl.state = match self.tl.state {
-    //         Signal::Stop => Signal::Go,
-    //         Signal::Go => Signal::Stop,
-    //     };
-    // }
 }
+//}
+// impl TheWorld {
+//     pub(crate) fn new() -> Self {
+//         Self {
+//             bits: BitArray::new(6000);
+//
+//             rng: rand::rng(),
+//             bits,
+//             frame_number: 0,
+//         }
+//     }
+// }
+
+// impl TheWorld {
+//     pub(crate) fn new() -> Self {
+//         Self {
+//             rng: rand::rng(),
+//             bits: BitArray::new(6000),
+//             frame_number: 0,
+//         }
+//     }
+// }
