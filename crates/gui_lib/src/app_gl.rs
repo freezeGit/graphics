@@ -63,7 +63,6 @@ fn custom_native_options(xv: f32, yv: f32) -> eframe::NativeOptions {
 /// The `new()` function must have an empty parameter list. This guarantees that
 /// the application `new()` constructor will have the correct signature to be called by the
 /// `run_the_app()` function.
-
 pub trait UserApp: eframe::App {
     fn new() -> Self;
 }

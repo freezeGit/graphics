@@ -12,7 +12,6 @@
 /// The default implementation of the `advance` function does nothing.
 /// This allows non-simulation applications or systems that do not require
 /// temporal updates to use this trait without implementing specific logic.
-
 /// # Notes
 /// - Implementors of this trait can provide their own logic for the `advance` method
 ///   to customize how the world evolves during each update.

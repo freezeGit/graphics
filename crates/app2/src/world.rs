@@ -63,25 +63,4 @@ impl TheWorld {
         }
     }
 }
-//}
-// impl TheWorld {
-//     pub(crate) fn new() -> Self {
-//         Self {
-//             bits: BitArray::new(6000);
-//
-//             rng: rand::rng(),
-//             bits,
-//             frame_number: 0,
-//         }
-//     }
-// }
 
-// impl TheWorld {
-//     pub(crate) fn new() -> Self {
-//         Self {
-//             rng: rand::rng(),
-//             bits: BitArray::new(6000),
-//             frame_number: 0,
-//         }
-//     }
-// }

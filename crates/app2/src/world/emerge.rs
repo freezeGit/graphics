@@ -86,9 +86,161 @@ fn apply_rule(a: bool, b: bool) -> (bool, bool) {
 }
 
 fn response(this: bool, other: bool) -> bool {
-    this != other
+    if this == other {
+        if this {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        if this {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
 
+// fn response(this: bool, other: bool) -> bool {
+//     if this == other {
+//         if this {
+//             return true;
+//         } else {
+//             return false;
+//         }
+//     } else {
+//         if this {
+//             return true;
+//         } else {
+//             return false;
+//         }
+//     }
+// }
+
+
+
+
+// if this {
+    //     if other {
+    //         return true;
+    //     }
+    //     else {
+    //         return true;
+    //     }
+    // }
+    // else {
+    //     if other {
+    //         return true;
+    //     }
+    //     else {
+    //         return false;
+    //     }
+    // }
+
+
+// fn response(this: bool, other: bool) -> bool {
+//     this != other
+// }
+
+// fn response(this: bool, other: bool) -> bool {
+//     this == other
+// }
+
+// fn response(this: bool, other: bool) -> bool {
+//     if this {
+//         if other {
+//             return true;
+//         }
+//         else {
+//             return true;
+//         }
+//     }
+//     else {
+//         if other {
+//             return false;
+//         }
+//         else {
+//             return true;
+//         }
+//     }
+// }
+
+// fn response(this: bool, other: bool) -> bool {
+//     if this {
+//         if other {
+//             return false;
+//         }
+//         else {
+//             return true;
+//         }
+//     }
+//     else {
+//         if other {
+//             return true;
+//         }
+//         else {
+//             return false;
+//         }
+//     }
+// }
+// fn response(this: bool, other: bool) -> bool {
+//     if this {
+//         if other {
+//             return false;
+//         }
+//         else {
+//             return true;
+//         }
+//     }
+//     else {
+//         if other {
+//             return true;
+//         }
+//         else {
+//             return false;
+//         }
+//     }
+// }
+
+// fn response(this: bool, other: bool) -> bool {
+//     //Always same number false and true
+//     if this {
+//         if other {
+//             return true;
+//         }
+//         else {
+//             return false;
+//         }
+//     }
+//     else {
+//         if other {
+//             return true;
+//         }
+//         else {
+//             return false;
+//         }
+//     }
+// }
+
+// fn response(this: bool, other: bool) -> bool {
+//     //Always same number false and true
+//     if this {
+//         if other {
+//             return true;
+//         }
+//         else {
+//             return true;
+//         }
+//     }
+//     else {
+//         if other {
+//             return true;
+//         }
+//         else {
+//             return false;
+//         }
+//     }
+// }
 // --------------------------------------------
 #[cfg(test)]
 mod tests {

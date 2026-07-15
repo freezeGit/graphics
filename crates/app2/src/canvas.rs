@@ -21,7 +21,7 @@ use gui_lib::{
     BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator, Shape,
     Space, Text,
 };
-use crate::world::emerge::BitArray;
+//use crate::world::emerge::BitArray;
 
 #[derive(Debug)]
 struct ViewHandles {

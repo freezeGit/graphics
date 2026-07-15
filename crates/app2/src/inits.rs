@@ -22,7 +22,7 @@ pub const INTERVAL: f64 = 0.5;
 // `BATCH_SIZE`: Number of world advances to perform in a single simulation step
 // during fast-forward of the simulation.
 //pub const BATCH_SIZE: u32 = 1;
-pub const BATCH_SIZE: u32 = 1000000;
+pub const BATCH_SIZE: u32 = 100;
 // `SMOOTH_ANIMATION`: If true, the simulation will request repaint at 16ms intervals.
 // This may result in a smoother animation, but may also cause performance issues
 // because of extra refresh requests. If false, the simulation will request repaint
