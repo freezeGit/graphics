@@ -47,17 +47,17 @@ impl BitArray {
     }
 } // end of BitArray
 
-pub(crate) fn step_bits(bits: &mut BitArray, rng: &mut impl Rng) {
+pub(crate) fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
 //fn random_pair_step(world: &mut World) {
     let n = bits.len();
 
     let i = rng.random_range(0..n);
     let j = rng.random_range(0..n);
 
-    interact(bits, i, j);
+    interact(bits, rule, i, j);
 }
 
-fn interact(bits: &mut BitArray, i: usize, j: usize) {
+fn interact(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
     if i == j {
         return;
     }
@@ -66,20 +66,21 @@ fn interact(bits: &mut BitArray, i: usize, j: usize) {
     let b = bits.get(j);
 
     //let (new_a, new_b) = apply_rule(a, b);
-    let (new_a, new_b) = apply_rule(a, b);
+    let (new_a, new_b) = rule.apply_rule(a, b);
 
     bits.set(i, new_a);
     bits.set(j, new_b);
 }
 
-struct Rule(bool, bool, bool, bool);
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Rule(bool, bool, bool, bool);
 
 // fn bit(n: u8, i: u8) -> bool {
 //     ((n >> i) & 1) != 0
 // }
 
 impl Rule {
-    fn new(n: u8) -> Self {
+   pub (crate) fn new(n: u8) -> Self {
         Self(
             Self::bit(n, 3),
             Self::bit(n, 2),
@@ -95,9 +96,23 @@ impl Rule {
     //     apply_rule(a, b)
     // }
 
-    fn apply_rule(: bool, b: bool) -> (bool, bool) {
+    fn response(self, this: bool, other: bool) -> bool {
+        if this == other {
+            if this {
+                self.3
+            } else {
+                self.0
+            }
+        } else if this {
+            self.2
+        } else {
+            self.1
+        }
+    }
+
+    fn apply_rule(self, a: bool, b: bool) -> (bool, bool) {
         // symmetrically reversible rule
-        (response(a, b), response(b, a))
+        (self.response(a, b), self.response(b, a))
     }
 }
 // fn make_rule(n: u8) -> Rule {
@@ -118,24 +133,24 @@ impl Rule {
 //     )
 // }
 
-fn apply_rule(a: bool, b: bool) -> (bool, bool) {
-    // symmetrically reversible rule
-    (response(a, b), response(b, a))
-}
+// fn apply_rule(a: bool, b: bool) -> (bool, bool) {
+//     // symmetrically reversible rule
+//     (response(a, b), response(b, a))
+// }
 
-fn response(rule: Rule, this: bool, other: bool) -> bool {
-    if this == other {
-        if this {
-            rule.3
-        } else {
-            rule.0
-        }
-    } else if this {
-        rule.2
-    } else {
-        rule.1
-    }
-}
+// fn response(rule: Rule, this: bool, other: bool) -> bool {
+//     if this == other {
+//         if this {
+//             rule.3
+//         } else {
+//             rule.0
+//         }
+//     } else if this {
+//         rule.2
+//     } else {
+//         rule.1
+//     }
+// }
 
 
 // fn response(this: bool, other: bool) -> bool {

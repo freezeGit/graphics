@@ -14,7 +14,7 @@ pub(crate) mod emerge;
 //use rand::Rng;
 use crate::world::world_demo::{Gauge, Person, Signal, Thing, ThingState, TrafficLight};
 //use crate::world::emerge::BitArray;
-use crate::world::emerge::{BitArray, step_bits};
+use crate::world::emerge::{BitArray, Rule, step_bits};
 use rand::{Rng, RngExt};
 use rand::rngs::ThreadRng;
 use gui_lib::World;
@@ -26,7 +26,8 @@ use gui_lib::World;
 pub(crate) struct TheWorld {
     rng: ThreadRng,
     pub bits: BitArray,
-    pub(crate) frame_number: u64, // TDJ: for batching
+    pub rule: Rule,
+    pub(crate) frame_number: u64, // for batching
 }
 
 impl World for TheWorld {
@@ -39,7 +40,7 @@ impl World for TheWorld {
         self.frame_number += 1;
 
         // Advance simulation by one step.
-        step_bits(&mut self.bits, &mut self.rng);
+        step_bits(&mut self.bits, self.rule, &mut self.rng);
 
         // Traffic light alternates between Go and Stop while simulation is running.
         //self.toggle_light();
@@ -59,6 +60,7 @@ impl TheWorld {
         Self {
             rng: rand::rng(),
             bits,
+            rule: Rule::new(6),
             frame_number: 0,
         }
     }
