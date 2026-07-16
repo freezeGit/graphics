@@ -65,19 +65,57 @@ fn interact(bits: &mut BitArray, i: usize, j: usize) {
     let a = bits.get(i);
     let b = bits.get(j);
 
+    //let (new_a, new_b) = apply_rule(a, b);
     let (new_a, new_b) = apply_rule(a, b);
 
     bits.set(i, new_a);
     bits.set(j, new_b);
 }
 
-// fn apply_rule(a: bool, b: bool) -> (bool, bool) {
-//     match (a, b) {
-//         (false, false) => (false, true),
-//         (false, true)  => (true, false),
-//         (true, false)  => (true, true),
-//         (true, true)   => (false, false),
-//     }
+struct Rule(bool, bool, bool, bool);
+
+// fn bit(n: u8, i: u8) -> bool {
+//     ((n >> i) & 1) != 0
+// }
+
+impl Rule {
+    fn new(n: u8) -> Self {
+        Self(
+            Self::bit(n, 3),
+            Self::bit(n, 2),
+            Self::bit(n, 1),
+            Self::bit(n, 0),
+        )
+    }
+
+    fn bit(n: u8, i: u8) -> bool {
+        ((n >> i) & 1) != 0
+    }
+    // fn apply(&self, a: bool, b: bool) -> (bool, bool) {
+    //     apply_rule(a, b)
+    // }
+
+    fn apply_rule(: bool, b: bool) -> (bool, bool) {
+        // symmetrically reversible rule
+        (response(a, b), response(b, a))
+    }
+}
+// fn make_rule(n: u8) -> Rule {
+//     (
+//         bit(n, 3),
+//         bit(n, 2),
+//         bit(n, 1),
+//         bit(n, 0),
+//     )
+// }
+
+// fn make_rule(n: u8) -> Rule {
+//     Rule(
+//         bit(n, 3),
+//         bit(n, 2),
+//         bit(n, 1),
+//         bit(n, 0),
+//     )
 // }
 
 fn apply_rule(a: bool, b: bool) -> (bool, bool) {
@@ -85,21 +123,20 @@ fn apply_rule(a: bool, b: bool) -> (bool, bool) {
     (response(a, b), response(b, a))
 }
 
-fn response(this: bool, other: bool) -> bool {
+fn response(rule: Rule, this: bool, other: bool) -> bool {
     if this == other {
         if this {
-            return true;
+            rule.3
         } else {
-            return false;
+            rule.0
         }
+    } else if this {
+        rule.2
     } else {
-        if this {
-            return false;
-        } else {
-            return true;
-        }
+        rule.1
     }
 }
+
 
 // fn response(this: bool, other: bool) -> bool {
 //     if this == other {
@@ -110,137 +147,22 @@ fn response(this: bool, other: bool) -> bool {
 //         }
 //     } else {
 //         if this {
-//             return true;
+//             return false;
 //         } else {
-//             return false;
-//         }
-//     }
-// }
-
-
-
-
-// if this {
-    //     if other {
-    //         return true;
-    //     }
-    //     else {
-    //         return true;
-    //     }
-    // }
-    // else {
-    //     if other {
-    //         return true;
-    //     }
-    //     else {
-    //         return false;
-    //     }
-    // }
-
-
-// fn response(this: bool, other: bool) -> bool {
-//     this != other
-// }
-
-// fn response(this: bool, other: bool) -> bool {
-//     this == other
-// }
-
-// fn response(this: bool, other: bool) -> bool {
-//     if this {
-//         if other {
-//             return true;
-//         }
-//         else {
-//             return true;
-//         }
-//     }
-//     else {
-//         if other {
-//             return false;
-//         }
-//         else {
 //             return true;
 //         }
 //     }
 // }
 
-// fn response(this: bool, other: bool) -> bool {
-//     if this {
-//         if other {
-//             return false;
-//         }
-//         else {
-//             return true;
-//         }
-//     }
-//     else {
-//         if other {
-//             return true;
-//         }
-//         else {
-//             return false;
-//         }
-//     }
-// }
-// fn response(this: bool, other: bool) -> bool {
-//     if this {
-//         if other {
-//             return false;
-//         }
-//         else {
-//             return true;
-//         }
-//     }
-//     else {
-//         if other {
-//             return true;
-//         }
-//         else {
-//             return false;
-//         }
+// fn apply_rule(a: bool, b: bool) -> (bool, bool) {
+//     match (a, b) {
+//         (false, false) => (false, true),
+//         (false, true)  => (true, false),
+//         (true, false)  => (true, true),
+//         (true, true)   => (false, false),
 //     }
 // }
 
-// fn response(this: bool, other: bool) -> bool {
-//     //Always same number false and true
-//     if this {
-//         if other {
-//             return true;
-//         }
-//         else {
-//             return false;
-//         }
-//     }
-//     else {
-//         if other {
-//             return true;
-//         }
-//         else {
-//             return false;
-//         }
-//     }
-// }
-
-// fn response(this: bool, other: bool) -> bool {
-//     //Always same number false and true
-//     if this {
-//         if other {
-//             return true;
-//         }
-//         else {
-//             return true;
-//         }
-//     }
-//     else {
-//         if other {
-//             return true;
-//         }
-//         else {
-//             return false;
-//         }
-//     }
-// }
 // --------------------------------------------
 #[cfg(test)]
 mod tests {
