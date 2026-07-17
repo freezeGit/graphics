@@ -36,6 +36,7 @@ impl World for TheWorld {
     /// this method can be left undefined:
     /// it will be automatically implemented as an empty function.
     fn advance(&mut self) {
+        //println!("{:?}", self.rule);
         // Increment frame number each simulation step.
         self.frame_number += 1;
 
@@ -51,7 +52,7 @@ impl TheWorld {
     pub(crate) fn new() -> Self {
         let mut bits = BitArray::new(6000);
 
-        // Example: change some bits before storing the BitArray.
+        // TDJ: Example: change some bits before storing the BitArray.
         // Replace these with the actual BitArray methods from your emerge module.
         bits.set(0, true);
         bits.set(10, true);
@@ -60,7 +61,7 @@ impl TheWorld {
         Self {
             rng: rand::rng(),
             bits,
-            rule: Rule::new(6),
+            rule: Rule::new(13),
             frame_number: 0,
         }
     }

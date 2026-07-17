@@ -7,11 +7,8 @@ pub(crate) struct BitArray {
 
 impl BitArray {
     pub(crate) fn new(len: usize) -> Self {
-        assert!(
-            len >= 2,
-            "BitArray length must be at least 2, got {len}"
-        );
-        
+        assert!(len >= 2, "BitArray length must be at least 2, got {len}");
+
         let word_count = (len + 63) / 64;
         Self {
             words: vec![0; word_count],
@@ -48,7 +45,6 @@ impl BitArray {
 } // end of BitArray
 
 pub(crate) fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
-//fn random_pair_step(world: &mut World) {
     let n = bits.len();
 
     let i = rng.random_range(0..n);
@@ -65,8 +61,8 @@ fn interact(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
     let a = bits.get(i);
     let b = bits.get(j);
 
-    //let (new_a, new_b) = apply_rule(a, b);
-    let (new_a, new_b) = rule.apply_rule(a, b);
+    // Symmetrical application of the rule.
+    let (new_a, new_b) = rule.apply(a, b);
 
     bits.set(i, new_a);
     bits.set(j, new_b);
@@ -75,12 +71,9 @@ fn interact(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
 #[derive(Debug, Clone, Copy)]
 pub(crate) struct Rule(bool, bool, bool, bool);
 
-// fn bit(n: u8, i: u8) -> bool {
-//     ((n >> i) & 1) != 0
-// }
-
 impl Rule {
-   pub (crate) fn new(n: u8) -> Self {
+    pub(crate) fn new(n: u8) -> Self {
+        assert!(n < 16, "Rule number must be less than 16, got {n}");
         Self(
             Self::bit(n, 3),
             Self::bit(n, 2),
@@ -92,93 +85,26 @@ impl Rule {
     fn bit(n: u8, i: u8) -> bool {
         ((n >> i) & 1) != 0
     }
-    // fn apply(&self, a: bool, b: bool) -> (bool, bool) {
-    //     apply_rule(a, b)
-    // }
 
     fn response(self, this: bool, other: bool) -> bool {
+        // The two bits are equal
         if this == other {
-            if this {
-                self.3
-            } else {
-                self.0
-            }
+            if this { self.0 } else { self.1 }
+        // The two bits are different
         } else if this {
             self.2
         } else {
-            self.1
+            self.3
         }
     }
 
-    fn apply_rule(self, a: bool, b: bool) -> (bool, bool) {
+    fn apply(self, a: bool, b: bool) -> (bool, bool) {
         // symmetrically reversible rule
         (self.response(a, b), self.response(b, a))
     }
 }
-// fn make_rule(n: u8) -> Rule {
-//     (
-//         bit(n, 3),
-//         bit(n, 2),
-//         bit(n, 1),
-//         bit(n, 0),
-//     )
-// }
-
-// fn make_rule(n: u8) -> Rule {
-//     Rule(
-//         bit(n, 3),
-//         bit(n, 2),
-//         bit(n, 1),
-//         bit(n, 0),
-//     )
-// }
-
-// fn apply_rule(a: bool, b: bool) -> (bool, bool) {
-//     // symmetrically reversible rule
-//     (response(a, b), response(b, a))
-// }
-
-// fn response(rule: Rule, this: bool, other: bool) -> bool {
-//     if this == other {
-//         if this {
-//             rule.3
-//         } else {
-//             rule.0
-//         }
-//     } else if this {
-//         rule.2
-//     } else {
-//         rule.1
-//     }
-// }
-
-
-// fn response(this: bool, other: bool) -> bool {
-//     if this == other {
-//         if this {
-//             return true;
-//         } else {
-//             return false;
-//         }
-//     } else {
-//         if this {
-//             return false;
-//         } else {
-//             return true;
-//         }
-//     }
-// }
-
-// fn apply_rule(a: bool, b: bool) -> (bool, bool) {
-//     match (a, b) {
-//         (false, false) => (false, true),
-//         (false, true)  => (true, false),
-//         (true, false)  => (true, true),
-//         (true, true)   => (false, false),
-//     }
-// }
-
 // --------------------------------------------
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -197,12 +123,3 @@ mod tests {
         assert!(!array.get(5));
     }
 } // end of tests
-
-
-
-
-
-
-
-
-
