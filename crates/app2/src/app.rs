@@ -129,6 +129,14 @@ impl TheApp {
                      Written in Rust + egui 0.33.3"
                 )));
             }
+            BTN_ABOUT => {
+                self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
+                    DLG_ABOUT,
+                    "About",
+                    "Emergence. \n\
+                    First working app"
+                )));
+            }
 
             BTN_SIM => {
                 let current_choice =
@@ -155,23 +163,24 @@ impl TheApp {
                 )));
             }
 
-            // BTN_PERSON => {
-            //     self.canvas
-            //         .canvas
-            //         .set_dialog(Box::new(MultiTextEntryDlg::new(
-            //             DLG_ENTER_PERSON,
-            //             "Enter person data",
-            //             [
-            //                 TextEntryField::new("name", "Name", self.world.person.name.clone()),
-            //                 TextEntryField::new("city", "City", self.world.person.city.clone()),
-            //                 TextEntryField::new(
-            //                     "address",
-            //                     "Address",
-            //                     self.world.person.address.clone(),
-            //                 ),
-            //             ],
-            //         )));
-            // }
+            BTN_SPECS => {
+                self.canvas
+                    .canvas
+                    .set_dialog(Box::new(MultiTextEntryDlg::new(
+                        DLG_ENTER_SPECS,
+                        "Enter simulation specs",
+                        [
+                            //TextEntryField::new("name", "Name", self.world.person.name.clone()),
+                            TextEntryField::new("name", "Name","xxx"),
+                            // TextEntryField::new("city", "City", self.world.person.city.clone()),
+                            // TextEntryField::new(
+                            //     "address",
+                            //     "Address",
+                            //     self.world.person.address.clone(),
+                            // ),
+                        ],
+                    )));
+            }
 
             // BTN_ENTER_NAME => {
             //     self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
