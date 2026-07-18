@@ -118,35 +118,13 @@ impl TheCanvas {
 
         canvas.add_widget(Box::new(Space::new(15.0)));
 
-        let wb_sim = Button::new(BTN_SIM, "Sim", 120.0, 40.0);
+        let wb_sim = Button::new(BTN_SIM, "Run Sim", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_sim));
 
+        let wb_specs = Button::new(BTN_SPECS, "Sim Specs", 120.0, 40.0);
+        canvas.add_widget(Box::new(wb_specs));
 
-
-        // let wb_a = Button::new(BTN_STATE_A, "State A", 120.0, 40.0);
-        // canvas.add_widget(Box::new(wb_a));
-        //
-        // let wb_b = Button::new(BTN_STATE_B, "State B", 120.0, 40.0);
-        // canvas.add_widget(Box::new(wb_b));
-
-    //     canvas.add_widget(Box::new(Separator::new()));
-    //
-    //     let mut wdf1 = DragFloat::new(DRAGFLOAT_GAUGE, "Gauge = ", 0.0, 0.0..=100.0);
-    //     wdf1.set_decimal(1);
-    //     //wdf1.set_speed(0.1);
-    //     canvas.add_widget(Box::new(wdf1));
-    //
-    //     let sep = Separator::new(); // sep consumed, so can be reused
-    //     canvas.add_widget(Box::new(sep));
-    //
-    //     // let wb_enter_name = Button::new(BTN_ENTER_NAME, "Enter Name", 120.0, 40.0);
-    //     // canvas.add_widget(Box::new(wb_enter_name));
-    //
-        let wb_person = Button::new(BTN_SPECS, "Sim Specs", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_person));
-    //
-    //     let wb_enter_value = Button::new(BTN_ENTER_VALUE, "Enter Value", 120.0, 40.0);
-    //     canvas.add_widget(Box::new(wb_enter_value));
+        canvas.add_widget(Box::new(Space::new(300.0)));
 
         let wb_about = Button::new(BTN_ABOUT, "About", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_about));

@@ -27,7 +27,10 @@ pub(crate) struct TheWorld {
     rng: ThreadRng,
     pub bits: BitArray,
     pub rule: Rule,
-    pub(crate) frame_number: u64, // for batching
+    pub(crate) frame_number: u64,
+
+    pub test_string: String,
+    pub test_int: u8,
 }
 
 impl World for TheWorld {
@@ -63,6 +66,9 @@ impl TheWorld {
             bits,
             rule: Rule::new(13),
             frame_number: 0,
+
+            test_string: "Hello".to_string(),
+            test_int: 42,
         }
     }
 }

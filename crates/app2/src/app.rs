@@ -125,8 +125,8 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "App using the gui_lib library.\n\
-                     Written in Rust + egui 0.33.3"
+                    "Emergence sims.\n\
+                     Written in Rust + egui 0.33.3",
                 )));
             }
             BTN_ABOUT => {
@@ -134,7 +134,7 @@ impl TheApp {
                     DLG_ABOUT,
                     "About",
                     "Emergence. \n\
-                    First working app"
+                    First working app",
                 )));
             }
 
@@ -170,8 +170,13 @@ impl TheApp {
                         DLG_ENTER_SPECS,
                         "Enter simulation specs",
                         [
-                            //TextEntryField::new("name", "Name", self.world.person.name.clone()),
-                            TextEntryField::new("name", "Name","xxx"),
+                            TextEntryField::new(
+                                "rule",
+                                "Rule (0 to 15)",
+                                self.world.test_string.clone(),
+                            ),
+                            TextEntryField::new("bitsnum", "Bits number", "1000"),
+                            TextEntryField::new("onesnum", "Ones number", "500"),
                             // TextEntryField::new("city", "City", self.world.person.city.clone()),
                             // TextEntryField::new(
                             //     "address",
@@ -209,24 +214,18 @@ impl TheApp {
             // BTN_STATE_B => {
             //     self.world.thing.state = ThingState::StateB;
             // }
-
             _ => {}
         }
     }
-
 
     fn handle_drag_float(&mut self, id: DragFloatId, value: f32) {
         match id {
             // DRAGFLOAT_GAUGE => {
             //     self.world.gauge.set_pointer(value.into());
             // }
-
             _ => {}
         }
     }
-
-
-
 
     fn handle_radio_boxes(&mut self, id: RadioBoxesDlgId, value: i32) {
         match id {
@@ -256,7 +255,6 @@ impl TheApp {
         }
     }
 
-
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
             // DLG_ENTER_PERSON => {
@@ -276,7 +274,6 @@ impl TheApp {
             //         }
             //     }
             // }
-
             _ => {}
         }
     }
@@ -289,7 +286,6 @@ impl TheApp {
             // DLG_ENTER_VALUE => {
             //     self.world.value = val as f64;
             // }
-
             _ => {}
         }
     }
