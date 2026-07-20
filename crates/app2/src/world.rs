@@ -30,7 +30,6 @@ pub(crate) struct TheWorld {
     pub(crate) frame_number: u64,
 
     pub test_string: String,
-    pub test_int: u8,
 }
 
 impl World for TheWorld {
@@ -68,8 +67,12 @@ impl TheWorld {
             frame_number: 0,
 
             test_string: "Hello".to_string(),
-            test_int: 42,
+            //test_int: 42,
         }
+    }
+
+    fn set_rule(&mut self, n: u8) {
+        self.rule = Rule::new(n);
     }
 }
 

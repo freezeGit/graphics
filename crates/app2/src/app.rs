@@ -125,14 +125,6 @@ impl TheApp {
                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
                     DLG_ABOUT,
                     "About",
-                    "Emergence sims.\n\
-                     Written in Rust + egui 0.33.3",
-                )));
-            }
-            BTN_ABOUT => {
-                self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
-                    DLG_ABOUT,
-                    "About",
                     "Emergence. \n\
                     First working app",
                 )));
