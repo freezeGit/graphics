@@ -7,7 +7,6 @@
 
 // Submodules under mod world.
 // Many applications will have multiple sub modules.
-//pub(crate) mod world_demo; // demo program data and logic
 pub(crate) mod emerge;
 // ---------------------------------------------------
 
@@ -25,10 +24,7 @@ pub(crate) struct TheWorld {
     rng: ThreadRng,
     pub bits: BitArray,
     pub rule: Rule,
-    pub current_rule: u8,
     pub(crate) frame_number: u64,
-
-    pub test_string: String,
 }
 
 impl World for TheWorld {
@@ -37,43 +33,23 @@ impl World for TheWorld {
     /// this method can be left undefined:
     /// it will be automatically implemented as an empty function.
     fn advance(&mut self) {
-        //println!("{:?}", self.rule);
         // Increment frame number each simulation step.
         self.frame_number += 1;
-
         // Advance simulation by one step.
         step_bits(&mut self.bits, self.rule, &mut self.rng);
-
-        // Traffic light alternates between Go and Stop while simulation is running.
-        //self.toggle_light();
     }
 }
 
 impl TheWorld {
     pub(crate) fn new() -> Self {
-        const INITIAL_RULE: u8 = 13;
-        let mut bits = BitArray::new(6000);
-
-        // TDJ: Example: change some bits before storing the BitArray.
-        // Replace these with the actual BitArray methods from your emerge module.
-        bits.set(0, true);
-        bits.set(10, true);
-        bits.set(42, true);
-
+        const INITIAL_RULE: u8 = 15; // Valid values are 0 to 15.
+        const INITIAL_BITS: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
         Self {
             rng: rand::rng(),
-            bits,
+            bits: BitArray::new(INITIAL_BITS),
             rule: Rule::new(INITIAL_RULE),
-            current_rule: INITIAL_RULE,
             frame_number: 0,
-
-            test_string: "Hello".to_string(),
-            //test_int: 42,
         }
-    }
-
-    fn set_rule(&mut self, n: u8) {
-        self.rule = Rule::new(n);
     }
 }
 

@@ -7,7 +7,7 @@ use gui_lib::{MultiTextEntryDlgId, RadioBoxesDlgId};
 // ---------- Widget ids
 
 pub(crate) const BTN_SIM: ButtonId = ButtonId(1);
-pub(crate) const BTN_SPECS: ButtonId = ButtonId(2);
+pub(crate) const BTN_NEW_SIM: ButtonId = ButtonId(2);
 pub(crate) const BTN_ABOUT: ButtonId = ButtonId(3);
 
 // ---------- Dialog ids

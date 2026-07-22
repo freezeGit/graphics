@@ -98,9 +98,10 @@ impl TheApp {
             WidgetMsg::ButtonClicked(id) => {
                 self.handle_button(id);
             }
-            WidgetMsg::DragFloatChanged(id, value) => {
-                self.handle_drag_float(id, value);
-            }
+            // TDJ: Not needed for this app
+            // WidgetMsg::DragFloatChanged(id, value) => {
+            //     self.handle_drag_float(id, value);
+            // }
             // WidgetMsg::DialogAcceptedText(id, text) => {
             //     self.handle_text_entry(id, text);
             // }
@@ -110,9 +111,10 @@ impl TheApp {
             WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
                 self.handle_multi_text_entry(id, values);
             }
-            WidgetMsg::DialogAcceptedDragFloat(id, val) => {
-                self.handle_drag_float_dlg(id, val);
-            }
+            // TDJ: Not needed for this app
+            // WidgetMsg::DialogAcceptedDragFloat(id, val) => {
+            //     self.handle_drag_float_dlg(id, val);
+            // }
             _ => {} // Other messages may not be handled in this app1                                                                                                                                other
         }
     }
@@ -156,7 +158,7 @@ impl TheApp {
                 )));
             }
 
-            BTN_SPECS => {
+            BTN_NEW_SIM => {
                 self.canvas
                     .canvas
                     .set_dialog(Box::new(MultiTextEntryDlg::new(
@@ -180,45 +182,20 @@ impl TheApp {
                     )));
             }
 
-            // BTN_ENTER_NAME => {
-            //     self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
-            //         DLG_ENTER_NAME,
-            //         "Enter name",
-            //         "Name:",
-            //         self.world.name.clone(),
-            //     )));
-            // }
-            // BTN_ENTER_VALUE => {
-            //     let mut dlg = DragFloatDlg::new(
-            //         DLG_ENTER_VALUE,
-            //         "Enter value",
-            //         //"Value:",
-            //         self.world.value as f32,
-            //     );
-            //     dlg.set_speed(1.0);
-            //     dlg.set_decimal(1);
-            //     self.canvas.canvas.set_dialog(Box::new(dlg));
-            // }
-
-            // BTN_STATE_A => {
-            //     self.world.thing.state = ThingState::StateA;
-            // }
-            //
-            // BTN_STATE_B => {
-            //     self.world.thing.state = ThingState::StateB;
-            // }
+            //{
             _ => {}
         }
     }
 
-    fn handle_drag_float(&mut self, id: DragFloatId, value: f32) {
-        match id {
-            // DRAGFLOAT_GAUGE => {
-            //     self.world.gauge.set_pointer(value.into());
-            // }
-            _ => {}
-        }
-    }
+    // TDJ: Not needed for this app
+    // fn handle_drag_float(&mut self, id: DragFloatId, value: f32) {
+    //     match id {
+    //         // DRAGFLOAT_GAUGE => {
+    //         //     self.world.gauge.set_pointer(value.into());
+    //         // }
+    //         _ => {}
+    //     }
+    // }
 
     fn handle_radio_boxes(&mut self, id: RadioBoxesDlgId, value: i32) {
         match id {
@@ -246,49 +223,27 @@ impl TheApp {
             }
             _ => {}
         }
-    }        fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+    }
+    fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
-            // DLG_ENTER_PERSON => {
-            //     for item in values {
-            //         let (item_id, text) = item;
-            //         match item_id.as_str() {
-            //             "name" => {
-            //                 self.world.person.name = text;
-            //             }
-            //             "city" => {
-            //                 self.world.person.city = text;
-            //             }
-            //             "address" => {
-            //                 self.world.person.address = text;
-            //             }
-            //             _ => {}
-            //         }
-            //     }
-            // }
             DLG_ENTER_SPECS => {
                 for item in values {
                     let (item_id, text) = item;
-                   // match item_id.as_str() {
-                        match item_id.as_str() {
-                            "rule" => {
-                                match text.trim().parse::<u8>() {
-                                    Ok(number) if number < 16 => {
-                                        self.world.rule = Rule::new(number);
-                                        self.world.current_rule = number;
-                                    }
-                                    Ok(number) => {
-                                        eprintln!(
-                                            "Invalid rule number: {number}. Rule must be between 0 and 15."
-                                        );
-                                    }
-                                    Err(err) => {
-                                        eprintln!(
-                                            "Could not parse rule number {:?}: {err}",
-                                            text
-                                        );
-                                    }
-                                }
+                    // match item_id.as_str() {
+                    match item_id.as_str() {
+                        "rule" => match text.trim().parse::<u8>() {
+                            Ok(number) if number < 16 => {
+                                self.world.rule = Rule::new(number);
                             }
+                            Ok(number) => {
+                                eprintln!(
+                                    "Invalid rule number: {number}. Rule must be between 0 and 15."
+                                );
+                            }
+                            Err(err) => {
+                                eprintln!("Could not parse rule number {:?}: {err}", text);
+                            }
+                        },
                         // "rule" => {
                         //     self.world.rule = Rule::new(text.parse::<u8>().unwrap());
                         // }
@@ -305,58 +260,16 @@ impl TheApp {
             _ => {}
         }
     }
-    // fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
-    //     match id {
-    //         // DLG_ENTER_PERSON => {
-    //         //     for item in values {
-    //         //         let (item_id, text) = item;
-    //         //         match item_id.as_str() {
-    //         //             "name" => {
-    //         //                 self.world.person.name = text;
-    //         //             }
-    //         //             "city" => {
-    //         //                 self.world.person.city = text;
-    //         //             }
-    //         //             "address" => {
-    //         //                 self.world.person.address = text;
-    //         //             }
-    //         //             _ => {}
-    //         //         }
-    //         //     }
-    //         // }
-    //         _ => {}
-    //     }
-    // //}
-    // DLG_ENTER_SPECS => {
-    //             for item in values {
-    //                 let (item_id, text) = item;
-    //                 match item_id.as_str() {
-    //                     "rule" => {
-    //                         self.world.rule = Rule::new(text.parse::<u8>().unwrap());
-    //                     }
-    //                     "bitsnum" => {
-    //                         //self.world.person.city = text;
-    //                     }
-    //                     "onesnum" => {
-    //                         //self.world.person.address = text;
-    //                     }
-    //                     _ => {}
-    //                 }
-    //             }
-    //         }
-    //         _ => {}
-    //     }
-    // //}
 
+    // TJD: Not needed for this app
     //Handle drag float dialog messages
-
     //Requires application specific customization.
-    fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
-        match id {
-            // DLG_ENTER_VALUE => {
-            //     self.world.value = val as f64;
-            // }
-            _ => {}
-        }
-    }
+    // fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
+    //     match id {
+    //         // DLG_ENTER_VALUE => {
+    //         //     self.world.value = val as f64;
+    //         //}
+    //         _ => {}
+    //     }
+    // }
 } // end impl TheApp
