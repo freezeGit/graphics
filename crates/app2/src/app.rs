@@ -27,8 +27,9 @@ use gui_lib::{
 
 use crate::canvas::TheCanvas;
 use crate::ids::*;
-use crate::world::TheWorld;
-use crate::world::world_demo::ThingState;
+//use crate::world::TheWorld;
+use crate::world::{Rule, TheWorld};
+//use crate::world::world_demo::ThingState;
 
 /// Constants for simulation state choice. 1 = Run, 2 = Pause, 3 = Fast-forward.
 const CHOICE_RUN: i32 = 1;
@@ -165,7 +166,7 @@ impl TheApp {
                             TextEntryField::new(
                                 "rule",
                                 "Rule (0 to 15)",
-                                self.world.test_string.clone(),
+                                self.world.rule.number().to_string(),
                             ),
                             TextEntryField::new("bitsnum", "Bits number", "1000"),
                             TextEntryField::new("onesnum", "Ones number", "500"),
@@ -245,9 +246,7 @@ impl TheApp {
             }
             _ => {}
         }
-    }
-
-    fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+    }        fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
             // DLG_ENTER_PERSON => {
             //     for item in values {
@@ -266,9 +265,88 @@ impl TheApp {
             //         }
             //     }
             // }
+            DLG_ENTER_SPECS => {
+                for item in values {
+                    let (item_id, text) = item;
+                   // match item_id.as_str() {
+                        match item_id.as_str() {
+                            "rule" => {
+                                match text.trim().parse::<u8>() {
+                                    Ok(number) if number < 16 => {
+                                        self.world.rule = Rule::new(number);
+                                        self.world.current_rule = number;
+                                    }
+                                    Ok(number) => {
+                                        eprintln!(
+                                            "Invalid rule number: {number}. Rule must be between 0 and 15."
+                                        );
+                                    }
+                                    Err(err) => {
+                                        eprintln!(
+                                            "Could not parse rule number {:?}: {err}",
+                                            text
+                                        );
+                                    }
+                                }
+                            }
+                        // "rule" => {
+                        //     self.world.rule = Rule::new(text.parse::<u8>().unwrap());
+                        // }
+                        "bitsnum" => {
+                            //self.world.person.city = text;
+                        }
+                        "onesnum" => {
+                            //self.world.person.address = text;
+                        }
+                        _ => {}
+                    }
+                }
+            }
             _ => {}
         }
     }
+    // fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+    //     match id {
+    //         // DLG_ENTER_PERSON => {
+    //         //     for item in values {
+    //         //         let (item_id, text) = item;
+    //         //         match item_id.as_str() {
+    //         //             "name" => {
+    //         //                 self.world.person.name = text;
+    //         //             }
+    //         //             "city" => {
+    //         //                 self.world.person.city = text;
+    //         //             }
+    //         //             "address" => {
+    //         //                 self.world.person.address = text;
+    //         //             }
+    //         //             _ => {}
+    //         //         }
+    //         //     }
+    //         // }
+    //         _ => {}
+    //     }
+    // //}
+    // DLG_ENTER_SPECS => {
+    //             for item in values {
+    //                 let (item_id, text) = item;
+    //                 match item_id.as_str() {
+    //                     "rule" => {
+    //                         self.world.rule = Rule::new(text.parse::<u8>().unwrap());
+    //                     }
+    //                     "bitsnum" => {
+    //                         //self.world.person.city = text;
+    //                     }
+    //                     "onesnum" => {
+    //                         //self.world.person.address = text;
+    //                     }
+    //                     _ => {}
+    //                 }
+    //             }
+    //         }
+    //         _ => {}
+    //     }
+    // //}
 
     //Handle drag float dialog messages
 

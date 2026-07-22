@@ -7,14 +7,12 @@
 
 // Submodules under mod world.
 // Many applications will have multiple sub modules.
-pub(crate) mod world_demo; // demo program data and logic
+//pub(crate) mod world_demo; // demo program data and logic
 pub(crate) mod emerge;
 // ---------------------------------------------------
 
-//use rand::Rng;
-use crate::world::world_demo::{Gauge, Person, Signal, Thing, ThingState, TrafficLight};
-//use crate::world::emerge::BitArray;
-use crate::world::emerge::{BitArray, Rule, step_bits};
+use crate::world::emerge::{BitArray, step_bits};
+pub(crate) use crate::world::emerge::Rule;
 use rand::{Rng, RngExt};
 use rand::rngs::ThreadRng;
 use gui_lib::World;
@@ -27,6 +25,7 @@ pub(crate) struct TheWorld {
     rng: ThreadRng,
     pub bits: BitArray,
     pub rule: Rule,
+    pub current_rule: u8,
     pub(crate) frame_number: u64,
 
     pub test_string: String,
@@ -52,6 +51,7 @@ impl World for TheWorld {
 
 impl TheWorld {
     pub(crate) fn new() -> Self {
+        const INITIAL_RULE: u8 = 13;
         let mut bits = BitArray::new(6000);
 
         // TDJ: Example: change some bits before storing the BitArray.
@@ -63,7 +63,8 @@ impl TheWorld {
         Self {
             rng: rand::rng(),
             bits,
-            rule: Rule::new(13),
+            rule: Rule::new(INITIAL_RULE),
+            current_rule: INITIAL_RULE,
             frame_number: 0,
 
             test_string: "Hello".to_string(),

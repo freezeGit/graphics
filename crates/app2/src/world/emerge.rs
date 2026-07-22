@@ -70,34 +70,77 @@ fn interact(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct Rule(bool, bool, bool, bool);
+pub struct Rule {
+    number: u8,
+    flags: [bool; 4],
+}
+
+
+// #[derive(Debug, Clone, Copy)]
+// pub(crate) struct Rule(bool, bool, bool, bool);
 
 impl Rule {
-    pub(crate) fn new(n: u8) -> Self {
-        assert!(n < 16, "Rule number must be less than 16, got {n}");
-        Self(
-            Self::bit(n, 3),
-            Self::bit(n, 2),
-            Self::bit(n, 1),
-            Self::bit(n, 0),
-        )
+    // pub(crate) fn new(n: u8) -> Self {
+    //     assert!(n < 16, "Rule number must be less than 16, got {n}");
+    //     Self(
+    //         Self::bit(n, 3),
+    //         Self::bit(n, 2),
+    //         Self::bit(n, 1),
+    //         Self::bit(n, 0),
+    //     )
+    // }
+
+    pub(crate) fn new(number: u8) -> Self {
+        assert!(number < 16, "Rule number must be less than 16, got {number}");
+
+        Self {
+            number,
+            flags: [
+                Self::bit(number, 3), // (false, false)
+                Self::bit(number, 2), // (false, true)
+                Self::bit(number, 1), // (true,  false)
+                Self::bit(number, 0), // (true,  true)
+            ],
+        }
+    }
+
+    pub fn number(&self) -> u8 {
+        self.number
     }
 
     fn bit(n: u8, i: u8) -> bool {
         ((n >> i) & 1) != 0
     }
 
+    // fn response(self, this: bool, other: bool) -> bool {
+    //     // The two bits are equal
+    //     if this == other {
+    //         if this { self.0 } else { self.1 }
+    //     // The two bits are different
+    //     } else if this {
+    //         self.2
+    //     } else {
+    //         self.3
+    //     }
+    // }
+
     fn response(self, this: bool, other: bool) -> bool {
         // The two bits are equal
         if this == other {
-            if this { self.0 } else { self.1 }
+            if this { self.flags[0] } else { self.flags[1] }
         // The two bits are different
         } else if this {
-            self.2
+            self.flags[2]
         } else {
-            self.3
+            self.flags[3]
         }
     }
+
+
+    // pub fn response(&self, this: bool, other: bool) -> bool {
+    //     let index = (this as usize) * 2 + other as usize;
+    //     self.flags[index]
+    // }
 
     fn apply(self, a: bool, b: bool) -> (bool, bool) {
         // symmetrically reversible rule
