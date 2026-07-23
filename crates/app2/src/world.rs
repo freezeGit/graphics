@@ -12,7 +12,7 @@ pub(crate) mod emerge;
 
 use crate::world::emerge::{BitArray, step_bits};
 pub(crate) use crate::world::emerge::Rule;
-use crate::inits::INITIAL_RULE;
+use crate::inits::{INITIAL_RULE, INITIAL_BITS_NUM};
 use rand::{Rng, RngExt};
 use rand::rngs::ThreadRng;
 use gui_lib::World;
@@ -43,11 +43,9 @@ impl World for TheWorld {
 
 impl TheWorld {
     pub(crate) fn new() -> Self {
-        //const INITIAL_RULE: u8 = 15; // Valid values are 0 to 15.
-        const INITIAL_BITS: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
         Self {
             rng: rand::rng(),
-            bits: BitArray::new(INITIAL_BITS),
+            bits: BitArray::new(INITIAL_BITS_NUM),
             rule: Rule::new(INITIAL_RULE),
             frame_number: 0,
         }

@@ -170,7 +170,11 @@ impl TheApp {
                                 "Rule (0 to 15)",
                                 self.world.rule.number().to_string(),
                             ),
-                            TextEntryField::new("bitsnum", "Bits number", "1000"),
+                            TextEntryField::new(
+                                "bitsnum",
+                                "Bits number",
+                                self.world.bits.len().to_string(),
+                            ),
                             TextEntryField::new("onesnum", "Ones number", "500"),
                             // TextEntryField::new("city", "City", self.world.person.city.clone()),
                             // TextEntryField::new(
@@ -224,7 +228,9 @@ impl TheApp {
             _ => {}
         }
     }
+
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+        let mut bits: u32 = 50000;
         match id {
             DLG_ENTER_SPECS => {
                 for item in values {
@@ -244,22 +250,71 @@ impl TheApp {
                                 eprintln!("Could not parse rule number {:?}: {err}", text);
                             }
                         },
-                        // "rule" => {
-                        //     self.world.rule = Rule::new(text.parse::<u8>().unwrap());
-                        // }
-                        "bitsnum" => {
-                            //self.world.person.city = text;
-                        }
+                        "bitsnum" => match text.trim().parse::<u32>() {
+                            Ok(number) => {
+                                bits = number;
+                            }
+                            // Ok(number) if number < u32::MAX => {
+                            //     bits = number;
+                            // }
+                            // Ok(number) => {
+                            //     eprintln!(
+                            //         "Invalid rule number: {number}. Bits number too large for u32::MAX."
+                            //     );
+                            // }
+                            Err(err) => {
+                                eprintln!("Could not parse rule number {:?}: {err}", text);
+                            }
+                        },
                         "onesnum" => {
                             //self.world.person.address = text;
                         }
+
                         _ => {}
                     }
                 }
             }
             _ => {}
         }
+        println!("Bits = {bits}");
     }
+
+    // fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+    //     match id {
+    //         DLG_ENTER_SPECS => {
+    //             for item in values {
+    //                 let (item_id, text) = item;
+    //                 // match item_id.as_str() {
+    //                 match item_id.as_str() {
+    //                     "rule" => match text.trim().parse::<u8>() {
+    //                         Ok(number) if number < 16 => {
+    //                             self.world.rule = Rule::new(number);
+    //                         }
+    //                         Ok(number) => {
+    //                             eprintln!(
+    //                                 "Invalid rule number: {number}. Rule must be between 0 and 15."
+    //                             );
+    //                         }
+    //                         Err(err) => {
+    //                             eprintln!("Could not parse rule number {:?}: {err}", text);
+    //                         }
+    //                     },
+    //                     // "rule" => {
+    //                     //     self.world.rule = Rule::new(text.parse::<u8>().unwrap());
+    //                     // }
+    //                     "bitsnum" => {
+    //                         //self.world.person.city = text;
+    //                     }
+    //                     "onesnum" => {
+    //                         //self.world.person.address = text;
+    //                     }
+    //                     _ => {}
+    //                 }
+    //             }
+    //         }
+    //         _ => {}
+    //     }
+    // }
 
     // TJD: Not needed for this app
     //Handle drag float dialog messages

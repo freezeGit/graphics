@@ -15,7 +15,7 @@ pub const LAYOUT_STYLE: gui_lib::LayoutStyle = TopPanel;
 // Background colors: BKG_DEFAULT, BKG_WINDOWS, or any Color32
 pub const BACKGROUND_COLOR: Color32 = gui_lib::BKG_DEFAULT;
 
-// ------ User customized simulation initialization constants --------
+// ------ User customized timer initialization constants --------
 
 // `INTERVAL`: Time between simulation steps in seconds
 //pub const INTERVAL: f64 = 0.5;
@@ -32,4 +32,8 @@ pub const BATCH_SIZE: u32 = 100;
 pub const SMOOTH_ANIMATION: bool = false;
 // 'INITIAL_RULE': Initial rule number for the simulation.
 // Valid values are 0 to 15.
-pub const INITIAL_RULE: u8 = 15;
+
+// ------ User customized simulation initialization constants --------
+
+pub const INITIAL_RULE: u8 = 15; // must be 0 to 15 inclusive
+pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
