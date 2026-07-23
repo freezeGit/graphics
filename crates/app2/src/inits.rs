@@ -30,3 +30,6 @@ pub const BATCH_SIZE: u32 = 100;
 // at intervals determined by INTERVAL.
 //pub const SMOOTH_ANIMATION: bool = true;
 pub const SMOOTH_ANIMATION: bool = false;
+// 'INITIAL_RULE': Initial rule number for the simulation.
+// Valid values are 0 to 15.
+pub const INITIAL_RULE: u8 = 15;

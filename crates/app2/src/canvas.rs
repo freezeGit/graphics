@@ -99,7 +99,7 @@ impl TheCanvas {
         let stxt_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             //eframe::egui::Pos2::new(250.0, 270.0),
             egui::Pos2::new(10.0, 10.0),
-            format!("Rule: _"),
+            format!("Rule: {}", inits::INITIAL_RULE),
         )));
         canvas.add_shape(stxt_rule.clone()); // coercion to ShapeHandle happens automatically
 
