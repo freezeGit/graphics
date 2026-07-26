@@ -37,3 +37,4 @@ pub const SMOOTH_ANIMATION: bool = false;
 
 pub const INITIAL_RULE: u8 = 15; // must be 0 to 15 inclusive
 pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
+pub const INITIAL_ONES: usize = 3000; // Must be <= INITIAL_BITS_NUM.

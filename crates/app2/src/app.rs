@@ -231,9 +231,13 @@ impl TheApp {
     }
 
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
-        let mut rule: u8 = 0;
-        let mut bits: usize = 50000;
-        let mut ones: usize = 500;
+        // let mut rule: u8 = 0;
+        // let mut bits: usize = 50000;
+        // let mut ones: usize = 500;
+
+        let mut rule: u8 = self.world.rule.number();
+        let mut bits: usize = self.world.bits.len();
+        let mut ones: usize = self.world.init_ones;
 
         match id {
             DLG_ENTER_SPECS => {
@@ -266,8 +270,7 @@ impl TheApp {
                             }
                         },
                         "onesnum" => match text.trim().parse::<usize>() {
-                            //Ok(number) if number >= 2 => {
-                            Ok(number) if number <= 4000 => {
+                            Ok(number) if number <= bits => {
                                 ones = number;
                             }
                             Ok(number) => {
@@ -275,6 +278,7 @@ impl TheApp {
                                     "Invalid ones number: {number}. \
                                     Ones number must be smaller than bits number."
                                 );
+                                //ones = 0;
                             }
                             Err(err) => {
                                 eprintln!("Could not parse ones number {:?}: {err}", text);
@@ -293,6 +297,9 @@ impl TheApp {
         self.world.bits = BitArray::new(bits);
         println!("Bits = {bits} = {}", self.world.bits.len());
 
+        if ones > bits {
+            ones = bits;
+        }
         println!("Ones = {ones}");
     }
 

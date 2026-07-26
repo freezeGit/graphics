@@ -12,7 +12,7 @@ pub(crate) mod emerge;
 
 use crate::world::emerge::{BitArray, step_bits};
 pub(crate) use crate::world::emerge::Rule;
-use crate::inits::{INITIAL_RULE, INITIAL_BITS_NUM};
+use crate::inits::{INITIAL_RULE, INITIAL_BITS_NUM, INITIAL_ONES};
 use rand::{Rng, RngExt};
 use rand::rngs::ThreadRng;
 use gui_lib::World;
@@ -21,11 +21,12 @@ use gui_lib::World;
 /// It has no dependence on gui_lib and no dependence on egui.
 /// It has no dependence on the app1 struct or the canvas struct.
 //#[derive(Debug)] // TDJ: Debug is not needed
-pub(crate) struct TheWorld {
+pub struct TheWorld {
     rng: ThreadRng,
     pub bits: BitArray,
     pub rule: Rule,
-    pub(crate) frame_number: u64,
+    pub init_ones: usize,
+    pub frame_number: u64,
 }
 
 impl World for TheWorld {
@@ -42,13 +43,21 @@ impl World for TheWorld {
 }
 
 impl TheWorld {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             rng: rand::rng(),
             bits: BitArray::new(INITIAL_BITS_NUM),
             rule: Rule::new(INITIAL_RULE),
+            //init_ones: INITIAL_ONES,
+            init_ones: 500,
             frame_number: 0,
         }
     }
+
+    pub fn set_initial_ones(&mut self, ones: usize) {
+        //self.init_ones = ones;
+        for _ in 0..ones {}
+    }
 }
+
 
