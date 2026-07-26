@@ -29,6 +29,7 @@ use crate::canvas::TheCanvas;
 use crate::ids::*;
 //use crate::world::TheWorld;
 use crate::world::{Rule, TheWorld};
+use crate::world::emerge::BitArray;
 //use crate::world::world_demo::ThingState;
 
 /// Constants for simulation state choice. 1 = Run, 2 = Pause, 3 = Fast-forward.
@@ -230,7 +231,7 @@ impl TheApp {
     }
 
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
-        let mut bits: u32 = 50000;
+        let mut bits: usize = 50000;
         match id {
             DLG_ENTER_SPECS => {
                 for item in values {
@@ -250,18 +251,13 @@ impl TheApp {
                                 eprintln!("Could not parse rule number {:?}: {err}", text);
                             }
                         },
-                        "bitsnum" => match text.trim().parse::<u32>() {
-                            Ok(number) => {
+                        "bitsnum" => match text.trim().parse::<usize>() {
+                            Ok(number) if number >= 2 => {
                                 bits = number;
                             }
-                            // Ok(number) if number < u32::MAX => {
-                            //     bits = number;
-                            // }
-                            // Ok(number) => {
-                            //     eprintln!(
-                            //         "Invalid rule number: {number}. Bits number too large for u32::MAX."
-                            //     );
-                            // }
+                            Ok(number) => {
+                                eprintln!("Invalid rule number: {number}. Bits number too small.");
+                            }
                             Err(err) => {
                                 eprintln!("Could not parse rule number {:?}: {err}", text);
                             }
@@ -277,6 +273,7 @@ impl TheApp {
             _ => {}
         }
         println!("Bits = {bits}");
+        self.world.bits = BitArray::new(bits);
     }
 
     // fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
