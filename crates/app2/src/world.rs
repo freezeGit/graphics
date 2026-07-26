@@ -43,21 +43,32 @@ impl World for TheWorld {
 }
 
 impl TheWorld {
+    // pub fn new() -> Self {
+    //     Self {
+    //         rng: rand::rng(),
+    //         bits: BitArray::new(INITIAL_BITS_NUM),
+    //         rule: Rule::new(INITIAL_RULE),
+    //         //init_ones: INITIAL_ONES,
+    //         //init_ones: 500,
+    //         frame_number: 0,
+    //     }
+    // }
+
     pub fn new() -> Self {
         Self {
             rng: rand::rng(),
-            bits: BitArray::new(INITIAL_BITS_NUM),
+            bits: BitArray::new_with_initial_ones(INITIAL_BITS_NUM, INITIAL_ONES),
             rule: Rule::new(INITIAL_RULE),
-            //init_ones: INITIAL_ONES,
-            init_ones: 500,
+            init_ones: INITIAL_ONES,
+            //init_ones: 500,
             frame_number: 0,
         }
     }
 
-    pub fn set_initial_ones(&mut self, ones: usize) {
-        //self.init_ones = ones;
-        for _ in 0..ones {}
-    }
+    // pub fn set_initial_ones(&mut self, ones: usize) {
+    //     //self.init_ones = ones;
+    //     for _ in 0..ones {}
+    // }
 }
 
 

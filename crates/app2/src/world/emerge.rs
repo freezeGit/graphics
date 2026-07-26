@@ -1,13 +1,13 @@
 use rand::{Rng, RngExt};
 //use rand::Rng;
 
-pub(crate) struct BitArray {
+pub struct BitArray {
     words: Vec<u64>,
     len: usize,
 }
 
 impl BitArray {
-    pub(crate) fn new(len: usize) -> Self {
+    pub fn new(len: usize) -> Self {
         assert!(len >= 2, "BitArray length must be at least 2, got {len}");
 
         let word_count = (len + 63) / 64;
@@ -17,11 +17,33 @@ impl BitArray {
         }
     }
 
-    pub(crate) fn len(&self) -> usize {
+    pub fn new_with_initial_ones(len: usize, initial_ones: usize) -> Self {
+        assert!(len >= 2, "BitArray length must be at least 2, got {len}");
+        assert!(
+            initial_ones <= len,
+            "Initial ones cannot exceed total length"
+        );
+
+        // 1. Create a blank instance with all zeros
+        let word_count = (len + 63) / 64;
+        let mut bit_array = Self {
+            words: vec![0; word_count],
+            len,
+        };
+
+        // 2. Use your existing set method repeatedly
+        for i in 0..initial_ones {
+            bit_array.set(i, true);
+        }
+
+        bit_array
+    }
+
+    pub fn len(&self) -> usize {
         self.len
     }
 
-    pub(crate) fn get(&self, i: usize) -> bool {
+    pub fn get(&self, i: usize) -> bool {
         debug_assert!(i < self.len);
 
         let word_index = i / 64;
@@ -30,7 +52,7 @@ impl BitArray {
         (self.words[word_index] & (1u64 << bit_index)) != 0
     }
 
-    pub(crate) fn set(&mut self, i: usize, value: bool) {
+    pub fn set(&mut self, i: usize, value: bool) {
         debug_assert!(i < self.len);
 
         let word_index = i / 64;
@@ -45,7 +67,7 @@ impl BitArray {
     }
 } // end of BitArray
 
-pub(crate) fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
+pub fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
     let n = bits.len();
 
     let i = rng.random_range(0..n);
@@ -75,7 +97,6 @@ pub struct Rule {
     flags: [bool; 4],
 }
 
-
 // #[derive(Debug, Clone, Copy)]
 // pub(crate) struct Rule(bool, bool, bool, bool);
 
@@ -90,8 +111,11 @@ impl Rule {
     //     )
     // }
 
-    pub(crate) fn new(number: u8) -> Self {
-        assert!(number < 16, "Rule number must be less than 16, got {number}");
+    pub fn new(number: u8) -> Self {
+        assert!(
+            number < 16,
+            "Rule number must be less than 16, got {number}"
+        );
 
         Self {
             number,
@@ -112,18 +136,6 @@ impl Rule {
         ((n >> i) & 1) != 0
     }
 
-    // fn response(self, this: bool, other: bool) -> bool {
-    //     // The two bits are equal
-    //     if this == other {
-    //         if this { self.0 } else { self.1 }
-    //     // The two bits are different
-    //     } else if this {
-    //         self.2
-    //     } else {
-    //         self.3
-    //     }
-    // }
-
     fn response(self, this: bool, other: bool) -> bool {
         // The two bits are equal
         if this == other {
@@ -135,12 +147,6 @@ impl Rule {
             self.flags[3]
         }
     }
-
-
-    // pub fn response(&self, this: bool, other: bool) -> bool {
-    //     let index = (this as usize) * 2 + other as usize;
-    //     self.flags[index]
-    // }
 
     fn apply(self, a: bool, b: bool) -> (bool, bool) {
         // symmetrically reversible rule

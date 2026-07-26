@@ -176,13 +176,13 @@ impl TheApp {
                                 "Bits number",
                                 self.world.bits.len().to_string(),
                             ),
-                            TextEntryField::new("onesnum", "Ones number", "500"),
-                            // TextEntryField::new("city", "City", self.world.person.city.clone()),
-                            // TextEntryField::new(
-                            //     "address",
-                            //     "Address",
-                            //     self.world.person.address.clone(),
-                            // ),
+                            //TextEntryField::new("onesnum", "Ones number", "500"),
+                            TextEntryField::new(
+                                "onesnum",
+                                "Ones number",
+                                //self.world.init_ones.to_string(),
+                                self.world.init_ones.to_string(),
+                            ),
                         ],
                     )));
             }
@@ -273,12 +273,13 @@ impl TheApp {
                             Ok(number) if number <= bits => {
                                 ones = number;
                             }
-                            Ok(number) => {
+                             Ok(number) => {
                                 eprintln!(
                                     "Invalid ones number: {number}. \
-                                    Ones number must be smaller than bits number."
+                                    Ones number must be smaller than bits number.\
+                                    Wiil be set to number of bits."
                                 );
-                                //ones = 0;
+                                ones = bits;
                             }
                             Err(err) => {
                                 eprintln!("Could not parse ones number {:?}: {err}", text);
@@ -294,13 +295,15 @@ impl TheApp {
 
         self.world.rule = Rule::new(rule);
         println!("Rule = {rule} = {}", self.world.rule.number());
-        self.world.bits = BitArray::new(bits);
-        println!("Bits = {bits} = {}", self.world.bits.len());
 
         if ones > bits {
             ones = bits;
         }
         println!("Ones = {ones}");
+
+        self.world.init_ones = ones;
+        self.world.bits = BitArray::new_with_initial_ones(bits, ones);
+        println!("Bits = {bits} = {}", self.world.bits.len());
     }
 
     // TJD: Not needed for this app

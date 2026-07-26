@@ -90,7 +90,8 @@ impl TheCanvas {
                     egui::Vec2::new(10.0, 10.0),
                 )));
                 bit_disp.borrow_mut().set_color(Color32::GRAY);
-                bit_disp.borrow_mut().set_fill_color(Color32::BLACK);
+                bit_disp.borrow_mut().set_fill_color(Color32::GRAY);
+                //bit_disp.borrow_mut().set_fill_color(Color32::BLACK);
                 canvas.add_shape(bit_disp.clone());
             }
         }
