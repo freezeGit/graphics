@@ -28,8 +28,8 @@ use gui_lib::{
 use crate::canvas::TheCanvas;
 use crate::ids::*;
 //use crate::world::TheWorld;
-use crate::world::{Rule, TheWorld};
 use crate::world::emerge::BitArray;
+use crate::world::{Rule, TheWorld};
 //use crate::world::world_demo::ThingState;
 
 /// Constants for simulation state choice. 1 = Run, 2 = Pause, 3 = Fast-forward.
@@ -231,7 +231,10 @@ impl TheApp {
     }
 
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+        let mut rule: u8 = 0;
         let mut bits: usize = 50000;
+        let mut ones: usize = 500;
+
         match id {
             DLG_ENTER_SPECS => {
                 for item in values {
@@ -240,7 +243,7 @@ impl TheApp {
                     match item_id.as_str() {
                         "rule" => match text.trim().parse::<u8>() {
                             Ok(number) if number < 16 => {
-                                self.world.rule = Rule::new(number);
+                                rule = number;
                             }
                             Ok(number) => {
                                 eprintln!(
@@ -256,15 +259,27 @@ impl TheApp {
                                 bits = number;
                             }
                             Ok(number) => {
-                                eprintln!("Invalid rule number: {number}. Bits number too small.");
+                                eprintln!("Invalid bits number: {number}. Bits number too small.");
                             }
                             Err(err) => {
-                                eprintln!("Could not parse rule number {:?}: {err}", text);
+                                eprintln!("Could not parse bits number {:?}: {err}", text);
                             }
                         },
-                        "onesnum" => {
-                            //self.world.person.address = text;
-                        }
+                        "onesnum" => match text.trim().parse::<usize>() {
+                            //Ok(number) if number >= 2 => {
+                            Ok(number) if number <= 4000 => {
+                                ones = number;
+                            }
+                            Ok(number) => {
+                                eprintln!(
+                                    "Invalid ones number: {number}. \
+                                    Ones number must be smaller than bits number."
+                                );
+                            }
+                            Err(err) => {
+                                eprintln!("Could not parse ones number {:?}: {err}", text);
+                            }
+                        },
 
                         _ => {}
                     }
@@ -272,46 +287,14 @@ impl TheApp {
             }
             _ => {}
         }
-        println!("Bits = {bits}");
-        self.world.bits = BitArray::new(bits);
-    }
 
-    // fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
-    //     match id {
-    //         DLG_ENTER_SPECS => {
-    //             for item in values {
-    //                 let (item_id, text) = item;
-    //                 // match item_id.as_str() {
-    //                 match item_id.as_str() {
-    //                     "rule" => match text.trim().parse::<u8>() {
-    //                         Ok(number) if number < 16 => {
-    //                             self.world.rule = Rule::new(number);
-    //                         }
-    //                         Ok(number) => {
-    //                             eprintln!(
-    //                                 "Invalid rule number: {number}. Rule must be between 0 and 15."
-    //                             );
-    //                         }
-    //                         Err(err) => {
-    //                             eprintln!("Could not parse rule number {:?}: {err}", text);
-    //                         }
-    //                     },
-    //                     // "rule" => {
-    //                     //     self.world.rule = Rule::new(text.parse::<u8>().unwrap());
-    //                     // }
-    //                     "bitsnum" => {
-    //                         //self.world.person.city = text;
-    //                     }
-    //                     "onesnum" => {
-    //                         //self.world.person.address = text;
-    //                     }
-    //                     _ => {}
-    //                 }
-    //             }
-    //         }
-    //         _ => {}
-    //     }
-    // }
+        self.world.rule = Rule::new(rule);
+        println!("Rule = {rule} = {}", self.world.rule.number());
+        self.world.bits = BitArray::new(bits);
+        println!("Bits = {bits} = {}", self.world.bits.len());
+
+        println!("Ones = {ones}");
+    }
 
     // TJD: Not needed for this app
     //Handle drag float dialog messages
