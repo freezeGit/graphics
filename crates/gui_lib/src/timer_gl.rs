@@ -20,7 +20,7 @@ pub struct SimTimer {
 }
 
 impl SimTimer {
-    pub fn new(interval: f64, smooth: bool,  batch_size: u32) -> Self {
+    pub fn new(interval: f64, smooth: bool, batch_size: u32) -> Self {
         Self {
             interval,
             last_time: 0.0,

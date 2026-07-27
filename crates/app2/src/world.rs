@@ -10,12 +10,12 @@
 pub(crate) mod emerge;
 // ---------------------------------------------------
 
-use crate::world::emerge::{BitArray, step_bits};
+use crate::inits::{INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_RULE};
 pub(crate) use crate::world::emerge::Rule;
-use crate::inits::{INITIAL_RULE, INITIAL_BITS_NUM, INITIAL_ONES};
-use rand::{Rng, RngExt};
-use rand::rngs::ThreadRng;
+use crate::world::emerge::{BitArray, step_bits};
 use gui_lib::World;
+use rand::rngs::ThreadRng;
+use rand::{Rng, RngExt};
 
 /// TheWorld struct encapsulates application data and logic.
 /// It has no dependence on gui_lib and no dependence on egui.
@@ -25,7 +25,6 @@ pub struct TheWorld {
     pub rng: ThreadRng,
     pub bits: BitArray,
     pub rule: Rule,
-    //pub init_ones: usize,
     pub frame_number: u64,
 }
 
@@ -43,11 +42,6 @@ impl World for TheWorld {
 }
 
 impl TheWorld {
-
-
-
-
-
     // pub fn new() -> Self {
     //     let mut rng = rand::rng();
     //     let bits = BitArray::new_with_random_ones(INITIAL_BITS_NUM, INITIAL_ONES, &mut rng);
@@ -65,13 +59,9 @@ impl TheWorld {
     pub fn new() -> Self {
         Self {
             rng: rand::rng(),
-            //bits: BitArray::new_with_initial_ones(INITIAL_BITS_NUM, INITIAL_ONES),
             bits: BitArray::new(INITIAL_BITS_NUM),
             rule: Rule::new(INITIAL_RULE),
-            //init_ones: INITIAL_ONES,
             frame_number: 0,
         }
     }
 }
-
-

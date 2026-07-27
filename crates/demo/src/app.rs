@@ -18,6 +18,7 @@ use egui::Context;
 //     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
 //     app_gl,
 // };
+use crate::inits;
 #[allow(unused_imports)]
 use gui_lib::{
     ButtonId, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
@@ -25,7 +26,6 @@ use gui_lib::{
     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
     app_gl,
 };
-use crate::inits;
 
 use crate::canvas::TheCanvas;
 use crate::ids::*;
@@ -129,7 +129,7 @@ impl TheApp {
                     "About",
                     "Demonstration app using the gui_lib library.\n\
                     Intended to be used as a template to get started.\n\
-                    Written in Rust + egui 0.33.3"
+                    Written in Rust + egui 0.33.3",
                 )));
             }
 

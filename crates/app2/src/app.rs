@@ -233,19 +233,21 @@ impl TheApp {
     }
 
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
-        // let mut rule: u8 = 0;
-        // let mut bits: usize = 50000;
-        // let mut ones: usize = 500;
-
-        let mut rule: u8 = self.world.rule.number();
-        let mut bits: usize = self.world.bits.len();
-        //let mut ones: usize = self.world.init_ones;
-        let mut ones: usize = self.world.bits.ones_count();
-
-        self.sim_timer.pause();
+        // let mut rule: u8 = self.world.rule.number();
+        // let mut bits: usize = self.world.bits.len();
+        // let mut ones: usize = self.world.bits.ones_count();
+        //
+        // self.sim_timer.pause();
 
         match id {
             DLG_ENTER_SPECS => {
+                self.sim_timer.pause();
+                let mut bad_val = false;
+                let mut rule = self.world.rule.number();
+                let mut bits = self.world.bits.len();
+                //println!("Orig bits = {bits}");
+                let mut ones = self.world.bits.ones_count();
+
                 for item in values {
                     let (item_id, text) = item;
                     // match item_id.as_str() {
@@ -255,11 +257,13 @@ impl TheApp {
                                 rule = number;
                             }
                             Ok(number) => {
+                                bad_val = true;
                                 eprintln!(
                                     "Invalid rule number: {number}. Rule must be between 0 and 15."
                                 );
                             }
                             Err(err) => {
+                                bad_val = true;
                                 eprintln!("Could not parse rule number {:?}: {err}", text);
                             }
                         },
@@ -268,9 +272,11 @@ impl TheApp {
                                 bits = number;
                             }
                             Ok(number) => {
+                                bad_val = true;
                                 eprintln!("Invalid bits number: {number}. Bits number too small.");
                             }
                             Err(err) => {
+                                bad_val = true;
                                 eprintln!("Could not parse bits number {:?}: {err}", text);
                             }
                         },
@@ -278,39 +284,141 @@ impl TheApp {
                             Ok(number) if number <= bits => {
                                 ones = number;
                             }
-                             Ok(number) => {
+                            Ok(number) => {
+                                bad_val = true;
                                 eprintln!(
                                     "Invalid ones number: {number}. \
                                     Ones number must be smaller than bits number.\
                                     Wiil be set to number of bits."
                                 );
-                                ones = bits;
+                                //ones = bits;
                             }
                             Err(err) => {
+                                bad_val = true;
                                 eprintln!("Could not parse ones number {:?}: {err}", text);
                             }
                         },
-
                         _ => {}
                     }
                 }
+
+                if bad_val {
+                    self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
+                        DLG_BAD_VALS,
+                        "Error Message",
+                        "Bad value(s) entered.",
+                    )));
+                } else {
+                    self.world.rule = Rule::new(rule);
+                    println!("Rule = {rule} = {}", self.world.rule.number());
+                    self.world.bits =
+                        BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
+                    println!("Bits = {bits} = {}", self.world.bits.len());
+                    println!("Ones = {ones} = {}", self.world.bits.ones_count());
+                    self.world.frame_number = 0;
+                }
+
+                // self.world.rule = Rule::new(rule);
+                // println!("Rule = {rule} = {}", self.world.rule.number());
+                //
+                // if ones > bits {
+                //     ones = bits;
+                // }
+                // println!("Ones = {ones}");
+                //
+                // self.world.bits = BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
+                // println!("Bits = {bits} = {}", self.world.bits.len());
             }
             _ => {}
         }
 
-        self.world.rule = Rule::new(rule);
-        println!("Rule = {rule} = {}", self.world.rule.number());
+        // self.world.rule = Rule::new(rule);
+        // println!("Rule = {rule} = {}", self.world.rule.number());
+        //
+        // if ones > bits {
+        //     ones = bits;
+        // }
+        // println!("Ones = {ones}");
 
-        if ones > bits {
-            ones = bits;
-        }
-        println!("Ones = {ones}");
+        // fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+        //     // let mut rule: u8 = 0;
+        //     // let mut bits: usize = 50000;
+        //     // let mut ones: usize = 500;
+        //
+        //     let mut rule: u8 = self.world.rule.number();
+        //     let mut bits: usize = self.world.bits.len();
+        //     //let mut ones: usize = self.world.init_ones;
+        //     let mut ones: usize = self.world.bits.ones_count();
+        //
+        //     self.sim_timer.pause();
+        //
+        //     match id {
+        //         DLG_ENTER_SPECS => {
+        //             for item in values {
+        //                 let (item_id, text) = item;
+        //                 // match item_id.as_str() {
+        //                 match item_id.as_str() {
+        //                     "rule" => match text.trim().parse::<u8>() {
+        //                         Ok(number) if number < 16 => {
+        //                             rule = number;
+        //                         }
+        //                         Ok(number) => {
+        //                             eprintln!(
+        //                                 "Invalid rule number: {number}. Rule must be between 0 and 15."
+        //                             );
+        //                         }
+        //                         Err(err) => {
+        //                             eprintln!("Could not parse rule number {:?}: {err}", text);
+        //                         }
+        //                     },
+        //                     "bitsnum" => match text.trim().parse::<usize>() {
+        //                         Ok(number) if number >= 2 => {
+        //                             bits = number;
+        //                         }
+        //                         Ok(number) => {
+        //                             eprintln!("Invalid bits number: {number}. Bits number too small.");
+        //                         }
+        //                         Err(err) => {
+        //                             eprintln!("Could not parse bits number {:?}: {err}", text);
+        //                         }
+        //                     },
+        //                     "onesnum" => match text.trim().parse::<usize>() {
+        //                         Ok(number) if number <= bits => {
+        //                             ones = number;
+        //                         }
+        //                          Ok(number) => {
+        //                             eprintln!(
+        //                                 "Invalid ones number: {number}. \
+        //                                 Ones number must be smaller than bits number.\
+        //                                 Wiil be set to number of bits."
+        //                             );
+        //                             ones = bits;
+        //                         }
+        //                         Err(err) => {
+        //                             eprintln!("Could not parse ones number {:?}: {err}", text);
+        //                         }
+        //                     },
+        //
+        //                     _ => {}
+        //                 }
+        //             }
+        //         }
+        //         _ => {}
+        //     }
+        //
+        //     self.world.rule = Rule::new(rule);
+        //     println!("Rule = {rule} = {}", self.world.rule.number());
+        //
+        //     if ones > bits {
+        //         ones = bits;
+        //     }
+        //     println!("Ones = {ones}");
 
         //self.world.init_ones = ones;
         //self.world.init_ones = ones; TDJ: ones count is now in the BitArray struct
         //self.world.bits = BitArray::new_with_initial_ones(bits, ones);
-        self.world.bits = BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
-        println!("Bits = {bits} = {}", self.world.bits.len());
+        // self.world.bits = BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
+        // println!("Bits = {bits} = {}", self.world.bits.len());
     }
 
     // TJD: Not needed for this app

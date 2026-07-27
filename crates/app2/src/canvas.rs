@@ -185,12 +185,17 @@ impl TheCanvas {
             let col = if bit { Color32::WHITE } else { Color32::BLACK };
             self.canvas.shapes[i].borrow_mut().set_fill_color(col);
         }
+        for i in n..GRID_SIZE {
+            self.canvas.shapes[i]
+                .borrow_mut()
+                .set_fill_color(Color32::GRAY);
+        }
 
         // Set stxt_bits to display bits number
         self.view_handles
             .stxt_bits
             .borrow_mut()
-            .set_text(format!("Bits: {}", world.bits.ones_count()));
+            .set_text(format!("Bits: {}", world.bits.len()));
 
         // Set stxt_ones to display ones number
         self.view_handles

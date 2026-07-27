@@ -74,9 +74,9 @@
 
 // main.rs
 mod app;
-mod inits;
 mod canvas;
 mod ids;
+mod inits;
 mod world;
 
 // -----------------------------------------------------------

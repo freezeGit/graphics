@@ -69,14 +69,16 @@ impl TheApp {
         ctx.input(|i| i.time)
     }
 
-    fn batch_step(&mut self) { // TDJ: needs world and canvas
+    fn batch_step(&mut self) {
+        // TDJ: needs world and canvas
         for _ in 0..self.sim_timer.batch_size() {
             self.world.advance();
         }
         self.canvas.update(&self.world);
     }
 
-    fn step_when_ready(&mut self, now: f64) { // TDJ: needs world and canvas
+    fn step_when_ready(&mut self, now: f64) {
+        // TDJ: needs world and canvas
         if self.sim_timer.ready(now) {
             self.world.advance();
             self.canvas.update(&self.world);

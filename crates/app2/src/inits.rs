@@ -2,7 +2,7 @@
 
 use gui_lib::Color32;
 #[allow(unused_imports)]
-use gui_lib::LayoutStyle::{TopPanel, SidePanel, NoPanel}; //Any of these styles are valid.
+use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel}; //Any of these styles are valid.
 
 // ------ User customized gui_lib application specific initialization constants --------
 pub const APP_NAME: &str = "App using gui_lib"; // Application name.
@@ -38,4 +38,4 @@ pub const SMOOTH_ANIMATION: bool = false;
 //pub const INITIAL_RULE: u8 = 15; // must be 0 to 15 inclusive
 pub const INITIAL_RULE: u8 = 1; // must be 0 to 15 inclusive
 pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
-pub const INITIAL_ONES: usize = 3000; // Must be <= INITIAL_BITS_NUM.
+pub const INITIAL_ONES: usize = 0; // Must be <= INITIAL_BITS_NUM.

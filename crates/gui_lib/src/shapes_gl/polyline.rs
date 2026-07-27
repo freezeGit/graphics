@@ -4,7 +4,7 @@
 // polyline.rs
 
 //use crate::egui::{self, Color32, Painter, Pos2, Stroke, Vec2};
-use crate::egui::{self, Painter, Pos2, Stroke,};
+use crate::egui::{self, Painter, Pos2, Stroke};
 use crate::shapes_gl::base::{LineStyle, Shape, ShapeBase};
 
 /// A customizable Polyline component.

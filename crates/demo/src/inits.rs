@@ -2,7 +2,7 @@
 
 use gui_lib::Color32;
 #[allow(unused_imports)]
-use gui_lib::LayoutStyle::{TopPanel, SidePanel, NoPanel};
+use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 
 // ------ User customized gui_lib application specific initialization constants --------
 pub const APP_NAME: &str = "Demo app for gui_lib"; // Application name.

@@ -8,8 +8,8 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::inits;
 use crate::ids::*;
+use crate::inits;
 //use crate::app_inits::{LAYOUT_STYLE, BACKGROUND_COLOR};
 use crate::world::TheWorld;
 //use crate::world::{Signal, TheWorld, ThingState};
@@ -18,8 +18,8 @@ use crate::world::world_demo::{Signal, ThingState};
 #[allow(unused_imports)]
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{
-    BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle,
-    Separator, Shape, Space, Text,
+    BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator, Shape,
+    Space, Text,
 };
 
 #[derive(Debug)]
@@ -48,7 +48,7 @@ pub(crate) struct TheCanvas {
     // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
     // Widgets are stored in  BasicCanvas::Vec<Box<dyn Widget>>
     pub(crate) canvas: BasicCanvas, // From gui_lib
-    
+
     // ViewHandles fields are concrete shapes as unique handles of type Rc<RefCell<T>>
     view_handles: ViewHandles,
 }

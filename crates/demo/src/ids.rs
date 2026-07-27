@@ -1,7 +1,7 @@
 //! ids used to identify widgets and dialogs
 
 use ::gui_lib as gl;
-use gl::{ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId,};
+use gl::{ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId};
 use gui_lib::{MultiTextEntryDlgId, RadioBoxesDlgId};
 
 // ---------- Widget ids

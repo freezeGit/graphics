@@ -38,11 +38,7 @@ impl BitArray {
         bit_array
     }
 
-    pub fn new_with_random_ones(
-        len: usize,
-        initial_ones: usize,
-        rng: &mut impl Rng,
-    ) -> Self {
+    pub fn new_with_random_ones(len: usize, initial_ones: usize, rng: &mut impl Rng) -> Self {
         assert!(len >= 2, "BitArray length must be at least 2, got {len}");
         assert!(
             initial_ones <= len,
