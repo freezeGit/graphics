@@ -17,13 +17,18 @@ use crate::world::TheWorld;
 //use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 #[allow(unused_imports)]
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
-use gui_lib::{BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Polyline, Rectangle, Separator, Shape, Space, Text};
+use gui_lib::{
+    BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Polyline, Rectangle, Separator,
+    Shape, Space, Text,
+};
 //use crate::world::emerge::BitArray;
 
 #[derive(Debug)]
 struct ViewHandles {
-    stxt_frame: Rc<RefCell<Text>>,
+    stxt_bits: Rc<RefCell<Text>>,
+    stxt_ones: Rc<RefCell<Text>>,
     stxt_rule: Rc<RefCell<Text>>,
+    stxt_frame: Rc<RefCell<Text>>,
 }
 
 /// ## struct Canvas
@@ -102,7 +107,8 @@ impl TheCanvas {
 
         let stxt_ones: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(175.0, 10.0),
-            format!("Ones: {}", inits::INITIAL_ONES),
+            format!("Ones: {}", 0),
+            //format!("Ones: {}", inits::INITIAL_ONES),
         )));
         canvas.add_shape(stxt_ones.clone());
 
@@ -124,14 +130,13 @@ impl TheCanvas {
 
         //let sln: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new()))
 
-
-
-
         ViewHandles {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
+            stxt_bits,
+            stxt_ones,
             stxt_rule,
             stxt_frame,
-         }
+        }
     }
 
     // Create and add widgets as Box<dyn Widget>
@@ -173,13 +178,25 @@ impl TheCanvas {
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
     pub(crate) fn update(&mut self, world: &TheWorld) {
         let n = world.bits.len().min(GRID_SIZE);
-            for i in 0..n {
-                //let bit = world.bits.get(i);
-                let bit = world.bits.get(i);
-                //let col = if bit { Color32::LIGHT_RED } else { Color32::LIGHT_BLUE };
-                let col = if bit { Color32::WHITE } else { Color32::BLACK };
-                self.canvas.shapes[i].borrow_mut().set_fill_color(col);
-            }
+        for i in 0..n {
+            //let bit = world.bits.get(i);
+            let bit = world.bits.get(i);
+            //let col = if bit { Color32::LIGHT_RED } else { Color32::LIGHT_BLUE };
+            let col = if bit { Color32::WHITE } else { Color32::BLACK };
+            self.canvas.shapes[i].borrow_mut().set_fill_color(col);
+        }
+
+        // Set stxt_bits to display bits number
+        self.view_handles
+            .stxt_bits
+            .borrow_mut()
+            .set_text(format!("Bits: {}", world.bits.ones_count()));
+
+        // Set stxt_ones to display ones number
+        self.view_handles
+            .stxt_ones
+            .borrow_mut()
+            .set_text(format!("Ones: {}", world.bits.ones_count()));
 
         // Set stxt_rule to display rule number
         self.view_handles
@@ -187,11 +204,11 @@ impl TheCanvas {
             .borrow_mut()
             .set_text(format!("Rule: {}", world.rule.number()));
 
-
-            // Set stxt_frame to display frame number
-            self.view_handles
-                .stxt_frame
-                .borrow_mut()
-                .set_text(format!("Interactions: {}", world.frame_number));
-        }
+        // Set stxt_frame to display interactionss number
+        //pub(crate) fn update_frame(&mut self, world: &TheWorld) {}
+        self.view_handles
+            .stxt_frame
+            .borrow_mut()
+            .set_text(format!("Interactions: {}", world.frame_number));
+    }
 } // end of impl TheCanvas

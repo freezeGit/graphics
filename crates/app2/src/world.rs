@@ -22,10 +22,10 @@ use gui_lib::World;
 /// It has no dependence on the app1 struct or the canvas struct.
 //#[derive(Debug)] // TDJ: Debug is not needed
 pub struct TheWorld {
-    rng: ThreadRng,
+    pub rng: ThreadRng,
     pub bits: BitArray,
     pub rule: Rule,
-    pub init_ones: usize,
+    //pub init_ones: usize,
     pub frame_number: u64,
 }
 
@@ -43,12 +43,20 @@ impl World for TheWorld {
 }
 
 impl TheWorld {
+
+
+
+
+
     // pub fn new() -> Self {
+    //     let mut rng = rand::rng();
+    //     let bits = BitArray::new_with_random_ones(INITIAL_BITS_NUM, INITIAL_ONES, &mut rng);
     //     Self {
-    //         rng: rand::rng(),
-    //         bits: BitArray::new(INITIAL_BITS_NUM),
+    //         rng,
+    //         //bits: BitArray::new_with_initial_ones(INITIAL_BITS_NUM, INITIAL_ONES),
+    //         bits,
     //         rule: Rule::new(INITIAL_RULE),
-    //         //init_ones: INITIAL_ONES,
+    //         init_ones: INITIAL_ONES,
     //         //init_ones: 500,
     //         frame_number: 0,
     //     }
@@ -57,18 +65,13 @@ impl TheWorld {
     pub fn new() -> Self {
         Self {
             rng: rand::rng(),
-            bits: BitArray::new_with_initial_ones(INITIAL_BITS_NUM, INITIAL_ONES),
+            //bits: BitArray::new_with_initial_ones(INITIAL_BITS_NUM, INITIAL_ONES),
+            bits: BitArray::new(INITIAL_BITS_NUM),
             rule: Rule::new(INITIAL_RULE),
-            init_ones: INITIAL_ONES,
-            //init_ones: 500,
+            //init_ones: INITIAL_ONES,
             frame_number: 0,
         }
     }
-
-    // pub fn set_initial_ones(&mut self, ones: usize) {
-    //     //self.init_ones = ones;
-    //     for _ in 0..ones {}
-    // }
 }
 
 

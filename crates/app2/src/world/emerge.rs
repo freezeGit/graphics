@@ -1,3 +1,4 @@
+use rand::seq::SliceRandom;
 use rand::{Rng, RngExt};
 //use rand::Rng;
 
@@ -24,15 +25,36 @@ impl BitArray {
             "Initial ones cannot exceed total length"
         );
 
-        // 1. Create a blank instance with all zeros
         let word_count = (len + 63) / 64;
         let mut bit_array = Self {
             words: vec![0; word_count],
             len,
         };
 
-        // 2. Use your existing set method repeatedly
         for i in 0..initial_ones {
+            bit_array.set(i, true);
+        }
+
+        bit_array
+    }
+
+    pub fn new_with_random_ones(
+        len: usize,
+        initial_ones: usize,
+        rng: &mut impl Rng,
+    ) -> Self {
+        assert!(len >= 2, "BitArray length must be at least 2, got {len}");
+        assert!(
+            initial_ones <= len,
+            "Initial ones cannot exceed total length"
+        );
+
+        let mut bit_array = Self::new(len);
+
+        let mut indices: Vec<usize> = (0..len).collect();
+        indices.shuffle(rng);
+
+        for &i in &indices[..initial_ones] {
             bit_array.set(i, true);
         }
 
@@ -64,6 +86,13 @@ impl BitArray {
         } else {
             self.words[word_index] &= !mask;
         }
+    }
+
+    pub fn ones_count(&self) -> usize {
+        self.words
+            .iter()
+            .map(|word| word.count_ones() as usize)
+            .sum()
     }
 } // end of BitArray
 

@@ -181,7 +181,9 @@ impl TheApp {
                                 "onesnum",
                                 "Ones number",
                                 //self.world.init_ones.to_string(),
-                                self.world.init_ones.to_string(),
+                                //self.world.init_ones.to_string(),
+                                //self.world.bits.ones_count().to_string(),
+                                inits::INITIAL_ONES.to_string(),
                             ),
                         ],
                     )));
@@ -237,7 +239,10 @@ impl TheApp {
 
         let mut rule: u8 = self.world.rule.number();
         let mut bits: usize = self.world.bits.len();
-        let mut ones: usize = self.world.init_ones;
+        //let mut ones: usize = self.world.init_ones;
+        let mut ones: usize = self.world.bits.ones_count();
+
+        self.sim_timer.pause();
 
         match id {
             DLG_ENTER_SPECS => {
@@ -301,8 +306,10 @@ impl TheApp {
         }
         println!("Ones = {ones}");
 
-        self.world.init_ones = ones;
-        self.world.bits = BitArray::new_with_initial_ones(bits, ones);
+        //self.world.init_ones = ones;
+        //self.world.init_ones = ones; TDJ: ones count is now in the BitArray struct
+        //self.world.bits = BitArray::new_with_initial_ones(bits, ones);
+        self.world.bits = BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
         println!("Bits = {bits} = {}", self.world.bits.len());
     }
 
