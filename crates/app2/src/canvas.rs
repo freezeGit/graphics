@@ -17,10 +17,7 @@ use crate::world::TheWorld;
 //use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 #[allow(unused_imports)]
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
-use gui_lib::{
-    BasicCanvas, Button, Circle, Color32, DragFloat, Label, Polyline, Rectangle, Separator, Shape,
-    Space, Text,
-};
+use gui_lib::{BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Polyline, Rectangle, Separator, Shape, Space, Text};
 //use crate::world::emerge::BitArray;
 
 #[derive(Debug)]
@@ -97,9 +94,21 @@ impl TheCanvas {
         }
         // ---------------------------------
 
-        let stxt_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //eframe::egui::Pos2::new(250.0, 270.0),
+        let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(10.0, 10.0),
+            format!("Bits: {}", inits::INITIAL_BITS_NUM),
+        )));
+        canvas.add_shape(stxt_bits.clone());
+
+        let stxt_ones: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(175.0, 10.0),
+            format!("Ones: {}", inits::INITIAL_ONES),
+        )));
+        canvas.add_shape(stxt_ones.clone());
+
+        let stxt_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            //egui::Pos2::new(10.0, 10.0),
+            egui::Pos2::new(360.0, 10.0),
             format!("Rule: {}", inits::INITIAL_RULE),
         )));
         canvas.add_shape(stxt_rule.clone()); // coercion to ShapeHandle happens automatically
@@ -107,10 +116,13 @@ impl TheCanvas {
         // frame number.
         let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             //eframe::egui::Pos2::new(250.0, 270.0),
-            egui::Pos2::new(200.0, 10.0),
+            //egui::Pos2::new(200.0, 10.0),
+            egui::Pos2::new(525.0, 10.0),
             format!("Interactions: {}", 0),
         )));
         canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
+
+        //let sln: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new()))
 
 
 
