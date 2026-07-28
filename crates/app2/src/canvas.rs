@@ -129,19 +129,24 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
 
+        // let sln: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+        //     Pos2::new(250.0, 705.0),
+        //     Vec2::new(650.0, 0.0),
+        // )));
         let sln: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-            Pos2::new(250.0, 705.0),
-            Vec2::new(650.0, 0.0),
+            Pos2::new(100.0, 705.0),
+            Vec2::new(950.0, 0.0),
         )));
         sln.borrow_mut().set_line_width(8.0);
         sln.borrow_mut().set_color(Color32::DARK_BLUE);
         canvas.add_shape(sln.clone());
 
         let tics: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
-            Pos2::new(250.0, 705.0),
+            //Pos2::new(250.0, 705.0),
+            Pos2::new(100.0, 705.0),
             vec![
                 [Pos2::new(0.0, -16.0), Pos2::new(0.0, 16.0)],
-                [Pos2::new(650.0, -16.0), Pos2::new(650.0, 16.0)],
+                [Pos2::new(950.0, -16.0), Pos2::new(950.0, 16.0)],
             ],
         )));
         canvas.add_shape(tics.clone());
@@ -233,17 +238,17 @@ impl TheCanvas {
             .borrow_mut()
             .set_text(format!("Interactions: {}", world.frame_number));
 
-        let length = 650.0 * (world.bits.ones_fraction() as f32);
-        //let length = 400.0;
+        //let length = 650.0 * (world.bits.ones_fraction() as f32);
+        let length = 950.0 * (world.bits.ones_fraction() as f32);
 
         self.view_handles
             .sln
             .borrow_mut()
             //.set_length(650.0 * (world.bits.ones_fraction() as f32));
-            //.set_length(length);
+            .set_length(length);
             //.set_length(500.0);
-            .set_length(length.max(10.0));
-        //set_length(100.0);
+            //.set_length(length.max(10.0));
+            //.set_length(100.0);
         //println!("length: {}", world.bits.ones_fraction() as f32);
         println!("ones_count: {}", world.bits.ones_count());
         println!("ones_fraction: {}", world.bits.ones_fraction() as f32);

@@ -56,11 +56,26 @@ impl Line {
     pub fn length(&self) -> f32 {
         self.vctr.length()
     }
+
+    // pub fn set_length(&mut self, length: f32) {
+    //     if self.vctr.length_sq() > 0.0 {
+    //         self.vctr = self.vctr.normalized() * length;
+    //     }
+    // }
+    // TDJ: !!Redo Line code so that zero length does not lose direction.
+    // Temporary kludge
+
     pub fn set_length(&mut self, length: f32) {
+        let length = length.max(0.0);
+
         if self.vctr.length_sq() > 0.0 {
             self.vctr = self.vctr.normalized() * length;
+        } else {
+            self.vctr = egui::Vec2::new(length, 0.0);
         }
     }
+
+
     pub fn angle(&self) -> f32 {
         self.vctr.angle()
     }
