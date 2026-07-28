@@ -95,6 +95,15 @@ impl BitArray {
         self.ones_count() as f64 / self.len() as f64
     }
 } // end of BitArray
+// pub fn ones_fraction(&self) -> f64 {
+//     let len = self.len();
+//
+//     if len == 0 {
+//         0.0
+//     } else {
+//         self.ones_count() as f64 / len as f64
+//     }
+// }
 
 pub fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
     let n = bits.len();

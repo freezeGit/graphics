@@ -241,7 +241,8 @@ impl TheCanvas {
             .borrow_mut()
             //.set_length(650.0 * (world.bits.ones_fraction() as f32));
             //.set_length(length);
-            .set_length(500.0);
+            //.set_length(500.0);
+            .set_length(length.max(10.0));
         //set_length(100.0);
         //println!("length: {}", world.bits.ones_fraction() as f32);
         println!("ones_count: {}", world.bits.ones_count());
