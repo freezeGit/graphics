@@ -180,10 +180,8 @@ impl TheApp {
                             TextEntryField::new(
                                 "onesnum",
                                 "Ones number",
-                                //self.world.init_ones.to_string(),
-                                //self.world.init_ones.to_string(),
-                                //self.world.bits.ones_count().to_string(),
-                                inits::INITIAL_ONES.to_string(),
+                                  //inits::INITIAL_ONES.to_string(),
+                                  self.world.bits.ones_count().to_string(),
                             ),
                         ],
                     )));
@@ -242,6 +240,7 @@ impl TheApp {
         match id {
             DLG_ENTER_SPECS => {
                 self.sim_timer.pause();
+
                 let mut bad_val = false;
                 let mut rule = self.world.rule.number();
                 let mut bits = self.world.bits.len();

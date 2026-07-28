@@ -18,8 +18,8 @@ use crate::world::TheWorld;
 #[allow(unused_imports)]
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{
-    BasicCanvas, Button, Circle, Color32, DragFloat, Label, Line, Polyline, Rectangle, Separator,
-    Shape, Space, Text,
+    BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Rectangle, Separator, Shape, Space,
+    Text, Vec2,
 };
 //use crate::world::emerge::BitArray;
 
@@ -29,6 +29,7 @@ struct ViewHandles {
     stxt_ones: Rc<RefCell<Text>>,
     stxt_rule: Rc<RefCell<Text>>,
     stxt_frame: Rc<RefCell<Text>>,
+    sln: Rc<RefCell<Line>>,
 }
 
 /// ## struct Canvas
@@ -128,7 +129,22 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
 
-        //let sln: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new()))
+        let sln: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+            Pos2::new(250.0, 705.0),
+            Vec2::new(650.0, 0.0),
+        )));
+        sln.borrow_mut().set_line_width(8.0);
+        sln.borrow_mut().set_color(Color32::DARK_BLUE);
+        canvas.add_shape(sln.clone());
+
+        let tics: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
+            Pos2::new(250.0, 705.0),
+            vec![
+                [Pos2::new(0.0, -16.0), Pos2::new(0.0, 16.0)],
+                [Pos2::new(650.0, -16.0), Pos2::new(650.0, 16.0)],
+            ],
+        )));
+        canvas.add_shape(tics.clone());
 
         ViewHandles {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
@@ -136,6 +152,7 @@ impl TheCanvas {
             stxt_ones,
             stxt_rule,
             stxt_frame,
+            sln,
         }
     }
 
@@ -215,5 +232,21 @@ impl TheCanvas {
             .stxt_frame
             .borrow_mut()
             .set_text(format!("Interactions: {}", world.frame_number));
+
+        let length = 650.0 * (world.bits.ones_fraction() as f32);
+        //let length = 400.0;
+
+        self.view_handles
+            .sln
+            .borrow_mut()
+            //.set_length(650.0 * (world.bits.ones_fraction() as f32));
+            //.set_length(length);
+            .set_length(500.0);
+        //set_length(100.0);
+        //println!("length: {}", world.bits.ones_fraction() as f32);
+        println!("ones_count: {}", world.bits.ones_count());
+        println!("ones_fraction: {}", world.bits.ones_fraction() as f32);
+        //println!("length: {}", 650.0 * (world.bits.ones_fraction() as f32));
+        println!("length: {length}");
     }
 } // end of impl TheCanvas

@@ -90,6 +90,10 @@ impl BitArray {
             .map(|word| word.count_ones() as usize)
             .sum()
     }
+
+    pub fn ones_fraction(&self) -> f64 {
+        self.ones_count() as f64 / self.len() as f64
+    }
 } // end of BitArray
 
 pub fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
