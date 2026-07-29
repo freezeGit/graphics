@@ -14,6 +14,7 @@ pub const BTN_ABOUT: ButtonId = ButtonId(4);
 // ---------- Dialog ids
 pub const DLG_ABOUT: MessageBoxDlgId = MessageBoxDlgId(1);
 pub const DLG_BAD_VALS: MessageBoxDlgId = MessageBoxDlgId(2);
+pub const DLG_BAD_BATCH: MessageBoxDlgId = MessageBoxDlgId(3);
 // ------------
 pub const DLG_BATCH: TextEntryDlgId = TextEntryDlgId(1);
 // ------------

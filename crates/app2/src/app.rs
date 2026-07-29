@@ -8,14 +8,7 @@
 
 mod app_internal; // internal functions that do not require application specific customizations
 
-//use ::gui_lib as gl;
 use egui::Context;
-// use gui_lib::{
-//     ButtonId, Dialog, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
-//     MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesDlgId,
-//     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
-//     app_gl,
-// };
 use crate::inits;
 #[allow(unused_imports)]
 use gui_lib::{
@@ -27,10 +20,8 @@ use gui_lib::{
 
 use crate::canvas::TheCanvas;
 use crate::ids::*;
-//use crate::world::TheWorld;
 use crate::world::emerge::BitArray;
 use crate::world::{Rule, TheWorld};
-//use crate::world::world_demo::ThingState;
 
 /// Constants for simulation state choice. 1 = Run, 2 = Pause, 3 = Fast-forward.
 const CHOICE_RUN: i32 = 1;
@@ -103,7 +94,6 @@ impl TheApp {
             // WidgetMsg::DragFloatChanged(id, value) => {
             //     self.handle_drag_float(id, value);
             // }
-
             WidgetMsg::DialogAcceptedRadioBoxes(id, value) => {
                 self.handle_radio_boxes(id, value);
             }
@@ -311,6 +301,25 @@ impl TheApp {
     }
 
     fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
-        println!("handle_text_entry: {}", text);
+        match id {
+            DLG_BATCH => {
+                match text.trim().parse::<u32>() {
+                    //Ok(number)  if number >= 1 => {
+                    Ok(number) => {
+                        self.sim_timer.set_batch_size(number);
+                    }
+                    Err(err) => {
+                        self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
+                            DLG_BAD_BATCH,
+                            "Error Message",
+                            err.to_string(),
+                            //"Bad value(s) entered.",
+                        )));
+                    }
+                }
+            }
+
+            _ => {}
+        }
     }
 } // end impl TheApp
