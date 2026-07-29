@@ -29,7 +29,7 @@ struct ViewHandles {
     stxt_ones: Rc<RefCell<Text>>,
     stxt_rule: Rc<RefCell<Text>>,
     stxt_frame: Rc<RefCell<Text>>,
-    sln: Rc<RefCell<Line>>,
+    sln2: Rc<RefCell<Line>>,
 }
 
 /// ## struct Canvas
@@ -42,6 +42,7 @@ struct ViewHandles {
 const GRID_WIDTH: usize = 100;
 const GRID_HEIGHT: usize = 60;
 const GRID_SIZE: usize = GRID_WIDTH * GRID_HEIGHT;
+const CELL_SIZE: f32 = 10.0;
 #[derive(Debug)]
 pub(crate) struct TheCanvas {
     // BasicCanvas provides underlying canvas structure and functionality.
@@ -86,11 +87,11 @@ impl TheCanvas {
         // TDJ: Maybe run update to show sim specs
         for y in 0..GRID_HEIGHT {
             for x in 0..GRID_WIDTH {
-                let xpx = 75.0 + ((x % GRID_WIDTH) as f32) * 10.0;
-                let ypx = 75.0 + y as f32 * 10.0;
+                let xpx = 75.0 + ((x % GRID_WIDTH) as f32) * CELL_SIZE;
+                let ypx = 75.0 + y as f32 * CELL_SIZE;
                 let bit_disp: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
                     egui::Pos2::new(xpx, ypx),
-                    egui::Vec2::new(10.0, 10.0),
+                    egui::Vec2::new(CELL_SIZE, CELL_SIZE),
                 )));
                 bit_disp.borrow_mut().set_color(Color32::GRAY);
                 bit_disp.borrow_mut().set_fill_color(Color32::GRAY);
@@ -129,17 +130,23 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
 
-        // let sln: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-        //     Pos2::new(250.0, 705.0),
-        //     Vec2::new(650.0, 0.0),
-        // )));
-        let sln: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+        let sln1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
             Pos2::new(100.0, 705.0),
             Vec2::new(950.0, 0.0),
         )));
-        sln.borrow_mut().set_line_width(8.0);
-        sln.borrow_mut().set_color(Color32::DARK_BLUE);
-        canvas.add_shape(sln.clone());
+        sln1.borrow_mut().set_line_width(8.0);
+        sln1.borrow_mut().set_color(Color32::LIGHT_GRAY);
+        canvas.add_shape(sln1.clone());
+
+        let sln2: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+            Pos2::new(100.0, 705.0),
+            Vec2::new(950.0, 0.0),
+        )));
+        sln2.borrow_mut().set_line_width(8.0);
+        sln2.borrow_mut().set_color(Color32::DARK_BLUE);
+        canvas.add_shape(sln2.clone());
+
+
 
         let tics: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
             //Pos2::new(250.0, 705.0),
@@ -157,7 +164,7 @@ impl TheCanvas {
             stxt_ones,
             stxt_rule,
             stxt_frame,
-            sln,
+            sln2,
         }
     }
 
@@ -176,6 +183,10 @@ impl TheCanvas {
 
         let wb_sim = Button::new(BTN_SIM, "Run Sim", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_sim));
+
+        let wb_batch = Button::new(BTN_BATCH, "Batch", 120.0, 40.0);
+        canvas.add_widget(Box::new(wb_batch));
+
 
         canvas.add_widget(Box::new(Space::new(300.0)));
 
@@ -232,27 +243,15 @@ impl TheCanvas {
             .set_text(format!("Rule: {}", world.rule.number()));
 
         // Set stxt_frame to display interactionss number
-        //pub(crate) fn update_frame(&mut self, world: &TheWorld) {}
         self.view_handles
             .stxt_frame
             .borrow_mut()
             .set_text(format!("Interactions: {}", world.frame_number));
-
-        //let length = 650.0 * (world.bits.ones_fraction() as f32);
         let length = 950.0 * (world.bits.ones_fraction() as f32);
 
         self.view_handles
-            .sln
+            .sln2
             .borrow_mut()
-            //.set_length(650.0 * (world.bits.ones_fraction() as f32));
             .set_length(length);
-            //.set_length(500.0);
-            //.set_length(length.max(10.0));
-            //.set_length(100.0);
-        //println!("length: {}", world.bits.ones_fraction() as f32);
-        println!("ones_count: {}", world.bits.ones_count());
-        println!("ones_fraction: {}", world.bits.ones_fraction() as f32);
-        //println!("length: {}", 650.0 * (world.bits.ones_fraction() as f32));
-        println!("length: {length}");
     }
 } // end of impl TheCanvas

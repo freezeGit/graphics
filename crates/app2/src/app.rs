@@ -103,15 +103,17 @@ impl TheApp {
             // WidgetMsg::DragFloatChanged(id, value) => {
             //     self.handle_drag_float(id, value);
             // }
-            // WidgetMsg::DialogAcceptedText(id, text) => {
-            //     self.handle_text_entry(id, text);
-            // }
+
             WidgetMsg::DialogAcceptedRadioBoxes(id, value) => {
                 self.handle_radio_boxes(id, value);
             }
             WidgetMsg::DialogAcceptedMultiTextEntry(id, values) => {
                 self.handle_multi_text_entry(id, values);
             }
+            WidgetMsg::DialogAcceptedText(id, text) => {
+                self.handle_text_entry(id, text);
+            }
+
             // TDJ: Not needed for this app
             // WidgetMsg::DialogAcceptedDragFloat(id, val) => {
             //     self.handle_drag_float_dlg(id, val);
@@ -180,14 +182,22 @@ impl TheApp {
                             TextEntryField::new(
                                 "onesnum",
                                 "Ones number",
-                                  //inits::INITIAL_ONES.to_string(),
-                                  self.world.bits.ones_count().to_string(),
+                                self.world.start_ones.to_string(),
                             ),
                         ],
                     )));
             }
 
-            //{
+            BTN_BATCH => {
+                println!("Batch size: {}", self.sim_timer.batch_size());
+                self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
+                    DLG_BATCH,
+                    "Enter batch size",
+                    "Batch size: ",
+                    self.sim_timer.batch_size().to_string(),
+                )));
+            }
+
             _ => {}
         }
     }
@@ -204,39 +214,23 @@ impl TheApp {
 
     fn handle_radio_boxes(&mut self, id: RadioBoxesDlgId, value: i32) {
         match id {
-            DLG_SIM_STATE => {
-                match value {
-                    // CHOICE_RUN => {
-                    //     self.sim_timer.set_normal_speed();
-                    //     self.sim_timer.run();
-                    // }
-                    CHOICE_RUN => {
-                        self.sim_timer.set_to_run_normal_speed();
-                    }
-                    CHOICE_PAUSE => {
-                        self.sim_timer.pause();
-                    }
-                    // CHOICE_FAST => {
-                    //     self.sim_timer.set_fast_forward();
-                    //     self.sim_timer.run();
-                    // }
-                    CHOICE_FAST => {
-                        self.sim_timer.set_to_run_fast_forward();
-                    }
-                    _ => {}
+            DLG_SIM_STATE => match value {
+                CHOICE_RUN => {
+                    self.sim_timer.set_to_run_normal_speed();
                 }
-            }
+                CHOICE_PAUSE => {
+                    self.sim_timer.pause();
+                }
+                CHOICE_FAST => {
+                    self.sim_timer.set_to_run_fast_forward();
+                }
+                _ => {}
+            },
             _ => {}
         }
     }
 
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
-        // let mut rule: u8 = self.world.rule.number();
-        // let mut bits: usize = self.world.bits.len();
-        // let mut ones: usize = self.world.bits.ones_count();
-        //
-        // self.sim_timer.pause();
-
         match id {
             DLG_ENTER_SPECS => {
                 self.sim_timer.pause();
@@ -244,12 +238,10 @@ impl TheApp {
                 let mut bad_val = false;
                 let mut rule = self.world.rule.number();
                 let mut bits = self.world.bits.len();
-                //println!("Orig bits = {bits}");
-                let mut ones = self.world.bits.ones_count();
+                let mut ones = self.world.start_ones;
 
                 for item in values {
                     let (item_id, text) = item;
-                    // match item_id.as_str() {
                     match item_id.as_str() {
                         "rule" => match text.trim().parse::<u8>() {
                             Ok(number) if number < 16 => {
@@ -290,7 +282,6 @@ impl TheApp {
                                     Ones number must be smaller than bits number.\
                                     Wiil be set to number of bits."
                                 );
-                                //ones = bits;
                             }
                             Err(err) => {
                                 bad_val = true;
@@ -309,126 +300,17 @@ impl TheApp {
                     )));
                 } else {
                     self.world.rule = Rule::new(rule);
-                    println!("Rule = {rule} = {}", self.world.rule.number());
                     self.world.bits =
                         BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
-                    println!("Bits = {bits} = {}", self.world.bits.len());
-                    println!("Ones = {ones} = {}", self.world.bits.ones_count());
+                    self.world.start_ones = ones;
                     self.world.frame_number = 0;
                 }
-
-                // self.world.rule = Rule::new(rule);
-                // println!("Rule = {rule} = {}", self.world.rule.number());
-                //
-                // if ones > bits {
-                //     ones = bits;
-                // }
-                // println!("Ones = {ones}");
-                //
-                // self.world.bits = BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
-                // println!("Bits = {bits} = {}", self.world.bits.len());
             }
             _ => {}
         }
-
-        // self.world.rule = Rule::new(rule);
-        // println!("Rule = {rule} = {}", self.world.rule.number());
-        //
-        // if ones > bits {
-        //     ones = bits;
-        // }
-        // println!("Ones = {ones}");
-
-        // fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
-        //     // let mut rule: u8 = 0;
-        //     // let mut bits: usize = 50000;
-        //     // let mut ones: usize = 500;
-        //
-        //     let mut rule: u8 = self.world.rule.number();
-        //     let mut bits: usize = self.world.bits.len();
-        //     //let mut ones: usize = self.world.init_ones;
-        //     let mut ones: usize = self.world.bits.ones_count();
-        //
-        //     self.sim_timer.pause();
-        //
-        //     match id {
-        //         DLG_ENTER_SPECS => {
-        //             for item in values {
-        //                 let (item_id, text) = item;
-        //                 // match item_id.as_str() {
-        //                 match item_id.as_str() {
-        //                     "rule" => match text.trim().parse::<u8>() {
-        //                         Ok(number) if number < 16 => {
-        //                             rule = number;
-        //                         }
-        //                         Ok(number) => {
-        //                             eprintln!(
-        //                                 "Invalid rule number: {number}. Rule must be between 0 and 15."
-        //                             );
-        //                         }
-        //                         Err(err) => {
-        //                             eprintln!("Could not parse rule number {:?}: {err}", text);
-        //                         }
-        //                     },
-        //                     "bitsnum" => match text.trim().parse::<usize>() {
-        //                         Ok(number) if number >= 2 => {
-        //                             bits = number;
-        //                         }
-        //                         Ok(number) => {
-        //                             eprintln!("Invalid bits number: {number}. Bits number too small.");
-        //                         }
-        //                         Err(err) => {
-        //                             eprintln!("Could not parse bits number {:?}: {err}", text);
-        //                         }
-        //                     },
-        //                     "onesnum" => match text.trim().parse::<usize>() {
-        //                         Ok(number) if number <= bits => {
-        //                             ones = number;
-        //                         }
-        //                          Ok(number) => {
-        //                             eprintln!(
-        //                                 "Invalid ones number: {number}. \
-        //                                 Ones number must be smaller than bits number.\
-        //                                 Wiil be set to number of bits."
-        //                             );
-        //                             ones = bits;
-        //                         }
-        //                         Err(err) => {
-        //                             eprintln!("Could not parse ones number {:?}: {err}", text);
-        //                         }
-        //                     },
-        //
-        //                     _ => {}
-        //                 }
-        //             }
-        //         }
-        //         _ => {}
-        //     }
-        //
-        //     self.world.rule = Rule::new(rule);
-        //     println!("Rule = {rule} = {}", self.world.rule.number());
-        //
-        //     if ones > bits {
-        //         ones = bits;
-        //     }
-        //     println!("Ones = {ones}");
-
-        //self.world.init_ones = ones;
-        //self.world.init_ones = ones; TDJ: ones count is now in the BitArray struct
-        //self.world.bits = BitArray::new_with_initial_ones(bits, ones);
-        // self.world.bits = BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
-        // println!("Bits = {bits} = {}", self.world.bits.len());
     }
 
-    // TJD: Not needed for this app
-    //Handle drag float dialog messages
-    //Requires application specific customization.
-    // fn handle_drag_float_dlg(&mut self, id: DragFloatDlgId, val: f32) {
-    //     match id {
-    //         // DLG_ENTER_VALUE => {
-    //         //     self.world.value = val as f64;
-    //         //}
-    //         _ => {}
-    //     }
-    // }
+    fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
+        println!("handle_text_entry: {}", text);
+    }
 } // end impl TheApp

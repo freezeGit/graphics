@@ -25,6 +25,7 @@ pub struct TheWorld {
     pub rng: ThreadRng,
     pub bits: BitArray,
     pub rule: Rule,
+    pub start_ones: usize,
     pub frame_number: u64,
 }
 
@@ -42,25 +43,12 @@ impl World for TheWorld {
 }
 
 impl TheWorld {
-    // pub fn new() -> Self {
-    //     let mut rng = rand::rng();
-    //     let bits = BitArray::new_with_random_ones(INITIAL_BITS_NUM, INITIAL_ONES, &mut rng);
-    //     Self {
-    //         rng,
-    //         //bits: BitArray::new_with_initial_ones(INITIAL_BITS_NUM, INITIAL_ONES),
-    //         bits,
-    //         rule: Rule::new(INITIAL_RULE),
-    //         init_ones: INITIAL_ONES,
-    //         //init_ones: 500,
-    //         frame_number: 0,
-    //     }
-    // }
-
     pub fn new() -> Self {
         Self {
             rng: rand::rng(),
             bits: BitArray::new(INITIAL_BITS_NUM),
             rule: Rule::new(INITIAL_RULE),
+            start_ones: INITIAL_ONES,
             frame_number: 0,
         }
     }
