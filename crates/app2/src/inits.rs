@@ -19,7 +19,7 @@ pub const BACKGROUND_COLOR: Color32 = gui_lib::BKG_DEFAULT;
 
 // `INTERVAL`: Time between simulation steps in seconds
 //pub const INTERVAL: f64 = 0.5;
-pub const INTERVAL: f64 = 0.5;
+pub const INTERVAL: f64 = 0.05;
 // `BATCH_SIZE`: Number of world advances to perform in a single simulation step
 // during fast-forward of the simulation.
 //pub const BATCH_SIZE: u32 = 1;
