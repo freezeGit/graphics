@@ -188,6 +188,8 @@ impl TheApp {
                 )));
             }
 
+            BTN_SEQ => {}
+
             _ => {}
         }
     }

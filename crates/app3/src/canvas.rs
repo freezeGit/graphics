@@ -187,6 +187,9 @@ impl TheCanvas {
         let wb_batch = Button::new(BTN_BATCH, "Batch", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_batch));
 
+        let wb_seq = Button::new(BTN_SEQ, "Sequence", 120.0, 40.0);
+        canvas.add_widget(Box::new(wb_seq));
+
 
         canvas.add_widget(Box::new(Space::new(300.0)));
 

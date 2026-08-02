@@ -9,7 +9,9 @@ use gui_lib::{TextEntryDlgId, MultiTextEntryDlgId, RadioBoxesDlgId};
 pub const BTN_SIM: ButtonId = ButtonId(1);
 pub const BTN_NEW_SIM: ButtonId = ButtonId(2);
 pub const BTN_BATCH: ButtonId = ButtonId(3);
-pub const BTN_ABOUT: ButtonId = ButtonId(4);
+
+pub const BTN_SEQ: ButtonId = ButtonId(4);
+pub const BTN_ABOUT: ButtonId = ButtonId(5);
 
 // ---------- Dialog ids
 pub const DLG_ABOUT: MessageBoxDlgId = MessageBoxDlgId(1);
