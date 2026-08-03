@@ -146,13 +146,14 @@ impl TheCanvas {
         sln2.borrow_mut().set_color(Color32::DARK_BLUE);
         canvas.add_shape(sln2.clone());
 
-
-
         let tics: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
             //Pos2::new(250.0, 705.0),
             Pos2::new(100.0, 705.0),
             vec![
                 [Pos2::new(0.0, -16.0), Pos2::new(0.0, 16.0)],
+                [Pos2::new(237.5, -16.0), Pos2::new(237.5, 16.0)],
+                [Pos2::new(475.0, -16.0), Pos2::new(475.0, 16.0)],
+                [Pos2::new(712.5, -16.0), Pos2::new(712.5, 16.0)],
                 [Pos2::new(950.0, -16.0), Pos2::new(950.0, 16.0)],
             ],
         )));
