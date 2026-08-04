@@ -95,15 +95,6 @@ impl BitArray {
         self.ones_count() as f64 / self.len() as f64
     }
 } // end of BitArray
-// pub fn ones_fraction(&self) -> f64 {
-//     let len = self.len();
-//
-//     if len == 0 {
-//         0.0
-//     } else {
-//         self.ones_count() as f64 / len as f64
-//     }
-// }
 
 pub fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
     let n = bits.len();
@@ -139,16 +130,6 @@ pub struct Rule {
 // pub(crate) struct Rule(bool, bool, bool, bool);
 
 impl Rule {
-    // pub(crate) fn new(n: u8) -> Self {
-    //     assert!(n < 16, "Rule number must be less than 16, got {n}");
-    //     Self(
-    //         Self::bit(n, 3),
-    //         Self::bit(n, 2),
-    //         Self::bit(n, 1),
-    //         Self::bit(n, 0),
-    //     )
-    // }
-
     pub fn new(number: u8) -> Self {
         assert!(
             number < 16,
@@ -189,6 +170,17 @@ impl Rule {
     fn apply(self, a: bool, b: bool) -> (bool, bool) {
         // symmetrically reversible rule
         (self.response(a, b), self.response(b, a))
+    }
+}
+
+pub struct Seq {
+    pub discard: usize,
+    pub length: usize,
+}
+
+impl Seq {
+    pub fn new(discard: usize, length: usize) -> Self {
+        Self { discard, length }
     }
 }
 // --------------------------------------------

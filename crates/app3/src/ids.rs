@@ -21,5 +21,6 @@ pub const DLG_BAD_BATCH: MessageBoxDlgId = MessageBoxDlgId(3);
 pub const DLG_BATCH: TextEntryDlgId = TextEntryDlgId(1);
 // ------------
 pub const DLG_ENTER_SPECS: MultiTextEntryDlgId = MultiTextEntryDlgId(1);
+pub const DLG_SEQUENCE: MultiTextEntryDlgId = MultiTextEntryDlgId(2);
 // ----------
 pub const DLG_SIM_STATE: RadioBoxesDlgId = RadioBoxesDlgId(1);

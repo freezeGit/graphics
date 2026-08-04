@@ -8,11 +8,11 @@
 
 mod app_internal; // internal functions that do not require application specific customizations
 
-use egui::Context;
 use crate::inits;
+use egui::Context;
 #[allow(unused_imports)]
 use gui_lib::{
-    ButtonId, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
+    World, ButtonId, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
     MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesDlgId,
     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
     app_gl,
@@ -188,7 +188,27 @@ impl TheApp {
                 )));
             }
 
-            BTN_SEQ => {}
+            BTN_SEQ => {
+                self.canvas
+                    .canvas
+                    .set_dialog(Box::new(MultiTextEntryDlg::new(
+                        DLG_SEQUENCE,
+                        "Enter sequence specs",
+                        [
+                            TextEntryField::new(
+                                "discard",
+                                "Discard interactions",
+                                //self.world.seq.discard.to_string(),
+                                inits::INITIAL_SEQ_DISCARD.to_string(),
+                            ),
+                            TextEntryField::new(
+                                "seq_length",
+                                "Sequence length",
+                                inits::INITIAL_SEQ_LENGTH.to_string(),
+                            ),
+                        ],
+                    )));
+            }
 
             _ => {}
         }
@@ -298,9 +318,115 @@ impl TheApp {
                     self.world.frame_number = 0;
                 }
             }
+
+            DLG_SEQUENCE => {
+                let mut discard = 10;
+                let mut seq_len = 12;
+                let mut bad_val = false;
+
+                for item in values {
+                    let (item_id, text) = item;
+                    match item_id.as_str() {
+                        "discard" => match text.trim().parse::<usize>() {
+                            Ok(number) => {
+                                discard = number;
+                            }
+                            Err(err) => {
+                                bad_val = true;
+                                //eprintln!("Could not parse discard number {:?}: {err}", text);
+                            }
+                        },
+                        "seq_length" => match text.trim().parse::<usize>() {
+                            Ok(number) => {
+                                seq_len = number;
+                            }
+                            Err(err) => {
+                                bad_val = true;
+                                eprintln!(
+                                    "Could not parse sequence length number {:?}: {err}",
+                                    text
+                                );
+                            }
+                        },
+                        _ => {}
+                    }
+                }
+                if bad_val {
+                    self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
+                        DLG_BAD_VALS,
+                        "Error Message",
+                        "Bad value(s) entered.",
+                    )));
+                }
+
+                while self.world.frame_number < discard.try_into().unwrap() {
+                    self.world.advance();
+                    self.canvas.update(&self.world);
+                }
+
+                //self.sim_timer.set_to_run_fast_forward();
+            }
+
+            // DLG_SEQUENCE => {
+            //     let mut bad_val = false;
+            //
+            //     for item in values {
+            //         let (item_id, text) = item;
+            //         match item_id.as_str() {
+            //             "discard" => match text.trim().parse::<usize>() {
+            //                 Ok(number) => {
+            //                     self.world.seq.discard = number;
+            //                 }
+            //                 Err(err) => {
+            //                     bad_val = true;
+            //                     eprintln!("Could not parse discard number {:?}: {err}", text);
+            //                 }
+            //             },
+            //             "seq_length" => match text.trim().parse::<usize>() {
+            //                 Ok(number) => {
+            //                     self.world.seq.length = number;
+            //                 }
+            //                 Err(err) => {
+            //                     bad_val = true;
+            //                     eprintln!(
+            //                         "Could not parse sequence length number {:?}: {err}",
+            //                         text
+            //                     );
+            //                 }
+            //             },
+            //             _ => {}
+            //         }
+            //     }
+            //     if bad_val {
+            //         self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
+            //             DLG_BAD_VALS,
+            //             "Error Message",
+            //             "Bad value(s) entered.",
+            //         )));
+            //     }
+            //
+            //     self.sim_timer.set_to_run_fast_forward();
+            // }
+
             _ => {}
         }
     }
+
+    // fn main() {
+    //     // 1. Create a mutable vector with elements
+    //     let mut numbers = vec![1, 2, 3, 4, 5];
+    //     println!("Before: {:?}", numbers); // Outputs: [1, 2, 3, 4, 5]
+    //
+    //     // 2. Clear the vector
+    //     numbers.clear();
+    //     println!("After: {:?}", numbers);  // Outputs: []
+    //
+    //     // 3. The vector is still usable and retains its capacity
+    //     numbers.push(6);
+    // }
+
+    //Retains Capacity: The memory buffer allocated for the vector is not freed. If you want to shrink the memory allocation after clearing, follow it with numbers.shrink_to_fit()
+
 
     fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
         match id {

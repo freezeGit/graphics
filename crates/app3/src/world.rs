@@ -10,9 +10,11 @@
 pub(crate) mod emerge;
 // ---------------------------------------------------
 
-use crate::inits::{INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_RULE};
+use crate::inits::{
+    INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_RULE, INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
+};
 pub(crate) use crate::world::emerge::Rule;
-use crate::world::emerge::{BitArray, step_bits};
+use crate::world::emerge::{BitArray, Seq, step_bits};
 use gui_lib::World;
 use rand::rngs::ThreadRng;
 use rand::{Rng, RngExt};
@@ -26,6 +28,8 @@ pub struct TheWorld {
     pub bits: BitArray,
     pub rule: Rule,
     pub start_ones: usize,
+    pub seq: Seq,
+    pub attractor: Vec<i32>,
     pub frame_number: u64,
 }
 
@@ -49,6 +53,8 @@ impl TheWorld {
             bits: BitArray::new(INITIAL_BITS_NUM),
             rule: Rule::new(INITIAL_RULE),
             start_ones: INITIAL_ONES,
+            seq: Seq::new(INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH),
+            attractor: Vec::new(),
             frame_number: 0,
         }
     }
