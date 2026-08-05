@@ -326,10 +326,8 @@ impl TheApp {
             }
 
             DLG_SEQUENCE => {
-                // let mut discard = self.world.attractor.discard;
-                // let mut seq_len = self.world.attractor.len();
                 let mut discard: usize = 0;
-                let mut seq_len:usize = 0;
+                let mut seq_len: usize = 0;
                 let mut bad_val = false;
 
                 for item in values {
@@ -371,7 +369,7 @@ impl TheApp {
                         self.world.advance();
                     }
                     self.world.attractor.discard = discard;
-                    
+
                     // Push 'seq_len' ones counts to the empty attractor sequence.
                     self.world.attractor.seq.clear();
                     self.world.attractor.seq.reserve(seq_len);
@@ -383,12 +381,33 @@ impl TheApp {
                         self.world.advance();
                     }
 
-                    println!("Discard length: {}", self.world.attractor.discard);
-                    //println!("Sequence length: {}", self.world.attractor.seq.len());
-                    println!("Sequence length: {}", self.world.attractor.len());
-                    for val in self.world.attractor.seq.iter().take(10) {
-                        println!("{}", val);
+                    // println!("Discard length: {}", self.world.attractor.discard);
+                    // //println!("Sequence length: {}", self.world.attractor.seq.len());
+                    // println!("Sequence length: {}", self.world.attractor.len());
+                    // for val in self.world.attractor.seq.iter().take(10) {
+                    //     println!("{}", val);
+                    // }
+
+                    let numbers = vec![2, 4, 6, 8, 10];
+                    let mut mean_test = 0.0;
+                    if numbers.len() > 0 {
+                        mean_test = numbers.iter().map(|&value| value as f64).sum::<f64>()
+                            / numbers.len() as f64;
                     }
+                    println!("Mean_test: {}", mean_test);
+
+                    let mut mean = 0.0;
+                    if self.world.attractor.seq.len() > 0 {
+                        mean = self
+                            .world
+                            .attractor
+                            .seq
+                            .iter()
+                            .map(|&value| value as f64)
+                            .sum::<f64>()
+                            / self.world.attractor.seq.len() as f64;
+                    }
+                    println!("Mean: {}", mean);
 
                     self.canvas.update(&self.world);
                 }
@@ -397,6 +416,8 @@ impl TheApp {
             _ => {}
         }
     }
+
+    // for git
 
     fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
         match id {
