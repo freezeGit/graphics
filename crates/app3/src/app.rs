@@ -189,6 +189,11 @@ impl TheApp {
             }
 
             BTN_SEQ => {
+                let mut the_len = self.world.attractor.len();
+                if the_len == 0 {
+                    the_len = inits::INITIAL_SEQ_LENGTH;
+                }
+
                 self.canvas
                     .canvas
                     .set_dialog(Box::new(MultiTextEntryDlg::new(
@@ -198,13 +203,14 @@ impl TheApp {
                             TextEntryField::new(
                                 "discard",
                                 "Discard interactions",
-                                //self.world.seq.discard.to_string(),
-                                inits::INITIAL_SEQ_DISCARD.to_string(),
+                                self.world.attractor.discard.to_string(),
+                                //inits::INITIAL_SEQ_DISCARD.to_string(),
                             ),
                             TextEntryField::new(
                                 "seq_length",
                                 "Sequence length",
-                                inits::INITIAL_SEQ_LENGTH.to_string(),
+                                //inits::INITIAL_SEQ_LENGTH.to_string(),
+                                the_len.to_string(),
                             ),
                         ],
                     )));
@@ -320,9 +326,10 @@ impl TheApp {
             }
 
             DLG_SEQUENCE => {
-                let mut discard = self.world.attractor.discard;
-                //let mut seq_len = self.world.attractor.seq.len();
-                let mut seq_len = self.world.attractor.len();
+                // let mut discard = self.world.attractor.discard;
+                // let mut seq_len = self.world.attractor.len();
+                let mut discard: usize = 0;
+                let mut seq_len:usize = 0;
                 let mut bad_val = false;
 
                 for item in values {
@@ -334,7 +341,7 @@ impl TheApp {
                             }
                             Err(err) => {
                                 bad_val = true;
-                                //eprintln!("Could not parse discard number {:?}: {err}", text);
+                                eprintln!("Could not parse discard number {:?}: {err}", text);
                             }
                         },
                         "seq_length" => match text.trim().parse::<usize>() {
