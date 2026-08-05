@@ -8,8 +8,8 @@
 
 mod app_internal; // internal functions that do not require application specific customizations
 
-use egui::Context;
 use crate::inits;
+use egui::Context;
 #[allow(unused_imports)]
 use gui_lib::{
     ButtonId, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,

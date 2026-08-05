@@ -2,7 +2,7 @@
 
 use ::gui_lib as gl;
 use gl::{ButtonId, DragFloatDlgId, DragFloatId, MessageBoxDlgId};
-use gui_lib::{TextEntryDlgId, MultiTextEntryDlgId, RadioBoxesDlgId};
+use gui_lib::{MultiTextEntryDlgId, RadioBoxesDlgId, TextEntryDlgId};
 
 // ---------- Widget ids
 

@@ -146,8 +146,6 @@ impl TheCanvas {
         sln2.borrow_mut().set_color(Color32::DARK_BLUE);
         canvas.add_shape(sln2.clone());
 
-
-
         let tics: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
             //Pos2::new(250.0, 705.0),
             Pos2::new(100.0, 705.0),
@@ -189,7 +187,6 @@ impl TheCanvas {
 
         let wb_batch = Button::new(BTN_BATCH, "Batch", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_batch));
-
 
         canvas.add_widget(Box::new(Space::new(300.0)));
 
@@ -252,9 +249,6 @@ impl TheCanvas {
             .set_text(format!("Interactions: {}", world.frame_number));
         let length = 950.0 * (world.bits.ones_fraction() as f32);
 
-        self.view_handles
-            .sln2
-            .borrow_mut()
-            .set_length(length);
+        self.view_handles.sln2.borrow_mut().set_length(length);
     }
 } // end of impl TheCanvas

@@ -175,14 +175,33 @@ impl Rule {
 
 pub struct Seq {
     pub discard: usize,
-    pub length: usize,
+    //pub length: usize,
+    pub seq: Vec<i32>,
 }
 
 impl Seq {
-    pub fn new(discard: usize, length: usize) -> Self {
-        Self { discard, length }
+    //pub fn new(discard: usize, length: usize) -> Self {
+    pub fn new(discard: usize) -> Self {
+        Self {
+            discard,
+            //length,
+            seq: Vec::new(),
+        }
+    }
+
+
+    pub fn push(&mut self, val: i32) {
+        self.seq.push(val);
+    }
+
+    pub fn len(&self) -> usize {
+        self.seq.len()
     }
 }
+
+
+
+
 // --------------------------------------------
 
 #[cfg(test)]

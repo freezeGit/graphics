@@ -75,7 +75,6 @@ impl Line {
         }
     }
 
-
     pub fn angle(&self) -> f32 {
         self.vctr.angle()
     }

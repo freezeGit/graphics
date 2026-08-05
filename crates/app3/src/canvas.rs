@@ -191,7 +191,6 @@ impl TheCanvas {
         let wb_seq = Button::new(BTN_SEQ, "Sequence", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_seq));
 
-
         canvas.add_widget(Box::new(Space::new(300.0)));
 
         let wb_about = Button::new(BTN_ABOUT, "About", 120.0, 40.0);
@@ -253,9 +252,6 @@ impl TheCanvas {
             .set_text(format!("Interactions: {}", world.frame_number));
         let length = 950.0 * (world.bits.ones_fraction() as f32);
 
-        self.view_handles
-            .sln2
-            .borrow_mut()
-            .set_length(length);
+        self.view_handles.sln2.borrow_mut().set_length(length);
     }
 } // end of impl TheCanvas

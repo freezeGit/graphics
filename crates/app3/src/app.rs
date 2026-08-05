@@ -12,10 +12,10 @@ use crate::inits;
 use egui::Context;
 #[allow(unused_imports)]
 use gui_lib::{
-    World, ButtonId, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
+    ButtonId, DialogId, DragFloatDlg, DragFloatDlgId, DragFloatId, MessageBoxDlg,
     MultiTextEntryDlg, MultiTextEntryDlgId, NilDlg, RadioBoxesDlg, RadioBoxesDlgId,
     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
-    app_gl,
+    World, app_gl,
 };
 
 use crate::canvas::TheCanvas;
@@ -320,8 +320,9 @@ impl TheApp {
             }
 
             DLG_SEQUENCE => {
-                let mut discard = 10;
-                let mut seq_len = 12;
+                let mut discard = self.world.attractor.discard;
+                //let mut seq_len = self.world.attractor.seq.len();
+                let mut seq_len = self.world.attractor.len();
                 let mut bad_val = false;
 
                 for item in values {
@@ -357,76 +358,38 @@ impl TheApp {
                         "Error Message",
                         "Bad value(s) entered.",
                     )));
-                }
+                } else {
+                    // Discard the first 'discard' interactions.
+                    for _ in 0..discard {
+                        self.world.advance();
+                    }
+                    self.world.attractor.discard = discard;
+                    
+                    // Push 'seq_len' ones counts to the empty attractor sequence.
+                    self.world.attractor.seq.clear();
+                    self.world.attractor.seq.reserve(seq_len);
+                    for _ in 0..seq_len {
+                        self.world
+                            .attractor
+                            .seq
+                            .push(self.world.bits.ones_count().try_into().unwrap());
+                        self.world.advance();
+                    }
 
-                while self.world.frame_number < discard.try_into().unwrap() {
-                    self.world.advance();
+                    println!("Discard length: {}", self.world.attractor.discard);
+                    //println!("Sequence length: {}", self.world.attractor.seq.len());
+                    println!("Sequence length: {}", self.world.attractor.len());
+                    for val in self.world.attractor.seq.iter().take(10) {
+                        println!("{}", val);
+                    }
+
                     self.canvas.update(&self.world);
                 }
-
-                //self.sim_timer.set_to_run_fast_forward();
             }
-
-            // DLG_SEQUENCE => {
-            //     let mut bad_val = false;
-            //
-            //     for item in values {
-            //         let (item_id, text) = item;
-            //         match item_id.as_str() {
-            //             "discard" => match text.trim().parse::<usize>() {
-            //                 Ok(number) => {
-            //                     self.world.seq.discard = number;
-            //                 }
-            //                 Err(err) => {
-            //                     bad_val = true;
-            //                     eprintln!("Could not parse discard number {:?}: {err}", text);
-            //                 }
-            //             },
-            //             "seq_length" => match text.trim().parse::<usize>() {
-            //                 Ok(number) => {
-            //                     self.world.seq.length = number;
-            //                 }
-            //                 Err(err) => {
-            //                     bad_val = true;
-            //                     eprintln!(
-            //                         "Could not parse sequence length number {:?}: {err}",
-            //                         text
-            //                     );
-            //                 }
-            //             },
-            //             _ => {}
-            //         }
-            //     }
-            //     if bad_val {
-            //         self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
-            //             DLG_BAD_VALS,
-            //             "Error Message",
-            //             "Bad value(s) entered.",
-            //         )));
-            //     }
-            //
-            //     self.sim_timer.set_to_run_fast_forward();
-            // }
 
             _ => {}
         }
     }
-
-    // fn main() {
-    //     // 1. Create a mutable vector with elements
-    //     let mut numbers = vec![1, 2, 3, 4, 5];
-    //     println!("Before: {:?}", numbers); // Outputs: [1, 2, 3, 4, 5]
-    //
-    //     // 2. Clear the vector
-    //     numbers.clear();
-    //     println!("After: {:?}", numbers);  // Outputs: []
-    //
-    //     // 3. The vector is still usable and retains its capacity
-    //     numbers.push(6);
-    // }
-
-    //Retains Capacity: The memory buffer allocated for the vector is not freed. If you want to shrink the memory allocation after clearing, follow it with numbers.shrink_to_fit()
-
 
     fn handle_text_entry(&mut self, id: TextEntryDlgId, text: String) {
         match id {
