@@ -87,11 +87,14 @@ impl TheCanvas {
         // TDJ: Maybe run update to show sim specs
         for y in 0..GRID_HEIGHT {
             for x in 0..GRID_WIDTH {
-                let xpx = 75.0 + ((x % GRID_WIDTH) as f32) * CELL_SIZE;
-                let ypx = 75.0 + y as f32 * CELL_SIZE;
+                //let xpx = 75.0 + ((x % GRID_WIDTH) as f32) * CELL_SIZE;
+                let xpx = 975.0 + ((x % GRID_WIDTH) as f32) * 4.0;
+                //let ypx = 75.0 + y as f32 * CELL_SIZE;
+                let ypx = 200.0 + y as f32 * 4.0;
                 let bit_disp: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
                     egui::Pos2::new(xpx, ypx),
-                    egui::Vec2::new(CELL_SIZE, CELL_SIZE),
+                    //egui::Vec2::new(CELL_SIZE, CELL_SIZE),
+                    egui::Vec2::new(4.0, 4.0),
                 )));
                 bit_disp.borrow_mut().set_color(Color32::GRAY);
                 bit_disp.borrow_mut().set_fill_color(Color32::GRAY);
@@ -100,6 +103,21 @@ impl TheCanvas {
             }
         }
         // ---------------------------------
+
+
+        let x = 100.0;
+        let dx = 4.0;
+        let y = 100.0;
+        for n in 0..200 {
+            let x_pos = x + (n as f32) * dx;
+            let disp_val: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+                egui::Pos2::new(x_pos, y),
+                egui::Vec2::new(0.0, 400.0),
+            )));
+            //disp_val.borrow_mut().set_color(Color32::BLUE);
+            canvas.add_shape(disp_val.clone());
+        }
+
 
         let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(10.0, 10.0),
@@ -215,9 +233,7 @@ impl TheCanvas {
     pub(crate) fn update(&mut self, world: &TheWorld) {
         let n = world.bits.len().min(GRID_SIZE);
         for i in 0..n {
-            //let bit = world.bits.get(i);
             let bit = world.bits.get(i);
-            //let col = if bit { Color32::LIGHT_RED } else { Color32::LIGHT_BLUE };
             let col = if bit { Color32::WHITE } else { Color32::BLACK };
             self.canvas.shapes[i].borrow_mut().set_fill_color(col);
         }
