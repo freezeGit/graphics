@@ -114,7 +114,8 @@ impl TheCanvas {
                 egui::Pos2::new(x_pos, y),
                 egui::Vec2::new(0.0, 400.0),
             )));
-            //disp_val.borrow_mut().set_color(Color32::BLUE);
+            disp_val.borrow_mut().set_line_width(3.0);
+            disp_val.borrow_mut().set_color(Color32::DARK_BLUE);
             canvas.add_shape(disp_val.clone());
         }
 
