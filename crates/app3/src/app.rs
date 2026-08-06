@@ -8,6 +8,7 @@
 
 mod app_internal; // internal functions that do not require application specific customizations
 
+use statrs::statistics::Statistics;
 use crate::inits;
 use egui::Context;
 #[allow(unused_imports)]
@@ -17,6 +18,7 @@ use gui_lib::{
     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
     World, app_gl,
 };
+use std::fs;
 
 use crate::canvas::TheCanvas;
 use crate::ids::*;
@@ -408,6 +410,46 @@ impl TheApp {
                             / self.world.attractor.seq.len() as f64;
                     }
                     println!("Mean: {}", mean);
+
+                    let values_f64: Vec<f64> = self
+                        .world
+                        .attractor
+                        .seq
+                        .iter()
+                        .map(|&x| x as f64)
+                        .collect();
+
+                    let data = values_f64.as_slice();
+
+                    println!("Count: {}", data.len());
+                    println!("Mean: {}", data.mean());
+                    println!("Minimum: {}", data.min());
+                    println!("Maximum: {}", data.max());
+                    println!("Variance: {}", data.variance());
+                    println!("Standard deviation: {}", data.std_dev());
+
+                    // let values_f64: Vec<f64> =
+                    //     self.world.attractor.seq.iter().map(|&x| x as f64).collect();
+                    //
+                    // let data = values_f64.as_slice();
+                    //
+                    // println!("Count: {}", data.len());
+                    // println!("Mean: {}", data.mean());
+                    // println!("Minimum: {}", data.min());
+                    // println!("Maximum: {}", data.max());
+                    // println!("Variance: {}", data.variance());
+                    // println!("Standard deviation: {}", data.std_dev());
+
+                    fs::write(
+                        "sequence.txt",
+                        self.world
+                            .attractor
+                            .seq
+                            .iter()
+                            .map(|n| n.to_string())
+                            .collect::<Vec<_>>()
+                            .join("\n"),
+                    ).expect("TODO: panic message"); //?;
 
                     self.canvas.update(&self.world);
                 }
