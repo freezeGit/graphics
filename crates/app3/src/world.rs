@@ -7,7 +7,7 @@
 
 // Submodules under mod world.
 // Many applications will have multiple sub modules.
-pub(crate) mod emerge;
+pub mod emerge;
 // ---------------------------------------------------
 
 use crate::inits::{

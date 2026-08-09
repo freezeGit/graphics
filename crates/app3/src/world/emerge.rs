@@ -1,6 +1,5 @@
 use rand::seq::SliceRandom;
 use rand::{Rng, RngExt};
-//use rand::Rng;
 
 pub struct BitArray {
     words: Vec<u64>,

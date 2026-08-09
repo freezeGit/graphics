@@ -9,7 +9,7 @@ use crate::egui::{self, CornerRadius, Pos2, Rect, Stroke, StrokeKind, Vec2};
 use crate::shapes_gl::base::{Shape, ShapeBase};
 
 /// For Rectangle, `base.location` is the top-left corner.
-#[derive(Debug, Default)]
+#[derive(Debug, Copy, Clone, Default)]
 pub struct Rectangle {
     base: ShapeBase,
     pub size: Vec2,

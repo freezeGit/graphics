@@ -14,7 +14,7 @@ pub enum LineStyle {
 ///
 /// Implementations of the `Shape` trait use this struct to store common properties.
 /// ShapeBase methods are available for any Shape.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct ShapeBase {
     pub(crate) location: Pos2,
     pub(crate) color: Color32,

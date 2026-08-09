@@ -5,6 +5,9 @@
 
 // canvas_gl
 
+// Submodule under mod canvas.
+pub mod seq_graph;
+
 use std::cell::RefCell;
 use std::rc::Rc;
 
