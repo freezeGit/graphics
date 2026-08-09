@@ -14,6 +14,7 @@ use std::rc::Rc;
 use crate::ids::*;
 use crate::inits;
 //use crate::app_inits::{LAYOUT_STYLE, BACKGROUND_COLOR};
+use crate::canvas::seq_graph::SeqGraph;
 use crate::world::TheWorld;
 //use crate::world::{Signal, TheWorld, ThingState};
 //use crate::world::world_demo::{Signal, ThingState};
@@ -85,43 +86,46 @@ impl TheCanvas {
         // ----
 
         // --------------------------
-        // TDJ: Must go first. Some day I will figure out how to do this better.
-        // Create a grid of squares.
-        // TDJ: Maybe run update to show sim specs
-        for y in 0..GRID_HEIGHT {
-            for x in 0..GRID_WIDTH {
-                //let xpx = 75.0 + ((x % GRID_WIDTH) as f32) * CELL_SIZE;
-                let xpx = 975.0 + ((x % GRID_WIDTH) as f32) * 4.0;
-                //let ypx = 75.0 + y as f32 * CELL_SIZE;
-                let ypx = 200.0 + y as f32 * 4.0;
-                let bit_disp: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
-                    egui::Pos2::new(xpx, ypx),
-                    //egui::Vec2::new(CELL_SIZE, CELL_SIZE),
-                    egui::Vec2::new(4.0, 4.0),
-                )));
-                bit_disp.borrow_mut().set_color(Color32::GRAY);
-                bit_disp.borrow_mut().set_fill_color(Color32::GRAY);
-                //bit_disp.borrow_mut().set_fill_color(Color32::BLACK);
-                canvas.add_shape(bit_disp.clone());
-            }
-        }
-        // ---------------------------------
+        // // TDJ: Must go first. Some day I will figure out how to do this better.
+        // // Create a grid of squares.
+        // // TDJ: Maybe run update to show sim specs
+        // for y in 0..GRID_HEIGHT {
+        //     for x in 0..GRID_WIDTH {
+        //         //let xpx = 75.0 + ((x % GRID_WIDTH) as f32) * CELL_SIZE;
+        //         let xpx = 975.0 + ((x % GRID_WIDTH) as f32) * 4.0;
+        //         //let ypx = 75.0 + y as f32 * CELL_SIZE;
+        //         let ypx = 200.0 + y as f32 * 4.0;
+        //         let bit_disp: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
+        //             egui::Pos2::new(xpx, ypx),
+        //             //egui::Vec2::new(CELL_SIZE, CELL_SIZE),
+        //             egui::Vec2::new(4.0, 4.0),
+        //         )));
+        //         bit_disp.borrow_mut().set_color(Color32::GRAY);
+        //         bit_disp.borrow_mut().set_fill_color(Color32::GRAY);
+        //         //bit_disp.borrow_mut().set_fill_color(Color32::BLACK);
+        //         canvas.add_shape(bit_disp.clone());
+        //     }
+        // }
+        // // ---------------------------------
+        //
+        // let x = 100.0;
+        // let dx = 4.0;
+        // let y = 100.0;
+        // for n in 0..200 {
+        //     let x_pos = x + (n as f32) * dx;
+        //     let disp_val: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+        //         egui::Pos2::new(x_pos, y),
+        //         egui::Vec2::new(0.0, 400.0),
+        //     )));
+        //     disp_val.borrow_mut().set_line_width(3.0);
+        //     disp_val.borrow_mut().set_color(Color32::DARK_BLUE);
+        //     canvas.add_shape(disp_val.clone());
+        // }
 
-
-        let x = 100.0;
-        let dx = 4.0;
-        let y = 100.0;
-        for n in 0..200 {
-            let x_pos = x + (n as f32) * dx;
-            let disp_val: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-                egui::Pos2::new(x_pos, y),
-                egui::Vec2::new(0.0, 400.0),
-            )));
-            disp_val.borrow_mut().set_line_width(3.0);
-            disp_val.borrow_mut().set_color(Color32::DARK_BLUE);
-            canvas.add_shape(disp_val.clone());
-        }
-
+        let sgr: Rc<RefCell<SeqGraph>> =
+            //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0), 200)));
+            Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0))));
+        canvas.add_shape(sgr.clone());
 
         let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(10.0, 10.0),

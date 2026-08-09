@@ -1,72 +1,75 @@
-use gui_lib::{Lines, Pos2, ShapeBase};
+use gui_lib::{Lines, Pos2, Rectangle, Shape, ShapeBase, Vec2};
 
+#[derive(Debug, Default)]
 pub struct SeqGraph {
-    vec: Vec<i32>,
+    base: ShapeBase,
+    vec: Vec<Rectangle>,
 }
 
 impl SeqGraph {
-    pub fn new(location: Pos2, size: i32) -> Self {
+    // const SG_SIZE: i32 = 200;
+    //pub fn new(location: Pos2, size: i32) -> Self {
+    // pub fn new(location: Pos2) -> Self {
+    //     const SG_SIZE: i32 = 200;
+    //     //const SPACING: f32 = 4.0;
+    //     const SPACING: f32 = 20.0;
+    //     //const RECT_SIZE: f32 = 2.0;
+    //     const RECT_SIZE: f32 = 18.0;
+    //     let mut base = ShapeBase::default();
+    //
+    //     let mut vec = Vec::new();
+    //     //let spacing = 4.0;
+    //     for i in 0..SG_SIZE {
+    //         vec.push(Rectangle::new_from_center(
+    //             location + egui::vec2(i as f32 * SPACING, 0.0),
+    //             Vec2::splat(RECT_SIZE),
+    //         ));
+    //     }
+    //     Self { base, vec }
+    // }
+
+    pub fn new(location: Pos2) -> Self {
+        const SG_SIZE: i32 = 180;
+        //const SPACING: f32 = 4.0;
+        const SPACING: f32 = 6.0;
+        //const RECT_SIZE: f32 = 2.0;
+        const RECT_SIZE: f32 = 5.0;
+        let mut base = ShapeBase::default();
+
         let mut vec = Vec::new();
-        for i in 1..size{
-            vec.push(i);
-
+        //let spacing = 4.0;
+        for i in 0..SG_SIZE {
+            let mut rect = Rectangle::new_from_center(
+                location + egui::vec2(i as f32 * SPACING, 0.0),
+                Vec2::splat(RECT_SIZE),
+            );
+            rect.set_line_width(1.0);
+            rect.set_color(egui::Color32::LIGHT_GRAY);
+            rect.set_fill_color(egui::Color32::DARK_BLUE);
+            vec.push(rect);
+            //))
         }
-        Self {
-            // base: ShapeBase {
-            //     location,
-            //     ..Default::default()
-            // },
-            vec,
+        Self { base, vec }
+    }
+} // impl SeqGraph
+
+impl Shape for SeqGraph {
+    fn base(&self) -> &ShapeBase {
+        &self.base
+    }
+    fn base_mut(&mut self) -> &mut ShapeBase {
+        &mut self.base
+    }
+
+fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+        for s in &self.vec {
+            s.draw_at(painter, canvas_offset);
         }
-   }
-
-} // impl Lines
-
+    }
+}
 
 
-// #[derive(Debug, Clone, Copy)]
-// pub struct Rectangle {
-//     pub x: u32,
-//     pub y: u32,
-//     pub width: u32,
-//     pub height: u32,
-// }
-//
-// pub struct Container {
-//     data: Box<[Rectangle]>,
-// }
-//
-// impl Container {
-//     // 1. IMMUTABLE GETTER: Returns an optional reference to read data
-//     // Best for: Rendering/drawing loops where you just need coordinates
-//     pub fn get_rect(&self, index: usize) -> Option<&Rectangle> {
-//         self.data.get(index)
-//     }
-//
-//     // 2. MUTABLE UPDATE: Directly modifies the fields of a specific rectangle
-//     // Best for: Drag-and-drop actions, resizing, or moving elements
-//     pub fn update_rect_position(&mut self, index: usize, new_x: u32, new_y: u32) -> bool {
-//         if let Some(rect) = self.data.get_mut(index) {
-//             rect.x = new_x;
-//             rect.y = new_y;
-//             true // Successfully updated
-//         } else {
-//             false // Index was out of bounds
-//         }
-//     }
-//
-//     // 3. WHOLE REPLACEMENT: Replaces the entire rectangle structure at once
-//     // Best for: Swapping out a shape completely (enabled since we derived Copy/Clone!)
-//     pub fn replace_rect(&mut self, index: usize, new_rect: Rectangle) -> bool {
-//         if let Some(rect) = self.data.get_mut(index) {
-//             *rect = new_rect; // Overwrites the existing rectangle instantly
-//             true
-//         } else {
-//             false
-//         }
-//     }
-// }
-//
+
 // impl Container {
 //     // Updates all positions dynamically at runtime
 //     pub fn update_all_positions(&mut self, spacing: u32, base_x: u32, base_y: u32) {
