@@ -124,7 +124,7 @@ impl TheCanvas {
 
         let sgr: Rc<RefCell<SeqGraph>> =
             //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0), 200)));
-            Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0))));
+            Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 620.0))));
         canvas.add_shape(sgr.clone());
 
         let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(

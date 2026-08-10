@@ -1,43 +1,23 @@
 use gui_lib::{Lines, Pos2, Rectangle, Shape, ShapeBase, Vec2};
+use std::cell::RefCell;
+use std::rc::Rc;
 
 #[derive(Debug, Default)]
 pub struct SeqGraph {
     base: ShapeBase,
     vec: Vec<Rectangle>,
+    lines: Lines,
 }
 
 impl SeqGraph {
-    // const SG_SIZE: i32 = 200;
-    //pub fn new(location: Pos2, size: i32) -> Self {
-    // pub fn new(location: Pos2) -> Self {
-    //     const SG_SIZE: i32 = 200;
-    //     //const SPACING: f32 = 4.0;
-    //     const SPACING: f32 = 20.0;
-    //     //const RECT_SIZE: f32 = 2.0;
-    //     const RECT_SIZE: f32 = 18.0;
-    //     let mut base = ShapeBase::default();
-    //
-    //     let mut vec = Vec::new();
-    //     //let spacing = 4.0;
-    //     for i in 0..SG_SIZE {
-    //         vec.push(Rectangle::new_from_center(
-    //             location + egui::vec2(i as f32 * SPACING, 0.0),
-    //             Vec2::splat(RECT_SIZE),
-    //         ));
-    //     }
-    //     Self { base, vec }
-    // }
-
     pub fn new(location: Pos2) -> Self {
         const SG_SIZE: i32 = 180;
-        //const SPACING: f32 = 4.0;
         const SPACING: f32 = 6.0;
-        //const RECT_SIZE: f32 = 2.0;
         const RECT_SIZE: f32 = 5.0;
         let mut base = ShapeBase::default();
 
         let mut vec = Vec::new();
-        //let spacing = 4.0;
+
         for i in 0..SG_SIZE {
             let mut rect = Rectangle::new_from_center(
                 location + egui::vec2(i as f32 * SPACING, 0.0),
@@ -49,7 +29,19 @@ impl SeqGraph {
             vec.push(rect);
             //))
         }
-        Self { base, vec }
+
+        let mut lines: Lines = Lines::new(
+            //Pos2::new(250.0, 705.0),
+            location,
+            vec![
+                [Pos2::new(-20.0, 0.0), Pos2::new(1100.0, 0.0)],
+                [Pos2::new(-20.0, -250.0), Pos2::new(1100.0, -250.0)],
+                [Pos2::new(-20.0, -500.0), Pos2::new(1100.0, -500.0)],
+            ],
+        );
+        lines.set_color(egui::Color32::RED);
+
+        Self { base, vec, lines }
     }
 } // impl SeqGraph
 
@@ -61,14 +53,13 @@ impl Shape for SeqGraph {
         &mut self.base
     }
 
-fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
+    fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
         for s in &self.vec {
             s.draw_at(painter, canvas_offset);
         }
+        self.lines.draw_at(painter, canvas_offset);
     }
-}
-
-
+} // impl Shape for SeqGraph
 
 // impl Container {
 //     // Updates all positions dynamically at runtime
