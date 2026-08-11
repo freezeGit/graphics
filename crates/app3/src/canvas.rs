@@ -34,6 +34,7 @@ struct ViewHandles {
     stxt_rule: Rc<RefCell<Text>>,
     stxt_frame: Rc<RefCell<Text>>,
     sln2: Rc<RefCell<Line>>,
+    sgr: Rc<RefCell<SeqGraph>>,
 }
 
 /// ## struct Canvas
@@ -83,48 +84,13 @@ impl TheCanvas {
         // Shapes are stored in BasicCanvas::shapes: Vec<ShapeHandle
         // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
         // Rc<RefCell<T>> coercion to ShapeHandle happens automatically
-        // ----
-
         // --------------------------
-        // // TDJ: Must go first. Some day I will figure out how to do this better.
-        // // Create a grid of squares.
-        // // TDJ: Maybe run update to show sim specs
-        // for y in 0..GRID_HEIGHT {
-        //     for x in 0..GRID_WIDTH {
-        //         //let xpx = 75.0 + ((x % GRID_WIDTH) as f32) * CELL_SIZE;
-        //         let xpx = 975.0 + ((x % GRID_WIDTH) as f32) * 4.0;
-        //         //let ypx = 75.0 + y as f32 * CELL_SIZE;
-        //         let ypx = 200.0 + y as f32 * 4.0;
-        //         let bit_disp: Rc<RefCell<Rectangle>> = Rc::new(RefCell::new(Rectangle::new(
-        //             egui::Pos2::new(xpx, ypx),
-        //             //egui::Vec2::new(CELL_SIZE, CELL_SIZE),
-        //             egui::Vec2::new(4.0, 4.0),
-        //         )));
-        //         bit_disp.borrow_mut().set_color(Color32::GRAY);
-        //         bit_disp.borrow_mut().set_fill_color(Color32::GRAY);
-        //         //bit_disp.borrow_mut().set_fill_color(Color32::BLACK);
-        //         canvas.add_shape(bit_disp.clone());
-        //     }
-        // }
-        // // ---------------------------------
-        //
-        // let x = 100.0;
-        // let dx = 4.0;
-        // let y = 100.0;
-        // for n in 0..200 {
-        //     let x_pos = x + (n as f32) * dx;
-        //     let disp_val: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-        //         egui::Pos2::new(x_pos, y),
-        //         egui::Vec2::new(0.0, 400.0),
-        //     )));
-        //     disp_val.borrow_mut().set_line_width(3.0);
-        //     disp_val.borrow_mut().set_color(Color32::DARK_BLUE);
-        //     canvas.add_shape(disp_val.clone());
-        // }
+
 
         let sgr: Rc<RefCell<SeqGraph>> =
             //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0), 200)));
-            Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 620.0))));
+            //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 620.0))));
+            Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0))));
         canvas.add_shape(sgr.clone());
 
         let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
@@ -192,6 +158,7 @@ impl TheCanvas {
             stxt_rule,
             stxt_frame,
             sln2,
+            sgr,
         }
     }
 
@@ -239,18 +206,6 @@ impl TheCanvas {
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
     pub(crate) fn update(&mut self, world: &TheWorld) {
-        let n = world.bits.len().min(GRID_SIZE);
-        for i in 0..n {
-            let bit = world.bits.get(i);
-            let col = if bit { Color32::WHITE } else { Color32::BLACK };
-            self.canvas.shapes[i].borrow_mut().set_fill_color(col);
-        }
-        for i in n..GRID_SIZE {
-            self.canvas.shapes[i]
-                .borrow_mut()
-                .set_fill_color(Color32::GRAY);
-        }
-
         // Set stxt_bits to display bits number
         self.view_handles
             .stxt_bits
@@ -274,8 +229,13 @@ impl TheCanvas {
             .stxt_frame
             .borrow_mut()
             .set_text(format!("Interactions: {}", world.frame_number));
-        let length = 950.0 * (world.bits.ones_fraction() as f32);
 
+
+        // Update tehe sequence graph
+        self.view_handles.sgr.borrow_mut().add_val(world.bits.ones_fraction() as f32);
+
+        // Update the line length
+        let length = 950.0 * (world.bits.ones_fraction() as f32);
         self.view_handles.sln2.borrow_mut().set_length(length);
     }
 } // end of impl TheCanvas
