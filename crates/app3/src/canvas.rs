@@ -13,19 +13,14 @@ use std::rc::Rc;
 
 use crate::ids::*;
 use crate::inits;
-//use crate::app_inits::{LAYOUT_STYLE, BACKGROUND_COLOR};
 use crate::canvas::seq_graph::SeqGraph;
 use crate::world::TheWorld;
-//use crate::world::{Signal, TheWorld, ThingState};
-//use crate::world::world_demo::{Signal, ThingState};
-//use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel};
 #[allow(unused_imports)]
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{
-    BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Rectangle, Separator, Shape, Space,
+    BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Shape, Space,
     Text, Vec2,
 };
-//use crate::world::emerge::BitArray;
 
 #[derive(Debug)]
 struct ViewHandles {
@@ -44,17 +39,13 @@ struct ViewHandles {
 /// Owns the app1's BasicCanvas and selected concrete view handles.
 /// Builds the visual scene and updates selected elements from TheWorld.
 
-const GRID_WIDTH: usize = 100;
-const GRID_HEIGHT: usize = 60;
-const GRID_SIZE: usize = GRID_WIDTH * GRID_HEIGHT;
-const CELL_SIZE: f32 = 10.0;
 #[derive(Debug)]
-pub(crate) struct TheCanvas {
+pub struct TheCanvas {
     // BasicCanvas provides underlying canvas structure and functionality.
     // Shapes are stored in BasicCanvas::shapes: Vec<ShapeHandle>
     // (pub type ShapeHandle = Rc<RefCell<dyn Shape>> to allow dynamic update.)
     // Widgets are stored in BasicCanvas::Vec<Box<dyn Widget>>
-    pub(crate) canvas: BasicCanvas, // From gui_lib
+    pub canvas: BasicCanvas, // From gui_lib
 
     // ViewHandles fields are concrete shapes as unique handles of type Rc<RefCell<T>>
     view_handles: ViewHandles,
@@ -65,7 +56,7 @@ impl TheCanvas {
     ///
     /// Creates and initializes a BasicCanvas
     /// Creates and initializes all shapes and widgets
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         let mut canvas = BasicCanvas::new(inits::LAYOUT_STYLE, inits::BACKGROUND_COLOR);
         Self::init_widgets(&mut canvas);
         let view_handles = Self::init_shapes(&mut canvas);
@@ -88,9 +79,8 @@ impl TheCanvas {
 
 
         let sgr: Rc<RefCell<SeqGraph>> =
-            //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0), 200)));
-            //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 620.0))));
-            Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0))));
+           //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0))));
+            Rc::new(RefCell::new(SeqGraph::new(inits::SEQ_GRAPH_POSITION)));
         canvas.add_shape(sgr.clone());
 
         let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
@@ -101,8 +91,7 @@ impl TheCanvas {
 
         let stxt_ones: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(175.0, 10.0),
-            format!("Ones: {}", 0),
-            //format!("Ones: {}", inits::INITIAL_ONES),
+            format!("Ones: {}", inits::INITIAL_ONES),
         )));
         canvas.add_shape(stxt_ones.clone());
 
@@ -205,7 +194,7 @@ impl TheCanvas {
     /// Note that this method does not modify the world state.
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
-    pub(crate) fn update(&mut self, world: &TheWorld) {
+    pub fn update(&mut self, world: &TheWorld) {
         // Set stxt_bits to display bits number
         self.view_handles
             .stxt_bits
@@ -231,8 +220,9 @@ impl TheCanvas {
             .set_text(format!("Interactions: {}", world.frame_number));
 
 
-        // Update tehe sequence graph
-        self.view_handles.sgr.borrow_mut().add_val(world.bits.ones_fraction() as f32);
+        // Update the sequence graph
+        let val = world.bits.ones_fraction() as f32;
+        self.view_handles.sgr.borrow_mut().add_val(val);
 
         // Update the line length
         let length = 950.0 * (world.bits.ones_fraction() as f32);

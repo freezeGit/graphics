@@ -1,6 +1,7 @@
+//use crate::inits;
 use gui_lib::{Lines, Pos2, Rectangle, Shape, ShapeBase, Vec2};
-use std::cell::RefCell;
-use std::rc::Rc;
+
+// TDJ: zoom
 
 const SG_SIZE: i32 = 180;
 const SG_SPACING: f32 = 6.0;
@@ -18,6 +19,7 @@ pub struct SeqGraph {
 impl SeqGraph {
     pub fn new(location: Pos2) -> Self {
         let mut base = ShapeBase::default();
+        base.move_to(location);
 
         let mut vec = Vec::new();
 
@@ -39,13 +41,23 @@ impl SeqGraph {
             location,
             vec![
                 [Pos2::new(-20.0, 0.0), Pos2::new(SG_WIDTH + 20.0, 0.0)],
-                [Pos2::new(-20.0, -250.0), Pos2::new(SG_WIDTH + 20.0, -250.0)],
-                [Pos2::new(-20.0, -500.0), Pos2::new(SG_WIDTH + 20.0, -500.0)],
+                [
+                    Pos2::new(-20.0, -(SG_HEIGHT / 2.0)),
+                    Pos2::new(SG_WIDTH + 20.0, -(SG_HEIGHT / 2.0)),
+                ],
+                [
+                    Pos2::new(-20.0, -SG_HEIGHT),
+                    Pos2::new(SG_WIDTH + 20.0, -SG_HEIGHT),
+                ],
             ],
         );
         lines.set_line_width(1.0);
 
         Self { base, vec, lines }
+    }
+
+    pub fn location(&self) -> Pos2 {
+        self.base.location()
     }
 
     pub fn add_val(&mut self, ones_fraction: f32) {
@@ -62,12 +74,14 @@ impl SeqGraph {
         }
 
         let current_x = self.vec.last_mut().unwrap().location().x;
-        let next_y = clamped_fraction * SG_HEIGHT; // Fix: Used clamped variable
+
+        let mark_offset = SG_MARK_SIZE / 2.0;
+        let scaled_height = clamped_fraction * SG_HEIGHT;
+        let next_y = self.location().y - (mark_offset + scaled_height);
+
         let new_location = egui::Pos2::new(current_x, next_y);
         self.vec.last_mut().unwrap().move_to(new_location);
     }
-
-    //let length = 950.0 * (world.bits.ones_fraction() as f32);
 } // impl SeqGraph
 
 impl Shape for SeqGraph {
@@ -85,17 +99,3 @@ impl Shape for SeqGraph {
         self.lines.draw_at(painter, canvas_offset);
     }
 } // impl Shape for SeqGraph
-
-// impl Container {
-//     // Updates all positions dynamically at runtime
-//     pub fn update_all_positions(&mut self, spacing: u32, base_x: u32, base_y: u32) {
-//         // .enumerate() provides the index (i), .iter_mut() lets us modify the elements
-//         for (i, rect) in self.data.iter_mut().enumerate() {
-//             let index = i as u32;
-//
-//             // The formula calculates the unique position for each item based on its index
-//             rect.x = base_x + (index * (rect.width + spacing));
-//             rect.y = base_y;
-//         }
-//     }
-// }
