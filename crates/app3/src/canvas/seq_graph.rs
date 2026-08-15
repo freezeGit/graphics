@@ -92,11 +92,24 @@ impl SeqGraph {
         // let new_location = egui::Pos2::new(current_x, next_y);
         // self.vec.last_mut().unwrap().move_to(new_location);
 
+        // let current_x = self.vec.last_mut().unwrap().location().x;
+        //
+        // let mark_offset = SG_MARK_SIZE / 2.0;
+        // //let scaled_height = clamped_fraction * SG_HEIGHT;
+        // let scaled_height = (20.0 * clamped_fraction * SG_HEIGHT) - 4750.0;
+        // let next_y = self.location().y - (mark_offset + scaled_height);
+        //
+        // let new_location = egui::Pos2::new(current_x, next_y);
+        // self.vec.last_mut().unwrap().move_to(new_location);
+
         let current_x = self.vec.last_mut().unwrap().location().x;
 
         let mark_offset = SG_MARK_SIZE / 2.0;
         //let scaled_height = clamped_fraction * SG_HEIGHT;
-        let scaled_height = (20.0 * clamped_fraction * SG_HEIGHT) - 4750.0;
+        //let scaled_height = (20.0 * clamped_fraction * SG_HEIGHT) - 4750.0;
+        //let scaled_height = (20.0 * clamped_fraction * SG_HEIGHT) - 9.5 * SG_HEIGHT;
+        //let scaled_height = (10.0 * clamped_fraction * SG_HEIGHT) - 4.5 * SG_HEIGHT;
+        let scaled_height = (5.0 * clamped_fraction * SG_HEIGHT) - 2.0 * SG_HEIGHT;
         let next_y = self.location().y - (mark_offset + scaled_height);
 
         let new_location = egui::Pos2::new(current_x, next_y);
