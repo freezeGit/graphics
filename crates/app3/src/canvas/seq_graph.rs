@@ -64,7 +64,7 @@ impl SeqGraph {
         if self.vec.is_empty() {
             return;
         }
-        let clamped_fraction = ones_fraction.clamp(0.0, 1.0);
+        // let clamped_fraction = ones_fraction.clamp(0.0, 1.0);
 
         for i in 0..self.vec.len() - 1 {
             let current_x = self.vec[i].location().x;
@@ -73,47 +73,22 @@ impl SeqGraph {
             self.vec[i].move_to(new_location);
         }
 
-        // let current_x = self.vec.last_mut().unwrap().location().x;
-        //
-        // let mark_offset = SG_MARK_SIZE / 2.0;
-        // let scaled_height = clamped_fraction * SG_HEIGHT;
-        // let next_y = self.location().y - (mark_offset + scaled_height);
-        //
-        // let new_location = egui::Pos2::new(current_x, next_y);
-        // self.vec.last_mut().unwrap().move_to(new_location);
+         let focus = 0.5;
+        //let focus = 0.625;
+        //let focus = 0.375;
+        let scale: f32 = 1.0;
+        //let scale = 10.0;
+        //let scale : f32 = 20.0;
 
-        // let current_x = self.vec.last_mut().unwrap().location().x;
-        //
-        // let mark_offset = SG_MARK_SIZE / 2.0;
-        // //let scaled_height = clamped_fraction * SG_HEIGHT;
-        // let scaled_height = (10.0 * clamped_fraction * SG_HEIGHT) - 2250.0;
-        // let next_y = self.location().y - (mark_offset + scaled_height);
-        //
-        // let new_location = egui::Pos2::new(current_x, next_y);
-        // self.vec.last_mut().unwrap().move_to(new_location);
+        let vx = self.vec.last_mut().unwrap().location().x;
 
-        // let current_x = self.vec.last_mut().unwrap().location().x;
-        //
-        // let mark_offset = SG_MARK_SIZE / 2.0;
-        // //let scaled_height = clamped_fraction * SG_HEIGHT;
-        // let scaled_height = (20.0 * clamped_fraction * SG_HEIGHT) - 4750.0;
-        // let next_y = self.location().y - (mark_offset + scaled_height);
-        //
-        // let new_location = egui::Pos2::new(current_x, next_y);
-        // self.vec.last_mut().unwrap().move_to(new_location);
-
-        let current_x = self.vec.last_mut().unwrap().location().x;
-
+        let clamped_fraction = ones_fraction.clamp(0.0, 1.0);
+        let scaled_height = (0.5 + (clamped_fraction - focus) * scale) * SG_HEIGHT;
         let mark_offset = SG_MARK_SIZE / 2.0;
-        //let scaled_height = clamped_fraction * SG_HEIGHT;
-        //let scaled_height = (20.0 * clamped_fraction * SG_HEIGHT) - 4750.0;
-        //let scaled_height = (20.0 * clamped_fraction * SG_HEIGHT) - 9.5 * SG_HEIGHT;
-        //let scaled_height = (10.0 * clamped_fraction * SG_HEIGHT) - 4.5 * SG_HEIGHT;
-        let scaled_height = (5.0 * clamped_fraction * SG_HEIGHT) - 2.0 * SG_HEIGHT;
-        let next_y = self.location().y - (mark_offset + scaled_height);
+        let vy = self.location().y - (mark_offset + scaled_height);
 
-        let new_location = egui::Pos2::new(current_x, next_y);
-        self.vec.last_mut().unwrap().move_to(new_location);
+        let loc = egui::Pos2::new(vx, vy);
+        self.vec.last_mut().unwrap().move_to(loc);
     }
 } // impl SeqGraph
 
