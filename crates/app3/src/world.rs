@@ -28,8 +28,6 @@ pub struct TheWorld {
     pub bits: BitArray,
     pub rule: Rule,
     pub start_ones: usize,
-    //pub seq: Seq,
-    //pub attractor: Vec<i32>,
     pub attractor: Seq,
     pub frame_number: u64,
 }
