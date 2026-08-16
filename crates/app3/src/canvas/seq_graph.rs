@@ -1,5 +1,5 @@
 //use crate::inits;
-use gui_lib::{Lines, Pos2, Rectangle, Shape, ShapeBase, Vec2};
+use gui_lib::{Line, Lines, Pos2, Rectangle, Shape, ShapeBase, Vec2};
 
 // TDJ: zoom
 
@@ -28,6 +28,7 @@ impl Default for Zoom {
 pub struct SeqGraph {
     base: ShapeBase,
     vec: Vec<Rectangle>,
+    mid: Line,
     lines: Lines,
     zoom: Zoom,
 }
@@ -42,15 +43,21 @@ impl SeqGraph {
         assert!(SG_SIZE > 0);
         for i in 0..SG_SIZE {
             let mut rect = Rectangle::new_from_center(
-                location + egui::vec2(i as f32 * SG_SPACING, 0.0),
+                // Initial position is off-screen
+                location + egui::vec2(i as f32 * SG_SPACING, -10000.0),
                 Vec2::splat(SG_MARK_SIZE),
             );
             rect.set_line_width(1.0);
             rect.set_color(egui::Color32::LIGHT_GRAY);
             rect.set_fill_color(egui::Color32::DARK_BLUE);
             vec.push(rect);
-            //))
         }
+
+        let mut mid: Line = Line::new_from_points(
+            location + egui::vec2(-20.0, -(SG_HEIGHT / 2.0)),
+            location + egui::vec2(SG_WIDTH + 20.0, -(SG_HEIGHT / 2.0)),
+        );
+        mid.set_line_width(1.0);
 
         let mut lines: Lines = Lines::new(
             //Pos2::new(250.0, 705.0),
@@ -58,20 +65,17 @@ impl SeqGraph {
             vec![
                 [Pos2::new(-20.0, 0.0), Pos2::new(SG_WIDTH + 20.0, 0.0)],
                 [
-                    Pos2::new(-20.0, -(SG_HEIGHT / 2.0)),
-                    Pos2::new(SG_WIDTH + 20.0, -(SG_HEIGHT / 2.0)),
-                ],
-                [
                     Pos2::new(-20.0, -SG_HEIGHT),
                     Pos2::new(SG_WIDTH + 20.0, -SG_HEIGHT),
                 ],
             ],
         );
-        lines.set_line_width(1.0);
+        //lines.set_line_width(1.0);
 
         Self {
             base,
             vec,
+            mid,
             lines,
             zoom: Zoom::default(),
         }
@@ -103,10 +107,6 @@ impl SeqGraph {
 
         let loc = egui::Pos2::new(vx, vy);
         self.vec.last_mut().unwrap().move_to(loc);
-
-        if self.zoom.scale == 1.0 {
-            self.lines.set_color(egui::Color32::TRANSPARENT);
-        }
     }
 } // impl SeqGraph
 
@@ -122,6 +122,9 @@ impl Shape for SeqGraph {
         for s in &self.vec {
             s.draw_at(painter, canvas_offset);
         }
-        self.lines.draw_at(painter, canvas_offset);
+        self.mid.draw_at(painter, canvas_offset);
+        if self.zoom.scale <= 1.0 && self.zoom.focus == 0.5 {
+            self.lines.draw_at(painter, canvas_offset);
+        }
     }
 } // impl Shape for SeqGraph
