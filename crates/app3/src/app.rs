@@ -190,6 +190,29 @@ impl TheApp {
                 )));
             }
 
+            BTN_ZOOM => {
+                let sgr = self.canvas.view_handles.sgr.borrow();
+
+                self.canvas
+                    .canvas
+                    .set_dialog(Box::new(MultiTextEntryDlg::new(
+                        DLG_ZOOM,
+                        "Enter Zoom specs",
+                        [
+                            TextEntryField::new(
+                                "scale",
+                                "xxxx",
+                                sgr.zoom_scale().to_string(),
+                            ),
+                            TextEntryField::new(
+                                "focus",
+                                "xxxxx",
+                                sgr.zoom_focus().to_string(),
+                            ),
+                        ],
+                    )));
+            }
+
             BTN_SEQ => {
                 let mut the_len = self.world.attractor.len();
                 if the_len == 0 {
@@ -449,7 +472,7 @@ impl TheApp {
                             .map(|n| n.to_string())
                             .collect::<Vec<_>>()
                             .join("\n"),
-                    ).expect("TODO: panic message"); //?;
+                    ).expect("Unable to write to file");
 
                     self.canvas.update(&self.world);
                 }

@@ -23,13 +23,13 @@ use gui_lib::{
 };
 
 #[derive(Debug)]
-struct ViewHandles {
+pub struct ViewHandles {
     stxt_bits: Rc<RefCell<Text>>,
     stxt_ones: Rc<RefCell<Text>>,
     stxt_rule: Rc<RefCell<Text>>,
     stxt_frame: Rc<RefCell<Text>>,
     sln2: Rc<RefCell<Line>>,
-    sgr: Rc<RefCell<SeqGraph>>,
+    pub sgr: Rc<RefCell<SeqGraph>>,
 }
 
 /// ## struct Canvas
@@ -48,7 +48,7 @@ pub struct TheCanvas {
     pub canvas: BasicCanvas, // From gui_lib
 
     // ViewHandles fields are concrete shapes as unique handles of type Rc<RefCell<T>>
-    view_handles: ViewHandles,
+    pub view_handles: ViewHandles,
 }
 
 impl TheCanvas {
@@ -170,10 +170,15 @@ impl TheCanvas {
         let wb_batch = Button::new(BTN_BATCH, "Batch", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_batch));
 
+        let wb_zoom = Button::new(BTN_ZOOM, "Zoom", 120.0, 40.0);
+        canvas.add_widget(Box::new(wb_zoom));
+
+        canvas.add_widget(Box::new(Space::new(25.0)));
+
         let wb_seq = Button::new(BTN_SEQ, "Sequence", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_seq));
 
-        canvas.add_widget(Box::new(Space::new(300.0)));
+        canvas.add_widget(Box::new(Space::new(250.0)));
 
         let wb_about = Button::new(BTN_ABOUT, "About", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_about));

@@ -85,6 +85,14 @@ impl SeqGraph {
         self.base.location()
     }
 
+    pub fn zoom_scale(&self) -> f32 {
+        self.zoom.scale
+    }
+
+    pub fn zoom_focus(&self) -> f32 {
+        self.zoom.focus
+    }
+
     pub fn add_val(&mut self, ones_fraction: f32) {
         if self.vec.is_empty() {
             return;
