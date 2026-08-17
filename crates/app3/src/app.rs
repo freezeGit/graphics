@@ -201,12 +201,12 @@ impl TheApp {
                         [
                             TextEntryField::new(
                                 "scale",
-                                "xxxx",
+                                "Scale (> 0):",
                                 sgr.zoom_scale().to_string(),
                             ),
                             TextEntryField::new(
                                 "focus",
-                                "xxxxx",
+                                "Focus (0.0 to 1.0):",
                                 sgr.zoom_focus().to_string(),
                             ),
                         ],
@@ -348,6 +348,54 @@ impl TheApp {
                     self.world.start_ones = ones;
                     self.world.frame_number = 0;
                 }
+            }
+
+            DLG_ZOOM => {
+                  let mut bad_val = false;
+
+                let mut sgr = self.canvas.view_handles.sgr.borrow_mut();
+                for item in values {
+                    let (item_id, text) = item;
+                    match item_id.as_str() {
+                        "scale" => match text.trim().parse::<f32>() {
+                            Ok(number) if number >= 0.0 => {
+                                sgr.set_zoom_scale(number);
+                            }
+                            Ok(number) => {
+                                bad_val = true;
+                                eprintln!(
+                                    "Invalid scale value: {number}. Scale must be greater than 0."
+                                );
+                            }
+                            Err(err) => {
+                                bad_val = true;
+                                eprintln!("Could not parse scale value {:?}: {err}", text);
+                            }
+                        },
+                        "focus" => match text.trim().parse::<f32>() {
+                            Ok(number) if number >= 0.0 && number <= 1.0 => {
+                                  sgr.set_zoom_focus(number);
+                            }
+                            Ok(number) => {
+                                bad_val = true;
+                                eprintln!("Invalid focus value: {number}. Must be between 0 and 1.");
+                            }
+                            Err(err) => {
+                                bad_val = true;
+                                eprintln!("Could not parse focus value {:?}: {err}", text);
+                            }
+                        },
+                        _ => {}
+                    }
+                }
+
+                if bad_val {
+                    self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
+                        DLG_BAD_VALS,
+                        "Error Message",
+                        "Bad value(s) entered.",
+                    )));
+                } 
             }
 
             DLG_SEQUENCE => {

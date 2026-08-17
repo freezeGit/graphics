@@ -70,7 +70,7 @@ impl SeqGraph {
                 ],
             ],
         );
-        //lines.set_line_width(1.0);
+        lines.set_line_width(1.0);
 
         Self {
             base,
@@ -92,6 +92,19 @@ impl SeqGraph {
     pub fn zoom_focus(&self) -> f32 {
         self.zoom.focus
     }
+
+    pub fn set_zoom_scale(&mut self, scale: f32) {
+        if scale.is_finite() {
+            self.zoom.scale = scale.max(0.0);
+        }
+    }
+
+    pub fn set_zoom_focus(&mut self, focus: f32) {
+        if focus.is_finite() {
+            self.zoom.focus = focus.clamp(0.0, 1.0);
+        }
+    }
+
 
     pub fn add_val(&mut self, ones_fraction: f32) {
         if self.vec.is_empty() {
@@ -131,7 +144,7 @@ impl Shape for SeqGraph {
             s.draw_at(painter, canvas_offset);
         }
         self.mid.draw_at(painter, canvas_offset);
-        if self.zoom.scale <= 1.0 && self.zoom.focus == 0.5 {
+        if self.zoom.scale == 1.0 && self.zoom.focus == 0.5 {
             self.lines.draw_at(painter, canvas_offset);
         }
     }
