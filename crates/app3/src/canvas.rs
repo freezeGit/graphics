@@ -11,16 +11,13 @@ pub mod seq_graph;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use crate::canvas::seq_graph::SeqGraph;
 use crate::ids::*;
 use crate::inits;
-use crate::canvas::seq_graph::SeqGraph;
 use crate::world::TheWorld;
 #[allow(unused_imports)]
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
-use gui_lib::{
-    BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Shape, Space,
-    Text, Vec2,
-};
+use gui_lib::{BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Shape, Space, Text, Vec2};
 
 #[derive(Debug)]
 pub struct ViewHandles {
@@ -28,6 +25,7 @@ pub struct ViewHandles {
     stxt_ones: Rc<RefCell<Text>>,
     stxt_rule: Rc<RefCell<Text>>,
     stxt_frame: Rc<RefCell<Text>>,
+    pub stxt_batch: Rc<RefCell<Text>>,
     sln2: Rc<RefCell<Line>>,
     pub sgr: Rc<RefCell<SeqGraph>>,
 }
@@ -77,7 +75,6 @@ impl TheCanvas {
         // Rc<RefCell<T>> coercion to ShapeHandle happens automatically
         // --------------------------
 
-
         let sgr: Rc<RefCell<SeqGraph>> =
            //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0))));
             Rc::new(RefCell::new(SeqGraph::new(inits::SEQ_GRAPH_POSITION)));
@@ -110,6 +107,12 @@ impl TheCanvas {
             format!("Interactions: {}", 0),
         )));
         canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
+
+        let stxt_batch: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(10.0, 45.0),
+            format!("Batch: {}", inits::BATCH_SIZE),
+        )));
+        canvas.add_shape(stxt_batch.clone());
 
         let sln1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
             Pos2::new(100.0, 705.0),
@@ -146,6 +149,7 @@ impl TheCanvas {
             stxt_ones,
             stxt_rule,
             stxt_frame,
+            stxt_batch,
             sln2,
             sgr,
         }
@@ -223,7 +227,6 @@ impl TheCanvas {
             .stxt_frame
             .borrow_mut()
             .set_text(format!("Interactions: {}", world.frame_number));
-
 
         // Update the sequence graph
         let val = world.bits.ones_fraction() as f32;

@@ -8,7 +8,6 @@
 
 mod app_internal; // internal functions that do not require application specific customizations
 
-use statrs::statistics::Statistics;
 use crate::inits;
 use egui::Context;
 #[allow(unused_imports)]
@@ -18,6 +17,7 @@ use gui_lib::{
     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
     World, app_gl,
 };
+use statrs::statistics::Statistics;
 use std::fs;
 
 use crate::canvas::TheCanvas;
@@ -201,12 +201,12 @@ impl TheApp {
                         [
                             TextEntryField::new(
                                 "scale",
-                                "Scale (> 0):",
+                                "Scale (> 0)",
                                 sgr.zoom_scale().to_string(),
                             ),
                             TextEntryField::new(
                                 "focus",
-                                "Focus (0.0 to 1.0):",
+                                "Focus (0.0 to 1.0)",
                                 sgr.zoom_focus().to_string(),
                             ),
                         ],
@@ -351,7 +351,7 @@ impl TheApp {
             }
 
             DLG_ZOOM => {
-                  let mut bad_val = false;
+                let mut bad_val = false;
 
                 let mut sgr = self.canvas.view_handles.sgr.borrow_mut();
                 for item in values {
@@ -374,11 +374,13 @@ impl TheApp {
                         },
                         "focus" => match text.trim().parse::<f32>() {
                             Ok(number) if number >= 0.0 && number <= 1.0 => {
-                                  sgr.set_zoom_focus(number);
+                                sgr.set_zoom_focus(number);
                             }
                             Ok(number) => {
                                 bad_val = true;
-                                eprintln!("Invalid focus value: {number}. Must be between 0 and 1.");
+                                eprintln!(
+                                    "Invalid focus value: {number}. Must be between 0 and 1."
+                                );
                             }
                             Err(err) => {
                                 bad_val = true;
@@ -395,7 +397,7 @@ impl TheApp {
                         "Error Message",
                         "Bad value(s) entered.",
                     )));
-                } 
+                }
             }
 
             DLG_SEQUENCE => {
@@ -482,13 +484,8 @@ impl TheApp {
                     }
                     println!("Mean: {}", mean);
 
-                    let values_f64: Vec<f64> = self
-                        .world
-                        .attractor
-                        .seq
-                        .iter()
-                        .map(|&x| x as f64)
-                        .collect();
+                    let values_f64: Vec<f64> =
+                        self.world.attractor.seq.iter().map(|&x| x as f64).collect();
 
                     let data = values_f64.as_slice();
 
@@ -520,7 +517,8 @@ impl TheApp {
                             .map(|n| n.to_string())
                             .collect::<Vec<_>>()
                             .join("\n"),
-                    ).expect("Unable to write to file");
+                    )
+                    .expect("Unable to write to file");
 
                     self.canvas.update(&self.world);
                 }
@@ -539,6 +537,11 @@ impl TheApp {
                     //Ok(number)  if number >= 1 => {
                     Ok(number) => {
                         self.sim_timer.set_batch_size(number);
+                        self.canvas
+                            .view_handles
+                            .stxt_batch
+                            .borrow_mut()
+                            .set_text(format!("Batch: {}", number));
                     }
                     Err(err) => {
                         self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
