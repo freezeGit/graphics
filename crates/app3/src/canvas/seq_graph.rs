@@ -1,6 +1,6 @@
 //use crate::inits;
+use crate::inits;
 use gui_lib::{Line, Lines, Pos2, Rectangle, Shape, ShapeBase, Vec2};
-
 // TDJ: zoom
 
 const SG_SIZE: i32 = 180;
@@ -15,11 +15,20 @@ struct Zoom {
     focus: f32,
 }
 
+// impl Default for Zoom {
+//     fn default() -> Self {
+//         Self {
+//             scale: 1.0,
+//             focus: 0.5,
+//         }
+//     }
+// }
+
 impl Default for Zoom {
     fn default() -> Self {
         Self {
-            scale: 1.0,
-            focus: 0.5,
+            scale: inits::SEQ_GRAPH_SCALE,
+            focus: inits::SEQ_GRAPH_FOCUS,
         }
     }
 }
@@ -104,7 +113,6 @@ impl SeqGraph {
             self.zoom.focus = focus.clamp(0.0, 1.0);
         }
     }
-
 
     pub fn add_val(&mut self, ones_fraction: f32) {
         if self.vec.is_empty() {

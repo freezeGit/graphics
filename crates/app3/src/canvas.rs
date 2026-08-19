@@ -26,6 +26,8 @@ pub struct ViewHandles {
     stxt_rule: Rc<RefCell<Text>>,
     stxt_frame: Rc<RefCell<Text>>,
     pub stxt_batch: Rc<RefCell<Text>>,
+    pub stxt_scale: Rc<RefCell<Text>>,
+    pub stxt_focus: Rc<RefCell<Text>>,
     sln2: Rc<RefCell<Line>>,
     pub sgr: Rc<RefCell<SeqGraph>>,
 }
@@ -93,7 +95,6 @@ impl TheCanvas {
         canvas.add_shape(stxt_ones.clone());
 
         let stxt_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //egui::Pos2::new(10.0, 10.0),
             egui::Pos2::new(360.0, 10.0),
             format!("Rule: {}", inits::INITIAL_RULE),
         )));
@@ -113,6 +114,18 @@ impl TheCanvas {
             format!("Batch: {}", inits::BATCH_SIZE),
         )));
         canvas.add_shape(stxt_batch.clone());
+
+        let stxt_scale: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(200.0, 45.0),
+            format!("Scale: {}", inits::SEQ_GRAPH_SCALE),
+        )));
+        canvas.add_shape(stxt_scale.clone());
+
+        let stxt_focus: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(320.0, 45.0),
+            format!("Focus: {}", inits::SEQ_GRAPH_FOCUS),
+        )));
+        canvas.add_shape(stxt_focus.clone());
 
         let sln1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
             Pos2::new(100.0, 705.0),
@@ -150,6 +163,8 @@ impl TheCanvas {
             stxt_rule,
             stxt_frame,
             stxt_batch,
+            stxt_scale,
+            stxt_focus,
             sln2,
             sgr,
         }

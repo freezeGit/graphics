@@ -44,5 +44,5 @@ pub const INITIAL_SEQ_DISCARD: usize = 45000;
 pub const INITIAL_SEQ_LENGTH: usize = 1000;
 
 pub const SEQ_GRAPH_POSITION: egui::Pos2 = egui::pos2(50.0, 600.0);
-pub const INITIAL_SEQ_FRAC: f32 = 0.05;
-
+pub const SEQ_GRAPH_SCALE: f32 = 1.0;
+pub const SEQ_GRAPH_FOCUS: f32 = 0.5;

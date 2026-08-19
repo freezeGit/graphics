@@ -360,6 +360,11 @@ impl TheApp {
                         "scale" => match text.trim().parse::<f32>() {
                             Ok(number) if number >= 0.0 => {
                                 sgr.set_zoom_scale(number);
+                                self.canvas
+                                    .view_handles
+                                    .stxt_scale
+                                    .borrow_mut()
+                                    .set_text(format!("Scale: {}", number));
                             }
                             Ok(number) => {
                                 bad_val = true;
@@ -375,6 +380,11 @@ impl TheApp {
                         "focus" => match text.trim().parse::<f32>() {
                             Ok(number) if number >= 0.0 && number <= 1.0 => {
                                 sgr.set_zoom_focus(number);
+                                self.canvas
+                                    .view_handles
+                                    .stxt_focus
+                                    .borrow_mut()
+                                    .set_text(format!("Focus: {}", number));
                             }
                             Ok(number) => {
                                 bad_val = true;
@@ -534,7 +544,6 @@ impl TheApp {
         match id {
             DLG_BATCH => {
                 match text.trim().parse::<u32>() {
-                    //Ok(number)  if number >= 1 => {
                     Ok(number) => {
                         self.sim_timer.set_batch_size(number);
                         self.canvas

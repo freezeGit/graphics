@@ -188,7 +188,6 @@ impl Seq {
         }
     }
 
-
     pub fn push(&mut self, val: i32) {
         self.seq.push(val);
     }
@@ -197,9 +196,6 @@ impl Seq {
         self.seq.len()
     }
 }
-
-
-
 
 // --------------------------------------------
 
