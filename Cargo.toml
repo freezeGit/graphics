@@ -4,6 +4,7 @@ members = [
     "crates/demo",
     "crates/app2",
     "crates/app3",
+    "crates/app4",
 ]
 
 default-members = ["crates/gui_lib"]
