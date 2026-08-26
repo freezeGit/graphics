@@ -1,6 +1,6 @@
 use rand::seq::SliceRandom;
 use rand::{Rng, RngExt};
-
+#[derive(Debug)]
 pub struct BitArray {
     words: Vec<u64>,
     len: usize,
@@ -171,10 +171,9 @@ impl Rule {
         (self.response(a, b), self.response(b, a))
     }
 }
-
+#[derive(Debug)]
 pub struct Seq {
     pub discard: usize,
-    //pub length: usize,
     pub seq: Vec<i32>,
 }
 

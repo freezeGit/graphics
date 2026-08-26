@@ -174,7 +174,6 @@ impl Rule {
 
 pub struct Seq {
     pub discard: usize,
-    //pub length: usize,
     pub seq: Vec<i32>,
 }
 
