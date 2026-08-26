@@ -24,6 +24,7 @@ use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::world::emerge::BitArray;
 use crate::world::{Rule, TheWorld};
+use crate::world::delta_ones::DeltaOnes;
 
 /// Constants for simulation state choice. 1 = Run, 2 = Pause, 3 = Fast-forward.
 const CHOICE_RUN: i32 = 1;
@@ -239,6 +240,10 @@ impl TheApp {
                             ),
                         ],
                     )));
+
+                let delta = DeltaOnes::new(Rule::new(5), 3000, 100, &mut self.world.rng);
+                println!("{}", delta.delta_stats_str());
+
             }
 
             _ => {}

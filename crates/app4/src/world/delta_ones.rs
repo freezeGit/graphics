@@ -20,10 +20,14 @@ impl DeltaOnes {
             let mut bits: BitArray = BitArray::new_with_random_ones(SIM_BITS, ones, rng);
             step_bits(&mut bits, rule, rng);
             let new_ones = bits.ones_count();
-            let delta = new_ones - ones ;
+            //println!("new_ones: {}", new_ones);
+            let delta = new_ones as i32 - ones as i32 ;
+            //println!("delta: {}", delta);
             samples.push(delta as f64);
+            //println!("samples: {:?}", samples);
         }
 
+        println!("samples: {:?}", samples);
         let data = samples.as_slice();
         let mean_delta = data.mean();
         let max_delta = data.max();
