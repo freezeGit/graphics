@@ -14,8 +14,16 @@ pub struct Deltas {
 
 impl Deltas {
     pub fn new(rule: Rule, rng: &mut impl Rng) -> Self {
-        let deltas = Vec::<DeltaOnes>::with_capacity(10);
+        let mut deltas = Vec::<DeltaOnes>::with_capacity(251);
+        for i in (0..=SIM_BITS).step_by(24) {
+            deltas.push(DeltaOnes::new(rule, i, 100, rng));
+        }
+
         Self { deltas }
+    }
+
+    pub fn len(&self) -> usize {
+        self.deltas.len()
     }
 } // end impl Deltas
 
