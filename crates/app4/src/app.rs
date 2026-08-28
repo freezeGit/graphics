@@ -241,7 +241,7 @@ impl TheApp {
                         ],
                     )));
 
-                let delta = DeltaOnes::new(Rule::new(5), 3000, 100, &mut self.world.rng);
+                let delta = DeltaOnes::new(Rule::new(5), 2900, 100, &mut self.world.rng);
                 println!("{}", delta.delta_stats_str());
 
             }

@@ -3,9 +3,12 @@ use crate::inits;
 use gui_lib::{Line, Lines, Pos2, Rectangle, Shape, ShapeBase, Vec2};
 // TDJ: zoom
 
-const SG_SIZE: i32 = 180;
-const SG_SPACING: f32 = 6.0;
-const SG_MARK_SIZE: f32 = 5.0;
+//const SG_SIZE: i32 = 180;
+const SG_SIZE: i32 = 250;
+//const SG_SPACING: f32 = 6.0;
+const SG_SPACING: f32 = 4.0;
+//const SG_MARK_SIZE: f32 = 5.0;
+const SG_MARK_SIZE: f32 = 3.0;
 const SG_HEIGHT: f32 = 500.0;
 const SG_WIDTH: f32 = SG_SIZE as f32 * SG_SPACING;
 
@@ -54,11 +57,13 @@ impl SeqGraph {
             let mut rect = Rectangle::new_from_center(
                 // Initial position is off-screen
                 location + egui::vec2(i as f32 * SG_SPACING, -10000.0),
+                //location - egui::vec2(20.0, 0.0) + egui::vec2(i as f32 * SG_SPACING, -10000.0),
                 Vec2::splat(SG_MARK_SIZE),
             );
             rect.set_line_width(1.0);
             rect.set_color(egui::Color32::LIGHT_GRAY);
             rect.set_fill_color(egui::Color32::DARK_BLUE);
+            rect.set_fill_color(egui::Color32::RED);
             vec.push(rect);
         }
 
