@@ -58,6 +58,7 @@ pub struct TheApp {
 impl eframe::App for TheApp {
     /// Called each time the UI needs repainting.
     fn update(&mut self, ctx: &Context, _frame: &mut eframe::Frame) {
+        //self.canvas.canvas.render(ctx, &mut self.msgs);
         // Establish event loop
         self.event_loop(ctx);
         // Handle messages if any exist
@@ -245,7 +246,7 @@ impl TheApp {
                 //let delta = DeltaOnes::new(Rule::new(5), 2900, 100, &mut self.world.rng);
                 //println!("{}", delta.delta_stats_str());
                 println!("Bits = {}", self.world.bits.len());
-                let d = Deltas::new(Rule::new(5), &mut self.world.rng);
+                let d = Deltas::new(Rule::new(5), 100, &mut self.world.rng);
                 println!("Poss ones = {}", d.len());
 
             }

@@ -17,8 +17,13 @@ use crate::inits::{
 pub(crate) use crate::world::emerge::Rule;
 use crate::world::emerge::{BitArray, Seq, step_bits};
 use gui_lib::World;
+
 use rand::rngs::ThreadRng;
 use rand::{Rng, RngExt};
+
+// use rand::SeedableRng; // Required trait for initialization methods
+// use rand::rngs::SmallRng;
+// use rand::Rng;         // Required trait to actually generate numbers
 
 /// TheWorld struct encapsulates application data and logic.
 /// It has no dependence on gui_lib and no dependence on egui.
@@ -26,6 +31,7 @@ use rand::{Rng, RngExt};
 //#[derive(Debug)] // TDJ: Debug is not needed
 pub struct TheWorld {
     pub rng: ThreadRng,
+    //pub rng: SmallRng,
     pub bits: BitArray,
     pub rule: Rule,
     pub start_ones: usize,
@@ -34,22 +40,25 @@ pub struct TheWorld {
 }
 
 impl World for TheWorld {
-    /// Advance simulation by one step.
-    /// If the application does not include a simulation,
-    /// this method can be left undefined:
-    /// it will be automatically implemented as an empty function.
-    fn advance(&mut self) {
-        // Increment frame number each simulation step.
-        self.frame_number += 1;
-        // Advance simulation by one step.
-        step_bits(&mut self.bits, self.rule, &mut self.rng);
-    }
-}
+    // Advance simulation by one step.
+    // If the application does not include a simulation,
+    // this method can be left undefined:
+    // it will be automatically implemented as an empty function.
+    // fn advance(&mut self) {
+    //     // Increment frame number each simulation step.
+    //     self.frame_number += 1;
+    //     // Advance simulation by one step.
+    //     step_bits(&mut self.bits, self.rule, &mut self.rng);
+    // }
+} // end impl World
+
+
 
 impl TheWorld {
     pub fn new() -> Self {
         Self {
             rng: rand::rng(),
+            //rng: rand::make_rng(),
             bits: BitArray::new(INITIAL_BITS_NUM),
             rule: Rule::new(INITIAL_RULE),
             start_ones: INITIAL_ONES,
@@ -59,4 +68,4 @@ impl TheWorld {
             frame_number: 0,
         }
     }
-}
+} // end impl TheWorld

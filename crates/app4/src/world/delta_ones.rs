@@ -13,10 +13,19 @@ pub struct Deltas {
 }
 
 impl Deltas {
-    pub fn new(rule: Rule, rng: &mut impl Rng) -> Self {
+    // pub fn new(rule: Rule, rng: &mut impl Rng) -> Self {
+    //     let mut deltas = Vec::<DeltaOnes>::with_capacity(251);
+    //     for i in (0..=SIM_BITS).step_by(24) {
+    //         deltas.push(DeltaOnes::new(rule, i, 100, rng));
+    //     }
+    //
+    //     Self { deltas }
+    // }
+
+    pub fn new(rule: Rule, sample: u32, rng: &mut impl Rng) -> Self {
         let mut deltas = Vec::<DeltaOnes>::with_capacity(251);
         for i in (0..=SIM_BITS).step_by(24) {
-            deltas.push(DeltaOnes::new(rule, i, 100, rng));
+            deltas.push(DeltaOnes::new(rule, i, sample, rng));
         }
 
         Self { deltas }
