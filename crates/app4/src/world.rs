@@ -31,7 +31,6 @@ use rand::{Rng, RngExt};
 //#[derive(Debug)] // TDJ: Debug is not needed
 pub struct TheWorld {
     pub rng: ThreadRng,
-    //pub rng: SmallRng,
     pub bits: BitArray,
     pub rule: Rule,
     pub start_ones: usize,
@@ -39,11 +38,11 @@ pub struct TheWorld {
     pub frame_number: u64,
 }
 
+// Advance simulation by one step.
+// If the application does not include a simulation,
+// this method can be left undefined:
+// it will be automatically implemented as an empty function.
 impl World for TheWorld {
-    // Advance simulation by one step.
-    // If the application does not include a simulation,
-    // this method can be left undefined:
-    // it will be automatically implemented as an empty function.
     // fn advance(&mut self) {
     //     // Increment frame number each simulation step.
     //     self.frame_number += 1;

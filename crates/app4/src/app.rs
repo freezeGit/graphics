@@ -194,7 +194,7 @@ impl TheApp {
             }
 
             BTN_ZOOM => {
-                let sgr = self.canvas.view_handles.sgr.borrow();
+                let sgr = self.canvas.view_handles.dgr.borrow();
 
                 self.canvas
                     .canvas
@@ -363,18 +363,18 @@ impl TheApp {
             DLG_ZOOM => {
                 let mut bad_val = false;
 
-                let mut sgr = self.canvas.view_handles.sgr.borrow_mut();
+                let mut sgr = self.canvas.view_handles.dgr.borrow_mut();
                 for item in values {
                     let (item_id, text) = item;
                     match item_id.as_str() {
                         "scale" => match text.trim().parse::<f32>() {
                             Ok(number) if number >= 0.0 => {
                                 sgr.set_zoom_scale(number);
-                                self.canvas
-                                    .view_handles
-                                    .stxt_scale
-                                    .borrow_mut()
-                                    .set_text(format!("Scale: {}", number));
+                            //     self.canvas
+                            //         .view_handles
+                            //         .stxt_scale
+                            //         .borrow_mut()
+                            //         .set_text(format!("Scale: {}", number));
                             }
                             Ok(number) => {
                                 bad_val = true;
@@ -390,11 +390,11 @@ impl TheApp {
                         "focus" => match text.trim().parse::<f32>() {
                             Ok(number) if number >= 0.0 && number <= 1.0 => {
                                 sgr.set_zoom_focus(number);
-                                self.canvas
-                                    .view_handles
-                                    .stxt_focus
-                                    .borrow_mut()
-                                    .set_text(format!("Focus: {}", number));
+                                //self.canvas
+                                    // .view_handles
+                                    // .stxt_focus
+                                    // .borrow_mut()
+                                    // .set_text(format!("Focus: {}", number));
                             }
                             Ok(number) => {
                                 bad_val = true;
@@ -556,11 +556,11 @@ impl TheApp {
                 match text.trim().parse::<u32>() {
                     Ok(number) => {
                         self.sim_timer.set_batch_size(number);
-                        self.canvas
-                            .view_handles
-                            .stxt_batch
-                            .borrow_mut()
-                            .set_text(format!("Batch: {}", number));
+                        // self.canvas
+                        //     .view_handles
+                        //     .stxt_batch
+                        //     .borrow_mut()
+                        //     .set_text(format!("Batch: {}", number));
                     }
                     Err(err) => {
                         self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(

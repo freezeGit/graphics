@@ -6,12 +6,12 @@
 // canvas_gl
 
 // Submodule under mod canvas.
-pub mod seq_graph;
+pub mod delta_graph;
 
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::canvas::seq_graph::SeqGraph;
+use crate::canvas::delta_graph::DeltaGraph;
 use crate::ids::*;
 use crate::inits;
 use crate::world::TheWorld;
@@ -25,11 +25,7 @@ pub struct ViewHandles {
     stxt_ones: Rc<RefCell<Text>>,
     stxt_rule: Rc<RefCell<Text>>,
     stxt_frame: Rc<RefCell<Text>>,
-    pub stxt_batch: Rc<RefCell<Text>>,
-    pub stxt_scale: Rc<RefCell<Text>>,
-    pub stxt_focus: Rc<RefCell<Text>>,
-    sln2: Rc<RefCell<Line>>,
-    pub sgr: Rc<RefCell<SeqGraph>>,
+    pub dgr: Rc<RefCell<DeltaGraph>>,
 }
 
 /// ## struct Canvas
@@ -77,10 +73,9 @@ impl TheCanvas {
         // Rc<RefCell<T>> coercion to ShapeHandle happens automatically
         // --------------------------
 
-        let sgr: Rc<RefCell<SeqGraph>> =
-           //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0))));
-            Rc::new(RefCell::new(SeqGraph::new(inits::SEQ_GRAPH_POSITION)));
-        canvas.add_shape(sgr.clone());
+        let dgr: Rc<RefCell<DeltaGraph>> =
+            Rc::new(RefCell::new(DeltaGraph::new(inits::DELTA_GRAPH_POSITION)));
+        canvas.add_shape(dgr.clone());
 
         let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(10.0, 10.0),
@@ -109,52 +104,23 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
 
-        let stxt_batch: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(10.0, 45.0),
-            format!("Batch: {}", inits::BATCH_SIZE),
-        )));
-        canvas.add_shape(stxt_batch.clone());
+        // let stxt_batch: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+        //     egui::Pos2::new(10.0, 45.0),
+        //     format!("Batch: {}", inits::BATCH_SIZE),
+        // )));
+        // canvas.add_shape(stxt_batch.clone());
 
-        let stxt_scale: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(200.0, 45.0),
-            format!("Scale: {}", inits::SEQ_GRAPH_SCALE),
-        )));
-        canvas.add_shape(stxt_scale.clone());
+        // let stxt_scale: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+        //     egui::Pos2::new(200.0, 45.0),
+        //     format!("Scale: {}", inits::SEQ_GRAPH_SCALE),
+        // )));
+        // canvas.add_shape(stxt_scale.clone());
 
-        let stxt_focus: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(320.0, 45.0),
-            format!("Focus: {}", inits::SEQ_GRAPH_FOCUS),
-        )));
-        canvas.add_shape(stxt_focus.clone());
-
-        let sln1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-            Pos2::new(100.0, 705.0),
-            Vec2::new(950.0, 0.0),
-        )));
-        sln1.borrow_mut().set_line_width(8.0);
-        sln1.borrow_mut().set_color(Color32::LIGHT_GRAY);
-        canvas.add_shape(sln1.clone());
-
-        let sln2: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-            Pos2::new(100.0, 705.0),
-            Vec2::new(950.0, 0.0),
-        )));
-        sln2.borrow_mut().set_line_width(8.0);
-        sln2.borrow_mut().set_color(Color32::DARK_BLUE);
-        canvas.add_shape(sln2.clone());
-
-        let tics: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
-            //Pos2::new(250.0, 705.0),
-            Pos2::new(100.0, 705.0),
-            vec![
-                [Pos2::new(0.0, -16.0), Pos2::new(0.0, 16.0)],
-                [Pos2::new(237.5, -16.0), Pos2::new(237.5, 16.0)],
-                [Pos2::new(475.0, -16.0), Pos2::new(475.0, 16.0)],
-                [Pos2::new(712.5, -16.0), Pos2::new(712.5, 16.0)],
-                [Pos2::new(950.0, -16.0), Pos2::new(950.0, 16.0)],
-            ],
-        )));
-        canvas.add_shape(tics.clone());
+        // let stxt_focus: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+        //     egui::Pos2::new(320.0, 45.0),
+        //     format!("Focus: {}", inits::SEQ_GRAPH_FOCUS),
+        // )));
+        // canvas.add_shape(stxt_focus.clone());
 
         ViewHandles {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
@@ -162,11 +128,11 @@ impl TheCanvas {
             stxt_ones,
             stxt_rule,
             stxt_frame,
-            stxt_batch,
-            stxt_scale,
-            stxt_focus,
-            sln2,
-            sgr,
+            //stxt_batch,
+            //stxt_scale,
+            //stxt_focus,
+            //sln2,
+            dgr,
         }
     }
 
@@ -245,10 +211,10 @@ impl TheCanvas {
 
         // Update the sequence graph
         let val = world.bits.ones_fraction() as f32;
-        self.view_handles.sgr.borrow_mut().add_val(val);
+        self.view_handles.dgr.borrow_mut().add_val(val);
 
-        // Update the line length
-        let length = 950.0 * (world.bits.ones_fraction() as f32);
-        self.view_handles.sln2.borrow_mut().set_length(length);
+        // // Update the line length
+        // let length = 950.0 * (world.bits.ones_fraction() as f32);
+        // self.view_handles.sln2.borrow_mut().set_length(length);
     }
 } // end of impl TheCanvas

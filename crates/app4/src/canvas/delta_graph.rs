@@ -9,7 +9,8 @@ const SG_SIZE: i32 = 250;
 const SG_SPACING: f32 = 4.0;
 //const SG_MARK_SIZE: f32 = 5.0;
 const SG_MARK_SIZE: f32 = 3.0;
-const SG_HEIGHT: f32 = 500.0;
+//const SG_HEIGHT: f32 = 500.0;
+const SG_HEIGHT: f32 = 600.0;
 const SG_WIDTH: f32 = SG_SIZE as f32 * SG_SPACING;
 
 #[derive(Debug, Clone, Copy)]
@@ -17,15 +18,6 @@ struct Zoom {
     scale: f32,
     focus: f32,
 }
-
-// impl Default for Zoom {
-//     fn default() -> Self {
-//         Self {
-//             scale: 1.0,
-//             focus: 0.5,
-//         }
-//     }
-// }
 
 impl Default for Zoom {
     fn default() -> Self {
@@ -37,7 +29,7 @@ impl Default for Zoom {
 }
 
 #[derive(Debug, Default)]
-pub struct SeqGraph {
+pub struct DeltaGraph {
     base: ShapeBase,
     vec: Vec<Rectangle>,
     mid: Line,
@@ -45,7 +37,7 @@ pub struct SeqGraph {
     zoom: Zoom,
 }
 
-impl SeqGraph {
+impl DeltaGraph {
     pub fn new(location: Pos2) -> Self {
         let mut base = ShapeBase::default();
         base.move_to(location);
@@ -68,8 +60,8 @@ impl SeqGraph {
         }
 
         let mut mid: Line = Line::new_from_points(
-            location + egui::vec2(-20.0, -(SG_HEIGHT / 2.0)),
-            location + egui::vec2(SG_WIDTH + 20.0, -(SG_HEIGHT / 2.0)),
+            location + egui::vec2(0.0, -(SG_HEIGHT / 2.0)),
+            location + egui::vec2(SG_WIDTH, -(SG_HEIGHT / 2.0)),
         );
         mid.set_line_width(1.0);
 
@@ -77,10 +69,10 @@ impl SeqGraph {
             //Pos2::new(250.0, 705.0),
             location,
             vec![
-                [Pos2::new(-20.0, 0.0), Pos2::new(SG_WIDTH + 20.0, 0.0)],
+                [Pos2::new(0.0, 0.0), Pos2::new(SG_WIDTH, 0.0)],
                 [
-                    Pos2::new(-20.0, -SG_HEIGHT),
-                    Pos2::new(SG_WIDTH + 20.0, -SG_HEIGHT),
+                    Pos2::new(0.0, -SG_HEIGHT),
+                    Pos2::new(SG_WIDTH, -SG_HEIGHT),
                 ],
             ],
         );
@@ -142,9 +134,9 @@ impl SeqGraph {
         let loc = egui::Pos2::new(vx, vy);
         self.vec.last_mut().unwrap().move_to(loc);
     }
-} // impl SeqGraph
+} // impl DeltaGraph
 
-impl Shape for SeqGraph {
+impl Shape for DeltaGraph {
     fn base(&self) -> &ShapeBase {
         &self.base
     }
@@ -161,4 +153,4 @@ impl Shape for SeqGraph {
             self.lines.draw_at(painter, canvas_offset);
         }
     }
-} // impl Shape for SeqGraph
+} // impl Shape for DeltaGraph
