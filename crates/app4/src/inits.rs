@@ -42,6 +42,7 @@ pub const INITIAL_ONES: usize = 0; // Must be <= INITIAL_BITS_NUM.
 
 pub const INITIAL_SEQ_DISCARD: usize = 45000;
 pub const INITIAL_SEQ_LENGTH: usize = 1000;
+//pub const INITIAL_SAMPLE_SIZE: u32 = 100;
 
 //pub const DELTA_GRAPH_POSITION: egui::Pos2 = egui::pos2(50.0, 600.0);
 pub const DELTA_GRAPH_POSITION: egui::Pos2 = egui::pos2(100.0, 680.0);

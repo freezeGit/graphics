@@ -12,7 +12,8 @@ pub mod delta_ones;
 // ---------------------------------------------------
 
 use crate::inits::{
-    INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_RULE, INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
+    INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_RULE, INITIAL_SEQ_DISCARD,
+    INITIAL_SEQ_LENGTH,
 };
 pub(crate) use crate::world::emerge::Rule;
 use crate::world::emerge::{BitArray, Seq, step_bits};
@@ -20,7 +21,7 @@ use gui_lib::World;
 
 use rand::rngs::ThreadRng;
 use rand::{Rng, RngExt};
-
+use crate::world::delta_ones::Deltas;
 // use rand::SeedableRng; // Required trait for initialization methods
 // use rand::rngs::SmallRng;
 // use rand::Rng;         // Required trait to actually generate numbers
@@ -31,8 +32,10 @@ use rand::{Rng, RngExt};
 //#[derive(Debug)] // TDJ: Debug is not needed
 pub struct TheWorld {
     pub rng: ThreadRng,
-    pub bits: BitArray,
     pub rule: Rule,
+    pub sample_size: u32,
+
+    pub bits: BitArray,
     pub start_ones: usize,
     pub attractor: Seq,
     pub frame_number: u64,
@@ -57,14 +60,21 @@ impl TheWorld {
     pub fn new() -> Self {
         Self {
             rng: rand::rng(),
-            //rng: rand::make_rng(),
+            rule: Rule::new(5),
+            sample_size: 100,
+
             bits: BitArray::new(INITIAL_BITS_NUM),
-            rule: Rule::new(INITIAL_RULE),
             start_ones: INITIAL_ONES,
             //attractor: Seq::new(INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH),
             attractor: Seq::new(INITIAL_SEQ_DISCARD),
             //attractor: Vec::new(),
             frame_number: 0,
         }
+    }
+
+    //let d = Deltas::new(Rule::new(5), 100, &mut self.world.rng);
+
+    pub fn recalc_deltas (&mut self) -> Deltas {
+        Deltas::new(self.rule, self.sample_size, &mut self.rng)
     }
 } // end impl TheWorld

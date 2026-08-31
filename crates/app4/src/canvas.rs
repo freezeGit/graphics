@@ -124,8 +124,8 @@ impl TheCanvas {
 
         canvas.add_widget(Box::new(Space::new(15.0)));
 
-        let wb_specs = Button::new(BTN_NEW_SIM, "New Sim", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_specs));
+        let wb_sim = Button::new(BTN_NEW_SIM, "New Sim", 120.0, 40.0);
+        canvas.add_widget(Box::new(wb_sim));
 
         let wb_sim = Button::new(BTN_SIM, "Run Sim", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_sim));

@@ -155,32 +155,32 @@ impl TheApp {
                 )));
             }
 
-            // BTN_NEW_SIM => {
-            //     self.canvas
-            //         .canvas
-            //         .set_dialog(Box::new(MultiTextEntryDlg::new(
-            //             DLG_ENTER_SPECS,
-            //             "Enter simulation specs",
-            //             [
-            //                 TextEntryField::new(
-            //                     "rule",
-            //                     "Rule (0 to 15)",
-            //                     self.world.rule.number().to_string(),
-            //                 ),
-            //                 TextEntryField::new(
-            //                     "bitsnum",
-            //                     "Bits number",
-            //                     self.world.bits.len().to_string(),
-            //                 ),
-            //                 //TextEntryField::new("onesnum", "Ones number", "500"),
-            //                 TextEntryField::new(
-            //                     "onesnum",
-            //                     "Ones number",
-            //                     self.world.start_ones.to_string(),
-            //                 ),
-            //             ],
-            //         )));
-            // }
+            BTN_NEW_SIM => {
+                self.canvas
+                    .canvas
+                    .set_dialog(Box::new(MultiTextEntryDlg::new(
+                        DLG_ENTER_SPECS,
+                        "Enter simulation specs",
+                        [
+                            TextEntryField::new(
+                                "rule",
+                                "Rule (0 to 15)",
+                                self.world.rule.number().to_string(),
+                            ),
+                            TextEntryField::new(
+                                "bitsnum",
+                                "Bits number",
+                                self.world.bits.len().to_string(),
+                            ),
+                            //TextEntryField::new("onesnum", "Ones number", "500"),
+                            TextEntryField::new(
+                                "onesnum",
+                                "Ones number",
+                                self.world.start_ones.to_string(),
+                            ),
+                        ],
+                    )));
+            }
 
             BTN_BATCH => {
                 println!("Batch size: {}", self.sim_timer.batch_size());
