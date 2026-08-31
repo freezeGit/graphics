@@ -8,8 +8,9 @@ use crate::egui::{self, Color32, FontId, Pos2};
 use crate::shapes_gl::base::{Shape, ShapeBase};
 use std::f32::consts::FRAC_PI_2;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum TextFont {
+    #[default]
     Proportional,
     Monospace,
 }
@@ -96,6 +97,12 @@ impl Text {
     }
 }
 
+impl Default for Text {
+    fn default() -> Self {
+        Self::new_from_top_left(Pos2::ZERO, "")
+    }
+}
+
 /// Implement trait Shape for Text.
 ///
 /// Make trait [`Shape`] methods available.
@@ -128,3 +135,17 @@ impl Shape for Text {
         }
     }
 } // impl Shape for Text
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_text_default() {
+        let text = Text::default();
+        assert_eq!(text.text(), "");
+        assert_eq!(text.size(), 24.0);
+        assert_eq!(text.font(), TextFont::Proportional);
+        assert_eq!(text.base().location(), Pos2::ZERO);
+    }
+}

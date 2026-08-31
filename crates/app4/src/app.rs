@@ -133,7 +133,6 @@ impl TheApp {
 
             BTN_SIM => {
                 let current_choice =
-                    //if self.sim_timer.is_running() && !self.sim_timer.fast_forward() {
                     if self.sim_timer.is_running() && self.sim_timer.normal_speed() {
                         CHOICE_RUN
                     } else if self.sim_timer.is_running() && self.sim_timer.fast_forward() {

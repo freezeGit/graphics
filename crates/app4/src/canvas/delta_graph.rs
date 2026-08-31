@@ -1,6 +1,6 @@
 //use crate::inits;
 use crate::inits;
-use gui_lib::{Line, Lines, Pos2, Rectangle, Shape, ShapeBase, Vec2};
+use gui_lib::{Line, Lines, Pos2, Rectangle, Shape, ShapeBase, Text, Vec2};
 // TDJ: zoom
 
 //const SG_SIZE: i32 = 180;
@@ -32,8 +32,9 @@ impl Default for Zoom {
 pub struct DeltaGraph {
     base: ShapeBase,
     vec: Vec<Rectangle>,
-    mid: Line,
-    lines: Lines,
+    horiz_lines: Lines,
+    vertical_lines: Lines,
+    nvec: Vec<Text>,
     zoom: Zoom,
 }
 
@@ -54,35 +55,59 @@ impl DeltaGraph {
             );
             rect.set_line_width(1.0);
             rect.set_color(egui::Color32::LIGHT_GRAY);
-            rect.set_fill_color(egui::Color32::DARK_BLUE);
             rect.set_fill_color(egui::Color32::RED);
             vec.push(rect);
         }
 
-        let mut mid: Line = Line::new_from_points(
-            location + egui::vec2(0.0, -(SG_HEIGHT / 2.0)),
-            location + egui::vec2(SG_WIDTH, -(SG_HEIGHT / 2.0)),
-        );
-        mid.set_line_width(1.0);
-
-        let mut lines: Lines = Lines::new(
-            //Pos2::new(250.0, 705.0),
+        let mut horiz_lines = Lines::new(
             location,
             vec![
                 [Pos2::new(0.0, 0.0), Pos2::new(SG_WIDTH, 0.0)],
                 [
-                    Pos2::new(0.0, -SG_HEIGHT),
-                    Pos2::new(SG_WIDTH, -SG_HEIGHT),
+                    Pos2::new(0.0, -SG_HEIGHT * 0.75),
+                    Pos2::new(SG_WIDTH, -SG_HEIGHT * 0.75),
                 ],
+                [
+                    Pos2::new(0.0, -SG_HEIGHT * 0.5),
+                    Pos2::new(SG_WIDTH, -SG_HEIGHT * 0.5),
+                ],
+                [
+                    Pos2::new(0.0, -SG_HEIGHT * 0.25),
+                    Pos2::new(SG_WIDTH, -SG_HEIGHT * 0.25),
+                ],
+                [Pos2::new(0.0, -SG_HEIGHT), Pos2::new(SG_WIDTH, -SG_HEIGHT)],
             ],
         );
-        lines.set_line_width(1.0);
+        horiz_lines.set_line_width(1.0);
+
+        let mut vertical_lines = Lines::new(
+            location,
+            vec![
+                [Pos2::new(0.0, 0.0), Pos2::new(0.0, -SG_HEIGHT)],
+                [
+                    Pos2::new(SG_WIDTH / 2.0, 0.0),
+                    Pos2::new(SG_WIDTH / 2.0, -SG_HEIGHT),
+                ],
+                [Pos2::new(SG_WIDTH, 0.0), Pos2::new(SG_WIDTH, -SG_HEIGHT)],
+            ],
+        );
+        vertical_lines.set_line_width(1.0);
+
+        let mut st_p2 = Text::new_from_center(location + egui::vec2(-30.0, -SG_HEIGHT), "+2");
+        let mut st_p1 =
+            Text::new_from_center(location + egui::vec2(-30.0, -SG_HEIGHT * 0.75), "+1");
+        let mut st_0 = Text::new_from_center(location + egui::vec2(-30.0, -SG_HEIGHT * 0.5), "0");
+        let mut st_m1 =
+            Text::new_from_center(location + egui::vec2(-30.0, -SG_HEIGHT * 0.25), "\u{2212}1");
+        let mut st_m2 = Text::new_from_center(location + egui::vec2(-30.0, 0.0), "\u{2212}2");
+        let nvec = vec![st_m2, st_m1, st_0, st_p1, st_p2];
 
         Self {
             base,
             vec,
-            mid,
-            lines,
+            horiz_lines,
+            vertical_lines,
+            nvec,
             zoom: Zoom::default(),
         }
     }
@@ -148,9 +173,11 @@ impl Shape for DeltaGraph {
         for s in &self.vec {
             s.draw_at(painter, canvas_offset);
         }
-        self.mid.draw_at(painter, canvas_offset);
-        if self.zoom.scale == 1.0 && self.zoom.focus == 0.5 {
-            self.lines.draw_at(painter, canvas_offset);
+        self.horiz_lines.draw_at(painter, canvas_offset);
+        self.vertical_lines.draw_at(painter, canvas_offset);
+        //self.st_0.draw_at(painter, canvas_offset);
+        for s in &self.nvec {
+            s.draw_at(painter, canvas_offset);
         }
     }
 } // impl Shape for DeltaGraph
