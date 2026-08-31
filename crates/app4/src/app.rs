@@ -155,32 +155,32 @@ impl TheApp {
                 )));
             }
 
-            BTN_NEW_SIM => {
-                self.canvas
-                    .canvas
-                    .set_dialog(Box::new(MultiTextEntryDlg::new(
-                        DLG_ENTER_SPECS,
-                        "Enter simulation specs",
-                        [
-                            TextEntryField::new(
-                                "rule",
-                                "Rule (0 to 15)",
-                                self.world.rule.number().to_string(),
-                            ),
-                            TextEntryField::new(
-                                "bitsnum",
-                                "Bits number",
-                                self.world.bits.len().to_string(),
-                            ),
-                            //TextEntryField::new("onesnum", "Ones number", "500"),
-                            TextEntryField::new(
-                                "onesnum",
-                                "Ones number",
-                                self.world.start_ones.to_string(),
-                            ),
-                        ],
-                    )));
-            }
+            // BTN_NEW_SIM => {
+            //     self.canvas
+            //         .canvas
+            //         .set_dialog(Box::new(MultiTextEntryDlg::new(
+            //             DLG_ENTER_SPECS,
+            //             "Enter simulation specs",
+            //             [
+            //                 TextEntryField::new(
+            //                     "rule",
+            //                     "Rule (0 to 15)",
+            //                     self.world.rule.number().to_string(),
+            //                 ),
+            //                 TextEntryField::new(
+            //                     "bitsnum",
+            //                     "Bits number",
+            //                     self.world.bits.len().to_string(),
+            //                 ),
+            //                 //TextEntryField::new("onesnum", "Ones number", "500"),
+            //                 TextEntryField::new(
+            //                     "onesnum",
+            //                     "Ones number",
+            //                     self.world.start_ones.to_string(),
+            //                 ),
+            //             ],
+            //         )));
+            // }
 
             BTN_BATCH => {
                 println!("Batch size: {}", self.sim_timer.batch_size());
@@ -192,28 +192,28 @@ impl TheApp {
                 )));
             }
 
-            BTN_ZOOM => {
-                let sgr = self.canvas.view_handles.dgr.borrow();
-
-                self.canvas
-                    .canvas
-                    .set_dialog(Box::new(MultiTextEntryDlg::new(
-                        DLG_ZOOM,
-                        "Enter Zoom specs",
-                        [
-                            TextEntryField::new(
-                                "scale",
-                                "Scale (> 0)",
-                                sgr.zoom_scale().to_string(),
-                            ),
-                            TextEntryField::new(
-                                "focus",
-                                "Focus (0.0 to 1.0)",
-                                sgr.zoom_focus().to_string(),
-                            ),
-                        ],
-                    )));
-            }
+            // BTN_ZOOM => {
+            //     let sgr = self.canvas.view_handles.dgr.borrow();
+            //
+            //     self.canvas
+            //         .canvas
+            //         .set_dialog(Box::new(MultiTextEntryDlg::new(
+            //             DLG_ZOOM,
+            //             "Enter Zoom specs",
+            //             [
+            //                 TextEntryField::new(
+            //                     "scale",
+            //                     "Scale (> 0)",
+            //                     //sgr.zoom_scale().to_string(),
+            //                 ),
+            //                 TextEntryField::new(
+            //                     "focus",
+            //                     "Focus (0.0 to 1.0)",
+            //                     //sgr.zoom_focus().to_string(),
+            //                 ),
+            //             ],
+            //         )));
+            // }
 
             BTN_SEQ => {
                 let mut the_len = self.world.attractor.len();
@@ -359,65 +359,65 @@ impl TheApp {
                 }
             }
 
-            DLG_ZOOM => {
-                let mut bad_val = false;
-
-                let mut sgr = self.canvas.view_handles.dgr.borrow_mut();
-                for item in values {
-                    let (item_id, text) = item;
-                    match item_id.as_str() {
-                        "scale" => match text.trim().parse::<f32>() {
-                            Ok(number) if number >= 0.0 => {
-                                sgr.set_zoom_scale(number);
-                            //     self.canvas
-                            //         .view_handles
-                            //         .stxt_scale
-                            //         .borrow_mut()
-                            //         .set_text(format!("Scale: {}", number));
-                            }
-                            Ok(number) => {
-                                bad_val = true;
-                                eprintln!(
-                                    "Invalid scale value: {number}. Scale must be greater than 0."
-                                );
-                            }
-                            Err(err) => {
-                                bad_val = true;
-                                eprintln!("Could not parse scale value {:?}: {err}", text);
-                            }
-                        },
-                        "focus" => match text.trim().parse::<f32>() {
-                            Ok(number) if number >= 0.0 && number <= 1.0 => {
-                                sgr.set_zoom_focus(number);
-                                //self.canvas
-                                    // .view_handles
-                                    // .stxt_focus
-                                    // .borrow_mut()
-                                    // .set_text(format!("Focus: {}", number));
-                            }
-                            Ok(number) => {
-                                bad_val = true;
-                                eprintln!(
-                                    "Invalid focus value: {number}. Must be between 0 and 1."
-                                );
-                            }
-                            Err(err) => {
-                                bad_val = true;
-                                eprintln!("Could not parse focus value {:?}: {err}", text);
-                            }
-                        },
-                        _ => {}
-                    }
-                }
-
-                if bad_val {
-                    self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
-                        DLG_BAD_VALS,
-                        "Error Message",
-                        "Bad value(s) entered.",
-                    )));
-                }
-            }
+            // DLG_ZOOM => {
+            //     let mut bad_val = false;
+            //
+            //     let mut sgr = self.canvas.view_handles.dgr.borrow_mut();
+            //     for item in values {
+            //         let (item_id, text) = item;
+            //         match item_id.as_str() {
+            //             "scale" => match text.trim().parse::<f32>() {
+            //                 Ok(number) if number >= 0.0 => {
+            //                     sgr.set_zoom_scale(number);
+            //                 //     self.canvas
+            //                 //         .view_handles
+            //                 //         .stxt_scale
+            //                 //         .borrow_mut()
+            //                 //         .set_text(format!("Scale: {}", number));
+            //                 }
+            //                 Ok(number) => {
+            //                     bad_val = true;
+            //                     eprintln!(
+            //                         "Invalid scale value: {number}. Scale must be greater than 0."
+            //                     );
+            //                 }
+            //                 Err(err) => {
+            //                     bad_val = true;
+            //                     eprintln!("Could not parse scale value {:?}: {err}", text);
+            //                 }
+            //             },
+            //             "focus" => match text.trim().parse::<f32>() {
+            //                 Ok(number) if number >= 0.0 && number <= 1.0 => {
+            //                     sgr.set_zoom_focus(number);
+            //                     //self.canvas
+            //                         // .view_handles
+            //                         // .stxt_focus
+            //                         // .borrow_mut()
+            //                         // .set_text(format!("Focus: {}", number));
+            //                 }
+            //                 Ok(number) => {
+            //                     bad_val = true;
+            //                     eprintln!(
+            //                         "Invalid focus value: {number}. Must be between 0 and 1."
+            //                     );
+            //                 }
+            //                 Err(err) => {
+            //                     bad_val = true;
+            //                     eprintln!("Could not parse focus value {:?}: {err}", text);
+            //                 }
+            //             },
+            //             _ => {}
+            //         }
+            //     }
+            //
+            //     if bad_val {
+            //         self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
+            //             DLG_BAD_VALS,
+            //             "Error Message",
+            //             "Bad value(s) entered.",
+            //         )));
+            //     }
+            // }
 
             DLG_SEQUENCE => {
                 let mut discard: usize = 0;

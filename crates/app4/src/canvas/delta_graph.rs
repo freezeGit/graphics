@@ -35,7 +35,6 @@ pub struct DeltaGraph {
     horiz_lines: Lines,
     vertical_lines: Lines,
     nvec: Vec<Text>,
-    zoom: Zoom,
 }
 
 impl DeltaGraph {
@@ -108,32 +107,11 @@ impl DeltaGraph {
             horiz_lines,
             vertical_lines,
             nvec,
-            zoom: Zoom::default(),
         }
     }
 
     pub fn location(&self) -> Pos2 {
         self.base.location()
-    }
-
-    pub fn zoom_scale(&self) -> f32 {
-        self.zoom.scale
-    }
-
-    pub fn zoom_focus(&self) -> f32 {
-        self.zoom.focus
-    }
-
-    pub fn set_zoom_scale(&mut self, scale: f32) {
-        if scale.is_finite() {
-            self.zoom.scale = scale.max(0.0);
-        }
-    }
-
-    pub fn set_zoom_focus(&mut self, focus: f32) {
-        if focus.is_finite() {
-            self.zoom.focus = focus.clamp(0.0, 1.0);
-        }
     }
 
     pub fn add_val(&mut self, ones_fraction: f32) {
@@ -151,13 +129,13 @@ impl DeltaGraph {
         let vx = self.vec.last_mut().unwrap().location().x;
 
         let clamped_fraction = ones_fraction.clamp(0.0, 1.0);
-        let scaled_height =
-            (0.5 + (clamped_fraction - self.zoom.focus) * self.zoom.scale) * SG_HEIGHT;
+        //let scaled_height =
+            //(0.5 + (clamped_fraction - self.zoom.focus) * self.zoom.scale) * SG_HEIGHT;
         let mark_offset = SG_MARK_SIZE / 2.0;
-        let vy = self.location().y - (mark_offset + scaled_height);
+        //let vy = self.location().y - (mark_offset + scaled_height);
 
-        let loc = egui::Pos2::new(vx, vy);
-        self.vec.last_mut().unwrap().move_to(loc);
+        //let loc = egui::Pos2::new(vx, vy);
+        //self.vec.last_mut().unwrap().move_to(loc);
     }
 } // impl DeltaGraph
 

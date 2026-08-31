@@ -104,34 +104,12 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
 
-        // let stxt_batch: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     egui::Pos2::new(10.0, 45.0),
-        //     format!("Batch: {}", inits::BATCH_SIZE),
-        // )));
-        // canvas.add_shape(stxt_batch.clone());
-
-        // let stxt_scale: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     egui::Pos2::new(200.0, 45.0),
-        //     format!("Scale: {}", inits::SEQ_GRAPH_SCALE),
-        // )));
-        // canvas.add_shape(stxt_scale.clone());
-
-        // let stxt_focus: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     egui::Pos2::new(320.0, 45.0),
-        //     format!("Focus: {}", inits::SEQ_GRAPH_FOCUS),
-        // )));
-        // canvas.add_shape(stxt_focus.clone());
-
         ViewHandles {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
             stxt_bits,
             stxt_ones,
             stxt_rule,
             stxt_frame,
-            //stxt_batch,
-            //stxt_scale,
-            //stxt_focus,
-            //sln2,
             dgr,
         }
     }
