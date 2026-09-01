@@ -60,6 +60,7 @@ impl TheWorld {
     pub fn new() -> Self {
         Self {
             rng: rand::rng(),
+            //rule: Rule::new(5),
             rule: Rule::new(5),
             sample_size: 100,
 

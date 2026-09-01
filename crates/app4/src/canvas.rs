@@ -119,13 +119,10 @@ impl TheCanvas {
         // ---- Create and add widgets as Box<dyn Widget>
         canvas.add_widget(Box::new(Space::new(15.0)));
 
-        let label1 = Label::new("App3", Color32::BLUE, 20.0);
+        let label1 = Label::new("App4", Color32::BLUE, 20.0);
         canvas.add_widget(Box::new(label1));
 
         canvas.add_widget(Box::new(Space::new(15.0)));
-
-        // let wb_sim = Button::new(BTN_NEW_SIM, "New Sim", 120.0, 40.0);
-        // canvas.add_widget(Box::new(wb_sim));
 
         let wb_delta = Button::new(BTN_DELTAS, "Deltas", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_delta));
@@ -200,7 +197,7 @@ impl TheCanvas {
             self.view_handles
                 .dgr
                 .borrow_mut()
-                .move_rect_y(i, deltas.get_deltas(i).mean() as f32);
+                .set_mean_y(i, deltas.get_deltas(i).mean() as f32);
         }
 
         // let val = world.bits.ones_fraction() as f32;

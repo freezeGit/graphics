@@ -31,7 +31,7 @@ impl Default for Zoom {
 #[derive(Debug, Default)]
 pub struct DeltaGraph {
     base: ShapeBase,
-    vec: Vec<Rectangle>,
+    means: Vec<Rectangle>,
     horiz_lines: Lines,
     vertical_lines: Lines,
     nvec: Vec<Text>,
@@ -42,7 +42,7 @@ impl DeltaGraph {
         let mut base = ShapeBase::default();
         base.move_to(location);
 
-        let mut vec = Vec::new();
+        let mut means = Vec::new();
 
         assert!(SG_SIZE > 0);
         for i in 0..=SG_SIZE {  //TDJ: Is this right?
@@ -53,9 +53,10 @@ impl DeltaGraph {
                 Vec2::splat(SG_MARK_SIZE),
             );
             rect.set_line_width(1.0);
-            rect.set_color(egui::Color32::LIGHT_GRAY);
+            //rect.set_color(egui::Color32::LIGHT_GRAY);
+            rect.set_color(egui::Color32::RED);
             rect.set_fill_color(egui::Color32::RED);
-            vec.push(rect);
+            means.push(rect);
         }
 
         let mut horiz_lines = Lines::new(
@@ -103,7 +104,7 @@ impl DeltaGraph {
 
         Self {
             base,
-            vec,
+            means,
             horiz_lines,
             vertical_lines,
             nvec,
@@ -114,9 +115,13 @@ impl DeltaGraph {
         self.base.location()
     }
 
-    pub fn move_rect_y(&mut self, index: usize, y_val: f32) {
-        let new_pos= Pos2::new(self.vec[index].center().x, y_val);
-        self.vec[index].move_to(new_pos);
+    pub fn set_mean_y(&mut self, index: usize, y_val: f32) {
+        let x = self.means[index].center().x;
+         //let y = (self.location().y - 0.5 * SG_HEIGHT) - 0.25 * y_val * SG_HEIGHT;
+         let y = self.location().y - 0.5 * SG_HEIGHT - 0.25 * y_val * SG_HEIGHT;
+
+        let new_pos= Pos2::new(x, y);
+        self.means[index].move_to(new_pos);
     }
 
     // pub fn move_rect(&mut self, index: usize, new_pos: Pos2) {
@@ -143,7 +148,7 @@ impl Shape for DeltaGraph {
         for s in &self.nvec {
             s.draw_at(painter, canvas_offset);
         }
-        for s in &self.vec {
+        for s in &self.means {
             s.draw_at(painter, canvas_offset);
         }
     }
