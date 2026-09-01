@@ -13,15 +13,6 @@ pub struct Deltas {
 }
 
 impl Deltas {
-    // pub fn new(rule: Rule, rng: &mut impl Rng) -> Self {
-    //     let mut deltas = Vec::<DeltaOnes>::with_capacity(251);
-    //     for i in (0..=SIM_BITS).step_by(24) {
-    //         deltas.push(DeltaOnes::new(rule, i, 100, rng));
-    //     }
-    //
-    //     Self { deltas }
-    // }
-
     pub fn new(rule: Rule, sample: u32, rng: &mut impl Rng) -> Self {
         let mut deltas = Vec::<DeltaOnes>::with_capacity(251);
         for i in (0..=SIM_BITS).step_by(24) {
@@ -34,16 +25,19 @@ impl Deltas {
     pub fn len(&self) -> usize {
         self.deltas.len()
     }
+
+    pub fn get_deltas(&self, i: usize) -> &DeltaOnes {
+        assert!(i < self.deltas.len());
+        &self.deltas[i]
+    }
 } // end impl Deltas
 
 //----------------------------------------
 
 #[derive(Debug, Copy, Clone)]
-struct DeltaOnes {
+pub struct DeltaOnes {
     mean: f64,
     sem: f64,
-    // max_delta: f64,
-    // min_delta: f64,
 }
 
 impl DeltaOnes {
@@ -68,31 +62,19 @@ impl DeltaOnes {
         let n = data.len() as f64;
         let sem = std_dev / n.sqrt();
 
-        // let max_delta = data.max();
-        // let min_delta = data.min();
-
         Self {
             mean,
             sem,
-            // max_delta,
-            // min_delta,
         }
     }
 
-    fn mean(&self) -> f64 {
+    pub fn mean(&self) -> f64 {
         self.mean
     }
 
-    fn sem(&self) -> f64 {
+    pub fn sem(&self) -> f64 {
         self.sem
     }
-
-    // pub fn max_delta(&self) -> f64 {
-    //     self.max_delta
-    // }
-    // pub fn min_delta(&self) -> f64 {
-    //     self.min_delta
-    // }
 
     pub fn delta_stats_str(&self) -> String {
         format!(

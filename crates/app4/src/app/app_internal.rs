@@ -74,14 +74,14 @@ impl TheApp {
         for _ in 0..self.sim_timer.batch_size() {
             self.world.advance();
         }
-        self.canvas.update(&self.world);
+        self.canvas.update(&mut self.world);
     }
 
     fn step_when_ready(&mut self, now: f64) {
         // TDJ: needs world and canvas
         if self.sim_timer.ready(now) {
             self.world.advance();
-            self.canvas.update(&self.world);
+            self.canvas.update(&mut self.world);
         }
     }
 
@@ -104,7 +104,7 @@ impl TheApp {
             self.msgs = msgs;
 
             // Update canvas to reflect all state changes:
-            self.canvas.update(&self.world);
+            self.canvas.update(&mut self.world);
         }
     }
 } // end impl TheApp

@@ -63,6 +63,7 @@ impl TheWorld {
             rule: Rule::new(5),
             sample_size: 100,
 
+
             bits: BitArray::new(INITIAL_BITS_NUM),
             start_ones: INITIAL_ONES,
             //attractor: Seq::new(INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH),
@@ -72,7 +73,9 @@ impl TheWorld {
         }
     }
 
-    //let d = Deltas::new(Rule::new(5), 100, &mut self.world.rng);
+
+
+
 
     pub fn recalc_deltas (&mut self) -> Deltas {
         Deltas::new(self.rule, self.sample_size, &mut self.rng)

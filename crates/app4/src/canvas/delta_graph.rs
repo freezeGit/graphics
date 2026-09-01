@@ -45,7 +45,7 @@ impl DeltaGraph {
         let mut vec = Vec::new();
 
         assert!(SG_SIZE > 0);
-        for i in 0..SG_SIZE {
+        for i in 0..=SG_SIZE {  //TDJ: Is this right?
             let mut rect = Rectangle::new_from_center(
                 // Initial position is off-screen
                 location + egui::vec2(i as f32 * SG_SPACING, -10000.0),
@@ -114,29 +114,16 @@ impl DeltaGraph {
         self.base.location()
     }
 
-    pub fn add_val(&mut self, ones_fraction: f32) {
-        if self.vec.is_empty() {
-            return;
-        }
-
-        for i in 0..self.vec.len() - 1 {
-            let current_x = self.vec[i].location().x;
-            let next_y = self.vec[i + 1].location().y;
-            let new_location = egui::Pos2::new(current_x, next_y);
-            self.vec[i].move_to(new_location);
-        }
-
-        let vx = self.vec.last_mut().unwrap().location().x;
-
-        let clamped_fraction = ones_fraction.clamp(0.0, 1.0);
-        //let scaled_height =
-            //(0.5 + (clamped_fraction - self.zoom.focus) * self.zoom.scale) * SG_HEIGHT;
-        let mark_offset = SG_MARK_SIZE / 2.0;
-        //let vy = self.location().y - (mark_offset + scaled_height);
-
-        //let loc = egui::Pos2::new(vx, vy);
-        //self.vec.last_mut().unwrap().move_to(loc);
+    pub fn move_rect_y(&mut self, index: usize, y_val: f32) {
+        let new_pos= Pos2::new(self.vec[index].center().x, y_val);
+        self.vec[index].move_to(new_pos);
     }
+
+    // pub fn move_rect(&mut self, index: usize, new_pos: Pos2) {
+    //     self.vec[index].move_to(new_pos);
+    // }
+
+
 } // impl DeltaGraph
 
 impl Shape for DeltaGraph {
@@ -148,13 +135,15 @@ impl Shape for DeltaGraph {
     }
 
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-        for s in &self.vec {
-            s.draw_at(painter, canvas_offset);
-        }
+        // for s in &self.vec {
+        //     s.draw_at(painter, canvas_offset);
+        // }
         self.horiz_lines.draw_at(painter, canvas_offset);
         self.vertical_lines.draw_at(painter, canvas_offset);
-        //self.st_0.draw_at(painter, canvas_offset);
         for s in &self.nvec {
+            s.draw_at(painter, canvas_offset);
+        }
+        for s in &self.vec {
             s.draw_at(painter, canvas_offset);
         }
     }

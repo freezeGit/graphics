@@ -124,8 +124,11 @@ impl TheCanvas {
 
         canvas.add_widget(Box::new(Space::new(15.0)));
 
-        let wb_sim = Button::new(BTN_NEW_SIM, "New Sim", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_sim));
+        // let wb_sim = Button::new(BTN_NEW_SIM, "New Sim", 120.0, 40.0);
+        // canvas.add_widget(Box::new(wb_sim));
+
+        let wb_delta = Button::new(BTN_DELTAS, "Deltas", 120.0, 40.0);
+        canvas.add_widget(Box::new(wb_delta));
 
         let wb_sim = Button::new(BTN_SIM, "Run Sim", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_sim));
@@ -162,7 +165,7 @@ impl TheCanvas {
     /// Note that this method does not modify the world state.
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
-    pub fn update(&mut self, world: &TheWorld) {
+    pub fn update(&mut self, world: &mut TheWorld) {
         // Set stxt_bits to display bits number
         self.view_handles
             .stxt_bits
@@ -187,12 +190,20 @@ impl TheCanvas {
             .borrow_mut()
             .set_text(format!("Interactions: {}", world.frame_number));
 
-        // Update the sequence graph
-        let val = world.bits.ones_fraction() as f32;
-        self.view_handles.dgr.borrow_mut().add_val(val);
+        // // Update the sequence graph
+        // let val = world.bits.ones_fraction() as f32;
+        // self.view_handles.dgr.borrow_mut().add_val(val);
 
-        // // Update the line length
-        // let length = 950.0 * (world.bits.ones_fraction() as f32);
-        // self.view_handles.sln2.borrow_mut().set_length(length);
+        // Update the deltas graph
+        let deltas = world.recalc_deltas();
+        for i in 0..deltas.len() {
+            self.view_handles
+                .dgr
+                .borrow_mut()
+                .move_rect_y(i, deltas.get_deltas(i).mean() as f32);
+        }
+
+        // let val = world.bits.ones_fraction() as f32;
+        // self.view_handles.dgr.borrow_mut().add_val(val);
     }
 } // end of impl TheCanvas

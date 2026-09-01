@@ -7,8 +7,8 @@ use gui_lib::{MultiTextEntryDlgId, RadioBoxesDlgId, TextEntryDlgId};
 // ---------- Widget ids
 
 pub const BTN_SIM: ButtonId = ButtonId(1);
-pub const BTN_DELTAS: ButtonId = ButtonId(1);
-pub const BTN_NEW_SIM: ButtonId = ButtonId(2);
+pub const BTN_DELTAS: ButtonId = ButtonId(2);
+//pub const BTN_NEW_SIM: ButtonId = ButtonId(2);
 pub const BTN_BATCH: ButtonId = ButtonId(3);
 pub const BTN_ZOOM: ButtonId = ButtonId(4);
 
