@@ -76,7 +76,6 @@ impl TheCanvas {
         canvas.add_shape(dgr.clone());
 
         let stxt_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //egui::Pos2::new(360.0, 10.0),
             egui::Pos2::new(200.0, 10.0),
             format!("Rule: {}", inits::INITIAL_RULE),
         )));
@@ -85,7 +84,6 @@ impl TheCanvas {
         let stxt_sample_size: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             //egui::Pos2::new(360.0, 10.0),
             egui::Pos2::new(350.0, 10.0),
-            //format!("Sample size: {}", inits::INITIAL_RULE),
             format!("Sample size: {}", inits::INITIAL_SAMPLE_SIZE),
         )));
         canvas.add_shape(stxt_sample_size.clone()); // coercion to ShapeHandle happens automatically
@@ -128,13 +126,9 @@ impl TheCanvas {
             .borrow_mut()
             .set_text(format!("Rule: {}", world.rule.number()));
 
-        // Update the deltas graph
-        let deltas = world.recalc_deltas();
-        for i in 0..deltas.len() {
-            self.view_handles
-                .dgr
-                .borrow_mut()
-                .set_mean_y(i, deltas.get_deltas(i).mean() as f32);
-        }
+        self.view_handles
+            .stxt_sample_size
+            .borrow_mut()
+            .set_text(format!("Sample size: {}", world.sample_size));
     }
 } // end of impl TheCanvas

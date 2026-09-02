@@ -39,4 +39,3 @@ pub const INITIAL_RULE: u8 = 5; // must be 0 to 15 inclusive
 pub const INITIAL_SAMPLE_SIZE: u32 = 100;
 
 pub const DELTA_GRAPH_POSITION: egui::Pos2 = egui::pos2(100.0, 680.0);
-

@@ -5,7 +5,7 @@ use rand::Rng;
 use statrs::statistics::Statistics;
 
 const SIM_BITS: usize = 6000;
-const DELTAS_VALS: u32 = 250;
+const DELTAS_VALS: usize = 250;
 
 #[derive(Debug)]
 pub struct Deltas {
@@ -14,7 +14,8 @@ pub struct Deltas {
 
 impl Deltas {
     pub fn new(rule: Rule, sample: u32, rng: &mut impl Rng) -> Self {
-        let mut deltas = Vec::<DeltaOnes>::with_capacity(251);
+        //let mut deltas = Vec::<DeltaOnes>::with_capacity(251);
+        let mut deltas = Vec::<DeltaOnes>::with_capacity(DELTAS_VALS + 1);
         for i in (0..=SIM_BITS).step_by(24) {
             deltas.push(DeltaOnes::new(rule, i, sample, rng));
         }
@@ -43,7 +44,7 @@ pub struct DeltaOnes {
 impl DeltaOnes {
     fn new(rule: Rule, ones: usize, sample: u32, rng: &mut impl Rng) -> Self {
         assert!(ones <= SIM_BITS);
-        assert!(sample > 1);
+        assert!(sample > 0);
 
         let mut samples: Vec<f64> = Vec::with_capacity(sample as usize);
         for _ in 0..sample {
@@ -58,14 +59,12 @@ impl DeltaOnes {
 
         let mean = data.mean();
 
-        let std_dev = data.std_dev();
-        let n = data.len() as f64;
-        let sem = std_dev / n.sqrt();
+        // let std_dev = data.std_dev();
+        // let n = data.len() as f64;
+        // let sem = std_dev / n.sqrt();
+        let sem = 0.0;
 
-        Self {
-            mean,
-            sem,
-        }
+        Self { mean, sem }
     }
 
     pub fn mean(&self) -> f64 {

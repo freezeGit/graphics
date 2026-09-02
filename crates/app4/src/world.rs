@@ -10,11 +10,6 @@
 pub mod delta_ones;
 pub mod emerge;
 // ---------------------------------------------------
-
-// use crate::inits::{
-//     INITIAL_RULE, INITIAL_SEQ_DISCARD,
-//     INITIAL_SEQ_LENGTH,
-// };
 use crate::inits::INITIAL_RULE;
 pub(crate) use crate::world::emerge::Rule;
 use crate::world::emerge::{BitArray, Seq, step_bits};

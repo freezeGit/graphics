@@ -31,7 +31,6 @@ impl DeltaGraph {
             let mut rect = Rectangle::new_from_center(
                 // Initial position is off-screen
                 location + egui::vec2(i as f32 * SG_SPACING, -10000.0),
-                //location - egui::vec2(20.0, 0.0) + egui::vec2(i as f32 * SG_SPACING, -10000.0),
                 Vec2::splat(SG_MARK_SIZE),
             );
             rect.set_line_width(1.0);

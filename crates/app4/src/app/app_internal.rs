@@ -104,7 +104,7 @@ impl TheApp {
             self.msgs = msgs;
 
             // Update canvas to reflect all state changes:
-            self.canvas.update(&mut self.world);
+            self.canvas.update(&mut self.world); //TDJ: canvas update. When is this called?
         }
     }
 } // end impl TheApp

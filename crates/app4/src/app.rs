@@ -11,8 +11,8 @@ mod app_internal; // internal functions that do not require application specific
 use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::inits;
-use crate::world::delta_ones::Deltas;
-use crate::world::emerge::BitArray;
+//use crate::world::delta_ones::Deltas;
+//use crate::world::emerge::BitArray;
 use crate::world::{Rule, TheWorld};
 use egui::Context;
 #[allow(unused_imports)]
@@ -22,10 +22,6 @@ use gui_lib::{
     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
     World, app_gl,
 };
-use rand::Rng;
-use statrs::statistics::Statistics;
-use std::fs;
-//use crate::world::delta_ones::DeltaOnes;
 
 /// Main application structure.
 ///
@@ -121,7 +117,7 @@ impl TheApp {
                     .canvas
                     .set_dialog(Box::new(MultiTextEntryDlg::new(
                         DLG_ENTER_SPECS,
-                        "Enter simulation specs",
+                        "Enter simulrule and sample size:",
                         [
                             TextEntryField::new(
                                 "rule",
@@ -129,17 +125,9 @@ impl TheApp {
                                 self.world.rule.number().to_string(),
                             ),
                             TextEntryField::new(
-                                "bitsnum",
-                                "Bits number",
-                                //self.world.bits.len().to_string(),
-                                "Text",
-                            ),
-                            //TextEntryField::new("onesnum", "Ones number", "500"),
-                            TextEntryField::new(
-                                "onesnum",
-                                "Ones number",
-                                //self.world.start_ones.to_string(),
-                                "Text",
+                                "sample_size",
+                                "Sample size",
+                                self.world.sample_size.to_string(),
                             ),
                         ],
                     )));
@@ -158,14 +146,12 @@ impl TheApp {
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
             DLG_ENTER_SPECS => {
-                self.sim_timer.pause();
+                let mut rule = 0;
+                let mut sample_size = 0;
+
+                //self.sim_timer.pause();
 
                 let mut bad_val = false;
-                let mut rule = self.world.rule.number();
-                //let mut bits = self.world.bits.len();
-                let mut bits = 0;
-                //let mut ones = self.world.start_ones;
-                let mut ones = 0;
 
                 for item in values {
                     let (item_id, text) = item;
@@ -185,9 +171,12 @@ impl TheApp {
                                 eprintln!("Could not parse rule number {:?}: {err}", text);
                             }
                         },
-                        "bitsnum" => match text.trim().parse::<usize>() {
-                            Ok(number) if number >= 2 => {
-                                bits = number;
+                        "sample_size" => match text.trim().parse::<u32>() {
+                            // Ok(number)  => {
+                            //     sample_size = number;
+                            //}
+                            Ok(number) if number >= 1 => {
+                                sample_size = number;
                             }
                             Ok(number) => {
                                 bad_val = true;
@@ -198,23 +187,7 @@ impl TheApp {
                                 eprintln!("Could not parse bits number {:?}: {err}", text);
                             }
                         },
-                        "onesnum" => match text.trim().parse::<usize>() {
-                            Ok(number) if number <= bits => {
-                                ones = number;
-                            }
-                            Ok(number) => {
-                                bad_val = true;
-                                eprintln!(
-                                    "Invalid ones number: {number}. \
-                                    Ones number must be smaller than bits number.\
-                                    Wiil be set to number of bits."
-                                );
-                            }
-                            Err(err) => {
-                                bad_val = true;
-                                eprintln!("Could not parse ones number {:?}: {err}", text);
-                            }
-                        },
+
                         _ => {}
                     }
                 }
@@ -226,11 +199,18 @@ impl TheApp {
                         "Bad value(s) entered.",
                     )));
                 } else {
-                    // self.world.rule = Rule::new(rule);
-                    // self.world.bits = 0.into();
-                    //     //BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
-                    // self.world.start_ones = ones;
-                    // self.world.frame_number = 0;
+                    self.world.rule = Rule::new(rule);
+                    self.world.sample_size = sample_size;
+
+                    // Update the deltas graph
+                    let deltas = self.world.recalc_deltas();
+                    for i in 0..deltas.len() {
+                        self.canvas
+                            .view_handles
+                            .dgr
+                            .borrow_mut()
+                            .set_mean_y(i, deltas.get_deltas(i).mean() as f32);
+                    }
                 }
             }
 
