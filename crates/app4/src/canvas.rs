@@ -21,10 +21,8 @@ use gui_lib::{BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Shape, Spa
 
 #[derive(Debug)]
 pub struct ViewHandles {
-    stxt_bits: Rc<RefCell<Text>>,
-    stxt_ones: Rc<RefCell<Text>>,
     stxt_rule: Rc<RefCell<Text>>,
-    stxt_frame: Rc<RefCell<Text>>,
+    stxt_sample_size: Rc<RefCell<Text>>,
     pub dgr: Rc<RefCell<DeltaGraph>>,
 }
 
@@ -77,39 +75,25 @@ impl TheCanvas {
             Rc::new(RefCell::new(DeltaGraph::new(inits::DELTA_GRAPH_POSITION)));
         canvas.add_shape(dgr.clone());
 
-        let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(10.0, 10.0),
-            format!("Bits: {}", inits::INITIAL_BITS_NUM),
-        )));
-        canvas.add_shape(stxt_bits.clone());
-
-        let stxt_ones: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(175.0, 10.0),
-            format!("Ones: {}", inits::INITIAL_ONES),
-        )));
-        canvas.add_shape(stxt_ones.clone());
-
         let stxt_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(360.0, 10.0),
+            //egui::Pos2::new(360.0, 10.0),
+            egui::Pos2::new(200.0, 10.0),
             format!("Rule: {}", inits::INITIAL_RULE),
         )));
         canvas.add_shape(stxt_rule.clone()); // coercion to ShapeHandle happens automatically
 
-        // frame number.
-        let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //eframe::egui::Pos2::new(250.0, 270.0),
-            //egui::Pos2::new(200.0, 10.0),
-            egui::Pos2::new(525.0, 10.0),
-            format!("Interactions: {}", 0),
+        let stxt_sample_size: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            //egui::Pos2::new(360.0, 10.0),
+            egui::Pos2::new(350.0, 10.0),
+            //format!("Sample size: {}", inits::INITIAL_RULE),
+            format!("Sample size: {}", inits::INITIAL_SAMPLE_SIZE),
         )));
-        canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
+        canvas.add_shape(stxt_sample_size.clone()); // coercion to ShapeHandle happens automatically
 
         ViewHandles {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
-            stxt_bits,
-            stxt_ones,
             stxt_rule,
-            stxt_frame,
+            stxt_sample_size,
             dgr,
         }
     }
@@ -121,41 +105,16 @@ impl TheCanvas {
 
         let label1 = Label::new("App4", Color32::BLUE, 20.0);
         canvas.add_widget(Box::new(label1));
-
         canvas.add_widget(Box::new(Space::new(15.0)));
 
         let wb_delta = Button::new(BTN_DELTAS, "Deltas", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_delta));
 
-        let wb_sim = Button::new(BTN_SIM, "Run Sim", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_sim));
-
-        let wb_batch = Button::new(BTN_BATCH, "Batch", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_batch));
-
-        let wb_zoom = Button::new(BTN_ZOOM, "Zoom", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_zoom));
-
-        canvas.add_widget(Box::new(Space::new(25.0)));
-
-        let wb_seq = Button::new(BTN_SEQ, "Sequence", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_seq));
-
-        canvas.add_widget(Box::new(Space::new(250.0)));
+        canvas.add_widget(Box::new(Space::new(350.0)));
 
         let wb_about = Button::new(BTN_ABOUT, "About", 120.0, 40.0);
         canvas.add_widget(Box::new(wb_about));
     }
-
-    // --------------------------------------
-    //TDJ: not used. Should it be?
-    // pub(crate) fn canvas(&self) -> &BasicCanvas {
-    //     &self.canvas
-    // }
-    //TDJ: not used.  Should it be?
-    // pub(crate) fn canvas_mut(&mut self) -> &mut BasicCanvas {
-    //     &mut self.canvas
-    // }
 
     /// Update the state of the canvas based on the current world state.
     ///
@@ -163,33 +122,11 @@ impl TheCanvas {
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
     pub fn update(&mut self, world: &mut TheWorld) {
-        // Set stxt_bits to display bits number
-        self.view_handles
-            .stxt_bits
-            .borrow_mut()
-            .set_text(format!("Bits: {}", world.bits.len()));
-
-        // Set stxt_ones to display ones number
-        self.view_handles
-            .stxt_ones
-            .borrow_mut()
-            .set_text(format!("Ones: {}", world.bits.ones_count()));
-
         // Set stxt_rule to display rule number
         self.view_handles
             .stxt_rule
             .borrow_mut()
             .set_text(format!("Rule: {}", world.rule.number()));
-
-        // Set stxt_frame to display interactionss number
-        self.view_handles
-            .stxt_frame
-            .borrow_mut()
-            .set_text(format!("Interactions: {}", world.frame_number));
-
-        // // Update the sequence graph
-        // let val = world.bits.ones_fraction() as f32;
-        // self.view_handles.dgr.borrow_mut().add_val(val);
 
         // Update the deltas graph
         let deltas = world.recalc_deltas();
@@ -199,8 +136,5 @@ impl TheCanvas {
                 .borrow_mut()
                 .set_mean_y(i, deltas.get_deltas(i).mean() as f32);
         }
-
-        // let val = world.bits.ones_fraction() as f32;
-        // self.view_handles.dgr.borrow_mut().add_val(val);
     }
 } // end of impl TheCanvas
