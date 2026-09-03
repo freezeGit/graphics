@@ -97,7 +97,8 @@ impl DeltaGraph {
     }
 
     pub fn set_mean_y(&mut self, index: usize, y_val: f32) {
-        let x = self.means[index].center().x;
+        //let x = self.means[index].center().x;
+        let x = self.means[index].location().x;
         let y = self.location().y - 0.5 * SG_HEIGHT - 0.25 * y_val * SG_HEIGHT;
         let new_pos = Pos2::new(x, y);
         self.means[index].move_to(new_pos);

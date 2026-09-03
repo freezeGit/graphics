@@ -117,7 +117,7 @@ impl TheApp {
                     .canvas
                     .set_dialog(Box::new(MultiTextEntryDlg::new(
                         DLG_ENTER_SPECS,
-                        "Enter simulrule and sample size:",
+                        "Enter rule and sample size:",
                         [
                             TextEntryField::new(
                                 "rule",
