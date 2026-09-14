@@ -124,7 +124,7 @@ impl TheApp {
                     DLG_ABOUT,
                     "About",
                     "Emergence. \n\
-                    second app",
+                    Using connections",
                 )));
             }
 

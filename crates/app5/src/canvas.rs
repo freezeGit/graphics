@@ -175,7 +175,7 @@ impl TheCanvas {
         // ---- Create and add widgets as Box<dyn Widget>
         canvas.add_widget(Box::new(Space::new(15.0)));
 
-        let label1 = Label::new("App3", Color32::BLUE, 20.0);
+        let label1 = Label::new("App5", Color32::BLUE, 20.0);
         canvas.add_widget(Box::new(label1));
 
         canvas.add_widget(Box::new(Space::new(15.0)));

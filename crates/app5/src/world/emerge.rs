@@ -170,7 +170,7 @@ impl Rule {
         // symmetrically reversible rule
         (self.response(a, b), self.response(b, a))
     }
-}
+} // end of struct
 
 pub struct Seq {
     pub discard: usize,
@@ -194,7 +194,56 @@ impl Seq {
     pub fn len(&self) -> usize {
         self.seq.len()
     }
+} // end of struct
+
+pub struct BitGraph {
+    values: BitArray,
+    connections: BitArray,
 }
+
+// pub fn len(&self) -> usize {
+//     self.values.len()
+// }
+impl BitGraph {
+    pub fn new(nodes: usize) -> Self {
+        assert!(nodes >= 2);
+
+        Self {
+            values: BitArray::new(nodes),
+            connections: BitArray::new(nodes * nodes),
+        }
+    }
+
+    pub fn nodes(&self) -> usize {
+        self.values.len()
+    }
+
+    fn edge_index(&self, a: usize, b: usize) -> usize {
+        a * self.nodes() + b
+    }
+
+    fn is_connected(&self, a: usize, b: usize) -> bool {
+        self.connections.get(self.edge_index(a, b))
+    }
+
+    fn set_connected(&mut self, a: usize, b: usize, connected: bool) {
+        let ab = a * self.nodes() + b;
+        let ba = b * self.nodes() + a;
+
+        self.connections.set(ab, connected);
+        self.connections.set(ba, connected);
+    }
+
+
+
+    // node state:
+    // bit_i = 0 or 1
+    //
+    // relationship state:
+    // edge_ij = 0 or 1
+}
+
+
 
 // --------------------------------------------
 

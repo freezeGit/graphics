@@ -14,7 +14,7 @@ use crate::inits::{
     INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_RULE, INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
 };
 pub(crate) use crate::world::emerge::Rule;
-use crate::world::emerge::{BitArray, Seq, step_bits};
+use crate::world::emerge::{step_bits, BitArray, BitGraph, Seq};
 use gui_lib::World;
 use rand::rngs::ThreadRng;
 use rand::{Rng, RngExt};
@@ -23,9 +23,19 @@ use rand::{Rng, RngExt};
 /// It has no dependence on gui_lib and no dependence on egui.
 /// It has no dependence on the app1 struct or the canvas struct.
 //#[derive(Debug)] // TDJ: Debug is not needed
+// pub struct TheWorld {
+//     pub rng: ThreadRng,
+//     pub bits: BitArray,
+//     pub rule: Rule,
+//     pub start_ones: usize,
+//     pub attractor: Seq,
+//     pub frame_number: u64,
+// }
+
 pub struct TheWorld {
     pub rng: ThreadRng,
     pub bits: BitArray,
+    pub bit_graph: BitGraph,
     pub rule: Rule,
     pub start_ones: usize,
     pub attractor: Seq,
@@ -50,6 +60,7 @@ impl TheWorld {
         Self {
             rng: rand::rng(),
             bits: BitArray::new(INITIAL_BITS_NUM),
+            bit_graph: BitGraph::new(INITIAL_BITS_NUM),
             rule: Rule::new(INITIAL_RULE),
             start_ones: INITIAL_ONES,
             //attractor: Seq::new(INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH),
