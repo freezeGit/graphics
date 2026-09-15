@@ -223,13 +223,15 @@ impl TheCanvas {
         self.view_handles
             .stxt_bits
             .borrow_mut()
-            .set_text(format!("Bits: {}", world.bits.len()));
+            //.set_text(format!("Bits: {}", world.bits.len()));
+            .set_text(format!("Bits: {}", world.bit_graph.nodes()));
 
         // Set stxt_ones to display ones number
         self.view_handles
             .stxt_ones
             .borrow_mut()
-            .set_text(format!("Ones: {}", world.bits.ones_count()));
+            //.set_text(format!("Ones: {}", world.bits.ones_count()));
+            .set_text(format!("Ones: {}", world.bit_graph.values.ones_count()));
 
         // Set stxt_rule to display rule number
         self.view_handles
@@ -244,11 +246,13 @@ impl TheCanvas {
             .set_text(format!("Interactions: {}", world.frame_number));
 
         // Update the sequence graph
-        let val = world.bits.ones_fraction() as f32;
+        //let val = world.bits.ones_fraction() as f32;
+        let val = world.bit_graph.ones_fraction() as f32;
         self.view_handles.sgr.borrow_mut().add_val(val);
 
         // Update the line length
-        let length = 950.0 * (world.bits.ones_fraction() as f32);
+        //let length = 950.0 * (world.bits.ones_fraction() as f32);
+        let length = 950.0 * (world.bit_graph.ones_fraction() as f32);
         self.view_handles.sln2.borrow_mut().set_length(length);
     }
 } // end of impl TheCanvas

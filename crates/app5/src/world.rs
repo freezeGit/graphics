@@ -22,19 +22,10 @@ use rand::{Rng, RngExt};
 /// TheWorld struct encapsulates application data and logic.
 /// It has no dependence on gui_lib and no dependence on egui.
 /// It has no dependence on the app1 struct or the canvas struct.
-//#[derive(Debug)] // TDJ: Debug is not needed
-// pub struct TheWorld {
-//     pub rng: ThreadRng,
-//     pub bits: BitArray,
-//     pub rule: Rule,
-//     pub start_ones: usize,
-//     pub attractor: Seq,
-//     pub frame_number: u64,
-// }
-
+//#[derive(Debug)] // TDJ: Debug is not needed pub struct
 pub struct TheWorld {
     pub rng: ThreadRng,
-    pub bits: BitArray,
+    //pub bits: BitArray,
     pub bit_graph: BitGraph,
     pub rule: Rule,
     pub start_ones: usize,
@@ -51,7 +42,9 @@ impl World for TheWorld {
         // Increment frame number each simulation step.
         self.frame_number += 1;
         // Advance simulation by one step.
-        step_bits(&mut self.bits, self.rule, &mut self.rng);
+        //step_bits(&mut self.bits, self.rule, &mut self.rng);
+        // TDJ: Needs work
+        step_bits(&mut self.bit_graph.values, self.rule, &mut self.rng);
     }
 }
 
@@ -59,7 +52,7 @@ impl TheWorld {
     pub fn new() -> Self {
         Self {
             rng: rand::rng(),
-            bits: BitArray::new(INITIAL_BITS_NUM),
+            //bits: BitArray::new(INITIAL_BITS_NUM),
             bit_graph: BitGraph::new(INITIAL_BITS_NUM),
             rule: Rule::new(INITIAL_RULE),
             start_ones: INITIAL_ONES,

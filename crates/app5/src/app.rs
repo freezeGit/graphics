@@ -22,7 +22,7 @@ use std::fs;
 
 use crate::canvas::TheCanvas;
 use crate::ids::*;
-use crate::world::emerge::BitArray;
+use crate::world::emerge::{BitArray, BitGraph};
 use crate::world::{Rule, TheWorld};
 
 /// Constants for simulation state choice. 1 = Run, 2 = Pause, 3 = Fast-forward.
@@ -168,7 +168,8 @@ impl TheApp {
                             TextEntryField::new(
                                 "bitsnum",
                                 "Bits number",
-                                self.world.bits.len().to_string(),
+                                //self.world.bits.len().to_string(),
+                                self.world.bit_graph.nodes().to_string(),
                             ),
                             //TextEntryField::new("onesnum", "Ones number", "500"),
                             TextEntryField::new(
@@ -280,7 +281,8 @@ impl TheApp {
 
                 let mut bad_val = false;
                 let mut rule = self.world.rule.number();
-                let mut bits = self.world.bits.len();
+                //let mut bits = self.world.bits.len();
+                let mut bits = self.world.bit_graph.nodes();
                 let mut ones = self.world.start_ones;
 
                 for item in values {
@@ -343,8 +345,10 @@ impl TheApp {
                     )));
                 } else {
                     self.world.rule = Rule::new(rule);
-                    self.world.bits =
-                        BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
+                    // self.world.bits =
+                    //     BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
+                    self.world.bit_graph =
+                        BitGraph::new_with_random_ones(bits, ones, &mut self.world.rng);
                     self.world.start_ones = ones;
                     self.world.frame_number = 0;
                 }
@@ -462,7 +466,8 @@ impl TheApp {
                         self.world
                             .attractor
                             .seq
-                            .push(self.world.bits.ones_count().try_into().unwrap());
+                            //.push(self.world.bits.ones_count().try_into().unwrap());
+                            .push(self.world.bit_graph.values.ones_count().try_into().unwrap());
                         self.world.advance();
                     }
 

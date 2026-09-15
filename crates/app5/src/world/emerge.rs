@@ -197,7 +197,7 @@ impl Seq {
 } // end of struct
 
 pub struct BitGraph {
-    values: BitArray,
+    pub values: BitArray,  // TDJ: Can I get rid of pub?
     connections: BitArray,
 }
 
@@ -205,6 +205,7 @@ pub struct BitGraph {
 //     self.values.len()
 // }
 impl BitGraph {
+    // TDJ: May want to add a new() function to initialize a graph with a given number of nodes
     pub fn new(nodes: usize) -> Self {
         assert!(nodes >= 2);
 
@@ -214,9 +215,74 @@ impl BitGraph {
         }
     }
 
+    pub fn new_with_random_ones(len: usize, initial_ones: usize, rng: &mut impl Rng) -> Self {
+        assert!(len >= 2, "BitArray length must be at least 2, got {len}");
+        assert!(
+            initial_ones <= len,
+            "Initial ones cannot exceed total length"
+        );
+
+        let mut grph = Self::new(len);
+
+        let mut indices: Vec<usize> = (0..len).collect();
+        indices.shuffle(rng);
+
+        for &i in &indices[..initial_ones] {
+            grph.set_node(i, true);
+        }
+
+        grph
+    }
+
     pub fn nodes(&self) -> usize {
         self.values.len()
     }
+
+    pub fn get_node(&self, i: usize) -> bool {
+        debug_assert!(i < self.nodes());
+
+        let word_index = i / 64;
+        let bit_index = i % 64;
+
+        //(self.words[word_index] & (1u64 << bit_index)) != 0
+        (self.values.words[word_index] & (1u64 << bit_index)) != 0
+    }
+
+    pub fn set_node(&mut self, i: usize, value: bool) {
+        //debug_assert!(i < self.len);
+        debug_assert!(i < self.nodes());
+
+        let word_index = i / 64;
+        let bit_index = i % 64;
+        let mask = 1u64 << bit_index;
+
+        if value {
+            //self.words[word_index] |= mask;
+            self.values.words[word_index] |= mask;
+        } else {
+            //self.words[word_index] &= !mask;
+            self.values.words[word_index] &= !mask;
+        }
+    }
+
+    pub fn ones_count(&self) -> usize {
+        self.values.ones_count()
+    }
+
+    pub fn ones_fraction(&self) -> f64 {
+        self.values.ones_fraction()
+    }
+
+    // pub fn step_bits(grph: &mut BitGraph, rule: Rule, rng: &mut impl Rng) {
+    //     grph.values.step_bits()
+    //
+    //     // let n = bits.len();
+    //     //
+    //     // let i = rng.random_range(0..n);
+    //     // let j = rng.random_range(0..n);
+    //     //
+    //     // interact(bits, rule, i, j);
+    // //}
 
     fn edge_index(&self, a: usize, b: usize) -> usize {
         a * self.nodes() + b
