@@ -205,7 +205,7 @@ pub struct BitGraph {
 //     self.values.len()
 // }
 impl BitGraph {
-    // TDJ: May want to add a new() function to initialize a graph with a given number of nodes
+    // TDJ: May want to add a new() function to initialize a graph with an initial number of nodes
     pub fn new(nodes: usize) -> Self {
         assert!(nodes >= 2);
 
@@ -215,16 +215,16 @@ impl BitGraph {
         }
     }
 
-    pub fn new_with_random_ones(len: usize, initial_ones: usize, rng: &mut impl Rng) -> Self {
-        assert!(len >= 2, "BitArray length must be at least 2, got {len}");
+    pub fn new_with_random_ones(nodes: usize, initial_ones: usize, rng: &mut impl Rng) -> Self {
+        assert!(nodes >= 2, "BitArray nodes must be at least 2, got {nodes}");
         assert!(
-            initial_ones <= len,
-            "Initial ones cannot exceed total length"
+            initial_ones <= nodes,
+            "Initial ones cannot exceed total number of nodes"
         );
 
-        let mut grph = Self::new(len);
+        let mut grph = Self::new(nodes);
 
-        let mut indices: Vec<usize> = (0..len).collect();
+        let mut indices: Vec<usize> = (0..nodes).collect();
         indices.shuffle(rng);
 
         for &i in &indices[..initial_ones] {
@@ -244,12 +244,10 @@ impl BitGraph {
         let word_index = i / 64;
         let bit_index = i % 64;
 
-        //(self.words[word_index] & (1u64 << bit_index)) != 0
         (self.values.words[word_index] & (1u64 << bit_index)) != 0
     }
 
     pub fn set_node(&mut self, i: usize, value: bool) {
-        //debug_assert!(i < self.len);
         debug_assert!(i < self.nodes());
 
         let word_index = i / 64;
@@ -273,23 +271,12 @@ impl BitGraph {
         self.values.ones_fraction()
     }
 
-    // pub fn step_bits(grph: &mut BitGraph, rule: Rule, rng: &mut impl Rng) {
-    //     grph.values.step_bits()
-    //
-    //     // let n = bits.len();
-    //     //
-    //     // let i = rng.random_range(0..n);
-    //     // let j = rng.random_range(0..n);
-    //     //
-    //     // interact(bits, rule, i, j);
-    // //}
-
-    fn edge_index(&self, a: usize, b: usize) -> usize {
+    fn node_index(&self, a: usize, b: usize) -> usize {
         a * self.nodes() + b
     }
 
     fn is_connected(&self, a: usize, b: usize) -> bool {
-        self.connections.get(self.edge_index(a, b))
+        self.connections.get(self.node_index(a, b))
     }
 
     fn set_connected(&mut self, a: usize, b: usize, connected: bool) {
