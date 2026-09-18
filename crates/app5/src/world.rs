@@ -13,9 +13,9 @@ pub mod emerge;
 use crate::inits::{
     INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_RULE, INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
 };
-//pub(crate) use crate::world::emerge::Rule;
 pub(crate) use crate::world::emerge::BitsRule;
-use crate::world::emerge::{step_bits, step_bg, BitArray, BitGraph, Seq, CntnsRule};
+//use crate::world::emerge::{step_bits, step_bg, BitArray, BitGraph, Seq, CntnsRule};
+use crate::world::emerge::{step_bg, BitArray, BitGraph, Seq, CntnsRule};
 use gui_lib::World;
 use rand::rngs::ThreadRng;
 use rand::{Rng, RngExt};

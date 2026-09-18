@@ -95,16 +95,16 @@ impl BitArray {
     }
 } // end of BitArray
 
-pub fn step_bits(bits: &mut BitArray, rule: BitsRule, rng: &mut impl Rng) {
-    let n = bits.len();
+// pub fn step_bits(bits: &mut BitArray, rule: BitsRule, rng: &mut impl Rng) {
+//     let n = bits.len();
+//
+//     let i = rng.random_range(0..n);
+//     let j = rng.random_range(0..n);
+//
+//     interact(bits, rule, i, j);
+// }
 
-    let i = rng.random_range(0..n);
-    let j = rng.random_range(0..n);
-
-    interact(bits, rule, i, j);
-}
-
-fn interact(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
+fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
     if i == j {
         return;
     }
@@ -167,7 +167,7 @@ impl BitsRule {
         // symmetrically reversible rule
         (self.response(a, b), self.response(b, a))
     }
-} // end of struct
+} // end of impl BitsRule
 
 pub struct Seq {
     pub discard: usize,
@@ -291,14 +291,17 @@ impl BitGraph {
     // edge_ij = 0 or 1
 } // end Impl BitGraph
 
-pub fn step_cntns(bg: &mut BitGraph, cntns_rule: CntnsRule, rng: &mut impl Rng) {
-// TDJ code this
-}
+// TDJ: code change_cntn()
+fn change_cntn(bg: &mut BitGraph, rule: CntnsRule, i: usize, j: usize) {}
 
-pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, _cntns_rule: CntnsRule, rng: &mut impl Rng) {
-    step_bits(&mut bg.values, bits_rule, rng);
+pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cntns_rule: CntnsRule, rng: &mut impl Rng) {
+    let n = bg.nodes();
 
-    // TDJ: this function will also call step_cntns()
+    let i = rng.random_range(0..n);
+    let j = rng.random_range(0..n);
+
+    interact_bits(&mut bg.values, bits_rule, i, j);
+    change_cntn(bg, cntns_rule, i, j);
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -325,18 +328,6 @@ impl CntnsRule {
     //fn bit(n: u8, i: u8) -> bool {
     //((n >> i) & 1) != 0
     //}
-
-    // fn response(self, this: bool, other: bool) -> bool {
-    //     // The two bits are equal
-    //     if this == other {
-    //         if this { self.flags[0] } else { self.flags[1] }
-    //     // The two bits are different
-    //     } else if this {
-    //         self.flags[2]
-    //     } else {
-    //         self.flags[3]
-    //     }
-    // }
 
     fn apply(self, a: bool, b: bool) -> (bool, bool) {
         // symmetrically reversible rule
