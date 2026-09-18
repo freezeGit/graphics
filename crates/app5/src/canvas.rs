@@ -23,7 +23,7 @@ use gui_lib::{BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Shape, Spa
 pub struct ViewHandles {
     stxt_bits: Rc<RefCell<Text>>,
     stxt_ones: Rc<RefCell<Text>>,
-    stxt_rule: Rc<RefCell<Text>>,
+    stxt_bits_rule: Rc<RefCell<Text>>,
     stxt_frame: Rc<RefCell<Text>>,
     pub stxt_batch: Rc<RefCell<Text>>,
     pub stxt_scale: Rc<RefCell<Text>>,
@@ -94,11 +94,11 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxt_ones.clone());
 
-        let stxt_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+        let stxt_bits_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(360.0, 10.0),
-            format!("Rule: {}", inits::INITIAL_RULE),
+            format!("Bits Rule: {}", inits::INITIAL_RULE),
         )));
-        canvas.add_shape(stxt_rule.clone()); // coercion to ShapeHandle happens automatically
+        canvas.add_shape(stxt_bits_rule.clone()); // coercion to ShapeHandle happens automatically
 
         // frame number.
         let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
@@ -160,7 +160,7 @@ impl TheCanvas {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
             stxt_bits,
             stxt_ones,
-            stxt_rule,
+            stxt_bits_rule,
             stxt_frame,
             stxt_batch,
             stxt_scale,
@@ -235,9 +235,9 @@ impl TheCanvas {
 
         // Set stxt_rule to display rule number
         self.view_handles
-            .stxt_rule
+            .stxt_bits_rule
             .borrow_mut()
-            .set_text(format!("Rule: {}", world.rule.number()));
+            .set_text(format!("Bits Rule: {}", world.bits_rule.number()));
 
         // Set stxt_frame to display interactionss number
         self.view_handles

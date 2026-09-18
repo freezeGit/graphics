@@ -164,7 +164,7 @@ impl TheApp {
                             TextEntryField::new(
                                 "rule",
                                 "Rule (0 to 15)",
-                                self.world.rule.number().to_string(),
+                                self.world.bits_rule.number().to_string(),
                             ),
                             TextEntryField::new(
                                 "bitsnum",
@@ -281,8 +281,7 @@ impl TheApp {
                 self.sim_timer.pause();
 
                 let mut bad_val = false;
-                let mut rule = self.world.rule.number();
-                //let mut bits = self.world.bits.len();
+                let mut rule = self.world.bits_rule.number();
                 let mut bits = self.world.bit_graph.nodes();
                 let mut ones = self.world.start_ones;
 
@@ -345,7 +344,7 @@ impl TheApp {
                         "Bad value(s) entered.",
                     )));
                 } else {
-                    self.world.rule = BitsRule::new(rule);
+                    self.world.bits_rule = BitsRule::new(rule);
                     // self.world.bits =
                     //     BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
                     self.world.bit_graph =

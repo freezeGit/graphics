@@ -194,7 +194,7 @@ impl Seq {
 } // end of struct
 
 pub struct BitGraph {
-    pub values: BitArray,  // TDJ: Can I get rid of pub?
+    pub values: BitArray, // TDJ: Can I get rid of pub?
     connections: BitArray,
 }
 
@@ -282,18 +282,27 @@ impl BitGraph {
 
         self.connections.set(ab, connected);
         self.connections.set(ba, connected);
-    } //
-
-
+    }
 
     // node state:
     // bit_i = 0 or 1
     //
     // relationship state:
     // edge_ij = 0 or 1
-} // Impl BitGrapg
+} // end Impl BitGraph
+
+pub fn step_cntns(bg: &mut BitGraph, cntns_rule: CntnsRule, rng: &mut impl Rng) {
+// TDJ code this
+}
+
+pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, _cntns_rule: CntnsRule, rng: &mut impl Rng) {
+    step_bits(&mut bg.values, bits_rule, rng);
+
+    // TDJ: this function will also call step_cntns()
+}
 
 #[derive(Debug, Clone, Copy)]
+//pub struct RuleCntns {
 pub struct CntnsRule {
     number: u8,
     //flags: [bool; 4],
@@ -306,9 +315,7 @@ impl CntnsRule {
             "Connections Rule number must be less than 4, got {number}"
         );
 
-        Self {
-            number,
-                    }
+        Self { number }
     }
 
     pub fn number(&self) -> u8 {
@@ -316,7 +323,7 @@ impl CntnsRule {
     }
 
     //fn bit(n: u8, i: u8) -> bool {
-        //((n >> i) & 1) != 0
+    //((n >> i) & 1) != 0
     //}
 
     // fn response(self, this: bool, other: bool) -> bool {
