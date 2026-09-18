@@ -23,7 +23,8 @@ use std::fs;
 use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::world::emerge::{BitArray, BitGraph};
-use crate::world::{Rule, TheWorld};
+//use crate::world::{Rule, TheWorld};
+use crate::world::{BitsRule, TheWorld};
 
 /// Constants for simulation state choice. 1 = Run, 2 = Pause, 3 = Fast-forward.
 const CHOICE_RUN: i32 = 1;
@@ -344,7 +345,7 @@ impl TheApp {
                         "Bad value(s) entered.",
                     )));
                 } else {
-                    self.world.rule = Rule::new(rule);
+                    self.world.rule = BitsRule::new(rule);
                     // self.world.bits =
                     //     BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
                     self.world.bit_graph =

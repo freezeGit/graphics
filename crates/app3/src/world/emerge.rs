@@ -119,14 +119,17 @@ fn interact(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
     bits.set(j, new_b);
 }
 
+// #[derive(Debug, Clone, Copy)]
+// pub struct Rule {
+//     number: u8,
+//     flags: [bool; 4],
+// }
+
 #[derive(Debug, Clone, Copy)]
 pub struct Rule {
     number: u8,
     flags: [bool; 4],
 }
-
-// #[derive(Debug, Clone, Copy)]
-// pub(crate) struct Rule(bool, bool, bool, bool);
 
 impl Rule {
     pub fn new(number: u8) -> Self {

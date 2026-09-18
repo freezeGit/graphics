@@ -95,7 +95,7 @@ impl BitArray {
     }
 } // end of BitArray
 
-pub fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
+pub fn step_bits(bits: &mut BitArray, rule: BitsRule, rng: &mut impl Rng) {
     let n = bits.len();
 
     let i = rng.random_range(0..n);
@@ -104,7 +104,7 @@ pub fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
     interact(bits, rule, i, j);
 }
 
-fn interact(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
+fn interact(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
     if i == j {
         return;
     }
@@ -120,15 +120,12 @@ fn interact(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct Rule {
+pub struct BitsRule {
     number: u8,
     flags: [bool; 4],
 }
 
-// #[derive(Debug, Clone, Copy)]
-// pub(crate) struct Rule(bool, bool, bool, bool);
-
-impl Rule {
+impl BitsRule {
     pub fn new(number: u8) -> Self {
         assert!(
             number < 16,
@@ -285,7 +282,7 @@ impl BitGraph {
 
         self.connections.set(ab, connected);
         self.connections.set(ba, connected);
-    }
+    } //
 
 
 
@@ -294,9 +291,52 @@ impl BitGraph {
     //
     // relationship state:
     // edge_ij = 0 or 1
+} // Impl BitGrapg
+
+#[derive(Debug, Clone, Copy)]
+pub struct CntnsRule {
+    number: u8,
+    //flags: [bool; 4],
 }
 
+impl CntnsRule {
+    pub fn new(number: u8) -> Self {
+        assert!(
+            number < 4,
+            "Connections Rule number must be less than 4, got {number}"
+        );
 
+        Self {
+            number,
+                    }
+    }
+
+    pub fn number(&self) -> u8 {
+        self.number
+    }
+
+    //fn bit(n: u8, i: u8) -> bool {
+        //((n >> i) & 1) != 0
+    //}
+
+    // fn response(self, this: bool, other: bool) -> bool {
+    //     // The two bits are equal
+    //     if this == other {
+    //         if this { self.flags[0] } else { self.flags[1] }
+    //     // The two bits are different
+    //     } else if this {
+    //         self.flags[2]
+    //     } else {
+    //         self.flags[3]
+    //     }
+    // }
+
+    fn apply(self, a: bool, b: bool) -> (bool, bool) {
+        // symmetrically reversible rule
+        //(self.response(a, b), self.response(b, a))
+        (true, true)
+    }
+}
 
 // --------------------------------------------
 
