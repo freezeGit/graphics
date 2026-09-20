@@ -11,11 +11,10 @@ pub mod emerge;
 // ---------------------------------------------------
 
 use crate::inits::{
-    INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_CNTNS, INITIAL_BITS_RULE, INITIAL_CNTN_RULE, INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
+    INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_CNCTNS, INITIAL_BITS_RULE, INITIAL_CNCTN_RULE, INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
 };
 pub(crate) use crate::world::emerge::BitsRule;
-//use crate::world::emerge::{step_bits, step_bg, BitArray, BitGraph, Seq, CntnsRule};
-use crate::world::emerge::{step_bg, BitArray, BitGraph, Seq, CntnsRule};
+use crate::world::emerge::{step_bg, BitArray, BitGraph, Seq, CnctnsRule};
 use gui_lib::World;
 use rand::rngs::ThreadRng;
 use rand::{Rng, RngExt};
@@ -23,15 +22,14 @@ use rand::{Rng, RngExt};
 /// TheWorld struct encapsulates application data and logic.
 /// It has no dependence on gui_lib and no dependence on egui.
 /// It has no dependence on the app1 struct or the canvas struct.
-//#[derive(Debug)] // TDJ: Debug is not needed pub struct
 
 pub struct TheWorld {
     pub rng: ThreadRng,
     pub bit_graph: BitGraph,
     pub bits_rule: BitsRule,
-    pub cntns_rule: CntnsRule,
+    pub cnctns_rule: CnctnsRule,
     pub start_ones: usize,
-    pub start_cntns: usize,
+    pub start_cnctns: usize,
     pub attractor: Seq,
     pub frame_number: u64,
 }
@@ -45,7 +43,7 @@ impl World for TheWorld {
         // Increment frame number each simulation step.
         self.frame_number += 1;
         // Advance simulation by one step.
-        step_bg(&mut self.bit_graph, self.bits_rule, self.cntns_rule, &mut self.rng);
+        step_bg(&mut self.bit_graph, self.bits_rule, self.cnctns_rule, &mut self.rng);
     }
 }
 
@@ -55,9 +53,9 @@ impl TheWorld {
             rng: rand::rng(),
             bit_graph: BitGraph::new(INITIAL_BITS_NUM),
             bits_rule: BitsRule::new(INITIAL_BITS_RULE),
-            cntns_rule: CntnsRule::new(INITIAL_CNTN_RULE),
+            cnctns_rule: CnctnsRule::new(INITIAL_CNCTN_RULE),
             start_ones: INITIAL_ONES,
-            start_cntns: INITIAL_CNTNS,
+            start_cnctns: INITIAL_CNCTNS,
             attractor: Seq::new(INITIAL_SEQ_DISCARD),
             frame_number: 0,
         }

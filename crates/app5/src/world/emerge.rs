@@ -282,7 +282,7 @@ impl BitGraph {
     }
 } // end Impl BitGraph
 
-fn change_cntn(bg: &mut BitGraph, rule: CntnsRule, i: usize, j: usize) {
+fn change_cnctn(bg: &mut BitGraph, rule: CnctnsRule, i: usize, j: usize) {
     match rule.number {
         // No change
         0 => {}
@@ -308,26 +308,26 @@ fn change_cntn(bg: &mut BitGraph, rule: CntnsRule, i: usize, j: usize) {
     }
 }
 
-pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cntns_rule: CntnsRule, rng: &mut impl Rng) {
+pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cnctns_rule: CnctnsRule, rng: &mut impl Rng) {
     let n = bg.nodes();
 
     let i = rng.random_range(0..n);
     let j = rng.random_range(0..n);
 
     interact_bits(&mut bg.values, bits_rule, i, j);
-    change_cntn(bg, cntns_rule, i, j);
+    change_cnctn(bg, cnctns_rule, i, j);
 
     //println!("Connection: {}", bg.is_connected(i, j));
 }
 
 #[derive(Debug, Clone, Copy)]
-//pub struct RuleCntns {
-pub struct CntnsRule {
+//pub struct Rulecnctns {
+pub struct CnctnsRule {
     number: u8,
     //flags: [bool; 4],
 }
 
-impl CntnsRule {
+impl CnctnsRule {
     pub fn new(number: u8) -> Self {
         assert!(
             number < 4,
