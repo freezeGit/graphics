@@ -96,7 +96,7 @@ impl TheCanvas {
 
         let stxt_bits_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(360.0, 10.0),
-            format!("Bits Rule: {}", inits::INITIAL_RULE),
+            format!("Bits Rule: {}", inits::INITIAL_BITS_RULE),
         )));
         canvas.add_shape(stxt_bits_rule.clone()); // coercion to ShapeHandle happens automatically
 

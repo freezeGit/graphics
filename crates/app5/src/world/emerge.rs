@@ -198,9 +198,6 @@ pub struct BitGraph {
     connections: BitArray,
 }
 
-// pub fn len(&self) -> usize {
-//     self.values.len()
-// }
 impl BitGraph {
     // TDJ: May want to add a new() function to initialize a graph with an initial number of nodes
     pub fn new(nodes: usize) -> Self {
@@ -283,16 +280,33 @@ impl BitGraph {
         self.connections.set(ab, connected);
         self.connections.set(ba, connected);
     }
-
-    // node state:
-    // bit_i = 0 or 1
-    //
-    // relationship state:
-    // edge_ij = 0 or 1
 } // end Impl BitGraph
 
-// TDJ: code change_cntn()
-fn change_cntn(bg: &mut BitGraph, rule: CntnsRule, i: usize, j: usize) {}
+fn change_cntn(bg: &mut BitGraph, rule: CntnsRule, i: usize, j: usize) {
+    match rule.number {
+        // No change
+        0 => {}
+        // Toggle connection
+        1 => {
+            if bg.is_connected(i, j) {
+                bg.set_connected(i, j, false);
+            } else {
+                bg.set_connected(i, j, true);
+            }
+        }
+        // Connect
+        2 => {
+            bg.set_connected(i, j, true);
+        }
+        // Disconnect
+        3 => {
+            bg.set_connected(i, j, false);
+        }
+        _ => {
+            panic!("Connections Rule number must be less than 4, got {}", rule.number);
+        }
+    }
+}
 
 pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cntns_rule: CntnsRule, rng: &mut impl Rng) {
     let n = bg.nodes();
@@ -302,6 +316,8 @@ pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cntns_rule: CntnsRule, rn
 
     interact_bits(&mut bg.values, bits_rule, i, j);
     change_cntn(bg, cntns_rule, i, j);
+
+    //println!("Connection: {}", bg.is_connected(i, j));
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -323,16 +339,6 @@ impl CntnsRule {
 
     pub fn number(&self) -> u8 {
         self.number
-    }
-
-    //fn bit(n: u8, i: u8) -> bool {
-    //((n >> i) & 1) != 0
-    //}
-
-    fn apply(self, a: bool, b: bool) -> (bool, bool) {
-        // symmetrically reversible rule
-        //(self.response(a, b), self.response(b, a))
-        (true, true)
     }
 }
 
