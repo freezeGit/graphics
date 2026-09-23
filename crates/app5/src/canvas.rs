@@ -194,8 +194,8 @@ impl TheCanvas {
 
         canvas.add_widget(Box::new(Space::new(25.0)));
 
-        let wb_seq = Button::new(BTN_SEQ, "Sequence", 120.0, 40.0);
-        canvas.add_widget(Box::new(wb_seq));
+        // let wb_seq = Button::new(BTN_SEQ, "Sequence", 120.0, 40.0);
+        // canvas.add_widget(Box::new(wb_seq));
 
         canvas.add_widget(Box::new(Space::new(250.0)));
 
@@ -219,19 +219,21 @@ impl TheCanvas {
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
     pub fn update(&mut self, world: &TheWorld) {
+        let ones_count = world.bit_graph.values.ones_count();
+        assert_ne!(world.bit_graph.nodes(), 0);
+        let ones_fraction = ones_count as f64 / world.bit_graph.nodes() as f64;
+
         // Set stxt_bits to display bits number
         self.view_handles
             .stxt_bits
             .borrow_mut()
-            //.set_text(format!("Bits: {}", world.bits.len()));
             .set_text(format!("Bits: {}", world.bit_graph.nodes()));
 
         // Set stxt_ones to display ones number
         self.view_handles
             .stxt_ones
             .borrow_mut()
-            //.set_text(format!("Ones: {}", world.bits.ones_count()));
-            .set_text(format!("Ones: {}", world.bit_graph.values.ones_count()));
+            .set_text(format!("Ones: {}", ones_count));
 
         // Set stxt_rule to display rule number
         self.view_handles
@@ -246,13 +248,13 @@ impl TheCanvas {
             .set_text(format!("Interactions: {}", world.frame_number));
 
         // Update the sequence graph
-        //let val = world.bits.ones_fraction() as f32;
-        let val = world.bit_graph.ones_fraction() as f32;
+        //let val = world.bit_graph.ones_fraction() as f32;
+        let val = ones_fraction as f32;
         self.view_handles.sgr.borrow_mut().add_val(val);
 
         // Update the line length
-        //let length = 950.0 * (world.bits.ones_fraction() as f32);
-        let length = 950.0 * (world.bit_graph.ones_fraction() as f32);
+        //let length = 950.0 * (world.bit_graph.ones_fraction() as f32);
+        let length = 950.0 * (ones_fraction as f32);
         self.view_handles.sln2.borrow_mut().set_length(length);
     }
 } // end of impl TheCanvas

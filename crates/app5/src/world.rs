@@ -14,7 +14,8 @@ use crate::inits::{
     INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_CNCTNS, INITIAL_BITS_RULE, INITIAL_CNCTN_RULE, INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
 };
 pub(crate) use crate::world::emerge::BitsRule;
-use crate::world::emerge::{step_bg, BitArray, BitGraph, Seq, CnctnsRule};
+//use crate::world::emerge::{step_bg, BitArray, BitGraph, Seq, CnctnsRule};
+use crate::world::emerge::{step_bg, BitArray, BitGraph, CnctnsRule};
 use gui_lib::World;
 use rand::rngs::ThreadRng;
 use rand::{Rng, RngExt};
@@ -30,7 +31,6 @@ pub struct TheWorld {
     pub cnctns_rule: CnctnsRule,
     pub start_ones: usize,
     pub start_cnctns: usize,
-    pub attractor: Seq,
     pub frame_number: u64,
 }
 
@@ -56,7 +56,7 @@ impl TheWorld {
             cnctns_rule: CnctnsRule::new(INITIAL_CNCTN_RULE),
             start_ones: INITIAL_ONES,
             start_cnctns: INITIAL_CNCTNS,
-            attractor: Seq::new(INITIAL_SEQ_DISCARD),
+            //attractor: Seq::new(INITIAL_SEQ_DISCARD),
             frame_number: 0,
         }
     }

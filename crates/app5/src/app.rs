@@ -215,33 +215,33 @@ impl TheApp {
                     )));
             }
 
-            BTN_SEQ => {
-                let mut the_len = self.world.attractor.len();
-                if the_len == 0 {
-                    the_len = inits::INITIAL_SEQ_LENGTH;
-                }
-
-                self.canvas
-                    .canvas
-                    .set_dialog(Box::new(MultiTextEntryDlg::new(
-                        DLG_SEQUENCE,
-                        "Enter sequence specs",
-                        [
-                            TextEntryField::new(
-                                "discard",
-                                "Discard interactions",
-                                self.world.attractor.discard.to_string(),
-                                //inits::INITIAL_SEQ_DISCARD.to_string(),
-                            ),
-                            TextEntryField::new(
-                                "seq_length",
-                                "Sequence length",
-                                //inits::INITIAL_SEQ_LENGTH.to_string(),
-                                the_len.to_string(),
-                            ),
-                        ],
-                    )));
-            }
+            // BTN_SEQ => {
+            //     let mut the_len = self.world.attractor.len();
+            //     if the_len == 0 {
+            //         the_len = inits::INITIAL_SEQ_LENGTH;
+            //     }
+            //
+            //     self.canvas
+            //         .canvas
+            //         .set_dialog(Box::new(MultiTextEntryDlg::new(
+            //             DLG_SEQUENCE,
+            //             "Enter sequence specs",
+            //             [
+            //                 TextEntryField::new(
+            //                     "discard",
+            //                     "Discard interactions",
+            //                     self.world.attractor.discard.to_string(),
+            //                     //inits::INITIAL_SEQ_DISCARD.to_string(),
+            //                 ),
+            //                 TextEntryField::new(
+            //                     "seq_length",
+            //                     "Sequence length",
+            //                     //inits::INITIAL_SEQ_LENGTH.to_string(),
+            //                     the_len.to_string(),
+            //                 ),
+            //             ],
+            //         )));
+            // }
 
             _ => {}
         }
@@ -414,130 +414,130 @@ impl TheApp {
                 }
             }
 
-            DLG_SEQUENCE => {
-                let mut discard: usize = 0;
-                let mut seq_len: usize = 0;
-                let mut bad_val = false;
-
-                for item in values {
-                    let (item_id, text) = item;
-                    match item_id.as_str() {
-                        "discard" => match text.trim().parse::<usize>() {
-                            Ok(number) => {
-                                discard = number;
-                            }
-                            Err(err) => {
-                                bad_val = true;
-                                eprintln!("Could not parse discard number {:?}: {err}", text);
-                            }
-                        },
-                        "seq_length" => match text.trim().parse::<usize>() {
-                            Ok(number) => {
-                                seq_len = number;
-                            }
-                            Err(err) => {
-                                bad_val = true;
-                                eprintln!(
-                                    "Could not parse sequence length number {:?}: {err}",
-                                    text
-                                );
-                            }
-                        },
-                        _ => {}
-                    }
-                }
-                if bad_val {
-                    self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
-                        DLG_BAD_VALS,
-                        "Error Message",
-                        "Bad value(s) entered.",
-                    )));
-                } else {
-                    // Discard the first 'discard' interactions.
-                    for _ in 0..discard {
-                        self.world.advance();
-                    }
-                    self.world.attractor.discard = discard;
-
-                    // Push 'seq_len' ones counts to the empty attractor sequence.
-                    self.world.attractor.seq.clear();
-                    self.world.attractor.seq.reserve(seq_len);
-                    for _ in 0..seq_len {
-                        self.world
-                            .attractor
-                            .seq
-                            //.push(self.world.bits.ones_count().try_into().unwrap());
-                            .push(self.world.bit_graph.values.ones_count().try_into().unwrap());
-                        self.world.advance();
-                    }
-
-                    // println!("Discard length: {}", self.world.attractor.discard);
-                    // //println!("Sequence length: {}", self.world.attractor.seq.len());
-                    // println!("Sequence length: {}", self.world.attractor.len());
-                    // for val in self.world.attractor.seq.iter().take(10) {
-                    //     println!("{}", val);
-                    // }
-
-                    let numbers = vec![2, 4, 6, 8, 10];
-                    let mut mean_test = 0.0;
-                    if numbers.len() > 0 {
-                        mean_test = numbers.iter().map(|&value| value as f64).sum::<f64>()
-                            / numbers.len() as f64;
-                    }
-                    println!("Mean_test: {}", mean_test);
-
-                    let mut mean = 0.0;
-                    if self.world.attractor.seq.len() > 0 {
-                        mean = self
-                            .world
-                            .attractor
-                            .seq
-                            .iter()
-                            .map(|&value| value as f64)
-                            .sum::<f64>()
-                            / self.world.attractor.seq.len() as f64;
-                    }
-                    println!("Mean: {}", mean);
-
-                    let values_f64: Vec<f64> =
-                        self.world.attractor.seq.iter().map(|&x| x as f64).collect();
-
-                    let data = values_f64.as_slice();
-
-                    println!("Count: {}", data.len());
-                    println!("Mean: {}", data.mean());
-                    println!("Minimum: {}", data.min());
-                    println!("Maximum: {}", data.max());
-                    println!("Variance: {}", data.variance());
-                    println!("Standard deviation: {}", data.std_dev());
-
-                    // let values_f64: Vec<f64> =
-                    //     self.world.attractor.seq.iter().map(|&x| x as f64).collect();
-                    //
-                    // let data = values_f64.as_slice();
-                    //
-                    // println!("Count: {}", data.len());
-                    // println!("Mean: {}", data.mean());
-                    // println!("Minimum: {}", data.min());
-                    // println!("Maximum: {}", data.max());
-                    // println!("Variance: {}", data.variance());
-                    // println!("Standard deviation: {}", data.std_dev());
-
-                    fs::write(
-                        "sequence.txt",
-                        self.world
-                            .attractor
-                            .seq
-                            .iter()
-                            .map(|n| n.to_string())
-                            .collect::<Vec<_>>()
-                            .join("\n"),
-                    )
-                    .expect("Unable to write to file");
-
-                    self.canvas.update(&self.world);
-                }
-            }
+            // DLG_SEQUENCE => {
+            //     let mut discard: usize = 0;
+            //     let mut seq_len: usize = 0;
+            //     let mut bad_val = false;
+            //
+            //     for item in values {
+            //         let (item_id, text) = item;
+            //         match item_id.as_str() {
+            //             "discard" => match text.trim().parse::<usize>() {
+            //                 Ok(number) => {
+            //                     discard = number;
+            //                 }
+            //                 Err(err) => {
+            //                     bad_val = true;
+            //                     eprintln!("Could not parse discard number {:?}: {err}", text);
+            //                 }
+            //             },
+            //             "seq_length" => match text.trim().parse::<usize>() {
+            //                 Ok(number) => {
+            //                     seq_len = number;
+            //                 }
+            //                 Err(err) => {
+            //                     bad_val = true;
+            //                     eprintln!(
+            //                         "Could not parse sequence length number {:?}: {err}",
+            //                         text
+            //                     );
+            //                 }
+            //             },
+            //             _ => {}
+            //         }
+            //     }
+            //     if bad_val {
+            //         self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
+            //             DLG_BAD_VALS,
+            //             "Error Message",
+            //             "Bad value(s) entered.",
+            //         )));
+            //     } else {
+            //         // Discard the first 'discard' interactions.
+            //         for _ in 0..discard {
+            //             self.world.advance();
+            //         }
+            //         self.world.attractor.discard = discard;
+            //
+            //         // Push 'seq_len' ones counts to the empty attractor sequence.
+            //         self.world.attractor.seq.clear();
+            //         self.world.attractor.seq.reserve(seq_len);
+            //         for _ in 0..seq_len {
+            //             self.world
+            //                 .attractor
+            //                 .seq
+            //                 //.push(self.world.bits.ones_count().try_into().unwrap());
+            //                 .push(self.world.bit_graph.values.ones_count().try_into().unwrap());
+            //             self.world.advance();
+            //         }
+            //
+            //         // println!("Discard length: {}", self.world.attractor.discard);
+            //         // //println!("Sequence length: {}", self.world.attractor.seq.len());
+            //         // println!("Sequence length: {}", self.world.attractor.len());
+            //         // for val in self.world.attractor.seq.iter().take(10) {
+            //         //     println!("{}", val);
+            //         // }
+            //
+            //         let numbers = vec![2, 4, 6, 8, 10];
+            //         let mut mean_test = 0.0;
+            //         if numbers.len() > 0 {
+            //             mean_test = numbers.iter().map(|&value| value as f64).sum::<f64>()
+            //                 / numbers.len() as f64;
+            //         }
+            //         println!("Mean_test: {}", mean_test);
+            //
+            //         let mut mean = 0.0;
+            //         if self.world.attractor.seq.len() > 0 {
+            //             mean = self
+            //                 .world
+            //                 .attractor
+            //                 .seq
+            //                 .iter()
+            //                 .map(|&value| value as f64)
+            //                 .sum::<f64>()
+            //                 / self.world.attractor.seq.len() as f64;
+            //         }
+            //         println!("Mean: {}", mean);
+            //
+            //         let values_f64: Vec<f64> =
+            //             self.world.attractor.seq.iter().map(|&x| x as f64).collect();
+            //
+            //         let data = values_f64.as_slice();
+            //
+            //         println!("Count: {}", data.len());
+            //         println!("Mean: {}", data.mean());
+            //         println!("Minimum: {}", data.min());
+            //         println!("Maximum: {}", data.max());
+            //         println!("Variance: {}", data.variance());
+            //         println!("Standard deviation: {}", data.std_dev());
+            //
+            //         // let values_f64: Vec<f64> =
+            //         //     self.world.attractor.seq.iter().map(|&x| x as f64).collect();
+            //         //
+            //         // let data = values_f64.as_slice();
+            //         //
+            //         // println!("Count: {}", data.len());
+            //         // println!("Mean: {}", data.mean());
+            //         // println!("Minimum: {}", data.min());
+            //         // println!("Maximum: {}", data.max());
+            //         // println!("Variance: {}", data.variance());
+            //         // println!("Standard deviation: {}", data.std_dev());
+            //
+            //         fs::write(
+            //             "sequence.txt",
+            //             self.world
+            //                 .attractor
+            //                 .seq
+            //                 .iter()
+            //                 .map(|n| n.to_string())
+            //                 .collect::<Vec<_>>()
+            //                 .join("\n"),
+            //         )
+            //         .expect("Unable to write to file");
+            //
+            //         self.canvas.update(&self.world);
+            //     }
+            // }
 
             _ => {}
         }

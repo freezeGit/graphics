@@ -160,30 +160,6 @@ impl BitsRule {
     }
 } // end of impl BitsRule
 
-pub struct Seq {
-    pub discard: usize,
-    pub seq: Vec<i32>,
-}
-
-impl Seq {
-    //pub fn new(discard: usize, length: usize) -> Self {
-    pub fn new(discard: usize) -> Self {
-        Self {
-            discard,
-            //length,
-            seq: Vec::new(),
-        }
-    }
-
-    pub fn push(&mut self, val: i32) {
-        self.seq.push(val);
-    }
-
-    pub fn len(&self) -> usize {
-        self.seq.len()
-    }
-} // end of struct
-
 pub struct BitGraph {
     pub values: BitArray, // TDJ: Can I get rid of pub?
     connections: BitArray,
@@ -252,9 +228,9 @@ impl BitGraph {
         self.values.ones_count()
     }
 
-    pub fn ones_fraction(&self) -> f64 {
-        self.values.ones_fraction()
-    }
+    // pub fn ones_fraction(&self) -> f64 {
+    //     self.values.ones_fraction()
+    // }
 
     pub fn cnctns_count(&self) -> usize {
         // TDJ: ? count only first half
@@ -312,7 +288,7 @@ pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cnctns_rule: CnctnsRule, 
 
     interact_bits(&mut bg.values, bits_rule, i, j);
     change_cnctn(bg, cnctns_rule, i, j);
-    println!("Connections: {}", bg.cnctns_count());
+    //println!("Connections: {}", bg.cnctns_count());
 
     //println!("Connection: {}", bg.is_connected(i, j));
 }
