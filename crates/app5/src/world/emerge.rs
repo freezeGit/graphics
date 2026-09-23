@@ -95,15 +95,6 @@ impl BitArray {
     }
 } // end of BitArray
 
-// pub fn step_bits(bits: &mut BitArray, rule: BitsRule, rng: &mut impl Rng) {
-//     let n = bits.len();
-//
-//     let i = rng.random_range(0..n);
-//     let j = rng.random_range(0..n);
-//
-//     interact(bits, rule, i, j);
-// }
-
 fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
     if i == j {
         return;
@@ -265,6 +256,11 @@ impl BitGraph {
         self.values.ones_fraction()
     }
 
+    pub fn cnctns_count(&self) -> usize {
+        // TDJ: ? count only first half
+        self.connections.ones_count() / 2
+    }
+
     fn node_index(&self, a: usize, b: usize) -> usize {
         a * self.nodes() + b
     }
@@ -316,6 +312,7 @@ pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cnctns_rule: CnctnsRule, 
 
     interact_bits(&mut bg.values, bits_rule, i, j);
     change_cnctn(bg, cnctns_rule, i, j);
+    println!("Connections: {}", bg.cnctns_count());
 
     //println!("Connection: {}", bg.is_connected(i, j));
 }
