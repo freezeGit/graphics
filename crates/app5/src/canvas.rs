@@ -219,9 +219,14 @@ impl TheCanvas {
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
     pub fn update(&mut self, world: &TheWorld) {
+        let nodes = world.bit_graph.nodes();
+        assert_ne!(nodes, 0); // prevent divide by zero
         let ones_count = world.bit_graph.values.ones_count();
-        assert_ne!(world.bit_graph.nodes(), 0);
-        let ones_fraction = ones_count as f64 / world.bit_graph.nodes() as f64;
+        let ones_fraction = ones_count as f64 / nodes as f64;
+
+        let actual_connections = world.bit_graph.cnctns_count();
+        let possible_connections = nodes * (nodes - 1) / 2;
+        let fractional_connections = actual_connections as f64 / possible_connections as f64;
 
         // Set stxt_bits to display bits number
         self.view_handles
@@ -253,8 +258,16 @@ impl TheCanvas {
         self.view_handles.sgr.borrow_mut().add_val(val);
 
         // Update the line length
-        //let length = 950.0 * (world.bit_graph.ones_fraction() as f32);
-        let length = 950.0 * (ones_fraction as f32);
+        //let length = 950.0 * (ones_fraction as f32);
+        let length = 950.0 * (fractional_connections as f32);
         self.view_handles.sln2.borrow_mut().set_length(length);
     }
+
+    // pub fn fraction_connected(&self) -> f64 {
+    //     let n = self.nodes();
+    //     let possible = n * (n - 1) / 2;
+    //     let actual = self.connections.count_ones() / 2;
+    //
+    //     actual as f64 / possible as f64
+    // }
 } // end of impl TheCanvas

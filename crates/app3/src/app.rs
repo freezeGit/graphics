@@ -181,7 +181,7 @@ impl TheApp {
             }
 
             BTN_BATCH => {
-                println!("Batch size: {}", self.sim_timer.batch_size());
+                //println!("Batch size: {}", self.sim_timer.batch_size());
                 self.canvas.canvas.set_dialog(Box::new(TextEntryDlg::new(
                     DLG_BATCH,
                     "Enter batch size",

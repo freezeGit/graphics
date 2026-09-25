@@ -162,7 +162,7 @@ impl BitsRule {
 
 pub struct BitGraph {
     pub values: BitArray, // TDJ: Can I get rid of pub?
-    connections: BitArray,
+    pub connections: BitArray,
 }
 
 impl BitGraph {
