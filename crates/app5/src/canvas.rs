@@ -19,6 +19,8 @@ use crate::world::TheWorld;
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Shape, Space, Text, Vec2};
 
+use num_format::{Locale, ToFormattedString};
+
 #[derive(Debug)]
 pub struct ViewHandles {
     stxt_bits: Rc<RefCell<Text>>,
@@ -84,48 +86,80 @@ impl TheCanvas {
 
         let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(10.0, 10.0),
-            format!("Bits: {}", inits::INITIAL_BITS_NUM),
+            format!("Bits: {}", inits::INITIAL_BITS_NUM.to_formatted_string(&Locale::en)),
         )));
         canvas.add_shape(stxt_bits.clone());
 
         let stxt_ones: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(175.0, 10.0),
-            format!("Ones: {}", inits::INITIAL_ONES),
+            format!("Ones: {}", inits::INITIAL_ONES.to_formatted_string(&Locale::en)),
         )));
         canvas.add_shape(stxt_ones.clone());
 
+        // let stxt_poss_cxns: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+        //     egui::Pos2::new(370.0, 10.0),
+        //     format!(
+        //         "Poss Cxns: {}",
+        //         inits::INITIAL_BITS_NUM * (inits::INITIAL_BITS_NUM - 1) / 2
+        //     ),
+        // )));
+        // canvas.add_shape(stxt_poss_cxns.clone());
+
+        let stxt_poss_cxns: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(370.0, 10.0),
+            format!(
+                "Poss Cxns: {}",
+                (inits::INITIAL_BITS_NUM * (inits::INITIAL_BITS_NUM - 1) / 2)
+                    .to_formatted_string(&Locale::en)
+            ),
+        )));
+        canvas.add_shape(stxt_poss_cxns.clone());
+
+        let stxt_cxns: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(680.0, 10.0),
+            //format!("Cxns: {}", inits::INITIAL_ONES),
+            format!("Cxns: {}", inits::INITIAL_CNCTNS.to_formatted_string(&Locale::en)),
+        )));
+        canvas.add_shape(stxt_cxns.clone());
+
         let stxt_bits_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(360.0, 10.0),
+            //egui::Pos2::new(360.0, 10.0),
+            egui::Pos2::new(10.0, 45.0),
             format!("Bits Rule: {}", inits::INITIAL_BITS_RULE),
         )));
-        canvas.add_shape(stxt_bits_rule.clone()); // coercion to ShapeHandle happens automatically
+        canvas.add_shape(stxt_bits_rule.clone());
 
-        // frame number.
-        let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //eframe::egui::Pos2::new(250.0, 270.0),
-            //egui::Pos2::new(200.0, 10.0),
-            egui::Pos2::new(525.0, 10.0),
-            format!("Interactions: {}", 0),
+        let stxt_cxn_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            //egui::Pos2::new(100.0, 10.0),
+            egui::Pos2::new(160.0, 45.0),
+            format!("Cxn Rule: {}", inits::INITIAL_CNCTN_RULE),
         )));
-        canvas.add_shape(stxt_frame.clone()); // coercion to ShapeHandle happens automatically
-
-        let stxt_batch: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(10.0, 45.0),
-            format!("Batch: {}", inits::BATCH_SIZE),
-        )));
-        canvas.add_shape(stxt_batch.clone());
+        canvas.add_shape(stxt_cxn_rule.clone());
 
         let stxt_scale: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(200.0, 45.0),
+            egui::Pos2::new(400.0, 45.0),
             format!("Scale: {}", inits::SEQ_GRAPH_SCALE),
         )));
         canvas.add_shape(stxt_scale.clone());
 
         let stxt_focus: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(320.0, 45.0),
+            egui::Pos2::new(510.0, 45.0),
             format!("Focus: {}", inits::SEQ_GRAPH_FOCUS),
         )));
         canvas.add_shape(stxt_focus.clone());
+
+        let stxt_batch: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(700.0, 45.0),
+            format!("Batch: {}", inits::BATCH_SIZE.to_formatted_string(&Locale::en)),
+        )));
+        canvas.add_shape(stxt_batch.clone());
+
+        let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            //egui::Pos2::new(525.0, 10.0),
+            egui::Pos2::new(945.0, 10.0),
+            format!("Interactions: {}", 0),
+        )));
+        canvas.add_shape(stxt_frame.clone());
 
         let sln1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
             Pos2::new(100.0, 705.0),

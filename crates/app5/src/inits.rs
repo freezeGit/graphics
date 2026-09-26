@@ -6,8 +6,10 @@ use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel}; //Any of these styles 
 
 // ------ User customized gui_lib application specific initialization constants --------
 pub const APP_NAME: &str = "App using gui_lib"; // Application name.
-pub const XWVP: f32 = 1200.0; // Width of viewport in pixels.
-pub const YHVP: f32 = 800.0; // Height of viewport in pixels.
+//pub const XWVP: f32 = 1200.0; // Width of viewport in pixels.
+//pub const YHVP: f32 = 800.0; // Height of viewport in pixels.
+pub const XWVP: f32 = 1350.0; // Width of viewport in pixels.
+pub const YHVP: f32 = 900.0; // Height of viewport in pixels.
 
 // Layout styles: TopPanel, SidePanel, NoPanel
 pub const LAYOUT_STYLE: gui_lib::LayoutStyle = TopPanel;
@@ -36,8 +38,10 @@ pub const SMOOTH_ANIMATION: bool = false;
 pub const INITIAL_BITS_RULE: u8 = 5; // must be 0 to 15 inclusive
 pub const INITIAL_CNCTN_RULE: u8 = 1; // must be 0 to 3 inclusive
 pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
+//pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
 pub const INITIAL_ONES: usize = 0; // Must be <= INITIAL_BITS_NUM.
-pub const INITIAL_CNCTNS: usize = 0; // Must be <= ?.
+//pub const INITIAL_CNCTNS: usize = 0; // Must be <= ?.
+pub const INITIAL_CNCTNS: usize = INITIAL_BITS_NUM * (INITIAL_BITS_NUM -1) / 2;
 
 pub const INITIAL_SEQ_DISCARD: usize = 45000;
 pub const INITIAL_SEQ_LENGTH: usize = 1000;
