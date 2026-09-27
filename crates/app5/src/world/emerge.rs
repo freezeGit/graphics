@@ -275,7 +275,10 @@ fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize) {
             bg.set_connected(i, j, false);
         }
         _ => {
-            panic!("Connections Rule number must be less than 4, got {}", rule.number);
+            panic!(
+                "Connections Rule number must be less than 4, got {}",
+                rule.number
+            );
         }
     }
 }

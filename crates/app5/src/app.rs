@@ -8,7 +8,10 @@
 
 mod app_internal; // internal functions that do not require application specific customizations
 
+use crate::canvas::TheCanvas;
+use crate::ids::*;
 use crate::inits;
+use crate::world::emerge::{BitArray, BitGraph};
 use egui::Context;
 #[allow(unused_imports)]
 use gui_lib::{
@@ -17,13 +20,10 @@ use gui_lib::{
     RadioBoxesField, SimTimer, SliderId, TextEntryDlg, TextEntryDlgId, TextEntryField, WidgetMsg,
     World, app_gl,
 };
-use statrs::statistics::Statistics;
-use num_format::ToFormattedString;
-use std::fs;
 use num_format::Locale;
-use crate::canvas::TheCanvas;
-use crate::ids::*;
-use crate::world::emerge::{BitArray, BitGraph};
+use num_format::ToFormattedString;
+use statrs::statistics::Statistics;
+use std::fs;
 //use crate::world::{Rule, TheWorld};
 use crate::world::{BitsRule, TheWorld};
 
@@ -243,7 +243,6 @@ impl TheApp {
             //             ],
             //         )));
             // }
-
             _ => {}
         }
     }
@@ -539,7 +538,6 @@ impl TheApp {
             //         self.canvas.update(&self.world);
             //     }
             // }
-
             _ => {}
         }
     }
@@ -556,7 +554,10 @@ impl TheApp {
                             .view_handles
                             .stxt_batch
                             .borrow_mut()
-                            .set_text(format!("Batch: {}", number.to_formatted_string(&Locale::en)));
+                            .set_text(format!(
+                                "Batch: {}",
+                                number.to_formatted_string(&Locale::en)
+                            ));
                     }
                     Err(err) => {
                         self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(

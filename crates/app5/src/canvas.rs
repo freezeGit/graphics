@@ -33,7 +33,8 @@ pub struct ViewHandles {
     pub stxt_batch: Rc<RefCell<Text>>,
     pub stxt_scale: Rc<RefCell<Text>>,
     pub stxt_focus: Rc<RefCell<Text>>,
-    sln2: Rc<RefCell<Line>>,
+    slna2: Rc<RefCell<Line>>,
+    slnb2: Rc<RefCell<Line>>,
     pub sgr: Rc<RefCell<SeqGraph>>,
 }
 
@@ -89,13 +90,19 @@ impl TheCanvas {
 
         let stxt_bits: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(10.0, 10.0),
-            format!("Bits: {}", inits::INITIAL_BITS_NUM.to_formatted_string(&Locale::en)),
+            format!(
+                "Bits: {}",
+                inits::INITIAL_BITS_NUM.to_formatted_string(&Locale::en)
+            ),
         )));
         canvas.add_shape(stxt_bits.clone());
 
         let stxt_ones: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(175.0, 10.0),
-            format!("Ones: {}", inits::INITIAL_ONES.to_formatted_string(&Locale::en)),
+            format!(
+                "Ones: {}",
+                inits::INITIAL_ONES.to_formatted_string(&Locale::en)
+            ),
         )));
         canvas.add_shape(stxt_ones.clone());
 
@@ -121,7 +128,10 @@ impl TheCanvas {
         let stxt_cxns: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(680.0, 10.0),
             //format!("Cxns: {}", inits::INITIAL_ONES),
-            format!("Cxns: {}", inits::INITIAL_CXNS.to_formatted_string(&Locale::en)),
+            format!(
+                "Cxns: {}",
+                inits::INITIAL_CXNS.to_formatted_string(&Locale::en)
+            ),
         )));
         canvas.add_shape(stxt_cxns.clone());
 
@@ -140,7 +150,8 @@ impl TheCanvas {
         canvas.add_shape(stxt_cxn_rule.clone());
 
         let stxt_scale: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(400.0, 45.0),
+            //egui::Pos2::new(400.0, 45.0),
+            egui::Pos2::new(370.0, 45.0),
             format!("Scale: {}", inits::SEQ_GRAPH_SCALE),
         )));
         canvas.add_shape(stxt_scale.clone());
@@ -153,7 +164,10 @@ impl TheCanvas {
 
         let stxt_batch: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(700.0, 45.0),
-            format!("Batch: {}", inits::BATCH_SIZE.to_formatted_string(&Locale::en)),
+            format!(
+                "Batch: {}",
+                inits::BATCH_SIZE.to_formatted_string(&Locale::en)
+            ),
         )));
         canvas.add_shape(stxt_batch.clone());
 
@@ -164,24 +178,27 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxt_frame.clone());
 
-        let sln1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-            Pos2::new(100.0, 705.0),
+        const a_y: f32 = 705.0;
+        const b_y: f32 = 765.0;
+
+        let slna1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+            Pos2::new(100.0, a_y),
             Vec2::new(950.0, 0.0),
         )));
-        sln1.borrow_mut().set_line_width(8.0);
-        sln1.borrow_mut().set_color(Color32::LIGHT_GRAY);
-        canvas.add_shape(sln1.clone());
+        slna1.borrow_mut().set_line_width(8.0);
+        slna1.borrow_mut().set_color(Color32::LIGHT_GRAY);
+        canvas.add_shape(slna1.clone());
 
-        let sln2: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-            Pos2::new(100.0, 705.0),
+        let slna2: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+            Pos2::new(100.0, a_y),
             Vec2::new(950.0, 0.0),
         )));
-        sln2.borrow_mut().set_line_width(8.0);
-        sln2.borrow_mut().set_color(Color32::DARK_BLUE);
-        canvas.add_shape(sln2.clone());
+        slna2.borrow_mut().set_line_width(8.0);
+        slna2.borrow_mut().set_color(Color32::LIGHT_RED);
+        canvas.add_shape(slna2.clone());
 
-        let tics: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
-            //Pos2::new(250.0, 705.0),
+        let tics_a: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
+            //Pos2::new(250.0, a_y),
             Pos2::new(100.0, 705.0),
             vec![
                 [Pos2::new(0.0, -16.0), Pos2::new(0.0, 16.0)],
@@ -191,7 +208,35 @@ impl TheCanvas {
                 [Pos2::new(950.0, -16.0), Pos2::new(950.0, 16.0)],
             ],
         )));
-        canvas.add_shape(tics.clone());
+        canvas.add_shape(tics_a.clone());
+
+        let slnb1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+            Pos2::new(100.0, b_y),
+            Vec2::new(950.0, 0.0),
+        )));
+        slnb1.borrow_mut().set_line_width(8.0);
+        slnb1.borrow_mut().set_color(Color32::LIGHT_GRAY);
+        canvas.add_shape(slnb1.clone());
+
+        let slnb2: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
+            Pos2::new(100.0, b_y),
+            Vec2::new(950.0, 0.0),
+        )));
+        slnb2.borrow_mut().set_line_width(8.0);
+        slnb2.borrow_mut().set_color(Color32::BLUE);
+        canvas.add_shape(slnb2.clone());
+
+        let tics_b: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
+            Pos2::new(100.0, b_y),
+            vec![
+                [Pos2::new(0.0, -16.0), Pos2::new(0.0, 16.0)],
+                [Pos2::new(237.5, -16.0), Pos2::new(237.5, 16.0)],
+                [Pos2::new(475.0, -16.0), Pos2::new(475.0, 16.0)],
+                [Pos2::new(712.5, -16.0), Pos2::new(712.5, 16.0)],
+                [Pos2::new(950.0, -16.0), Pos2::new(950.0, 16.0)],
+            ],
+        )));
+        canvas.add_shape(tics_b.clone());
 
         ViewHandles {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
@@ -205,7 +250,8 @@ impl TheCanvas {
             stxt_batch,
             stxt_scale,
             stxt_focus,
-            sln2,
+            slna2,
+            slnb2,
             sgr,
         }
     }
@@ -260,26 +306,29 @@ impl TheCanvas {
         let fractional_connections = actual_connections as f64 / possible_connections as f64;
 
         // Set stxt_bits to display bits number
-        self.view_handles
-            .stxt_bits
-            .borrow_mut()
-            .set_text(format!("Bits: {}", world.bit_graph.nodes().to_formatted_string(&Locale::en)));
+        self.view_handles.stxt_bits.borrow_mut().set_text(format!(
+            "Bits: {}",
+            world.bit_graph.nodes().to_formatted_string(&Locale::en)
+        ));
 
         // Set stxt_ones to display ones number
-        self.view_handles
-            .stxt_ones
-            .borrow_mut()
-            .set_text(format!("Ones: {}", ones_count.to_formatted_string(&Locale::en)));
+        self.view_handles.stxt_ones.borrow_mut().set_text(format!(
+            "Ones: {}",
+            ones_count.to_formatted_string(&Locale::en)
+        ));
 
         self.view_handles
             .stxt_poss_cxns
             .borrow_mut()
-            .set_text(format!("Poss Cxns: {}", possible_connections.to_formatted_string(&Locale::en)));
+            .set_text(format!(
+                "Poss Cxns: {}",
+                possible_connections.to_formatted_string(&Locale::en)
+            ));
 
-        self.view_handles
-            .stxt_cxns
-            .borrow_mut()
-            .set_text(format!("Cxns: {}", actual_connections.to_formatted_string(&Locale::en)));
+        self.view_handles.stxt_cxns.borrow_mut().set_text(format!(
+            "Cxns: {}",
+            actual_connections.to_formatted_string(&Locale::en)
+        ));
 
         // Set stxt_rule to display rule number
         self.view_handles
@@ -288,17 +337,21 @@ impl TheCanvas {
             .set_text(format!("Bits Rule: {}", world.bits_rule.number()));
 
         // Set stxt_frame to display interactionss number
-        self.view_handles
-            .stxt_frame
-            .borrow_mut()
-            .set_text(format!("Interactions: {}", world.frame_number.to_formatted_string(&Locale::en)));
+        self.view_handles.stxt_frame.borrow_mut().set_text(format!(
+            "Interactions: {}",
+            world.frame_number.to_formatted_string(&Locale::en)
+        ));
 
         // Update the sequence graph
-         let val = ones_fraction as f32;
+        let val = ones_fraction as f32;
         self.view_handles.sgr.borrow_mut().add_ones_val(val);
+        let val = fractional_connections as f32;
+        self.view_handles.sgr.borrow_mut().add_cxns_val(val);
 
-        // Update the line length
+        // Update the line lengths
+        let length = 950.0 * (ones_fraction as f32);
+        self.view_handles.slna2.borrow_mut().set_length(length);
         let length = 950.0 * (fractional_connections as f32);
-        self.view_handles.sln2.borrow_mut().set_length(length);
+        self.view_handles.slnb2.borrow_mut().set_length(length);
     }
 } // end of impl TheCanvas
