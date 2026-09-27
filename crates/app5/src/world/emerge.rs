@@ -232,7 +232,7 @@ impl BitGraph {
     //     self.values.ones_fraction()
     // }
 
-    pub fn cnctns_count(&self) -> usize {
+    pub fn cxns_count(&self) -> usize {
         // TDJ: ? count only first half
         self.connections.ones_count() / 2
     }
@@ -254,7 +254,7 @@ impl BitGraph {
     }
 } // end Impl BitGraph
 
-fn change_cnctn(bg: &mut BitGraph, rule: CnctnsRule, i: usize, j: usize) {
+fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize) {
     match rule.number {
         // No change
         0 => {}
@@ -280,27 +280,23 @@ fn change_cnctn(bg: &mut BitGraph, rule: CnctnsRule, i: usize, j: usize) {
     }
 }
 
-pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cnctns_rule: CnctnsRule, rng: &mut impl Rng) {
+pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cxns_rule: CxnsRule, rng: &mut impl Rng) {
     let n = bg.nodes();
 
     let i = rng.random_range(0..n);
     let j = rng.random_range(0..n);
 
     interact_bits(&mut bg.values, bits_rule, i, j);
-    change_cnctn(bg, cnctns_rule, i, j);
-    //println!("Connections: {}", bg.cnctns_count());
-
-    //println!("Connection: {}", bg.is_connected(i, j));
+    change_cxn(bg, cxns_rule, i, j);
 }
 
 #[derive(Debug, Clone, Copy)]
-//pub struct Rulecnctns {
-pub struct CnctnsRule {
+pub struct CxnsRule {
     number: u8,
     //flags: [bool; 4],
 }
 
-impl CnctnsRule {
+impl CxnsRule {
     pub fn new(number: u8) -> Self {
         assert!(
             number < 4,

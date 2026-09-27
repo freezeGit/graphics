@@ -25,7 +25,10 @@ use num_format::{Locale, ToFormattedString};
 pub struct ViewHandles {
     stxt_bits: Rc<RefCell<Text>>,
     stxt_ones: Rc<RefCell<Text>>,
+    stxt_poss_cxns: Rc<RefCell<Text>>,
+    stxt_cxns: Rc<RefCell<Text>>,
     stxt_bits_rule: Rc<RefCell<Text>>,
+    stxt_cxn_rule: Rc<RefCell<Text>>,
     stxt_frame: Rc<RefCell<Text>>,
     pub stxt_batch: Rc<RefCell<Text>>,
     pub stxt_scale: Rc<RefCell<Text>>,
@@ -118,7 +121,7 @@ impl TheCanvas {
         let stxt_cxns: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(680.0, 10.0),
             //format!("Cxns: {}", inits::INITIAL_ONES),
-            format!("Cxns: {}", inits::INITIAL_CNCTNS.to_formatted_string(&Locale::en)),
+            format!("Cxns: {}", inits::INITIAL_CXNS.to_formatted_string(&Locale::en)),
         )));
         canvas.add_shape(stxt_cxns.clone());
 
@@ -132,7 +135,7 @@ impl TheCanvas {
         let stxt_cxn_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             //egui::Pos2::new(100.0, 10.0),
             egui::Pos2::new(160.0, 45.0),
-            format!("Cxn Rule: {}", inits::INITIAL_CNCTN_RULE),
+            format!("Cxn Rule: {}", inits::INITIAL_CXN_RULE),
         )));
         canvas.add_shape(stxt_cxn_rule.clone());
 
@@ -194,7 +197,10 @@ impl TheCanvas {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
             stxt_bits,
             stxt_ones,
+            stxt_poss_cxns,
+            stxt_cxns,
             stxt_bits_rule,
+            stxt_cxn_rule,
             stxt_frame,
             stxt_batch,
             stxt_scale,
@@ -238,15 +244,6 @@ impl TheCanvas {
     }
 
     // --------------------------------------
-    //TDJ: not used. Should it be?
-    // pub(crate) fn canvas(&self) -> &BasicCanvas {
-    //     &self.canvas
-    // }
-    //TDJ: not used.  Should it be?
-    // pub(crate) fn canvas_mut(&mut self) -> &mut BasicCanvas {
-    //     &mut self.canvas
-    // }
-
     /// Update the state of the canvas based on the current world state.
     ///
     /// Note that this method does not modify the world state.
@@ -258,7 +255,7 @@ impl TheCanvas {
         let ones_count = world.bit_graph.values.ones_count();
         let ones_fraction = ones_count as f64 / nodes as f64;
 
-        let actual_connections = world.bit_graph.cnctns_count();
+        let actual_connections = world.bit_graph.cxns_count();
         let possible_connections = nodes * (nodes - 1) / 2;
         let fractional_connections = actual_connections as f64 / possible_connections as f64;
 
@@ -266,13 +263,23 @@ impl TheCanvas {
         self.view_handles
             .stxt_bits
             .borrow_mut()
-            .set_text(format!("Bits: {}", world.bit_graph.nodes()));
+            .set_text(format!("Bits: {}", world.bit_graph.nodes().to_formatted_string(&Locale::en)));
 
         // Set stxt_ones to display ones number
         self.view_handles
             .stxt_ones
             .borrow_mut()
-            .set_text(format!("Ones: {}", ones_count));
+            .set_text(format!("Ones: {}", ones_count.to_formatted_string(&Locale::en)));
+
+        self.view_handles
+            .stxt_poss_cxns
+            .borrow_mut()
+            .set_text(format!("Poss Cxns: {}", possible_connections.to_formatted_string(&Locale::en)));
+
+        self.view_handles
+            .stxt_cxns
+            .borrow_mut()
+            .set_text(format!("Cxns: {}", actual_connections.to_formatted_string(&Locale::en)));
 
         // Set stxt_rule to display rule number
         self.view_handles
@@ -284,24 +291,14 @@ impl TheCanvas {
         self.view_handles
             .stxt_frame
             .borrow_mut()
-            .set_text(format!("Interactions: {}", world.frame_number));
+            .set_text(format!("Interactions: {}", world.frame_number.to_formatted_string(&Locale::en)));
 
         // Update the sequence graph
-        //let val = world.bit_graph.ones_fraction() as f32;
-        let val = ones_fraction as f32;
+         let val = ones_fraction as f32;
         self.view_handles.sgr.borrow_mut().add_val(val);
 
         // Update the line length
-        //let length = 950.0 * (ones_fraction as f32);
         let length = 950.0 * (fractional_connections as f32);
         self.view_handles.sln2.borrow_mut().set_length(length);
     }
-
-    // pub fn fraction_connected(&self) -> f64 {
-    //     let n = self.nodes();
-    //     let possible = n * (n - 1) / 2;
-    //     let actual = self.connections.count_ones() / 2;
-    //
-    //     actual as f64 / possible as f64
-    // }
 } // end of impl TheCanvas

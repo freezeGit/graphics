@@ -15,15 +15,6 @@ struct Zoom {
     focus: f32,
 }
 
-// impl Default for Zoom {
-//     fn default() -> Self {
-//         Self {
-//             scale: 1.0,
-//             focus: 0.5,
-//         }
-//     }
-// }
-
 impl Default for Zoom {
     fn default() -> Self {
         Self {
@@ -36,7 +27,7 @@ impl Default for Zoom {
 #[derive(Debug, Default)]
 pub struct SeqGraph {
     base: ShapeBase,
-    vec: Vec<Rectangle>,
+    ones_vec: Vec<Rectangle>,
     mid: Line,
     lines: Lines,
     zoom: Zoom,
@@ -47,7 +38,7 @@ impl SeqGraph {
         let mut base = ShapeBase::default();
         base.move_to(location);
 
-        let mut vec = Vec::new();
+        let mut ones_vec = Vec::new();
 
         assert!(SG_SIZE > 0);
         for i in 0..SG_SIZE {
@@ -59,7 +50,7 @@ impl SeqGraph {
             rect.set_line_width(1.0);
             rect.set_color(egui::Color32::LIGHT_GRAY);
             rect.set_fill_color(egui::Color32::DARK_BLUE);
-            vec.push(rect);
+            ones_vec.push(rect);
         }
 
         let mut mid: Line = Line::new_from_points(
@@ -83,7 +74,7 @@ impl SeqGraph {
 
         Self {
             base,
-            vec,
+            ones_vec,
             mid,
             lines,
             zoom: Zoom::default(),
@@ -115,18 +106,18 @@ impl SeqGraph {
     }
 
     pub fn add_val(&mut self, ones_fraction: f32) {
-        if self.vec.is_empty() {
+        if self.ones_vec.is_empty() {
             return;
         }
 
-        for i in 0..self.vec.len() - 1 {
-            let current_x = self.vec[i].location().x;
-            let next_y = self.vec[i + 1].location().y;
+        for i in 0..self.ones_vec.len() - 1 {
+            let current_x = self.ones_vec[i].location().x;
+            let next_y = self.ones_vec[i + 1].location().y;
             let new_location = egui::Pos2::new(current_x, next_y);
-            self.vec[i].move_to(new_location);
+            self.ones_vec[i].move_to(new_location);
         }
 
-        let vx = self.vec.last_mut().unwrap().location().x;
+        let vx = self.ones_vec.last_mut().unwrap().location().x;
 
         let clamped_fraction = ones_fraction.clamp(0.0, 1.0);
         let scaled_height =
@@ -135,7 +126,7 @@ impl SeqGraph {
         let vy = self.location().y - (mark_offset + scaled_height);
 
         let loc = egui::Pos2::new(vx, vy);
-        self.vec.last_mut().unwrap().move_to(loc);
+        self.ones_vec.last_mut().unwrap().move_to(loc);
     }
 } // impl SeqGraph
 
@@ -148,7 +139,7 @@ impl Shape for SeqGraph {
     }
 
     fn draw_at(&self, painter: &egui::Painter, canvas_offset: egui::Vec2) {
-        for s in &self.vec {
+        for s in &self.ones_vec {
             s.draw_at(painter, canvas_offset);
         }
         self.mid.draw_at(painter, canvas_offset);

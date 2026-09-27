@@ -18,8 +18,9 @@ use gui_lib::{
     World, app_gl,
 };
 use statrs::statistics::Statistics;
+use num_format::ToFormattedString;
 use std::fs;
-
+use num_format::Locale;
 use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::world::emerge::{BitArray, BitGraph};
@@ -555,7 +556,7 @@ impl TheApp {
                             .view_handles
                             .stxt_batch
                             .borrow_mut()
-                            .set_text(format!("Batch: {}", number));
+                            .set_text(format!("Batch: {}", number.to_formatted_string(&Locale::en)));
                     }
                     Err(err) => {
                         self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(

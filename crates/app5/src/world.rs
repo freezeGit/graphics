@@ -11,11 +11,10 @@ pub mod emerge;
 // ---------------------------------------------------
 
 use crate::inits::{
-    INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_CNCTNS, INITIAL_BITS_RULE, INITIAL_CNCTN_RULE, INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
+    INITIAL_BITS_NUM, INITIAL_ONES, INITIAL_CXNS, INITIAL_BITS_RULE, INITIAL_CXN_RULE, INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
 };
 pub(crate) use crate::world::emerge::BitsRule;
-//use crate::world::emerge::{step_bg, BitArray, BitGraph, Seq, CnctnsRule};
-use crate::world::emerge::{step_bg, BitArray, BitGraph, CnctnsRule};
+use crate::world::emerge::{step_bg, BitArray, BitGraph, CxnsRule};
 use gui_lib::World;
 use rand::rngs::ThreadRng;
 use rand::{Rng, RngExt};
@@ -28,9 +27,9 @@ pub struct TheWorld {
     pub rng: ThreadRng,
     pub bit_graph: BitGraph,
     pub bits_rule: BitsRule,
-    pub cnctns_rule: CnctnsRule,
+    pub cxns_rule: CxnsRule,
     pub start_ones: usize,
-    pub start_cnctns: usize,
+    pub start_cxns: usize,
     pub frame_number: u64,
 }
 
@@ -43,7 +42,7 @@ impl World for TheWorld {
         // Increment frame number each simulation step.
         self.frame_number += 1;
         // Advance simulation by one step.
-        step_bg(&mut self.bit_graph, self.bits_rule, self.cnctns_rule, &mut self.rng);
+        step_bg(&mut self.bit_graph, self.bits_rule, self.cxns_rule, &mut self.rng);
     }
 }
 
@@ -53,9 +52,9 @@ impl TheWorld {
             rng: rand::rng(),
             bit_graph: BitGraph::new(INITIAL_BITS_NUM),
             bits_rule: BitsRule::new(INITIAL_BITS_RULE),
-            cnctns_rule: CnctnsRule::new(INITIAL_CNCTN_RULE),
+            cxns_rule: CxnsRule::new(INITIAL_CXN_RULE),
             start_ones: INITIAL_ONES,
-            start_cnctns: INITIAL_CNCTNS,
+            start_cxns: INITIAL_CXNS,
             //attractor: Seq::new(INITIAL_SEQ_DISCARD),
             frame_number: 0,
         }
