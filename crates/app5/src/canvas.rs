@@ -295,7 +295,7 @@ impl TheCanvas {
 
         // Update the sequence graph
          let val = ones_fraction as f32;
-        self.view_handles.sgr.borrow_mut().add_val(val);
+        self.view_handles.sgr.borrow_mut().add_ones_val(val);
 
         // Update the line length
         let length = 950.0 * (fractional_connections as f32);

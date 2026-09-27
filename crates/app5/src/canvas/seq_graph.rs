@@ -28,9 +28,15 @@ impl Default for Zoom {
 pub struct SeqGraph {
     base: ShapeBase,
     ones_vec: Vec<Rectangle>,
+    cxns_vec: Vec<Rectangle>,
     mid: Line,
     lines: Lines,
     zoom: Zoom,
+}
+
+enum SeqGraphVals {
+    Ones,
+    Cxns,
 }
 
 impl SeqGraph {
@@ -52,6 +58,8 @@ impl SeqGraph {
             rect.set_fill_color(egui::Color32::DARK_BLUE);
             ones_vec.push(rect);
         }
+
+        let mut cxns_vec = Vec::new();
 
         let mut mid: Line = Line::new_from_points(
             location + egui::vec2(-20.0, -(SG_HEIGHT / 2.0)),
@@ -75,6 +83,7 @@ impl SeqGraph {
         Self {
             base,
             ones_vec,
+            cxns_vec,
             mid,
             lines,
             zoom: Zoom::default(),
@@ -105,7 +114,7 @@ impl SeqGraph {
         }
     }
 
-    pub fn add_val(&mut self, ones_fraction: f32) {
+    pub fn add_ones_val(&mut self, ones_fraction: f32) {
         if self.ones_vec.is_empty() {
             return;
         }
@@ -128,6 +137,35 @@ impl SeqGraph {
         let loc = egui::Pos2::new(vx, vy);
         self.ones_vec.last_mut().unwrap().move_to(loc);
     }
+
+    // fn add_val(&mut self, sg_vals: SeqGraphVals, fraction: f32) {
+    //     let mut vec_val = match sg_vals {
+    //         SeqGraphVals::Ones => &mut self.ones_vec,
+    //         SeqGraphVals::Cxns => &mut self.cxns_vec,
+    //     };
+    //
+    //     if vec_val.is_empty() {
+    //         return;
+    //     }
+    //
+    //     for i in 0..vec_val.len() - 1 {
+    //         let current_x = vec_val[i].location().x;
+    //         let next_y = vec_val[i + 1].location().y;
+    //         let new_location = egui::Pos2::new(current_x, next_y);
+    //         vec_val[i].move_to(new_location);
+    //     }
+    //
+    //     let vx = vec_val.last_mut().unwrap().location().x;
+    //
+    //     let clamped_fraction = fraction.clamp(0.0, 1.0);
+    //     let scaled_height =
+    //         (0.5 + (clamped_fraction - self.zoom.focus) * self.zoom.scale) * SG_HEIGHT;
+    //     let mark_offset = SG_MARK_SIZE / 2.0;
+    //     let vy = self.location().y - (mark_offset + scaled_height);
+    //
+    //     let loc = egui::Pos2::new(vx, vy);
+    //     vec_val.last_mut().unwrap().move_to(loc);
+    // }
 } // impl SeqGraph
 
 impl Shape for SeqGraph {
