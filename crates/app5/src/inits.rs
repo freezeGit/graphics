@@ -1,5 +1,6 @@
 //! ## module app_inits. Contains constants and initialization values.
 
+//use crate::world::emerge::BitGraph;
 use gui_lib::Color32;
 #[allow(unused_imports)]
 use gui_lib::LayoutStyle::{NoPanel, SidePanel, TopPanel}; //Any of these styles are valid.
@@ -40,8 +41,7 @@ pub const INITIAL_CXN_RULE: u8 = 1; // must be 0 to 3 inclusive
 pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
 //pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
 pub const INITIAL_ONES: usize = 0; // Must be <= INITIAL_BITS_NUM.
-//pub const INITIAL_CXNS: usize = 0; // Must be <= ?.
-pub const INITIAL_CXNS: usize = INITIAL_BITS_NUM * (INITIAL_BITS_NUM - 1) / 2;
+pub const INITIAL_CXNS: usize = 0; // Must be <= ?.
 
 pub const INITIAL_SEQ_DISCARD: usize = 45000;
 pub const INITIAL_SEQ_LENGTH: usize = 1000;

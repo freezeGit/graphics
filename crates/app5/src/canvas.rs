@@ -20,6 +20,7 @@ use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Shape, Space, Text, Vec2};
 
 use num_format::{Locale, ToFormattedString};
+use crate::world::emerge::BitGraph;
 
 #[derive(Debug)]
 pub struct ViewHandles {
@@ -106,20 +107,12 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxt_ones.clone());
 
-        // let stxt_poss_cxns: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-        //     egui::Pos2::new(370.0, 10.0),
-        //     format!(
-        //         "Poss Cxns: {}",
-        //         inits::INITIAL_BITS_NUM * (inits::INITIAL_BITS_NUM - 1) / 2
-        //     ),
-        // )));
-        // canvas.add_shape(stxt_poss_cxns.clone());
-
         let stxt_poss_cxns: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(370.0, 10.0),
             format!(
                 "Poss Cxns: {}",
-                (inits::INITIAL_BITS_NUM * (inits::INITIAL_BITS_NUM - 1) / 2)
+                //(inits::INITIAL_BITS_NUM * (inits::INITIAL_BITS_NUM - 1) / 2)
+                BitGraph::possible_cxns(inits::INITIAL_BITS_NUM)
                     .to_formatted_string(&Locale::en)
             ),
         )));
@@ -298,11 +291,12 @@ impl TheCanvas {
     pub fn update(&mut self, world: &TheWorld) {
         let nodes = world.bit_graph.nodes();
         assert_ne!(nodes, 0); // prevent divide by zero
-        let ones_count = world.bit_graph.values.ones_count();
+        let ones_count = world.bit_graph.values.calc_ones_count();
         let ones_fraction = ones_count as f64 / nodes as f64;
 
-        let actual_connections = world.bit_graph.cxns_count();
-        let possible_connections = nodes * (nodes - 1) / 2;
+        let actual_connections = world.bit_graph.calc_cxns_count();
+        //let possible_connections = nodes * (nodes - 1) / 2;
+        let possible_connections = BitGraph::possible_cxns(nodes);
         let fractional_connections = actual_connections as f64 / possible_connections as f64;
 
         // Set stxt_bits to display bits number

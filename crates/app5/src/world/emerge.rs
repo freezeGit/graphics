@@ -83,15 +83,15 @@ impl BitArray {
         }
     }
 
-    pub fn ones_count(&self) -> usize {
+    pub fn calc_ones_count(&self) -> usize {
         self.words
             .iter()
             .map(|word| word.count_ones() as usize)
             .sum()
     }
 
-    pub fn ones_fraction(&self) -> f64 {
-        self.ones_count() as f64 / self.len() as f64
+    pub fn calc_ones_fraction(&self) -> f64 {
+        self.calc_ones_count() as f64 / self.len() as f64
     }
 } // end of BitArray
 
@@ -199,6 +199,10 @@ impl BitGraph {
         self.values.len()
     }
 
+    pub const fn possible_cxns(nodes: usize) -> usize {
+        nodes * (nodes - 1) / 2
+    }
+
     pub fn get_node(&self, i: usize) -> bool {
         debug_assert!(i < self.nodes());
 
@@ -224,17 +228,17 @@ impl BitGraph {
         }
     }
 
-    pub fn ones_count(&self) -> usize {
-        self.values.ones_count()
-    }
-
-    // pub fn ones_fraction(&self) -> f64 {
-    //     self.values.ones_fraction()
+    // pub fn calc_ones_count(&self) -> usize {
+    //     self.values.calc_ones_count()
     // }
 
-    pub fn cxns_count(&self) -> usize {
+    // pub fn calc_ones_fraction(&self) -> f64 {
+    //     self.values.calc_ones_fraction()
+    // }
+
+    pub fn calc_cxns_count(&self) -> usize {
         // TDJ: ? count only first half
-        self.connections.ones_count() / 2
+        self.connections.calc_ones_count() / 2
     }
 
     fn node_index(&self, a: usize, b: usize) -> usize {
