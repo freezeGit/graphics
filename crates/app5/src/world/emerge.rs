@@ -161,7 +161,7 @@ impl BitsRule {
 } // end of impl BitsRule
 
 pub struct BitGraph {
-    pub values: BitArray, // TDJ: Can I get rid of pub?
+    pub values: BitArray,
     pub connections: BitArray,
 }
 
@@ -177,6 +177,30 @@ impl BitGraph {
     }
 
     pub fn new_with_random_ones(nodes: usize, initial_ones: usize, rng: &mut impl Rng) -> Self {
+        assert!(nodes >= 2, "BitArray nodes must be at least 2, got {nodes}");
+        assert!(
+            initial_ones <= nodes,
+            "Initial ones cannot exceed total number of nodes"
+        );
+
+        let mut grph = Self::new(nodes);
+
+        let mut indices: Vec<usize> = (0..nodes).collect();
+        indices.shuffle(rng);
+
+        for &i in &indices[..initial_ones] {
+            grph.set_node(i, true);
+        }
+
+        grph
+    }
+
+    pub fn new_with_random_values(
+        nodes: usize,
+        initial_ones: usize,
+        initial_cxns: usize,
+        rng: &mut impl Rng,
+    ) -> Self {
         assert!(nodes >= 2, "BitArray nodes must be at least 2, got {nodes}");
         assert!(
             initial_ones <= nodes,

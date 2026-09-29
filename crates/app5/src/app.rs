@@ -11,7 +11,8 @@ mod app_internal; // internal functions that do not require application specific
 use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::inits;
-use crate::world::emerge::{BitArray, BitGraph};
+//use crate::world::emerge::{BitArray, BitGraph};
+use crate::world::emerge::BitGraph;
 use egui::Context;
 #[allow(unused_imports)]
 use gui_lib::{
@@ -22,7 +23,7 @@ use gui_lib::{
 };
 use num_format::Locale;
 use num_format::ToFormattedString;
-use statrs::statistics::Statistics;
+//use statrs::statistics::Statistics;
 use std::fs;
 //use crate::world::{Rule, TheWorld};
 use crate::world::{BitsRule, TheWorld};
@@ -126,7 +127,7 @@ impl TheApp {
                     DLG_ABOUT,
                     "About",
                     "Emergence. \n\
-                    Using connections",
+                    Both bits and connections",
                 )));
             }
 
@@ -308,10 +309,9 @@ impl TheApp {
                     )));
                 } else {
                     self.world.bits_rule = BitsRule::new(rule);
-                    // self.world.bits =
-                    //     BitArray::new_with_random_ones(bits, ones, &mut self.world.rng);
                     self.world.bit_graph =
-                        BitGraph::new_with_random_ones(bits, ones, &mut self.world.rng);
+                        //BitGraph::new_with_random_ones(bits, ones, &mut self.world.rng);
+                        BitGraph::new_with_random_values(bits, ones, 0,&mut self.world.rng);
                     self.world.start_ones = ones;
                     self.world.frame_number = 0;
                 }
