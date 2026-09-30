@@ -61,7 +61,6 @@ impl TheWorld {
             cxns_rule: CxnsRule::new(INITIAL_CXN_RULE),
             start_ones: INITIAL_ONES,
             start_cxns: INITIAL_CXNS,
-            //attractor: Seq::new(INITIAL_SEQ_DISCARD),
             frame_number: 0,
         }
     }

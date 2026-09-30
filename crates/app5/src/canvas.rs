@@ -85,7 +85,6 @@ impl TheCanvas {
         // --------------------------
 
         let sgr: Rc<RefCell<SeqGraph>> =
-           //Rc::new(RefCell::new(SeqGraph::new(egui::pos2(50.0, 600.0))));
             Rc::new(RefCell::new(SeqGraph::new(inits::SEQ_GRAPH_POSITION)));
         canvas.add_shape(sgr.clone());
 
@@ -111,7 +110,6 @@ impl TheCanvas {
             egui::Pos2::new(370.0, 10.0),
             format!(
                 "Poss Cxns: {}",
-                //(inits::INITIAL_BITS_NUM * (inits::INITIAL_BITS_NUM - 1) / 2)
                 BitGraph::possible_cxns(inits::INITIAL_BITS_NUM)
                     .to_formatted_string(&Locale::en)
             ),
@@ -120,7 +118,6 @@ impl TheCanvas {
 
         let stxt_cxns: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(680.0, 10.0),
-            //format!("Cxns: {}", inits::INITIAL_ONES),
             format!(
                 "Cxns: {}",
                 inits::INITIAL_CXNS.to_formatted_string(&Locale::en)
@@ -129,21 +126,18 @@ impl TheCanvas {
         canvas.add_shape(stxt_cxns.clone());
 
         let stxt_bits_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //egui::Pos2::new(360.0, 10.0),
             egui::Pos2::new(10.0, 45.0),
             format!("Bits Rule: {}", inits::INITIAL_BITS_RULE),
         )));
         canvas.add_shape(stxt_bits_rule.clone());
 
         let stxt_cxn_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //egui::Pos2::new(100.0, 10.0),
             egui::Pos2::new(160.0, 45.0),
             format!("Cxn Rule: {}", inits::INITIAL_CXN_RULE),
         )));
         canvas.add_shape(stxt_cxn_rule.clone());
 
         let stxt_scale: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //egui::Pos2::new(400.0, 45.0),
             egui::Pos2::new(370.0, 45.0),
             format!("Scale: {}", inits::SEQ_GRAPH_SCALE),
         )));
@@ -165,17 +159,16 @@ impl TheCanvas {
         canvas.add_shape(stxt_batch.clone());
 
         let stxt_frame: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            //egui::Pos2::new(525.0, 10.0),
             egui::Pos2::new(945.0, 10.0),
             format!("Interactions: {}", 0),
         )));
         canvas.add_shape(stxt_frame.clone());
 
-        const a_y: f32 = 705.0;
-        const b_y: f32 = 765.0;
+        const A_Y: f32 = 705.0;
+        const B_Y: f32 = 765.0;
 
         let slna1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-            Pos2::new(100.0, a_y),
+            Pos2::new(100.0, A_Y),
             Vec2::new(950.0, 0.0),
         )));
         slna1.borrow_mut().set_line_width(8.0);
@@ -183,7 +176,7 @@ impl TheCanvas {
         canvas.add_shape(slna1.clone());
 
         let slna2: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-            Pos2::new(100.0, a_y),
+            Pos2::new(100.0, A_Y),
             Vec2::new(950.0, 0.0),
         )));
         slna2.borrow_mut().set_line_width(8.0);
@@ -203,8 +196,14 @@ impl TheCanvas {
         )));
         canvas.add_shape(tics_a.clone());
 
+        let stxt_ones_label: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(1080.0, A_Y - 17.0),
+            "Ones",
+        )));
+        canvas.add_shape(stxt_ones_label.clone());
+
         let slnb1: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-            Pos2::new(100.0, b_y),
+            Pos2::new(100.0, B_Y),
             Vec2::new(950.0, 0.0),
         )));
         slnb1.borrow_mut().set_line_width(8.0);
@@ -212,7 +211,7 @@ impl TheCanvas {
         canvas.add_shape(slnb1.clone());
 
         let slnb2: Rc<RefCell<Line>> = Rc::new(RefCell::new(Line::new(
-            Pos2::new(100.0, b_y),
+            Pos2::new(100.0, B_Y),
             Vec2::new(950.0, 0.0),
         )));
         slnb2.borrow_mut().set_line_width(8.0);
@@ -220,7 +219,7 @@ impl TheCanvas {
         canvas.add_shape(slnb2.clone());
 
         let tics_b: Rc<RefCell<Lines>> = Rc::new(RefCell::new(Lines::new(
-            Pos2::new(100.0, b_y),
+            Pos2::new(100.0, B_Y),
             vec![
                 [Pos2::new(0.0, -16.0), Pos2::new(0.0, 16.0)],
                 [Pos2::new(237.5, -16.0), Pos2::new(237.5, 16.0)],
@@ -230,6 +229,12 @@ impl TheCanvas {
             ],
         )));
         canvas.add_shape(tics_b.clone());
+
+        let stxt_cxns_label: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
+            egui::Pos2::new(1080.0, B_Y - 17.0),
+            "Connections",
+        )));
+        canvas.add_shape(stxt_cxns_label.clone());
 
         ViewHandles {
             // Shapes as unique handles to a concrete struct (e.g. Rc<RefCell<Circle>>)
@@ -273,9 +278,6 @@ impl TheCanvas {
 
         canvas.add_widget(Box::new(Space::new(25.0)));
 
-        // let wb_seq = Button::new(BTN_SEQ, "Sequence", 120.0, 40.0);
-        // canvas.add_widget(Box::new(wb_seq));
-
         canvas.add_widget(Box::new(Space::new(250.0)));
 
         let wb_about = Button::new(BTN_ABOUT, "About", 120.0, 40.0);
@@ -291,11 +293,10 @@ impl TheCanvas {
     pub fn update(&mut self, world: &TheWorld) {
         let nodes = world.bit_graph.nodes();
         assert_ne!(nodes, 0); // prevent divide by zero
-        let ones_count = world.bit_graph.values.calc_ones_count();
+        let ones_count = world.bit_graph.calc_ones_count();
         let ones_fraction = ones_count as f64 / nodes as f64;
 
         let actual_connections = world.bit_graph.calc_cxns_count();
-        //let possible_connections = nodes * (nodes - 1) / 2;
         let possible_connections = BitGraph::possible_cxns(nodes);
         let fractional_connections = actual_connections as f64 / possible_connections as f64;
 

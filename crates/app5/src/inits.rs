@@ -41,7 +41,7 @@ pub const INITIAL_CXN_RULE: u8 = 1; // must be 0 to 3 inclusive
 pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
 //pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.
 pub const INITIAL_ONES: usize = 0; // Must be <= INITIAL_BITS_NUM.
-pub const INITIAL_CXNS: usize = 0; // Must be <= ?.
+pub const INITIAL_CXNS: usize = 8000000; // Must be <= ?.
 
 pub const INITIAL_SEQ_DISCARD: usize = 45000;
 pub const INITIAL_SEQ_LENGTH: usize = 1000;

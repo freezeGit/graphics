@@ -176,24 +176,48 @@ impl BitGraph {
         }
     }
 
-    pub fn new_with_random_ones(nodes: usize, initial_ones: usize, rng: &mut impl Rng) -> Self {
-        assert!(nodes >= 2, "BitArray nodes must be at least 2, got {nodes}");
-        assert!(
-            initial_ones <= nodes,
-            "Initial ones cannot exceed total number of nodes"
-        );
+    // pub fn new_with_random_ones(nodes: usize, initial_ones: usize, rng: &mut impl Rng) -> Self {
+    //     assert!(nodes >= 2, "BitArray nodes must be at least 2, got {nodes}");
+    //     assert!(
+    //         initial_ones <= nodes,
+    //         "Initial ones cannot exceed total number of nodes"
+    //     );
+    //
+    //     let mut grph = Self::new(nodes);
+    //
+    //     let mut indices: Vec<usize> = (0..nodes).collect();
+    //     indices.shuffle(rng);
+    //
+    //     for &i in &indices[..initial_ones] {
+    //         grph.set_node(i, true);
+    //     }
+    //
+    //     grph
+    // }
 
-        let mut grph = Self::new(nodes);
-
-        let mut indices: Vec<usize> = (0..nodes).collect();
-        indices.shuffle(rng);
-
-        for &i in &indices[..initial_ones] {
-            grph.set_node(i, true);
-        }
-
-        grph
-    }
+    // pub fn new_with_random_values(
+    //     nodes: usize,
+    //     initial_ones: usize,
+    //     initial_cxns: usize,
+    //     rng: &mut impl Rng,
+    // ) -> Self {
+    //     assert!(nodes >= 2, "BitArray nodes must be at least 2, got {nodes}");
+    //     assert!(
+    //         initial_ones <= nodes,
+    //         "Initial ones cannot exceed total number of nodes"
+    //     );
+    //
+    //     let mut grph = Self::new(nodes);
+    //
+    //     let mut indices: Vec<usize> = (0..nodes).collect();
+    //     indices.shuffle(rng);
+    //
+    //     for &i in &indices[..initial_ones] {
+    //         grph.set_node(i, true);
+    //     }
+    //
+    //     grph
+    // }
 
     pub fn new_with_random_values(
         nodes: usize,
@@ -201,19 +225,43 @@ impl BitGraph {
         initial_cxns: usize,
         rng: &mut impl Rng,
     ) -> Self {
-        assert!(nodes >= 2, "BitArray nodes must be at least 2, got {nodes}");
+        assert!(nodes >= 2, "BitGraph nodes must be at least 2, got {nodes}");
         assert!(
             initial_ones <= nodes,
             "Initial ones cannot exceed total number of nodes"
         );
 
+        let possible_cxns = nodes * (nodes - 1) / 2; // TDJ: use BitGraph::possible_cxns
+
+        assert!(
+            initial_cxns <= possible_cxns,
+            "Initial connections cannot exceed number of possible connections"
+        );
+
         let mut grph = Self::new(nodes);
 
+        // Randomly choose nodes that initially contain one.
         let mut indices: Vec<usize> = (0..nodes).collect();
         indices.shuffle(rng);
 
         for &i in &indices[..initial_ones] {
             grph.set_node(i, true);
+        }
+
+        // Make a list of all possible undirected connections.
+        let mut edges = Vec::with_capacity(possible_cxns);
+
+        for i in 0..nodes {
+            for j in (i + 1)..nodes {
+                edges.push((i, j));
+            }
+        }
+
+        // Randomly choose the required number.
+        edges.shuffle(rng);
+
+        for &(i, j) in &edges[..initial_cxns] {
+            grph.set_connected(i, j, true);
         }
 
         grph
@@ -252,13 +300,9 @@ impl BitGraph {
         }
     }
 
-    // pub fn calc_ones_count(&self) -> usize {
-    //     self.values.calc_ones_count()
-    // }
-
-    // pub fn calc_ones_fraction(&self) -> f64 {
-    //     self.values.calc_ones_fraction()
-    // }
+    pub fn calc_ones_count(&self) -> usize {
+        self.values.calc_ones_count()
+    }
 
     pub fn calc_cxns_count(&self) -> usize {
         // TDJ: ? count only first half
@@ -270,10 +314,13 @@ impl BitGraph {
     }
 
     fn is_connected(&self, a: usize, b: usize) -> bool {
+        assert!(a != b, "A node cannot be connected to itself");
         self.connections.get(self.node_index(a, b))
     }
 
     fn set_connected(&mut self, a: usize, b: usize, connected: bool) {
+        assert!(a != b, "A node cannot be connected to itself");
+
         let ab = a * self.nodes() + b;
         let ba = b * self.nodes() + a;
 
@@ -316,6 +363,10 @@ pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cxns_rule: CxnsRule, rng:
 
     let i = rng.random_range(0..n);
     let j = rng.random_range(0..n);
+
+    if i == j {
+        return;
+    }
 
     interact_bits(&mut bg.values, bits_rule, i, j);
     change_cxn(bg, cxns_rule, i, j);

@@ -24,7 +24,7 @@ use gui_lib::{
 use num_format::Locale;
 use num_format::ToFormattedString;
 //use statrs::statistics::Statistics;
-use std::fs;
+//use std::fs;
 //use crate::world::{Rule, TheWorld};
 use crate::world::{BitsRule, TheWorld};
 
@@ -248,6 +248,7 @@ impl TheApp {
                 let mut rule = self.world.bits_rule.number();
                 let mut bits = self.world.bit_graph.nodes();
                 let mut ones = self.world.start_ones;
+                let mut cxns = self.world.start_cxns;
 
                 for item in values {
                     let (item_id, text) = item;
@@ -311,8 +312,9 @@ impl TheApp {
                     self.world.bits_rule = BitsRule::new(rule);
                     self.world.bit_graph =
                         //BitGraph::new_with_random_ones(bits, ones, &mut self.world.rng);
-                        BitGraph::new_with_random_values(bits, ones, 0,&mut self.world.rng);
+                        BitGraph::new_with_random_values(bits, ones, 8000000, &mut self.world.rng);
                     self.world.start_ones = ones;
+                    self.world.start_cxns = cxns;
                     self.world.frame_number = 0;
                 }
             }
