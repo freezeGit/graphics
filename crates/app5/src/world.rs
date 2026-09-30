@@ -10,9 +10,12 @@
 pub mod emerge;
 // ---------------------------------------------------
 
+// use crate::inits::{
+//     INITIAL_BITS_NUM, INITIAL_BITS_RULE, INITIAL_CXN_RULE, INITIAL_CXNS, INITIAL_ONES,
+//     INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
+// };
 use crate::inits::{
     INITIAL_BITS_NUM, INITIAL_BITS_RULE, INITIAL_CXN_RULE, INITIAL_CXNS, INITIAL_ONES,
-    INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
 };
 pub(crate) use crate::world::emerge::BitsRule;
 use crate::world::emerge::{BitArray, BitGraph, CxnsRule, step_bg};

@@ -176,15 +176,28 @@ impl BitGraph {
         }
     }
 
-    // pub fn new_with_random_ones(nodes: usize, initial_ones: usize, rng: &mut impl Rng) -> Self {
-    //     assert!(nodes >= 2, "BitArray nodes must be at least 2, got {nodes}");
+    // pub fn new_with_random_values(
+    //     nodes: usize,
+    //     initial_ones: usize,
+    //     initial_cxns: usize,
+    //     rng: &mut impl Rng,
+    // ) -> Self {
+    //     assert!(nodes >= 2, "BitGraph nodes must be at least 2, got {nodes}");
     //     assert!(
     //         initial_ones <= nodes,
     //         "Initial ones cannot exceed total number of nodes"
     //     );
     //
+    //     let possible_cxns = nodes * (nodes - 1) / 2; // TDJ: use BitGraph::possible_cxns
+    //
+    //     assert!(
+    //         initial_cxns <= possible_cxns,
+    //         "Initial connections cannot exceed number of possible connections"
+    //     );
+    //
     //     let mut grph = Self::new(nodes);
     //
+    //     // Randomly choose nodes that initially contain one.
     //     let mut indices: Vec<usize> = (0..nodes).collect();
     //     indices.shuffle(rng);
     //
@@ -192,28 +205,20 @@ impl BitGraph {
     //         grph.set_node(i, true);
     //     }
     //
-    //     grph
-    // }
-
-    // pub fn new_with_random_values(
-    //     nodes: usize,
-    //     initial_ones: usize,
-    //     initial_cxns: usize,
-    //     rng: &mut impl Rng,
-    // ) -> Self {
-    //     assert!(nodes >= 2, "BitArray nodes must be at least 2, got {nodes}");
-    //     assert!(
-    //         initial_ones <= nodes,
-    //         "Initial ones cannot exceed total number of nodes"
-    //     );
+    //     // Make a list of all possible undirected connections.
+    //     let mut edges = Vec::with_capacity(possible_cxns);
     //
-    //     let mut grph = Self::new(nodes);
+    //     for i in 0..nodes {
+    //         for j in (i + 1)..nodes {
+    //             edges.push((i, j));
+    //         }
+    //     }
     //
-    //     let mut indices: Vec<usize> = (0..nodes).collect();
-    //     indices.shuffle(rng);
+    //     // Randomly choose the required number.
+    //     edges.shuffle(rng);
     //
-    //     for &i in &indices[..initial_ones] {
-    //         grph.set_node(i, true);
+    //     for &(i, j) in &edges[..initial_cxns] {
+    //         grph.set_connected(i, j, true);
     //     }
     //
     //     grph
@@ -225,22 +230,22 @@ impl BitGraph {
         initial_cxns: usize,
         rng: &mut impl Rng,
     ) -> Self {
+        let possible_cxns = BitGraph::possible_cxns(nodes);
+
         assert!(nodes >= 2, "BitGraph nodes must be at least 2, got {nodes}");
         assert!(
             initial_ones <= nodes,
             "Initial ones cannot exceed total number of nodes"
         );
-
-        let possible_cxns = nodes * (nodes - 1) / 2; // TDJ: use BitGraph::possible_cxns
-
         assert!(
             initial_cxns <= possible_cxns,
             "Initial connections cannot exceed number of possible connections"
         );
 
+        // Create a BitGraph with all nodes and edges initialized to 0
         let mut grph = Self::new(nodes);
 
-        // Randomly choose nodes that initially contain one.
+        // Randomly choose nodes that will initially contain one.
         let mut indices: Vec<usize> = (0..nodes).collect();
         indices.shuffle(rng);
 
@@ -248,6 +253,8 @@ impl BitGraph {
             grph.set_node(i, true);
         }
 
+        // Randomly choose edges that will initially be connected.
+        //
         // Make a list of all possible undirected connections.
         let mut edges = Vec::with_capacity(possible_cxns);
 
