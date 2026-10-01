@@ -12,7 +12,7 @@ use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::inits;
 //use crate::world::emerge::{BitArray, BitGraph};
-use crate::world::emerge::BitGraph;
+use crate::world::emerge::{BitGraph, CxnsRule};
 use egui::Context;
 #[allow(unused_imports)]
 use gui_lib::{
@@ -165,8 +165,13 @@ impl TheApp {
                         [
                             TextEntryField::new(
                                 "rule",
-                                "Rule (0 to 15)",
+                                "Bits Rule (0 to 15)",
                                 self.world.bits_rule.number().to_string(),
+                            ),
+                            TextEntryField::new(
+                                "c_rule",
+                                "Connections Rule (0 to 3)",
+                                self.world.cxns_rule.number().to_string(),
                             ),
                             TextEntryField::new(
                                 "bitsnum",
@@ -239,6 +244,86 @@ impl TheApp {
         }
     }
 
+    // fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
+    //     match id {
+    //         DLG_ENTER_SPECS => {
+    //             self.sim_timer.pause();
+    //
+    //             let mut bad_val = false;
+    //             let mut rule = self.world.bits_rule.number();
+    //             let mut bits = self.world.bit_graph.nodes();
+    //             let mut ones = self.world.start_ones;
+    //             let mut cxns = self.world.start_cxns;
+    //
+    //             for item in values {
+    //                 let (item_id, text) = item;
+    //                 match item_id.as_str() {
+    //                     "rule" => match text.trim().parse::<u8>() {
+    //                         Ok(number) if number < 16 => {
+    //                             rule = number;
+    //                         }
+    //                         Ok(number) => {
+    //                             bad_val = true;
+    //                             eprintln!(
+    //                                 "Invalid rule number: {number}. Rule must be between 0 and 15."
+    //                             );
+    //                         }
+    //                         Err(err) => {
+    //                             bad_val = true;
+    //                             eprintln!("Could not parse rule number {:?}: {err}", text);
+    //                         }
+    //                     },
+    //                     "bitsnum" => match text.trim().parse::<usize>() {
+    //                         Ok(number) if number >= 2 => {
+    //                             bits = number;
+    //                         }
+    //                         Ok(number) => {
+    //                             bad_val = true;
+    //                             eprintln!("Invalid bits number: {number}. Bits number too small.");
+    //                         }
+    //                         Err(err) => {
+    //                             bad_val = true;
+    //                             eprintln!("Could not parse bits number {:?}: {err}", text);
+    //                         }
+    //                     },
+    //                     "onesnum" => match text.trim().parse::<usize>() {
+    //                         Ok(number) if number <= bits => {
+    //                             ones = number;
+    //                         }
+    //                         Ok(number) => {
+    //                             bad_val = true;
+    //                             eprintln!(
+    //                                 "Invalid ones number: {number}. \
+    //                                 Ones number must be smaller than bits number.\
+    //                                 Wiil be set to number of bits."
+    //                             );
+    //                         }
+    //                         Err(err) => {
+    //                             bad_val = true;
+    //                             eprintln!("Could not parse ones number {:?}: {err}", text);
+    //                         }
+    //                     },
+    //                     _ => {}
+    //                 }
+    //             }
+    //
+    //             if bad_val {
+    //                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
+    //                     DLG_BAD_VALS,
+    //                     "Error Message",
+    //                     "Bad value(s) entered.",
+    //                 )));
+    //             } else {
+    //                 self.world.bits_rule = BitsRule::new(rule);
+    //                 self.world.bit_graph =
+    //                     //BitGraph::new_with_random_ones(bits, ones, &mut self.world.rng);
+    //                     BitGraph::new_with_random_values(bits, ones, 0, &mut self.world.rng);
+    //                 self.world.start_ones = ones;
+    //                 self.world.start_cxns = cxns;
+    //                 self.world.frame_number = 0;
+    //             }
+    //         }
+
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
             DLG_ENTER_SPECS => {
@@ -246,6 +331,7 @@ impl TheApp {
 
                 let mut bad_val = false;
                 let mut rule = self.world.bits_rule.number();
+                let mut c_rule = self.world.cxns_rule.number();
                 let mut bits = self.world.bit_graph.nodes();
                 let mut ones = self.world.start_ones;
                 let mut cxns = self.world.start_cxns;
@@ -261,6 +347,21 @@ impl TheApp {
                                 bad_val = true;
                                 eprintln!(
                                     "Invalid rule number: {number}. Rule must be between 0 and 15."
+                                );
+                            }
+                            Err(err) => {
+                                bad_val = true;
+                                eprintln!("Could not parse rule number {:?}: {err}", text);
+                            }
+                        },
+                        "c_rule" => match text.trim().parse::<u8>() {
+                            Ok(number) if number < 4 => {
+                                c_rule = number;
+                            }
+                            Ok(number) => {
+                                bad_val = true;
+                                eprintln!(
+                                    "Invalid rule number: {number}. Connections Rule must be between 0 and 3."
                                 );
                             }
                             Err(err) => {
@@ -310,9 +411,10 @@ impl TheApp {
                     )));
                 } else {
                     self.world.bits_rule = BitsRule::new(rule);
+                    self.world.cxns_rule = CxnsRule::new(c_rule);
                     self.world.bit_graph =
                         //BitGraph::new_with_random_ones(bits, ones, &mut self.world.rng);
-                        BitGraph::new_with_random_values(bits, ones, 8000000, &mut self.world.rng);
+                        BitGraph::new_with_random_values(bits, ones, 0, &mut self.world.rng);
                     self.world.start_ones = ones;
                     self.world.start_cxns = cxns;
                     self.world.frame_number = 0;
