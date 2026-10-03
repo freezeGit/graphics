@@ -19,8 +19,8 @@ use crate::world::TheWorld;
 use gui_lib::LineStyle::{Dashed, Dotted, Solid};
 use gui_lib::{BasicCanvas, Button, Color32, Label, Line, Lines, Pos2, Shape, Space, Text, Vec2};
 
-use num_format::{Locale, ToFormattedString};
 use crate::world::emerge::BitGraph;
+use num_format::{Locale, ToFormattedString};
 
 #[derive(Debug)]
 pub struct ViewHandles {
@@ -110,8 +110,7 @@ impl TheCanvas {
             egui::Pos2::new(370.0, 10.0),
             format!(
                 "Poss Cxns: {}",
-                BitGraph::possible_cxns(inits::INITIAL_BITS_NUM)
-                    .to_formatted_string(&Locale::en)
+                BitGraph::possible_cxns(inits::INITIAL_BITS_NUM).to_formatted_string(&Locale::en)
             ),
         )));
         canvas.add_shape(stxt_poss_cxns.clone());

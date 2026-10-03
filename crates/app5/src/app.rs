@@ -164,7 +164,7 @@ impl TheApp {
                         "Enter simulation specs",
                         [
                             TextEntryField::new(
-                                "rule",
+                                "b_rule",
                                 "Bits Rule (0 to 15)",
                                 self.world.bits_rule.number().to_string(),
                             ),
@@ -175,15 +175,19 @@ impl TheApp {
                             ),
                             TextEntryField::new(
                                 "bitsnum",
-                                "Bits number",
+                                "Bits number (>= 2)",
                                 //self.world.bits.len().to_string(),
                                 self.world.bit_graph.nodes().to_string(),
                             ),
-                            //TextEntryField::new("onesnum", "Ones number", "500"),
                             TextEntryField::new(
                                 "onesnum",
-                                "Ones number",
+                                "Ones number (<= Bits number)",
                                 self.world.start_ones.to_string(),
+                            ),
+                            TextEntryField::new(
+                                "cxnsnum",
+                                "Connections number (<= Bits×(Bits-1)÷2)",
+                                self.world.start_cxns.to_string(),
                             ),
                         ],
                     )));
@@ -244,104 +248,24 @@ impl TheApp {
         }
     }
 
-    // fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
-    //     match id {
-    //         DLG_ENTER_SPECS => {
-    //             self.sim_timer.pause();
-    //
-    //             let mut bad_val = false;
-    //             let mut rule = self.world.bits_rule.number();
-    //             let mut bits = self.world.bit_graph.nodes();
-    //             let mut ones = self.world.start_ones;
-    //             let mut cxns = self.world.start_cxns;
-    //
-    //             for item in values {
-    //                 let (item_id, text) = item;
-    //                 match item_id.as_str() {
-    //                     "rule" => match text.trim().parse::<u8>() {
-    //                         Ok(number) if number < 16 => {
-    //                             rule = number;
-    //                         }
-    //                         Ok(number) => {
-    //                             bad_val = true;
-    //                             eprintln!(
-    //                                 "Invalid rule number: {number}. Rule must be between 0 and 15."
-    //                             );
-    //                         }
-    //                         Err(err) => {
-    //                             bad_val = true;
-    //                             eprintln!("Could not parse rule number {:?}: {err}", text);
-    //                         }
-    //                     },
-    //                     "bitsnum" => match text.trim().parse::<usize>() {
-    //                         Ok(number) if number >= 2 => {
-    //                             bits = number;
-    //                         }
-    //                         Ok(number) => {
-    //                             bad_val = true;
-    //                             eprintln!("Invalid bits number: {number}. Bits number too small.");
-    //                         }
-    //                         Err(err) => {
-    //                             bad_val = true;
-    //                             eprintln!("Could not parse bits number {:?}: {err}", text);
-    //                         }
-    //                     },
-    //                     "onesnum" => match text.trim().parse::<usize>() {
-    //                         Ok(number) if number <= bits => {
-    //                             ones = number;
-    //                         }
-    //                         Ok(number) => {
-    //                             bad_val = true;
-    //                             eprintln!(
-    //                                 "Invalid ones number: {number}. \
-    //                                 Ones number must be smaller than bits number.\
-    //                                 Wiil be set to number of bits."
-    //                             );
-    //                         }
-    //                         Err(err) => {
-    //                             bad_val = true;
-    //                             eprintln!("Could not parse ones number {:?}: {err}", text);
-    //                         }
-    //                     },
-    //                     _ => {}
-    //                 }
-    //             }
-    //
-    //             if bad_val {
-    //                 self.canvas.canvas.set_dialog(Box::new(MessageBoxDlg::new(
-    //                     DLG_BAD_VALS,
-    //                     "Error Message",
-    //                     "Bad value(s) entered.",
-    //                 )));
-    //             } else {
-    //                 self.world.bits_rule = BitsRule::new(rule);
-    //                 self.world.bit_graph =
-    //                     //BitGraph::new_with_random_ones(bits, ones, &mut self.world.rng);
-    //                     BitGraph::new_with_random_values(bits, ones, 0, &mut self.world.rng);
-    //                 self.world.start_ones = ones;
-    //                 self.world.start_cxns = cxns;
-    //                 self.world.frame_number = 0;
-    //             }
-    //         }
-
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
             DLG_ENTER_SPECS => {
                 self.sim_timer.pause();
 
                 let mut bad_val = false;
-                let mut rule = self.world.bits_rule.number();
+                let mut b_rule = self.world.bits_rule.number();
                 let mut c_rule = self.world.cxns_rule.number();
                 let mut bits = self.world.bit_graph.nodes();
-                let mut ones = self.world.start_ones;
-                let mut cxns = self.world.start_cxns;
+                let mut strt_ones = self.world.start_ones;
+                let mut strt_cxns = self.world.start_cxns;
 
                 for item in values {
                     let (item_id, text) = item;
                     match item_id.as_str() {
-                        "rule" => match text.trim().parse::<u8>() {
+                        "b_rule" => match text.trim().parse::<u8>() {
                             Ok(number) if number < 16 => {
-                                rule = number;
+                                b_rule = number;
                             }
                             Ok(number) => {
                                 bad_val = true;
@@ -384,14 +308,29 @@ impl TheApp {
                         },
                         "onesnum" => match text.trim().parse::<usize>() {
                             Ok(number) if number <= bits => {
-                                ones = number;
+                                strt_ones = number;
                             }
                             Ok(number) => {
                                 bad_val = true;
                                 eprintln!(
                                     "Invalid ones number: {number}. \
-                                    Ones number must be smaller than bits number.\
-                                    Wiil be set to number of bits."
+                                    Ones number must be smaller than bits number."
+                                );
+                            }
+                            Err(err) => {
+                                bad_val = true;
+                                eprintln!("Could not parse ones number {:?}: {err}", text);
+                            }
+                        },
+                        "cxnsnum" => match text.trim().parse::<usize>() {
+                            Ok(number) if number <= BitGraph::possible_cxns(bits) => {
+                                strt_cxns = number;
+                            }
+                            Ok(number) => {
+                                bad_val = true;
+                                eprintln!(
+                                    "Invalid connections number: {number}. \
+                                    Connections number must be smaller than possible connections number."
                                 );
                             }
                             Err(err) => {
@@ -410,13 +349,16 @@ impl TheApp {
                         "Bad value(s) entered.",
                     )));
                 } else {
-                    self.world.bits_rule = BitsRule::new(rule);
+                    self.world.bits_rule = BitsRule::new(b_rule);
                     self.world.cxns_rule = CxnsRule::new(c_rule);
-                    self.world.bit_graph =
-                        //BitGraph::new_with_random_ones(bits, ones, &mut self.world.rng);
-                        BitGraph::new_with_random_values(bits, ones, 0, &mut self.world.rng);
-                    self.world.start_ones = ones;
-                    self.world.start_cxns = cxns;
+                    self.world.bit_graph = BitGraph::new_with_random_values(
+                        bits,
+                        strt_ones,
+                        strt_cxns,
+                        &mut self.world.rng,
+                    );
+                    self.world.start_ones = strt_ones;
+                    self.world.start_cxns = strt_cxns;
                     self.world.frame_number = 0;
                 }
             }
