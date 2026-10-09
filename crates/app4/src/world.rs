@@ -12,7 +12,7 @@ pub mod emerge;
 // ---------------------------------------------------
 use crate::inits::INITIAL_RULE;
 pub(crate) use crate::world::emerge::Rule;
-use crate::world::emerge::{BitArray, Seq, step_bits};
+use crate::world::emerge::{BitArray, Seq, step_bits, step_bits_rand};
 use gui_lib::World;
 
 use crate::world::delta_ones::Deltas;

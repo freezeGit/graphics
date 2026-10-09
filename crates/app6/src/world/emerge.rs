@@ -161,6 +161,11 @@ impl BitsRule {
         //true
     }
 
+    // fn weighted_boolean() -> bool {
+    //     // Generates a boolean with a custom probability (e.g., 75% chance of being true)
+    //     rand::rng().random_bool(0.75)
+    // }
+
     fn response(self, this: bool, other: bool) -> bool {
         // The two bits are equal
         if this == other {

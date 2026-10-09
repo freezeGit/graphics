@@ -1,6 +1,7 @@
 use crate::world::Rule;
 use crate::world::emerge::BitArray;
 use crate::world::step_bits;
+use crate::world::step_bits_rand;
 use rand::Rng;
 use statrs::statistics::Statistics;
 
@@ -49,7 +50,8 @@ impl DeltaOnes {
         let mut samples: Vec<f64> = Vec::with_capacity(sample as usize);
         for _ in 0..sample {
             let mut bits: BitArray = BitArray::new_with_random_ones(SIM_BITS, ones, rng);
-            step_bits(&mut bits, rule, rng);
+            //step_bits(&mut bits, rule, rng);
+            step_bits_rand(&mut bits, rule, rng);
             let new_ones = bits.ones_count();
             let delta = new_ones as i32 - ones as i32;
             samples.push(delta as f64);
