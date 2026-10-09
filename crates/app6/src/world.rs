@@ -46,8 +46,8 @@ impl World for TheWorld {
         // Increment frame number each simulation step.
         self.frame_number += 1;
         // Advance simulation by one step.
-        //step_bg(
-        step_bg_rand(
+        step_bg(
+        //step_bg_rand(
             &mut self.bit_graph,
             self.bits_rule,
             self.cxns_rule,

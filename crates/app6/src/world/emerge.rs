@@ -109,6 +109,7 @@ fn interact_bits_rand(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
     bits.set(i, new_a);
     bits.set(j, new_b);
 }
+
 fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
     if i == j {
         return;
@@ -133,7 +134,7 @@ pub struct BitsRule {
 impl BitsRule {
     pub fn new(number: u8) -> Self {
         assert!(
-            number < 16,
+            number < 17,
             "Rule number must be less than 16, got {number}"
         );
 
@@ -166,9 +167,25 @@ impl BitsRule {
     //     rand::rng().random_bool(0.75)
     // }
 
+    // fn response(self, this: bool, other: bool) -> bool {
+    //     // The two bits are equal
+    //     if this == other {
+    //         if this { self.flags[0] } else { self.flags[1] }
+    //     // The two bits are different
+    //     } else if this {
+    //         self.flags[2]
+    //     } else {
+    //         self.flags[3]
+    //     }
+    // }
+
     fn response(self, this: bool, other: bool) -> bool {
+        if self.number == 16 {
+            //println!("Rule 16");
+            rand::random()
+        }
         // The two bits are equal
-        if this == other {
+        else if this == other {
             if this { self.flags[0] } else { self.flags[1] }
         // The two bits are different
         } else if this {
@@ -337,6 +354,10 @@ fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize) {
         3 => {
             bg.set_connected(i, j, false);
         }
+        4 => {
+            let connected = rand::random();
+            bg.set_connected(i, j, connected);
+        }
         _ => {
             panic!(
                 "Connections Rule number must be less than 4, got {}",
@@ -344,6 +365,34 @@ fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize) {
             );
         }
     }
+
+// fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize) {
+//     match rule.number {
+//         // No change
+//         0 => {}
+//         // Toggle connection
+//         1 => {
+//             if bg.is_connected(i, j) {
+//                 bg.set_connected(i, j, false);
+//             } else {
+//                 bg.set_connected(i, j, true);
+//             }
+//         }
+//         // Connect
+//         2 => {
+//             bg.set_connected(i, j, true);
+//         }
+//         // Disconnect
+//         3 => {
+//             bg.set_connected(i, j, false);
+//         }
+//         _ => {
+//             panic!(
+//                 "Connections Rule number must be less than 4, got {}",
+//                 rule.number
+//             );
+//         }
+//     }
 }
 
 pub fn step_bg_rand(bg: &mut BitGraph, bits_rule: BitsRule, cxns_rule: CxnsRule, rng: &mut impl Rng) {
@@ -382,8 +431,9 @@ pub struct CxnsRule {
 impl CxnsRule {
     pub fn new(number: u8) -> Self {
         assert!(
-            number < 4,
-            "Connections Rule number must be less than 4, got {number}"
+            //number < 4,
+            number < 5,
+            "Connections Rule number must be less than 5, got {number}"
         );
 
         Self { number }

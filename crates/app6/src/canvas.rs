@@ -324,11 +324,17 @@ impl TheCanvas {
             actual_connections.to_formatted_string(&Locale::en)
         ));
 
-        // Set stxt_rule to display rule number
+        // Set stxt_bits_rule to display rule number
         self.view_handles
             .stxt_bits_rule
             .borrow_mut()
             .set_text(format!("Bits Rule: {}", world.bits_rule.number()));
+
+        // Set stxt_cxns_rule rule to display rule number
+        self.view_handles
+            .stxt_cxn_rule
+            .borrow_mut()
+            .set_text(format!("Cxn Rule: {}", world.cxns_rule.number()));
 
         // Set stxt_frame to display interactionss number
         self.view_handles.stxt_frame.borrow_mut().set_text(format!(

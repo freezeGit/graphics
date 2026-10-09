@@ -165,12 +165,13 @@ impl TheApp {
                         [
                             TextEntryField::new(
                                 "b_rule",
-                                "Bits Rule (0 to 15)",
+                                "Bits Rule (0 to 16)",
                                 self.world.bits_rule.number().to_string(),
                             ),
                             TextEntryField::new(
                                 "c_rule",
-                                "Connections Rule (0 to 3)",
+                                //"Connections Rule (0 to 3)",
+                                "Connections Rule (0 to 4)",
                                 self.world.cxns_rule.number().to_string(),
                             ),
                             TextEntryField::new(
@@ -264,13 +265,13 @@ impl TheApp {
                     let (item_id, text) = item;
                     match item_id.as_str() {
                         "b_rule" => match text.trim().parse::<u8>() {
-                            Ok(number) if number < 16 => {
+                            Ok(number) if number < 17 => {
                                 b_rule = number;
                             }
                             Ok(number) => {
                                 bad_val = true;
                                 eprintln!(
-                                    "Invalid rule number: {number}. Rule must be between 0 and 15."
+                                    "Invalid rule number: {number}. Rule must be between 0 and 16."
                                 );
                             }
                             Err(err) => {
@@ -279,7 +280,8 @@ impl TheApp {
                             }
                         },
                         "c_rule" => match text.trim().parse::<u8>() {
-                            Ok(number) if number < 4 => {
+                            //Ok(number) if number < 4 => {
+                            Ok(number) if number < 5 => {
                                 c_rule = number;
                             }
                             Ok(number) => {
