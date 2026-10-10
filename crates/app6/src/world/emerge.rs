@@ -95,21 +95,6 @@ impl BitArray {
     }
 } // end of BitArray
 
-fn interact_bits_rand(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
-    if i == j {
-        return;
-    }
-
-    let a = bits.get(i);
-    let b = bits.get(j);
-
-    // Symmetrical application of the rule.
-    let (new_a, new_b) = rule.apply_rand(a, b);
-
-    bits.set(i, new_a);
-    bits.set(j, new_b);
-}
-
 fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
     if i == j {
         return;
@@ -157,28 +142,6 @@ impl BitsRule {
         ((n >> i) & 1) != 0
     }
 
-    fn response_rand(self, this: bool, other: bool) -> bool {
-        rand::random()
-        //true
-    }
-
-    // fn weighted_boolean() -> bool {
-    //     // Generates a boolean with a custom probability (e.g., 75% chance of being true)
-    //     rand::rng().random_bool(0.75)
-    // }
-
-    // fn response(self, this: bool, other: bool) -> bool {
-    //     // The two bits are equal
-    //     if this == other {
-    //         if this { self.flags[0] } else { self.flags[1] }
-    //     // The two bits are different
-    //     } else if this {
-    //         self.flags[2]
-    //     } else {
-    //         self.flags[3]
-    //     }
-    // }
-
     fn response(self, this: bool, other: bool) -> bool {
         if self.number == 16 {
             //println!("Rule 16");
@@ -193,11 +156,6 @@ impl BitsRule {
         } else {
             self.flags[3]
         }
-    }
-
-    fn apply_rand(self, a: bool, b: bool) -> (bool, bool) {
-        // symmetrically reversible rule
-        (self.response_rand(a, b), self.response_rand(b, a))
     }
 
     fn apply(self, a: bool, b: bool) -> (bool, bool) {
@@ -393,20 +351,6 @@ fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize) {
 //             );
 //         }
 //     }
-}
-
-pub fn step_bg_rand(bg: &mut BitGraph, bits_rule: BitsRule, cxns_rule: CxnsRule, rng: &mut impl Rng) {
-    let n = bg.nodes();
-
-    let i = rng.random_range(0..n);
-    let j = rng.random_range(0..n);
-
-    if i == j {
-        return;
-    }
-
-    interact_bits_rand(&mut bg.values, bits_rule, i, j);
-    change_cxn(bg, cxns_rule, i, j);
 }
 
 pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cxns_rule: CxnsRule, rng: &mut impl Rng) {

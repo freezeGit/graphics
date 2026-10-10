@@ -11,8 +11,8 @@ mod app_internal; // internal functions that do not require application specific
 use crate::canvas::TheCanvas;
 use crate::ids::*;
 use crate::inits;
-//use crate::world::emerge::{BitArray, BitGraph};
-use crate::world::emerge::{BitGraph, CxnsRule};
+use crate::world::TheWorld;
+use crate::world::emerge::{BitGraph, BitsRule, CxnsRule};
 use egui::Context;
 #[allow(unused_imports)]
 use gui_lib::{
@@ -25,8 +25,6 @@ use num_format::Locale;
 use num_format::ToFormattedString;
 //use statrs::statistics::Statistics;
 //use std::fs;
-//use crate::world::{Rule, TheWorld};
-use crate::world::{BitsRule, TheWorld};
 
 /// Constants for simulation state choice. 1 = Run, 2 = Pause, 3 = Fast-forward.
 const CHOICE_RUN: i32 = 1;
@@ -127,7 +125,7 @@ impl TheApp {
                     DLG_ABOUT,
                     "About",
                     "Emergence. \n\
-                    Random bits rule",
+                    Random rules",
                 )));
             }
 

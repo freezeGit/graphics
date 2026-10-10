@@ -17,8 +17,8 @@ pub mod emerge;
 use crate::inits::{
     INITIAL_BITS_NUM, INITIAL_BITS_RULE, INITIAL_CXN_RULE, INITIAL_CXNS, INITIAL_ONES,
 };
-pub(crate) use crate::world::emerge::BitsRule;
-use crate::world::emerge::{step_bg, step_bg_rand, BitArray, BitGraph, CxnsRule};
+//pub(crate) use crate::world::emerge::BitsRule;
+use crate::world::emerge::{step_bg, BitArray, BitGraph, BitsRule, CxnsRule};
 use gui_lib::World;
 use rand::rngs::ThreadRng;
 use rand::{Rng, RngExt};
@@ -47,7 +47,6 @@ impl World for TheWorld {
         self.frame_number += 1;
         // Advance simulation by one step.
         step_bg(
-        //step_bg_rand(
             &mut self.bit_graph,
             self.bits_rule,
             self.cxns_rule,
