@@ -23,6 +23,7 @@ use gui_lib::{
 };
 use num_format::Locale;
 use num_format::ToFormattedString;
+use rand::RngExt;
 //use statrs::statistics::Statistics;
 //use std::fs;
 
@@ -162,6 +163,26 @@ impl TheApp {
                         "Enter simulation specs",
                         [
                             TextEntryField::new(
+                                "random_b",
+                                "Random Bits Rule",
+                                self.world.bits_rule.random().to_string(),
+                            ),
+                            TextEntryField::new(
+                                "percent_b",
+                                "Bits percent",
+                                self.world.bits_rule.number().to_string(),
+                            ),
+                            TextEntryField::new(
+                                "random_c",
+                                "Random Connectons Rule",
+                                self.world.bits_rule.number().to_string(),
+                            ),
+                            TextEntryField::new(
+                                "percent_c",
+                                "Connections percent",
+                                self.world.bits_rule.number().to_string(),
+                            ),
+                            TextEntryField::new(
                                 "b_rule",
                                 "Bits Rule (0 to 16)",
                                 self.world.bits_rule.number().to_string(),
@@ -253,6 +274,7 @@ impl TheApp {
                 self.sim_timer.pause();
 
                 let mut bad_val = false;
+                let mut b_rand = self.world.bits_rule.random();
                 let mut b_rule = self.world.bits_rule.number();
                 let mut c_rule = self.world.cxns_rule.number();
                 let mut bits = self.world.bit_graph.nodes();
@@ -262,6 +284,18 @@ impl TheApp {
                 for item in values {
                     let (item_id, text) = item;
                     match item_id.as_str() {
+                        "random_b" => match text.trim().parse::<bool>() {
+                            Ok(value) => {
+                                b_rand = value;
+                            }
+                            Err(e) => {
+                                bad_val = true;
+                                eprintln!("Failed to parse Random Bits Rule: {}.", e);
+                            }
+                        },
+                        "percent_b" => {}
+                        "random_c" => {}
+                        "percent_c" => {}
                         "b_rule" => match text.trim().parse::<u8>() {
                             Ok(number) if number < 17 => {
                                 b_rule = number;
@@ -349,7 +383,8 @@ impl TheApp {
                         "Bad value(s) entered.",
                     )));
                 } else {
-                    self.world.bits_rule = BitsRule::new(b_rule);
+                    //self.world.bits_rule = BitsRule::new(b_rule);
+                    self.world.bits_rule = BitsRule::new(b_rule, b_rand, 0.2);
                     self.world.cxns_rule = CxnsRule::new(c_rule);
                     self.world.bit_graph = BitGraph::new_with_random_values(
                         bits,

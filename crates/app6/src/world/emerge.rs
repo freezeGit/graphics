@@ -110,20 +110,30 @@ fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
     bits.set(j, new_b);
 }
 
+// #[derive(Debug, Clone, Copy)]
+// pub struct BitsRule {
+//     number: u8,
+//     flags: [bool; 4],
+// }
+
 #[derive(Debug, Clone, Copy)]
 pub struct BitsRule {
+    random: bool,
+    percent: f64,
     number: u8,
     flags: [bool; 4],
 }
 
 impl BitsRule {
-    pub fn new(number: u8) -> Self {
+    pub fn new(number: u8, random: bool, percent: f64) -> Self {
         assert!(
             number < 17,
             "Rule number must be less than 16, got {number}"
         );
 
         Self {
+            random,
+            percent,
             number,
             flags: [
                 Self::bit(number, 3), // (false, false)
@@ -132,6 +142,10 @@ impl BitsRule {
                 Self::bit(number, 0), // (true,  true)
             ],
         }
+    }
+
+    pub fn random(&self) -> bool {
+        self.random
     }
 
     pub fn number(&self) -> u8 {
@@ -323,34 +337,6 @@ fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize) {
             );
         }
     }
-
-// fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize) {
-//     match rule.number {
-//         // No change
-//         0 => {}
-//         // Toggle connection
-//         1 => {
-//             if bg.is_connected(i, j) {
-//                 bg.set_connected(i, j, false);
-//             } else {
-//                 bg.set_connected(i, j, true);
-//             }
-//         }
-//         // Connect
-//         2 => {
-//             bg.set_connected(i, j, true);
-//         }
-//         // Disconnect
-//         3 => {
-//             bg.set_connected(i, j, false);
-//         }
-//         _ => {
-//             panic!(
-//                 "Connections Rule number must be less than 4, got {}",
-//                 rule.number
-//             );
-//         }
-//     }
 }
 
 pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cxns_rule: CxnsRule, rng: &mut impl Rng) {
