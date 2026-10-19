@@ -15,21 +15,24 @@ pub mod emerge;
 //     INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
 // };
 use crate::inits::{
-    INITIAL_BITS_NUM, INITIAL_BITS_RULE, INITIAL_BITS_RULE_RANDOM, INITIAL_CXN_RULE, INITIAL_CXNS,
+    INITIAL_BITS_NUM, INITIAL_BITS_RULE, INITIAL_BITS_RULE_RANDOM, INITIAL_BITS_RULE_PROBABILITY, INITIAL_CXN_RULE, INITIAL_CXNS,
     INITIAL_ONES,
 };
 //pub(crate) use crate::world::emerge::BitsRule;
 use crate::world::emerge::{BitArray, BitGraph, BitsRule, CxnsRule, step_bg};
 use gui_lib::World;
-use rand::rngs::ThreadRng;
-use rand::{Rng, RngExt};
+// use rand::rngs::ThreadRng;  // If ThreadRng wanted
+// use rand::{Rng, RngExt};  // If ThreadRng wanted
+use rand::rngs::SmallRng;
+use rand::SeedableRng;
 
 /// TheWorld struct encapsulates application data and logic.
 /// It has no dependence on gui_lib and no dependence on egui.
 /// It has no dependence on the app1 struct or the canvas struct.
 
 pub struct TheWorld {
-    pub rng: ThreadRng,
+    //pub rng: ThreadRng,
+    pub rng: SmallRng,
     pub bit_graph: BitGraph,
     pub bits_rule: BitsRule,
     pub cxns_rule: CxnsRule,
@@ -59,10 +62,11 @@ impl World for TheWorld {
 impl TheWorld {
     pub fn new() -> Self {
         Self {
-            rng: rand::rng(),
+            rng: SmallRng::from_rng(&mut rand::rng()),
+            //rng: SmallRng::seed_from_u64(12345),  // reproducable
             bit_graph: BitGraph::new(INITIAL_BITS_NUM),
             // bits_rule: BitsRule::new(INITIAL_BITS_RULE),
-            bits_rule: BitsRule::new(INITIAL_BITS_RULE, INITIAL_BITS_RULE_RANDOM, 0.3),
+            bits_rule: BitsRule::new(INITIAL_BITS_RULE, INITIAL_BITS_RULE_RANDOM, INITIAL_BITS_RULE_PROBABILITY),
             cxns_rule: CxnsRule::new(INITIAL_CXN_RULE),
             start_ones: INITIAL_ONES,
             start_cxns: INITIAL_CXNS,

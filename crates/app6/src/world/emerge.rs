@@ -95,7 +95,22 @@ impl BitArray {
     }
 } // end of BitArray
 
-fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
+// fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
+//     if i == j {
+//         return;
+//     }
+//
+//     let a = bits.get(i);
+//     let b = bits.get(j);
+//
+//     // Symmetrical application of the rule.
+//     let (new_a, new_b) = rule.apply(a, b);
+//
+//     bits.set(i, new_a);
+//     bits.set(j, new_b);
+// }
+
+fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize, rng: &mut impl Rng) {
     if i == j {
         return;
     }
@@ -104,28 +119,21 @@ fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
     let b = bits.get(j);
 
     // Symmetrical application of the rule.
-    let (new_a, new_b) = rule.apply(a, b);
+    let (new_a, new_b) = rule.apply(a, b, rng);
 
     bits.set(i, new_a);
     bits.set(j, new_b);
 }
-
-// #[derive(Debug, Clone, Copy)]
-// pub struct BitsRule {
-//     number: u8,
-//     flags: [bool; 4],
-// }
-
 #[derive(Debug, Clone, Copy)]
 pub struct BitsRule {
     random: bool,
-    percent: f64,
+    probability: f64,
     number: u8,
     flags: [bool; 4],
 }
 
 impl BitsRule {
-    pub fn new(number: u8, random: bool, percent: f64) -> Self {
+    pub fn new(number: u8, random: bool, probability: f64) -> Self {
         assert!(
             number < 16,
             "Rule number must be less than 16, got {number}"
@@ -133,7 +141,7 @@ impl BitsRule {
 
         Self {
             random,
-            percent,
+            probability,
             number,
             flags: [
                 Self::bit(number, 3), // (false, false)
@@ -148,6 +156,10 @@ impl BitsRule {
         self.random
     }
 
+    pub fn probability(&self) -> f64 {
+        self.probability
+    }
+
     pub fn number(&self) -> u8 {
         self.number
     }
@@ -156,17 +168,39 @@ impl BitsRule {
         ((n >> i) & 1) != 0
     }
 
-    fn response(self, this: bool, other: bool) -> bool {
-        // If random use random rule
+    // fn response(self, this: bool, other: bool) -> bool {
+    //     // If random use random rule
+    //     if self.random {
+    //         rand::random()
+    //     }
+    //     // Otherwise use numbered rule
+    //     //
+    //     // The two bits are equal
+    //     else if this == other {
+    //         if this { self.flags[0] } else { self.flags[1] }
+    //     // The two bits are different
+    //     } else if this {
+    //         self.flags[2]
+    //     } else {
+    //         self.flags[3]
+    //     }
+    // }
+
+    fn response(
+        &self,
+        this: bool,
+        other: bool,
+        rng: &mut impl Rng,
+    ) -> bool {
         if self.random {
-            rand::random()
-        }
-        // Otherwise use numbered rule
-        //
-        // The two bits are equal
-        else if this == other {
-            if this { self.flags[0] } else { self.flags[1] }
-        // The two bits are different
+            //rng.random()
+            rng.random_bool(self.probability)
+        } else if this == other {
+            if this {
+                self.flags[0]
+            } else {
+                self.flags[1]
+            }
         } else if this {
             self.flags[2]
         } else {
@@ -174,9 +208,9 @@ impl BitsRule {
         }
     }
 
-    fn apply(self, a: bool, b: bool) -> (bool, bool) {
+    fn apply(self, a: bool, b: bool, rng: &mut impl Rng) -> (bool, bool) {
         // symmetrically reversible rule
-        (self.response(a, b), self.response(b, a))
+        (self.response(a, b, rng), self.response(b, a, rng))
     }
 } // end of impl BitsRule
 
@@ -351,7 +385,7 @@ pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cxns_rule: CxnsRule, rng:
         return;
     }
 
-    interact_bits(&mut bg.values, bits_rule, i, j);
+    interact_bits(&mut bg.values, bits_rule, i, j, rng);
     change_cxn(bg, cxns_rule, i, j);
 }
 

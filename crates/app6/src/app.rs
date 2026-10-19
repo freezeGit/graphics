@@ -168,9 +168,9 @@ impl TheApp {
                                 self.world.bits_rule.random().to_string(),
                             ),
                             TextEntryField::new(
-                                "percent_b",
-                                "Bits percent",
-                                self.world.bits_rule.number().to_string(),
+                                "probability_b",
+                                "Bits probability",
+                                self.world.bits_rule.probability().to_string(),
                             ),
                             TextEntryField::new(
                                 "random_c",
@@ -178,8 +178,8 @@ impl TheApp {
                                 self.world.bits_rule.number().to_string(),
                             ),
                             TextEntryField::new(
-                                "percent_c",
-                                "Connections percent",
+                                "probability_c",
+                                "Connections probability",
                                 self.world.bits_rule.number().to_string(),
                             ),
                             TextEntryField::new(
@@ -275,6 +275,7 @@ impl TheApp {
 
                 let mut bad_val = false;
                 let mut b_rand = self.world.bits_rule.random();
+                let mut b_prob = self.world.bits_rule.probability();
                 let mut b_rule = self.world.bits_rule.number();
                 let mut c_rule = self.world.cxns_rule.number();
                 let mut bits = self.world.bit_graph.nodes();
@@ -293,9 +294,24 @@ impl TheApp {
                                 eprintln!("Failed to parse Random Bits Rule: {}.", e);
                             }
                         },
-                        "percent_b" => {}
+                        "probability_b" => {
+                            match text.trim().parse::<f64>() {
+                                Ok(number) if number >= 0.0 && number <= 1.0 => {
+                                    b_prob = number;
+                                }
+                                Ok(number) => {
+                                   // b_prob = value;
+                                    bad_val = true;
+                                    eprintln!("Bits rule probability must be between 0.0 and 1.0, found: {}.", number);
+                                }
+                                Err(e) => {
+                                    bad_val = true;
+                                    eprintln!("Failed to parse Probability Bits Rule: {}.", e);
+                                }
+                            }
+                        }
                         "random_c" => {}
-                        "percent_c" => {}
+                        "probability_c" => {}
                         "b_rule" => match text.trim().parse::<u8>() {
                             Ok(number) if number < 16 => {
                                 b_rule = number;
@@ -384,7 +400,7 @@ impl TheApp {
                     )));
                 } else {
                     //self.world.bits_rule = BitsRule::new(b_rule);
-                    self.world.bits_rule = BitsRule::new(b_rule, b_rand, 0.2);
+                    self.world.bits_rule = BitsRule::new(b_rule, b_rand, b_prob);
                     self.world.cxns_rule = CxnsRule::new(c_rule);
                     self.world.bit_graph = BitGraph::new_with_random_values(
                         bits,
