@@ -184,7 +184,7 @@ impl TheApp {
                             ),
                             TextEntryField::new(
                                 "b_rule",
-                                "Bits Rule (0 to 16)",
+                                "Bits Rule (0 to 15)",
                                 self.world.bits_rule.number().to_string(),
                             ),
                             TextEntryField::new(
@@ -297,13 +297,13 @@ impl TheApp {
                         "random_c" => {}
                         "percent_c" => {}
                         "b_rule" => match text.trim().parse::<u8>() {
-                            Ok(number) if number < 17 => {
+                            Ok(number) if number < 16 => {
                                 b_rule = number;
                             }
                             Ok(number) => {
                                 bad_val = true;
                                 eprintln!(
-                                    "Invalid rule number: {number}. Rule must be between 0 and 16."
+                                    "Invalid rule number: {number}. Rule must be between 0 and 15."
                                 );
                             }
                             Err(err) => {

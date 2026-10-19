@@ -127,7 +127,7 @@ pub struct BitsRule {
 impl BitsRule {
     pub fn new(number: u8, random: bool, percent: f64) -> Self {
         assert!(
-            number < 17,
+            number < 16,
             "Rule number must be less than 16, got {number}"
         );
 
@@ -157,10 +157,12 @@ impl BitsRule {
     }
 
     fn response(self, this: bool, other: bool) -> bool {
-        if self.number == 16 {
-            //println!("Rule 16");
+        // If random use random rule
+        if self.random {
             rand::random()
         }
+        // Otherwise use numbered rule
+        //
         // The two bits are equal
         else if this == other {
             if this { self.flags[0] } else { self.flags[1] }
