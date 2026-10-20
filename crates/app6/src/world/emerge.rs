@@ -95,21 +95,6 @@ impl BitArray {
     }
 } // end of BitArray
 
-// fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize) {
-//     if i == j {
-//         return;
-//     }
-//
-//     let a = bits.get(i);
-//     let b = bits.get(j);
-//
-//     // Symmetrical application of the rule.
-//     let (new_a, new_b) = rule.apply(a, b);
-//
-//     bits.set(i, new_a);
-//     bits.set(j, new_b);
-// }
-
 fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize, rng: &mut impl Rng) {
     if i == j {
         return;
@@ -168,39 +153,12 @@ impl BitsRule {
         ((n >> i) & 1) != 0
     }
 
-    // fn response(self, this: bool, other: bool) -> bool {
-    //     // If random use random rule
-    //     if self.random {
-    //         rand::random()
-    //     }
-    //     // Otherwise use numbered rule
-    //     //
-    //     // The two bits are equal
-    //     else if this == other {
-    //         if this { self.flags[0] } else { self.flags[1] }
-    //     // The two bits are different
-    //     } else if this {
-    //         self.flags[2]
-    //     } else {
-    //         self.flags[3]
-    //     }
-    // }
-
-    fn response(
-        &self,
-        this: bool,
-        other: bool,
-        rng: &mut impl Rng,
-    ) -> bool {
+    fn response(&self, this: bool, other: bool, rng: &mut impl Rng) -> bool {
         if self.random {
             //rng.random()
             rng.random_bool(self.probability)
         } else if this == other {
-            if this {
-                self.flags[0]
-            } else {
-                self.flags[1]
-            }
+            if this { self.flags[0] } else { self.flags[1] }
         } else if this {
             self.flags[2]
         } else {
@@ -342,35 +300,36 @@ impl BitGraph {
     }
 } // end Impl BitGraph
 
-fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize) {
-    match rule.number {
-        // No change
-        0 => {}
-        // Toggle connection
-        1 => {
-            if bg.is_connected(i, j) {
-                bg.set_connected(i, j, false);
-            } else {
+fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize, rng: &mut impl Rng) {
+    if rule.random() {
+        let connected = rng.random_bool(rule.probability());
+        bg.set_connected(i, j, connected);
+    } else {
+        match rule.number() {
+            // No change
+            0 => {}
+            // Toggle connection
+            1 => {
+                if bg.is_connected(i, j) {
+                    bg.set_connected(i, j, false);
+                } else {
+                    bg.set_connected(i, j, true);
+                }
+            }
+            // Connect
+            2 => {
                 bg.set_connected(i, j, true);
             }
-        }
-        // Connect
-        2 => {
-            bg.set_connected(i, j, true);
-        }
-        // Disconnect
-        3 => {
-            bg.set_connected(i, j, false);
-        }
-        4 => {
-            let connected = rand::random();
-            bg.set_connected(i, j, connected);
-        }
-        _ => {
-            panic!(
-                "Connections Rule number must be less than 4, got {}",
-                rule.number
-            );
+            // Disconnect
+            3 => {
+                bg.set_connected(i, j, false);
+            }
+            _ => {
+                panic!(
+                    "Connections Rule number must be less than 4, got {}",
+                    rule.number()
+                );
+            }
         }
     }
 }
@@ -386,27 +345,41 @@ pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cxns_rule: CxnsRule, rng:
     }
 
     interact_bits(&mut bg.values, bits_rule, i, j, rng);
-    change_cxn(bg, cxns_rule, i, j);
+    change_cxn(bg, cxns_rule, i, j, rng);
 }
 
 #[derive(Debug, Clone, Copy)]
 pub struct CxnsRule {
+    random: bool,
+    probability: f64,
     number: u8,
 }
 
 impl CxnsRule {
-    pub fn new(number: u8) -> Self {
+    pub fn new(number: u8, random: bool, probability: f64) -> Self {
         assert!(
-            //number < 4,
-            number < 5,
-            "Connections Rule number must be less than 5, got {number}"
+            number < 4,
+            //number < 5,
+            "Connections Rule number must be less than 4, got {number}"
         );
 
-        Self { number }
+        Self {
+            random,
+            probability,
+            number,
+        }
     }
 
     pub fn number(&self) -> u8 {
         self.number
+    }
+
+    pub fn random(&self) -> bool {
+        self.random
+    }
+
+    pub fn probability(&self) -> f64 {
+        self.probability
     }
 }
 

@@ -15,7 +15,8 @@ pub mod emerge;
 //     INITIAL_SEQ_DISCARD, INITIAL_SEQ_LENGTH,
 // };
 use crate::inits::{
-    INITIAL_BITS_NUM, INITIAL_BITS_RULE, INITIAL_BITS_RULE_RANDOM, INITIAL_BITS_RULE_PROBABILITY, INITIAL_CXN_RULE, INITIAL_CXNS,
+    INITIAL_BITS_NUM, INITIAL_BITS_RULE, INITIAL_BITS_RULE_PROBABILITY, INITIAL_BITS_RULE_RANDOM,
+    INITIAL_CXN_RULE, INITIAL_CXN_RULE_PROBABILITY, INITIAL_CXN_RULE_RANDOM, INITIAL_CXNS,
     INITIAL_ONES,
 };
 //pub(crate) use crate::world::emerge::BitsRule;
@@ -23,8 +24,8 @@ use crate::world::emerge::{BitArray, BitGraph, BitsRule, CxnsRule, step_bg};
 use gui_lib::World;
 // use rand::rngs::ThreadRng;  // If ThreadRng wanted
 // use rand::{Rng, RngExt};  // If ThreadRng wanted
-use rand::rngs::SmallRng;
 use rand::SeedableRng;
+use rand::rngs::SmallRng;
 
 /// TheWorld struct encapsulates application data and logic.
 /// It has no dependence on gui_lib and no dependence on egui.
@@ -66,8 +67,16 @@ impl TheWorld {
             //rng: SmallRng::seed_from_u64(12345),  // reproducable
             bit_graph: BitGraph::new(INITIAL_BITS_NUM),
             // bits_rule: BitsRule::new(INITIAL_BITS_RULE),
-            bits_rule: BitsRule::new(INITIAL_BITS_RULE, INITIAL_BITS_RULE_RANDOM, INITIAL_BITS_RULE_PROBABILITY),
-            cxns_rule: CxnsRule::new(INITIAL_CXN_RULE),
+            bits_rule: BitsRule::new(
+                INITIAL_BITS_RULE,
+                INITIAL_BITS_RULE_RANDOM,
+                INITIAL_BITS_RULE_PROBABILITY,
+            ),
+            cxns_rule: CxnsRule::new(
+                INITIAL_CXN_RULE,
+                INITIAL_CXN_RULE_RANDOM,
+                INITIAL_CXN_RULE_PROBABILITY,
+            ),
             start_ones: INITIAL_ONES,
             start_cxns: INITIAL_CXNS,
             frame_number: 0,

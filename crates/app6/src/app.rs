@@ -175,12 +175,12 @@ impl TheApp {
                             TextEntryField::new(
                                 "random_c",
                                 "Random Connectons Rule",
-                                self.world.bits_rule.number().to_string(),
+                                self.world.cxns_rule.random().to_string(),
                             ),
                             TextEntryField::new(
                                 "probability_c",
                                 "Connections probability",
-                                self.world.bits_rule.number().to_string(),
+                                self.world.cxns_rule.probability().to_string(),
                             ),
                             TextEntryField::new(
                                 "b_rule",
@@ -273,10 +273,21 @@ impl TheApp {
             DLG_ENTER_SPECS => {
                 self.sim_timer.pause();
 
+                // let mut bad_val = false;
+                // let mut b_rand = self.world.bits_rule.random();
+                // let mut b_prob = self.world.bits_rule.probability();
+                // let mut b_rule = self.world.bits_rule.number();
+                // let mut c_rule = self.world.cxns_rule.number();
+                // let mut bits = self.world.bit_graph.nodes();
+                // let mut strt_ones = self.world.start_ones;
+                // let mut strt_cxns = self.world.start_cxns;
+
                 let mut bad_val = false;
                 let mut b_rand = self.world.bits_rule.random();
                 let mut b_prob = self.world.bits_rule.probability();
                 let mut b_rule = self.world.bits_rule.number();
+                let mut c_rand = self.world.cxns_rule.random();
+                let mut c_prob = self.world.cxns_rule.probability();
                 let mut c_rule = self.world.cxns_rule.number();
                 let mut bits = self.world.bit_graph.nodes();
                 let mut strt_ones = self.world.start_ones;
@@ -300,9 +311,12 @@ impl TheApp {
                                     b_prob = number;
                                 }
                                 Ok(number) => {
-                                   // b_prob = value;
+                                    // b_prob = value;
                                     bad_val = true;
-                                    eprintln!("Bits rule probability must be between 0.0 and 1.0, found: {}.", number);
+                                    eprintln!(
+                                        "Bits rule probability must be between 0.0 and 1.0, found: {}.",
+                                        number
+                                    );
                                 }
                                 Err(e) => {
                                     bad_val = true;
@@ -310,8 +324,31 @@ impl TheApp {
                                 }
                             }
                         }
-                        "random_c" => {}
-                        "probability_c" => {}
+                        "random_c" => match text.trim().parse::<bool>() {
+                            Ok(value) => {
+                                c_rand = value;
+                            }
+                            Err(e) => {
+                                bad_val = true;
+                                eprintln!("Failed to parse Random Connections Rule: {}.", e);
+                            }
+                        },
+                        "probability_c" => match text.trim().parse::<f64>() {
+                            Ok(number) if number >= 0.0 && number <= 1.0 => {
+                                c_prob = number;
+                            }
+                            Ok(number) => {
+                                bad_val = true;
+                                eprintln!(
+                                    "Connections rule probability must be between 0.0 and 1.0, found: {}.",
+                                    number
+                                );
+                            }
+                            Err(e) => {
+                                bad_val = true;
+                                eprintln!("Failed to parse Probability Connections Rule: {}.", e);
+                            }
+                        },
                         "b_rule" => match text.trim().parse::<u8>() {
                             Ok(number) if number < 16 => {
                                 b_rule = number;
@@ -399,9 +436,8 @@ impl TheApp {
                         "Bad value(s) entered.",
                     )));
                 } else {
-                    //self.world.bits_rule = BitsRule::new(b_rule);
                     self.world.bits_rule = BitsRule::new(b_rule, b_rand, b_prob);
-                    self.world.cxns_rule = CxnsRule::new(c_rule);
+                    self.world.cxns_rule = CxnsRule::new(c_rule, c_rand, c_prob);
                     self.world.bit_graph = BitGraph::new_with_random_values(
                         bits,
                         strt_ones,
