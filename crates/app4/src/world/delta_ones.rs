@@ -1,7 +1,9 @@
-use crate::world::Rule;
+//use crate::world::Rule;
+use crate::world::emerge::{BitGraph, BitsRule, CxnsRule};
 use crate::world::emerge::BitArray;
-use crate::world::step_bits;
-use crate::world::step_bits_rand;
+//use crate::world::step_bits;
+use crate::world::step_bg;
+//use crate::world::step_bits_rand;
 use rand::Rng;
 use statrs::statistics::Statistics;
 
@@ -14,11 +16,11 @@ pub struct Deltas {
 }
 
 impl Deltas {
-    pub fn new(rule: Rule, sample: u32, rng: &mut impl Rng) -> Self {
-        //let mut deltas = Vec::<DeltaOnes>::with_capacity(251);
+    pub fn new(rule: BitsRule, sample: u32, rng: &mut impl Rng) -> Self {
+        assert!(DELTAS_VALS == SIM_BITS / 24);
         let mut deltas = Vec::<DeltaOnes>::with_capacity(DELTAS_VALS + 1);
         for i in (0..=SIM_BITS).step_by(24) {
-            deltas.push(DeltaOnes::new(rule, i, sample, rng));
+            deltas.push(DeltaOnes::new(rule, i, sample, rng)); //TDXX
         }
 
         Self { deltas }
@@ -43,16 +45,18 @@ pub struct DeltaOnes {
 }
 
 impl DeltaOnes {
-    fn new(rule: Rule, ones: usize, sample: u32, rng: &mut impl Rng) -> Self {
+    fn new(rule: BitsRule, ones: usize, sample: u32, rng: &mut impl Rng) -> Self {
         assert!(ones <= SIM_BITS);
         assert!(sample > 0);
 
         let mut samples: Vec<f64> = Vec::with_capacity(sample as usize);
         for _ in 0..sample {
-            let mut bits: BitArray = BitArray::new_with_random_ones(SIM_BITS, ones, rng);
+            //let mut bits_graph: BitGraph = BitGraph::new_with_random_ones(SIM_BITS, ones, rng);
+            let mut bits_graph: BitGraph = BitGraph::new_with_random_values(SIM_BITS, ones, 0, rng);
             //step_bits(&mut bits, rule, rng);
-            step_bits_rand(&mut bits, rule, rng);
-            let new_ones = bits.ones_count();
+            //step_bits_rand(&mut bits, rule, rng);
+            step_bg(&mut bits_graph, rule, CxnsRule::new(1,true, 0.6), rng); //TDX
+            let new_ones = bits_graph.calc_ones_count();
             let delta = new_ones as i32 - ones as i32;
             samples.push(delta as f64);
         }
@@ -68,7 +72,7 @@ impl DeltaOnes {
 
         Self { mean, sem }
     }
-
+    
     pub fn mean(&self) -> f64 {
         self.mean
     }

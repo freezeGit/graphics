@@ -124,7 +124,7 @@ impl TheCanvas {
         self.view_handles
             .stxt_rule
             .borrow_mut()
-            .set_text(format!("Rule: {}", world.rule.number()));
+            .set_text(format!("Rule: {}", world.bits_rule.number()));
 
         self.view_handles
             .stxt_sample_size

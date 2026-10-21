@@ -1,6 +1,6 @@
 use rand::seq::SliceRandom;
 use rand::{Rng, RngExt};
-#[derive(Debug)]
+
 pub struct BitArray {
     words: Vec<u64>,
     len: usize,
@@ -83,37 +83,19 @@ impl BitArray {
         }
     }
 
-    pub fn ones_count(&self) -> usize {
+    pub fn calc_ones_count(&self) -> usize {
         self.words
             .iter()
             .map(|word| word.count_ones() as usize)
             .sum()
     }
 
-    pub fn ones_fraction(&self) -> f64 {
-        self.ones_count() as f64 / self.len() as f64
+    pub fn calc_ones_fraction(&self) -> f64 {
+        self.calc_ones_count() as f64 / self.len() as f64
     }
 } // end of BitArray
 
-pub fn step_bits_rand(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
-    let n = bits.len();
-
-    let i = rng.random_range(0..n);
-    let j = rng.random_range(0..n);
-
-    interact_rand(bits, rule, i, j);
-}
-
-pub fn step_bits(bits: &mut BitArray, rule: Rule, rng: &mut impl Rng) {
-    let n = bits.len();
-
-    let i = rng.random_range(0..n);
-    let j = rng.random_range(0..n);
-
-    interact(bits, rule, i, j);
-}
-
-fn interact_rand(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
+fn interact_bits(bits: &mut BitArray, rule: BitsRule, i: usize, j: usize, rng: &mut impl Rng) {
     if i == j {
         return;
     }
@@ -122,44 +104,29 @@ fn interact_rand(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
     let b = bits.get(j);
 
     // Symmetrical application of the rule.
-    let (new_a, new_b) = rule.apply_rand(a, b);
+    let (new_a, new_b) = rule.apply(a, b, rng);
 
     bits.set(i, new_a);
     bits.set(j, new_b);
 }
-
-fn interact(bits: &mut BitArray, rule: Rule, i: usize, j: usize) {
-    if i == j {
-        return;
-    }
-
-    let a = bits.get(i);
-    let b = bits.get(j);
-
-    // Symmetrical application of the rule.
-    let (new_a, new_b) = rule.apply(a, b);
-
-    bits.set(i, new_a);
-    bits.set(j, new_b);
-}
-
 #[derive(Debug, Clone, Copy)]
-pub struct Rule {
+pub struct BitsRule {
+    random: bool,
+    probability: f64,
     number: u8,
     flags: [bool; 4],
 }
 
-// #[derive(Debug, Clone, Copy)]
-// pub(crate) struct Rule(bool, bool, bool, bool);
-
-impl Rule {
-    pub fn new(number: u8) -> Self {
+impl BitsRule {
+    pub fn new(number: u8, random: bool, probability: f64) -> Self {
         assert!(
             number < 16,
             "Rule number must be less than 16, got {number}"
         );
 
         Self {
+            random,
+            probability,
             number,
             flags: [
                 Self::bit(number, 3), // (false, false)
@@ -170,6 +137,14 @@ impl Rule {
         }
     }
 
+    pub fn random(&self) -> bool {
+        self.random
+    }
+
+    pub fn probability(&self) -> f64 {
+        self.probability
+    }
+
     pub fn number(&self) -> u8 {
         self.number
     }
@@ -178,16 +153,12 @@ impl Rule {
         ((n >> i) & 1) != 0
     }
 
-    fn response_rand(self, this: bool, other: bool) -> bool {
-        rand::random()
-        //true
-    }
-
-    fn response(self, this: bool, other: bool) -> bool {
-        // The two bits are equal
-        if this == other {
+    fn response(&self, this: bool, other: bool, rng: &mut impl Rng) -> bool {
+        if self.random {
+            //rng.random()
+            rng.random_bool(self.probability)
+        } else if this == other {
             if this { self.flags[0] } else { self.flags[1] }
-        // The two bits are different
         } else if this {
             self.flags[2]
         } else {
@@ -195,38 +166,222 @@ impl Rule {
         }
     }
 
-    fn apply_rand(self, a: bool, b: bool) -> (bool, bool) {
+    fn apply(self, a: bool, b: bool, rng: &mut impl Rng) -> (bool, bool) {
         // symmetrically reversible rule
-        (self.response_rand(a, b), self.response_rand(b, a))
+        (self.response(a, b, rng), self.response(b, a, rng))
     }
+} // end of impl BitsRule
 
-    fn apply(self, a: bool, b: bool) -> (bool, bool) {
-        // symmetrically reversible rule
-        (self.response(a, b), self.response(b, a))
-    }
-}
-#[derive(Debug)]
-pub struct Seq {
-    pub discard: usize,
-    pub seq: Vec<i32>,
+pub struct BitGraph {
+    pub values: BitArray,
+    pub connections: BitArray,
 }
 
-impl Seq {
-    //pub fn new(discard: usize, length: usize) -> Self {
-    pub fn new(discard: usize) -> Self {
+impl BitGraph {
+    // TDJ: May want to add a new() function to initialize a graph with an initial number of nodes
+    pub fn new(nodes: usize) -> Self {
+        assert!(nodes >= 2);
+
         Self {
-            discard,
-            //length,
-            seq: Vec::new(),
+            values: BitArray::new(nodes),
+            connections: BitArray::new(nodes * nodes),
         }
     }
 
-    pub fn push(&mut self, val: i32) {
-        self.seq.push(val);
+    pub fn new_with_random_values(
+        nodes: usize,
+        initial_ones: usize,
+        initial_cxns: usize,
+        rng: &mut impl Rng,
+    ) -> Self {
+        let possible_cxns = BitGraph::possible_cxns(nodes);
+
+        assert!(nodes >= 2, "BitGraph nodes must be at least 2, got {nodes}");
+        assert!(
+            initial_ones <= nodes,
+            "Initial ones cannot exceed total number of nodes"
+        );
+        assert!(
+            initial_cxns <= possible_cxns,
+            "Initial connections cannot exceed number of possible connections"
+        );
+
+        // Create a BitGraph with all nodes and edges initialized to 0
+        let mut grph = Self::new(nodes);
+
+        // Randomly choose nodes that will initially contain one.
+        let mut indices: Vec<usize> = (0..nodes).collect();
+        indices.shuffle(rng);
+
+        for &i in &indices[..initial_ones] {
+            grph.set_node(i, true);
+        }
+
+        // Randomly choose edges that will initially be connected.
+        //
+        // Make a list of all possible undirected connections. // TDXX
+        // let mut edges = Vec::with_capacity(possible_cxns);
+        //
+        // for i in 0..nodes {
+        //     for j in (i + 1)..nodes {
+        //         edges.push((i, j));
+        //     }
+        // }
+        //
+        // // Randomly choose the required number.
+        // edges.shuffle(rng);
+        //
+        // for &(i, j) in &edges[..initial_cxns] {
+        //     grph.set_connected(i, j, true);
+        // }
+
+
+
+        grph
     }
 
-    pub fn len(&self) -> usize {
-        self.seq.len()
+    pub fn nodes(&self) -> usize {
+        self.values.len()
+    }
+
+    pub const fn possible_cxns(nodes: usize) -> usize {
+        nodes * (nodes - 1) / 2
+    }
+
+    pub fn get_node(&self, i: usize) -> bool {
+        debug_assert!(i < self.nodes());
+
+        let word_index = i / 64;
+        let bit_index = i % 64;
+
+        (self.values.words[word_index] & (1u64 << bit_index)) != 0
+    }
+
+    pub fn set_node(&mut self, i: usize, value: bool) {
+        debug_assert!(i < self.nodes());
+
+        let word_index = i / 64;
+        let bit_index = i % 64;
+        let mask = 1u64 << bit_index;
+
+        if value {
+            //self.words[word_index] |= mask;
+            self.values.words[word_index] |= mask;
+        } else {
+            //self.words[word_index] &= !mask;
+            self.values.words[word_index] &= !mask;
+        }
+    }
+
+    pub fn calc_ones_count(&self) -> usize {
+        self.values.calc_ones_count()
+    }
+
+    pub fn calc_cxns_count(&self) -> usize {
+        // TDJ: ? count only first half
+        self.connections.calc_ones_count() / 2
+    }
+
+    fn node_index(&self, a: usize, b: usize) -> usize {
+        a * self.nodes() + b
+    }
+
+    fn is_connected(&self, a: usize, b: usize) -> bool {
+        assert!(a != b, "A node cannot be connected to itself");
+        self.connections.get(self.node_index(a, b))
+    }
+
+    fn set_connected(&mut self, a: usize, b: usize, connected: bool) {
+        assert!(a != b, "A node cannot be connected to itself");
+
+        let ab = a * self.nodes() + b;
+        let ba = b * self.nodes() + a;
+
+        self.connections.set(ab, connected);
+        self.connections.set(ba, connected);
+    }
+} // end Impl BitGraph
+
+fn change_cxn(bg: &mut BitGraph, rule: CxnsRule, i: usize, j: usize, rng: &mut impl Rng) {
+    if rule.random() {
+        let connected = rng.random_bool(rule.probability());
+        bg.set_connected(i, j, connected);
+    } else {
+        match rule.number() {
+            // No change
+            0 => {}
+            // Toggle connection
+            1 => {
+                if bg.is_connected(i, j) {
+                    bg.set_connected(i, j, false);
+                } else {
+                    bg.set_connected(i, j, true);
+                }
+            }
+            // Connect
+            2 => {
+                bg.set_connected(i, j, true);
+            }
+            // Disconnect
+            3 => {
+                bg.set_connected(i, j, false);
+            }
+            _ => {
+                panic!(
+                    "Connections Rule number must be less than 4, got {}",
+                    rule.number()
+                );
+            }
+        }
+    }
+}
+
+pub fn step_bg(bg: &mut BitGraph, bits_rule: BitsRule, cxns_rule: CxnsRule, rng: &mut impl Rng) {
+    let n = bg.nodes();
+
+    let i = rng.random_range(0..n);
+    let j = rng.random_range(0..n);
+
+    if i == j {
+        return;
+    }
+
+    interact_bits(&mut bg.values, bits_rule, i, j, rng);
+    change_cxn(bg, cxns_rule, i, j, rng);
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct CxnsRule {
+    random: bool,
+    probability: f64,
+    number: u8,
+}
+
+impl CxnsRule {
+    pub fn new(number: u8, random: bool, probability: f64) -> Self {
+        assert!(
+            number < 4,
+            //number < 5,
+            "Connections Rule number must be less than 4, got {number}"
+        );
+
+        Self {
+            random,
+            probability,
+            number,
+        }
+    }
+
+    pub fn number(&self) -> u8 {
+        self.number
+    }
+
+    pub fn random(&self) -> bool {
+        self.random
+    }
+
+    pub fn probability(&self) -> f64 {
+        self.probability
     }
 }
 

@@ -13,7 +13,9 @@ use crate::ids::*;
 use crate::inits;
 //use crate::world::delta_ones::Deltas;
 //use crate::world::emerge::BitArray;
-use crate::world::{Rule, TheWorld};
+//use crate::world::{Rule, TheWorld};
+use crate::world::TheWorld;
+use crate::world::emerge::{BitGraph, BitsRule, CxnsRule};
 use egui::Context;
 #[allow(unused_imports)]
 use gui_lib::{
@@ -120,9 +122,9 @@ impl TheApp {
                         "Enter rule and sample size:",
                         [
                             TextEntryField::new(
-                                "rule",
+                                "b_rule",
                                 "Rule (0 to 15)",
-                                self.world.rule.number().to_string(),
+                                self.world.bits_rule.number().to_string(),
                             ),
                             TextEntryField::new(
                                 "sample_size",
@@ -146,19 +148,16 @@ impl TheApp {
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
             DLG_ENTER_SPECS => {
-                let mut rule = 0;
+                let mut bits_rule = 0;
                 let mut sample_size = 0;
-
-                //self.sim_timer.pause();
-
                 let mut bad_val = false;
 
                 for item in values {
                     let (item_id, text) = item;
                     match item_id.as_str() {
-                        "rule" => match text.trim().parse::<u8>() {
+                        "b_rule" => match text.trim().parse::<u8>() {
                             Ok(number) if number < 16 => {
-                                rule = number;
+                                bits_rule = number;
                             }
                             Ok(number) => {
                                 bad_val = true;
@@ -199,11 +198,11 @@ impl TheApp {
                         "Bad value(s) entered.",
                     )));
                 } else {
-                    self.world.rule = Rule::new(rule);
+                    self.world.bits_rule = BitsRule::new(bits_rule, true, 0.5); //TDX
                     self.world.sample_size = sample_size;
 
                     // Update the deltas graph
-                    let deltas = self.world.recalc_deltas();
+                    let deltas = self.world.recalc_deltas(); //TDX
                     for i in 0..deltas.len() {
                         self.canvas
                             .view_handles
