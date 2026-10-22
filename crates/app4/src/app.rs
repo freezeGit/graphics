@@ -119,11 +119,21 @@ impl TheApp {
                     .canvas
                     .set_dialog(Box::new(MultiTextEntryDlg::new(
                         DLG_ENTER_SPECS,
-                        "Enter rule and sample size:",
+                        "Enter rule info and sample size:",
                         [
                             TextEntryField::new(
+                                "random_b",
+                                "Random Bits Rule",
+                                self.world.bits_rule.random().to_string(),
+                            ),
+                            TextEntryField::new(
+                                "probability_b",
+                                "Bits probability",
+                                self.world.bits_rule.probability().to_string(),
+                            ),
+                            TextEntryField::new(
                                 "b_rule",
-                                "Rule (0 to 15)",
+                                "Bits Rule (0 to 15)",
                                 self.world.bits_rule.number().to_string(),
                             ),
                             TextEntryField::new(
@@ -148,6 +158,8 @@ impl TheApp {
     fn handle_multi_text_entry(&mut self, id: MultiTextEntryDlgId, values: Vec<(String, String)>) {
         match id {
             DLG_ENTER_SPECS => {
+                let mut b_rand = self.world.bits_rule.random();
+                let mut b_prob = self.world.bits_rule.probability();
                 let mut bits_rule = 0;
                 let mut sample_size = 0;
                 let mut bad_val = false;
@@ -155,6 +167,34 @@ impl TheApp {
                 for item in values {
                     let (item_id, text) = item;
                     match item_id.as_str() {
+                        "random_b" => match text.trim().parse::<bool>() {
+                            Ok(value) => {
+                                b_rand = value;
+                            }
+                            Err(e) => {
+                                bad_val = true;
+                                eprintln!("Failed to parse Random Bits Rule: {}.", e);
+                            }
+                        },
+                        "probability_b" => {
+                            match text.trim().parse::<f64>() {
+                                Ok(number) if number >= 0.0 && number <= 1.0 => {
+                                    b_prob = number;
+                                }
+                                Ok(number) => {
+                                    // b_prob = value;
+                                    bad_val = true;
+                                    eprintln!(
+                                        "Bits rule probability must be between 0.0 and 1.0, found: {}.",
+                                        number
+                                    );
+                                }
+                                Err(e) => {
+                                    bad_val = true;
+                                    eprintln!("Failed to parse Probability Bits Rule: {}.", e);
+                                }
+                            }
+                        }
                         "b_rule" => match text.trim().parse::<u8>() {
                             Ok(number) if number < 16 => {
                                 bits_rule = number;
@@ -171,9 +211,6 @@ impl TheApp {
                             }
                         },
                         "sample_size" => match text.trim().parse::<u32>() {
-                            // Ok(number)  => {
-                            //     sample_size = number;
-                            //}
                             Ok(number) if number >= 1 => {
                                 sample_size = number;
                             }
@@ -198,7 +235,7 @@ impl TheApp {
                         "Bad value(s) entered.",
                     )));
                 } else {
-                    self.world.bits_rule = BitsRule::new(bits_rule, true, 0.5); //TDX
+                    self.world.bits_rule = BitsRule::new(bits_rule, b_rand, b_prob);
                     self.world.sample_size = sample_size;
 
                     // Update the deltas graph

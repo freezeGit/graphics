@@ -75,9 +75,15 @@ impl TheCanvas {
             Rc::new(RefCell::new(DeltaGraph::new(inits::DELTA_GRAPH_POSITION)));
         canvas.add_shape(dgr.clone());
 
+        let txt = if inits::INITIAL_BITS_RULE_RANDOM {
+            format!("{}R", inits::INITIAL_BITS_RULE_PROBABILITY)
+        } else {
+            inits::INITIAL_BITS_RULE.to_string()
+        };
         let stxt_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(200.0, 10.0),
-            format!("Rule: {}", inits::INITIAL_RULE),
+            //format!("Rule: {}", inits::INITIAL_RULE),
+            format!("Rule: {}", txt),
         )));
         canvas.add_shape(stxt_rule.clone()); // coercion to ShapeHandle happens automatically
 
@@ -120,11 +126,15 @@ impl TheCanvas {
     /// The world does not know about the canvas (nor about egui). This is important to keep the
     /// separation of concerns. Program data and logic is encapsulated in the [`TheWorld`] struct.
     pub fn update(&mut self, world: &mut TheWorld) {
-        // Set stxt_rule to display rule number
+        let txt = if world.bits_rule.random() {
+            format!("{}R", world.bits_rule.probability())
+        } else {
+            world.bits_rule.number().to_string()
+        };
         self.view_handles
             .stxt_rule
             .borrow_mut()
-            .set_text(format!("Rule: {}", world.bits_rule.number()));
+            .set_text(format!("Rule: {}", txt));
 
         self.view_handles
             .stxt_sample_size

@@ -124,15 +124,25 @@ impl TheCanvas {
         )));
         canvas.add_shape(stxt_cxns.clone());
 
+        let txt = if inits::INITIAL_BITS_RULE_RANDOM {
+            format!("{}R", inits::INITIAL_BITS_RULE_PROBABILITY)
+        } else {
+            inits::INITIAL_BITS_RULE.to_string()
+        };
         let stxt_bits_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
             egui::Pos2::new(10.0, 45.0),
-            format!("Bits Rule: {}", inits::INITIAL_BITS_RULE),
+            format!("Bits rule: {}", txt),
         )));
         canvas.add_shape(stxt_bits_rule.clone());
 
+        let txt = if inits::INITIAL_CXN_RULE_RANDOM {
+            format!("{}R", inits::INITIAL_CXN_RULE_PROBABILITY)
+        } else {
+            inits::INITIAL_CXN_RULE.to_string()
+        };
         let stxt_cxn_rule: Rc<RefCell<Text>> = Rc::new(RefCell::new(Text::new(
-            egui::Pos2::new(160.0, 45.0),
-            format!("Cxn Rule: {}", inits::INITIAL_CXN_RULE),
+            egui::Pos2::new(175.0, 45.0),
+            format!("Cxn rule: {}", txt),
         )));
         canvas.add_shape(stxt_cxn_rule.clone());
 
@@ -324,17 +334,28 @@ impl TheCanvas {
             actual_connections.to_formatted_string(&Locale::en)
         ));
 
-        // Set stxt_bits_rule to display rule number
+        // Set stxt_bits_rule rule to display rule
+        let txt = if world.bits_rule.random() {
+            format!("{}R", world.bits_rule.probability())
+        } else {
+            world.bits_rule.number().to_string()
+        };
         self.view_handles
             .stxt_bits_rule
             .borrow_mut()
-            .set_text(format!("Bits Rule: {}", world.bits_rule.number()));
+            .set_text(format!("Bits rule: {}", txt));
 
-        // Set stxt_cxns_rule rule to display rule number
+        // Set stxt_cxns_rule rule to display rule
+        let txt = if world.cxns_rule.random() {
+            format!("{}R", world.cxns_rule.probability())
+        } else {
+            world.bits_rule.number().to_string()
+        };
         self.view_handles
             .stxt_cxn_rule
             .borrow_mut()
-            .set_text(format!("Cxn Rule: {}", world.cxns_rule.number()));
+            //.set_text(format!("Cxn rule: {}", world.cxns_rule.number()));
+            .set_text(format!("Cxn rule: {}", txt));
 
         // Set stxt_frame to display interactionss number
         self.view_handles.stxt_frame.borrow_mut().set_text(format!(

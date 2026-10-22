@@ -217,9 +217,10 @@ impl BitGraph {
             grph.set_node(i, true);
         }
 
+        // TDJ: Ignore connections
         // Randomly choose edges that will initially be connected.
         //
-        // Make a list of all possible undirected connections. // TDXX
+        // Make a list of all possible undirected connections.
         // let mut edges = Vec::with_capacity(possible_cxns);
         //
         // for i in 0..nodes {
@@ -234,8 +235,6 @@ impl BitGraph {
         // for &(i, j) in &edges[..initial_cxns] {
         //     grph.set_connected(i, j, true);
         // }
-
-
 
         grph
     }

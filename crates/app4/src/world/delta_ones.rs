@@ -1,6 +1,6 @@
 //use crate::world::Rule;
-use crate::world::emerge::{BitGraph, BitsRule, CxnsRule};
 use crate::world::emerge::BitArray;
+use crate::world::emerge::{BitGraph, BitsRule, CxnsRule};
 //use crate::world::step_bits;
 use crate::world::step_bg;
 //use crate::world::step_bits_rand;
@@ -53,9 +53,7 @@ impl DeltaOnes {
         for _ in 0..sample {
             //let mut bits_graph: BitGraph = BitGraph::new_with_random_ones(SIM_BITS, ones, rng);
             let mut bits_graph: BitGraph = BitGraph::new_with_random_values(SIM_BITS, ones, 0, rng);
-            //step_bits(&mut bits, rule, rng);
-            //step_bits_rand(&mut bits, rule, rng);
-            step_bg(&mut bits_graph, rule, CxnsRule::new(1,true, 0.6), rng); //TDX
+            step_bg(&mut bits_graph, rule, CxnsRule::new(1, true, 0.6), rng); //TDX
             let new_ones = bits_graph.calc_ones_count();
             let delta = new_ones as i32 - ones as i32;
             samples.push(delta as f64);
@@ -72,7 +70,7 @@ impl DeltaOnes {
 
         Self { mean, sem }
     }
-    
+
     pub fn mean(&self) -> f64 {
         self.mean
     }

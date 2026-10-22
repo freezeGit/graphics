@@ -273,15 +273,6 @@ impl TheApp {
             DLG_ENTER_SPECS => {
                 self.sim_timer.pause();
 
-                // let mut bad_val = false;
-                // let mut b_rand = self.world.bits_rule.random();
-                // let mut b_prob = self.world.bits_rule.probability();
-                // let mut b_rule = self.world.bits_rule.number();
-                // let mut c_rule = self.world.cxns_rule.number();
-                // let mut bits = self.world.bit_graph.nodes();
-                // let mut strt_ones = self.world.start_ones;
-                // let mut strt_cxns = self.world.start_cxns;
-
                 let mut bad_val = false;
                 let mut b_rand = self.world.bits_rule.random();
                 let mut b_prob = self.world.bits_rule.probability();
