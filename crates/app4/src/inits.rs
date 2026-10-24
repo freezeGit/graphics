@@ -35,10 +35,10 @@ pub const BATCH_SIZE: u32 = 100;
 pub const SMOOTH_ANIMATION: bool = false;
 
 // ------ User customized simulation initialization constants --------
-pub const INITIAL_BITS_RULE_RANDOM: bool = true;
+pub const INITIAL_BITS_RULE_RANDOM: bool = false;
 pub const INITIAL_BITS_RULE_PROBABILITY: f64 = 0.5;
 pub const INITIAL_BITS_RULE: u8 = 5; // must be 0 to 15 inclusive
-// pub const INITIAL_CXN_RULE_RANDOM: bool = true;
+// pub const INITIAL_CXN_RULE_RANDOM: bool = false;
 // pub const INITIAL_CXN_RULE_PROBABILITY: f64 = 0.5;
 // pub const INITIAL_CXN_RULE: u8 = 1; // must be 0 to 3 inclusive
 // pub const INITIAL_BITS_NUM: usize = 6000; // 6000 to exactly fill a 100 * 60 grid.

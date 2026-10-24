@@ -19,9 +19,9 @@ pub mod emerge;
 use crate::inits::{
     INITIAL_BITS_RULE, INITIAL_BITS_RULE_PROBABILITY, INITIAL_BITS_RULE_RANDOM, INITIAL_SAMPLE_SIZE,
 };
+use crate::world::delta_ones::Deltas;
 use crate::world::emerge::{BitsRule, step_bg};
 use gui_lib::World;
-use crate::world::delta_ones::Deltas;
 use rand::SeedableRng;
 use rand::rngs::SmallRng;
 
